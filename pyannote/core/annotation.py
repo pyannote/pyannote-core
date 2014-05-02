@@ -451,10 +451,17 @@ class Annotation(object):
 
     # label = annotation[segment, track]
     def __getitem__(self, key):
+
+        if isinstance(key, Segment):
+            key = (key, '_')
+
         return self._tracks[key[0]][key[1]]
 
     # annotation[segment, track] = label
     def __setitem__(self, key, label):
+
+        if isinstance(key, Segment):
+            key = (key, '_')
 
         if key[0] not in self._tracks:
             self._tracks[key[0]] = {}
