@@ -25,8 +25,11 @@
 
 from IPython.core.pylabtools import print_figure
 import matplotlib.pyplot as plt
+from matplotlib.cm import get_cmap
 import itertools
+import codecs
 import numpy as np
+
 
 from segment import Segment
 
@@ -37,6 +40,8 @@ class Notebook:
 
 _notebook = Notebook()
 _notebook.extent = None
+_DEFAULT_NOTEBOOK_WIDTH = 10
+_notebook.width = _DEFAULT_NOTEBOOK_WIDTH
 
 def set_notebook_crop(segment=None, margin=0.1):
 
@@ -50,6 +55,12 @@ def set_notebook_crop(segment=None, margin=0.1):
 			segment.start-margin*duration, 
 			segment.end+margin*duration
 		)
+
+def set_notebook_width(inches=None):
+	if inches is None:
+		_notebook.width = _DEFAULT_NOTEBOOK_WIDTH
+	else:
+		_notebook.width = inches
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -70,7 +81,12 @@ def _draw_segment(ax, segment, y, color, label=None):
 	if segment:
 		ax.hlines(y, segment.start, segment.end, color, lw=1)
 		ax.vlines(segment.start, y+0.05, y-0.05, color, lw=1)
-		ax.vlines(segment.end, y+0.05, y-0.05, color, lw=1)	
+		ax.vlines(segment.end, y+0.05, y-0.05, color, lw=1)
+		if label:
+			text = ax.text(segment.middle, y+0.05, codecs.encode(unicode(label), 'ascii', 'replace'),
+				horizontalalignment='center', fontsize=10)
+			# text.draw()
+			# [[x0, y0], [x1, y1]] = text.get_window_extent().get_points()
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -79,7 +95,7 @@ def repr_segment(segment):
 	# remember current figure size 
 	figsize = plt.rcParams['figure.figsize']
 	# and update it for segment display
-	plt.rcParams['figure.figsize'] = (10, 1)
+	plt.rcParams['figure.figsize'] = (_notebook.width, 1)
 
 	if not _notebook.extent:
 		set_notebook_crop(segment=segment)
@@ -151,7 +167,7 @@ def repr_timeline(timeline):
 	# remember current figure size 
 	figsize = plt.rcParams['figure.figsize']
 	# and update it for segment display
-	plt.rcParams['figure.figsize'] = (10, 1)
+	plt.rcParams['figure.figsize'] = (_notebook.width, 1)
 
 	if not _notebook.extent and timeline:
 		set_notebook_crop(segment=timeline.extent())
@@ -173,13 +189,12 @@ def repr_timeline(timeline):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 def repr_annotation(annotation):
 
 	# remember current figure size 
 	figsize = plt.rcParams['figure.figsize']
 	# and update it for segment display
-	plt.rcParams['figure.figsize'] = (10, 2)
+	plt.rcParams['figure.figsize'] = (_notebook.width, 2)
 
 	if not _notebook.extent:
 		set_notebook_crop(segment=annotation.get_timeline().extent())
@@ -187,11 +202,19 @@ def repr_annotation(annotation):
 	cropped = annotation.crop(_notebook.extent, mode='loose')
 	segments = [s for s, _ in cropped.itertracks()]
 
+	# one color per label
+	chart = cropped.chart()
+	cm = get_cmap('gist_rainbow')
+	colors = {
+		label: cm(1.*i/len(chart))
+		for i, (label, _) in enumerate(chart) 
+	}
+
 	fig, ax = _setup()
 
 	for (segment, track, label), y in itertools.izip(
 		cropped.itertracks(label=True), _y(segments)):
-		color = 'b'  # color = f(label)
+		color = colors[label]  # color = f(label)
 		_draw_segment(ax, segment, y, color, label=label)
 
 	data = _render(fig)
