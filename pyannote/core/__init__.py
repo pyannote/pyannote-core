@@ -26,3 +26,18 @@
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
+
+PYANNOTE_URI = 'uri'
+PYANNOTE_MODALITY = 'modality'
+PYANNOTE_SEGMENT = 'segment'
+PYANNOTE_TRACK = 'track'
+PYANNOTE_LABEL = 'label'
+PYANNOTE_SCORE = 'score'
+PYANNOTE_IDENTITY = 'identity'
+
+from segment import Segment
+from timeline import Timeline
+from annotation import Annotation
+from scores import Scores
+
+from notebook import set_notebook_crop
