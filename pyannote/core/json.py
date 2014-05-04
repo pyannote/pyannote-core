@@ -31,6 +31,8 @@ PYANNOTE_JSON_TIME = 'T'
 PYANNOTE_JSON_SEGMENT = 'S'
 PYANNOTE_JSON_TIMELINE = 'L'
 PYANNOTE_JSON_ANNOTATION = 'A'
+PYANNOTE_JSON_TRANSCRIPTION = 'G'
+
 
 
 def object_hook(d):
@@ -46,6 +48,7 @@ def object_hook(d):
     from segment import Segment
     from timeline import Timeline
     from annotation import Annotation
+    from transcription import Transcription
 
     if PYANNOTE_JSON_TIME in d:
         return T.from_json(d)
@@ -58,6 +61,9 @@ def object_hook(d):
 
     if PYANNOTE_JSON_ANNOTATION in d:
         return Annotation.from_json(d)
+
+    if PYANNOTE_JSON_TRANSCRIPTION in d:
+        return Transcription.from_json(d)
 
     return d
 

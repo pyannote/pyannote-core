@@ -37,7 +37,9 @@ PYANNOTE_LABEL = 'label'
 PYANNOTE_SCORE = 'score'
 PYANNOTE_IDENTITY = 'identity'
 
+from time import T, TStart, TEnd
 from segment import Segment
 from timeline import Timeline
 from annotation import Annotation
+from transcription import Transcription
 from scores import Scores
