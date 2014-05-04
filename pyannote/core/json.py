@@ -23,42 +23,52 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import versioneer
-versioneer.versionfile_source = 'pyannote/core/_version.py'
-versioneer.versionfile_build = versioneer.versionfile_source
-versioneer.tag_prefix = ''
-versioneer.parentdir_prefix = 'pyannote.core-'
+from __future__ import unicode_literals
 
-from setuptools import setup, find_packages
+import simplejson as json
 
-setup(
+PYANNOTE_JSON_TIME = 'T'
+PYANNOTE_JSON_SEGMENT = 'S'
+PYANNOTE_JSON_TIMELINE = 'L'
+PYANNOTE_JSON_ANNOTATION = 'A'
 
-    # package
-    namespace_packages = ['pyannote'],
-    packages=find_packages(),
-    install_requires=[
-        'banyan >=0.1.5',
-        'numpy >=1.7.1',
-        'pandas >=0.13.1',
-        'simplejson >= 3.4.1',
-    ],
 
-    # versioneer
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
+def object_hook(d):
+    """
+    Usage
+    -----
+    >>> import simplejson as json
+    >>> with open('file.json', 'r') as f:
+    ...   json.load(f, object_hook=object_hook)
+    """
 
-    # PyPI
-    name='pyannote.core',
-    description=('PyAnnote core'),
-    author='Hervé Bredin',
-    author_email='bredin@limsi.fr',
-    url='http://herve.niderb.fr/',
-    classifiers=[
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-        "Natural Language :: English",
-        "Programming Language :: Python :: 2.7",
-        "Topic :: Scientific/Engineering"
-    ],        
-)
+    from time import T
+    from segment import Segment
+    from timeline import Timeline
+    from annotation import Annotation
+
+    if PYANNOTE_JSON_TIME in d:
+        return T.from_json(d)
+
+    if PYANNOTE_JSON_SEGMENT in d:
+        return Segment.from_json(d)
+
+    if PYANNOTE_JSON_TIMELINE in d:
+        return Timeline.from_json(d)
+
+    if PYANNOTE_JSON_ANNOTATION in d:
+        return Annotation.from_json(d)
+
+    return d
+
+def load(path):
+    with open(path, 'r') as f:
+        data = json.load(f, encoding='utf-8', object_hook=object_hook)
+    return data
+
+def dump(data, path):
+    # TODO: add pyannote.core version
+    with open(path, 'w') as f:
+        json.dump(data, f, encoding='utf-8', for_json=True)
+
+

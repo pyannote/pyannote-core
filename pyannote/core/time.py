@@ -56,7 +56,10 @@ Also, if you want to refer to a specific `drifting` time, simple use:
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+from __future__ import unicode_literals
 import itertools
+
+from json import PYANNOTE_JSON_TIME
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -98,12 +101,12 @@ class _TAnchored(float):
         t = float(self)
 
         if t == float('infinity'):
-            return {'__T__': '^'}
+            return {PYANNOTE_JSON_TIME: '^'}
         
         if t == -float('infinity'):
-            return {'__T__': '$'}
+            return {PYANNOTE_JSON_TIME: '$'}
         
-        return {'__T__': t} 
+        return {PYANNOTE_JSON_TIME: t} 
 
 
 
@@ -177,7 +180,7 @@ class _TDrifting(str):
         >>> t = T()
         >>> json.dumps(t, for_json=True)
         """
-        return {'__T__': str(self)}
+        return {PYANNOTE_JSON_TIME: str(self)}
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -222,7 +225,7 @@ class _T(object):
     def from_json(self, data):
         """Get time from JSON data"""
 
-        t = data['__T__']
+        t = data[PYANNOTE_JSON_TIME]
 
         if t == '$':
             t = -float('infinity')

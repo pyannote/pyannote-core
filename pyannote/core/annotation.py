@@ -23,6 +23,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from __future__ import unicode_literals
+
 import itertools
 import operator
 import warnings
@@ -34,6 +36,7 @@ from banyan import SortedDict
 from interval_tree import TimelineUpdator
 from segment import Segment
 from timeline import Timeline
+from json import PYANNOTE_JSON_ANNOTATION
 
 # ignore Banyan warning
 warnings.filterwarnings(
@@ -850,10 +853,27 @@ class Annotation(object):
             for t, T in itertools.product(tracks, other_tracks):
                 yield (s, t), (S, T)
 
-    def to_json(self):
-        annotation = [{PYANNOTE_SEGMENT: s.to_json(), PYANNOTE_TRACK: t, PYANNOTE_LABEL: l}
-                      for s, t, l in self.itertracks(label=True)]
-        return {PYANNOTE_URI: self.uri, PYANNOTE_MODALITY: self.modality, 'tracks': annotation}
+    def for_json(self):
+        data = {
+            PYANNOTE_JSON_ANNOTATION: [
+                [s.for_json(), t, l] for s, t, l in self.itertracks(label=True)
+            ],
+        }
+        if self.uri:
+            data[PYANNOTE_URI] = self.uri
+        if self.modality:
+            data[PYANNOTE_MODALITY] = self.modality
+        return data
+
+    @classmethod
+    def from_json(cls, data):
+        uri = data.get(PYANNOTE_URI, None)
+        modality = data.get(PYANNOTE_MODALITY, None)
+        annotation = cls(uri=uri, modality=modality)
+        for s, track, label in data[PYANNOTE_JSON_ANNOTATION]:
+            segment = Segment.from_json(s)
+            annotation[segment, track] = label
+        return annotation
 
     def _repr_png_(self):
         from pyannote.core.notebook import repr_annotation
