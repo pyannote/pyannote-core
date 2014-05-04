@@ -6,6 +6,7 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+MANIFEST
 .Python
 env/
 bin/
@@ -52,3 +53,4 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+doc/.ipynb_checkpoints
