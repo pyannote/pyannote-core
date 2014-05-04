@@ -23,6 +23,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from __future__ import unicode_literals
+
 from IPython.core.pylabtools import print_figure
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap

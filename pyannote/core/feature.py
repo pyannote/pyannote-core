@@ -29,6 +29,8 @@ Features.
 
 """
 
+from __future__ import unicode_literals
+
 import numpy as np
 from segment import Segment, SlidingWindow
 from timeline import Timeline
