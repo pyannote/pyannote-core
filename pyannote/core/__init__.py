@@ -41,5 +41,3 @@ from segment import Segment
 from timeline import Timeline
 from annotation import Annotation
 from scores import Scores
-
-from notebook import set_notebook_crop
