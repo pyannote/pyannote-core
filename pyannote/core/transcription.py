@@ -38,8 +38,9 @@ import itertools
 class Transcription(nx.MultiDiGraph):
     """Transcription stored as annotation graph"""
 
-    def __init__(self, graph=None, uri=None):
+    def __init__(self, graph=None, **attrs):
         super(Transcription, self).__init__(data=graph)
+        self.graph.update(attrs)
 
     def drifting(self):
         """Get list of drifting times"""
@@ -469,6 +470,8 @@ class Transcription(nx.MultiDiGraph):
     @classmethod
     def from_json(cls, data):
         graph = node_link_graph(data[PYANNOTE_JSON_TRANSCRIPTION])
+        mapping = {node: T(node) for node in graph}
+        graph = nx.relabel_nodes(graph, mapping)
         return cls(graph=graph, **graph.graph)
 
     # === IPython Notebook displays ===========================================

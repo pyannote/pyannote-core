@@ -86,30 +86,6 @@ class _TAnchored(float):
         
         return super(_TAnchored, self).__str__()
 
-    def __repr__(self):
-        return '<T(%s)>' % str(self)
-
-    def for_json(self):
-        """
-        Usage
-        -----
-        >>> import simplejson as json
-        >>> t = T()
-        >>> json.dumps(t, for_json=True)
-        """
-
-        t = float(self)
-
-        if t == float('infinity'):
-            return {PYANNOTE_JSON_TIME: '^'}
-        
-        if t == -float('infinity'):
-            return {PYANNOTE_JSON_TIME: '$'}
-        
-        return {PYANNOTE_JSON_TIME: t} 
-
-
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -155,7 +131,6 @@ class _TDrifting(str):
             t = next(cls.__t_iter)
         return str.__new__(cls, t)
 
-
     @classmethod
     def _reset(cls):
         """Reset label generator"""
@@ -168,19 +143,6 @@ class _TDrifting(str):
     @property
     def drifting(self):
         return True
-
-    def __repr__(self):
-        return '<T("%s")>' % str(self)
-
-    def for_json(self):
-        """
-        Usage
-        -----
-        >>> import simplejson as json
-        >>> t = T()
-        >>> json.dumps(t, for_json=True)
-        """
-        return {PYANNOTE_JSON_TIME: str(self)}
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
