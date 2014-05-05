@@ -50,7 +50,7 @@ class Transcription(nx.MultiDiGraph):
         """Get list of anchored times"""
         return [n for n in self if n.anchored]
 
-    def add_annotation(self, t1, t2, data=None):
+    def add_edge(self, t1, t2, key=None, attr_dict=None, **attrs):
         """Add annotation to the graph between times t1 and t2
 
         Parameters
@@ -62,12 +62,8 @@ class Transcription(nx.MultiDiGraph):
         Example
         -------
         >>> G = Transcription()
-        >>> t1 = T(1.000)
-        >>> t2 = T()
-        >>> data = {'speaker': 'John', 'speech': 'Hello world!'}
-        >>> G.add_annotation(t1, t2, data=data)
+        >>> G.add_edge(T(1.), T(), speaker='John', 'speech'='Hello world!')
         """
-
         t1 = T(t1)
         t2 = T(t2)
 
@@ -75,7 +71,7 @@ class Transcription(nx.MultiDiGraph):
         if t1.anchored and t2.anchored:
             assert t1 <= t2
 
-        self.add_edge(t1, t2, attr_dict=data)
+        super(Transcription, self).add_edge(t1, t2, key=key, attr_dict=attr_dict, **attrs)
 
     def relabel_drifting_nodes(self, mapping=None):
         """Relabel drifting nodes
@@ -287,10 +283,10 @@ class Transcription(nx.MultiDiGraph):
                 self.remove_edge(p, t2, key=key)
 
         for p in set(pred1) | set(pred2):
-            self.add_annotation(p, t, data=None)
+            self.add_edge(p, t)
 
-        self.add_annotation(t, t1, data=None)
-        self.add_annotation(t, t2, data=None)
+        self.add_edge(t, t1)
+        self.add_edge(t, t2)
 
     def post_align(self, t1, t2, t):
         """
@@ -333,10 +329,10 @@ class Transcription(nx.MultiDiGraph):
                 self.remove_edge(t2, s, key=key)
 
         for s in set(succ1) | set(succ2):
-            self.add_annotation(t, s, data=None)
+            self.add_edge(t, s)
 
-        self.add_annotation(t1, t, data=None)
-        self.add_annotation(t2, t, data=None)
+        self.add_edge(t1, t)
+        self.add_edge(t2, t)
 
     # =========================================================================
 
