@@ -59,8 +59,6 @@ Also, if you want to refer to a specific `drifting` time, simple use:
 from __future__ import unicode_literals
 import itertools
 
-from json import PYANNOTE_JSON_TIME
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 class _TAnchored(float):
@@ -183,19 +181,6 @@ class _T(object):
     def reset(self):
         """Reset drifting time string generator"""
         _TDrifting._reset()
-
-    def from_json(self, data):
-        """Get time from JSON data"""
-
-        t = data[PYANNOTE_JSON_TIME]
-
-        if t == '$':
-            t = -float('infinity')
-
-        if t == '^':
-            t = float('infinity')
-
-        return self.__call__(t)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
