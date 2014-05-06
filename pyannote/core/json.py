@@ -25,21 +25,51 @@
 
 from __future__ import unicode_literals
 
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
+import simplejson as json
 
-PYANNOTE_URI = 'uri'
-PYANNOTE_MODALITY = 'modality'
-PYANNOTE_SEGMENT = 'segment'
-PYANNOTE_TRACK = 'track'
-PYANNOTE_LABEL = 'label'
-PYANNOTE_SCORE = 'score'
-PYANNOTE_IDENTITY = 'identity'
+PYANNOTE_JSON_SEGMENT = 'S'
+PYANNOTE_JSON_TIMELINE = 'L'
+PYANNOTE_JSON_ANNOTATION = 'A'
+PYANNOTE_JSON_TRANSCRIPTION = 'G'
 
-from time import T, TStart, TEnd
-from segment import Segment
-from timeline import Timeline
-from annotation import Annotation
-from transcription import Transcription
-from scores import Scores
+
+
+def object_hook(d):
+    """
+    Usage
+    -----
+    >>> import simplejson as json
+    >>> with open('file.json', 'r') as f:
+    ...   json.load(f, object_hook=object_hook)
+    """
+
+    from segment import Segment
+    from timeline import Timeline
+    from annotation import Annotation
+    from transcription import Transcription
+
+    if PYANNOTE_JSON_SEGMENT in d:
+        return Segment.from_json(d)
+
+    if PYANNOTE_JSON_TIMELINE in d:
+        return Timeline.from_json(d)
+
+    if PYANNOTE_JSON_ANNOTATION in d:
+        return Annotation.from_json(d)
+
+    if PYANNOTE_JSON_TRANSCRIPTION in d:
+        return Transcription.from_json(d)
+
+    return d
+
+def load(path):
+    with open(path, 'r') as f:
+        data = json.load(f, encoding='utf-8', object_hook=object_hook)
+    return data
+
+def dump(data, path):
+    # TODO: add pyannote.core version
+    with open(path, 'w') as f:
+        json.dump(data, f, encoding='utf-8', for_json=True)
+
+

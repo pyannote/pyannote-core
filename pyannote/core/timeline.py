@@ -23,12 +23,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from __future__ import unicode_literals
+
 import warnings
 
+from . import PYANNOTE_URI
 from banyan import SortedSet
 from interval_tree import TimelineUpdator
 from segment import Segment
-
+from json import PYANNOTE_JSON_TIMELINE
 
 # ignore Banyan warning
 warnings.filterwarnings(
@@ -571,8 +574,17 @@ class Timeline(object):
 
         return timeline
 
-    def to_json(self):
-        return [s.to_json() for s in self]
+    def for_json(self):
+        data = {PYANNOTE_JSON_TIMELINE: [s.for_json() for s in self]}
+        if self.uri:
+            data[PYANNOTE_URI] = self.uri
+        return data
+
+    @classmethod
+    def from_json(cls, data):
+        segments = [Segment.from_json(s) for s in data[PYANNOTE_JSON_TIMELINE]]
+        uri = data.get(PYANNOTE_URI, None)
+        return cls(segments=segments, uri=uri)
 
     def _repr_png_(self):
         from pyannote.core.notebook import repr_timeline

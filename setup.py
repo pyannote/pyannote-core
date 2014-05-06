@@ -40,8 +40,16 @@ setup(
         'banyan >=0.1.5',
         'numpy >=1.7.1',
         'pandas >=0.13.1',
+        'networkx >= 1.8.1',
+        'simplejson >= 3.4.1',
     ],
-
+    extras_require = {
+        'notebook': [
+            'matplotlib >= 1.3.1',
+            'pygraphviz >= 1.2',
+            'ipython >= 2.0.0',
+        ],
+    },
     # versioneer
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),

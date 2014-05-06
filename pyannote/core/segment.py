@@ -23,9 +23,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from __future__ import unicode_literals
+
 from collections import namedtuple
 
 import numpy as np
+
+from json import PYANNOTE_JSON_SEGMENT
 
 SEGMENT_PRECISION = 1e-6
 
@@ -247,8 +251,13 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
     def __repr__(self):
         return '<Segment(%g, %g)>' % (self.start, self.end)
 
-    def to_json(self):
-        return {'start': self.start, 'end': self.end}
+    def for_json(self):
+        return {PYANNOTE_JSON_SEGMENT: [self.start, self.end]}
+
+    @classmethod
+    def from_json(cls, data):
+        start, end = data[PYANNOTE_JSON_SEGMENT]
+        return cls(start=start, end=end)
 
     def _repr_png_(self):
         from pyannote.core.notebook import repr_segment
