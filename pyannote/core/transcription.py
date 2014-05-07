@@ -437,7 +437,7 @@ class Transcription(nx.MultiDiGraph):
             for tt in self._anchored_predecessors(t):
                 yield tt
 
-    def timerange(self, t1, t2, inside=False):
+    def timerange(self, t1, t2, inside=True):
         """Infer edge timerange from graph structure
         
         a -- ... -- [ t1 ] -- A -- ... -- B -- [ t2 ] -- ... -- b
