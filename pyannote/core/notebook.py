@@ -224,7 +224,7 @@ def repr_annotation(annotation):
     if not _notebook.extent:
         set_notebook_crop(segment=annotation.get_timeline().extent())
 
-    cropped = annotation.crop(_notebook.extent, mode='loose')
+    cropped = annotation.crop(_notebook.extent, mode='intersection')
     segments = [s for s, _ in cropped.itertracks()]
 
     # one color per label
@@ -314,9 +314,9 @@ def _dottable(transcription):
                 name = _remove_non_ascii(name)
                 value = _remove_non_ascii(value)
                 # shorten long value
-                value = _shorten_long_text(value)
+                short_value = _shorten_long_text(value)
                 # update label and tooltip
-                label += label_pattern.format(name=name, value=value)
+                label += label_pattern.format(name=name, value=short_value)
                 tooltip += tooltip_pattern.format(name=name, value=value)
             
             # close label table
