@@ -27,7 +27,7 @@ import versioneer
 versioneer.versionfile_source = 'pyannote/core/_version.py'
 versioneer.versionfile_build = versioneer.versionfile_source
 versioneer.tag_prefix = ''
-versioneer.parentdir_prefix = 'pyannote.core-'
+versioneer.parentdir_prefix = 'pyannote-core-'
 
 from setuptools import setup, find_packages
 
