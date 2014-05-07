@@ -395,7 +395,14 @@ class Transcription(nx.MultiDiGraph):
             yield _
 
     # =========================================================================
-
+    # _anchored_{predecessors|successors} are far from optimal
+    # in this kind of situations
+    #       _______
+    #      /       \
+    # --- n -- a -- f' --
+    # 
+    # TODO: we should make sure not to look after f' for another anchored node
+    # 
     def _anchored_successors(self, n):
         """Get all first anchored successors"""
 
@@ -430,33 +437,54 @@ class Transcription(nx.MultiDiGraph):
             for tt in self._anchored_predecessors(t):
                 yield tt
 
-    def timerange(self, t):
-        """Infer smallest possible timerange from graph structure
+    def timerange(self, t1, t2, inside=False):
+        """Infer edge timerange from graph structure
+        
+        a -- ... -- [ t1 ] -- A -- ... -- B -- [ t2 ] -- ... -- b
+
+        ==> [a, b] (inside=False) or [A, B] (inside=True)
+
+        Parameters
+        ----------
+        t1, t2 : anchored or drifting times
+        inside : boolean, optional
 
         Returns
         -------
-        (left, right) tuple
-            left == None or right == None indicates that the current state of
-            the annotation graph does not allow to decide the boundary.
+        segment : Segment
 
         """
 
-        t = T(t)
+        start = None
+        end = None
 
-        if t.anchored:
-            return (t.T, t.T)
-        successors = [n for n in self._anchored_successors(t)]
-        predecessors = [n for n in self._anchored_predecessors(t)]
+        if t1.anchored:
+            start = t1
 
-        earlier_successor = None
-        if successors:
-            earlier_successor = min(successors)
+        if t2.anchored:
+            end = t2
 
-        later_predecessor = None
-        if predecessors:
-            later_predecessor = max(predecessors)
+        if inside:
 
-        return (later_predecessor.T, earlier_successor.T)
+            if start is None:
+                s1 = [n for n in self._anchored_successors(t1)]
+                start = min(s1) if s1 else TStart
+            
+            if end is None:
+                p2 = [n for n in self._anchored_predecessors(t2)]
+                end = max(p2) if p2 else TEnd
+
+        else:
+
+            if start is None:
+                p1 = [n for n in self._anchored_predecessors(t1)]
+                start = max(p1) if p1 else TStart
+
+            if end is None:
+                s2 = [n for n in self._anchored_successors(t2)]
+                end = max(s2) if s2 else TEnd
+
+        return Segment(start=start, end=end)
 
     # =========================================================================
 
