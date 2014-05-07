@@ -455,6 +455,9 @@ class Transcription(nx.MultiDiGraph):
 
         """
 
+        t1 = T(t1)
+        t2 = T(t2)
+
         start = None
         end = None
 
@@ -482,7 +485,7 @@ class Transcription(nx.MultiDiGraph):
 
             if end is None:
                 s2 = [n for n in self._anchored_successors(t2)]
-                end = max(s2) if s2 else TEnd
+                end = min(s2) if s2 else TEnd
 
         return Segment(start=start, end=end)
 
