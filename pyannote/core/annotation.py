@@ -44,8 +44,8 @@ warnings.filterwarnings(
     Warning, 'pyannote.core.annotation'
 )
 
-
 class Unknown(object):
+
     nextID = 0
 
     @classmethod
@@ -57,13 +57,13 @@ class Unknown(object):
         cls.nextID += 1
         return cls.nextID
 
-    def __init__(self, format='Inconnu_%05d'):
+    def __init__(self, format='#{id:d}'):
         super(Unknown, self).__init__()
         self.ID = Unknown.next()
         self._format = format
 
     def __str__(self):
-        return self._format % self.ID
+        return self._format.format(id=self.ID)
 
     def __repr__(self):
         return str(self)
