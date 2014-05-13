@@ -111,7 +111,7 @@ class Annotation(object):
 
         """
         annotation = cls(uri=uri, modality=modality)
-        for _, (segment, track, label) in df[[SEGMENT, TRACK, LABEL]].iterrows():
+        for _, (segment, track, label) in df[[PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]].iterrows():
             annotation[segment, track] = label
         return annotation
 
