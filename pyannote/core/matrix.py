@@ -65,6 +65,7 @@ class LabelMatrix(object):
                 val = self.df.at[row, col]
                 if not np.isnan(val):
                     yield row, col, val
+
     def iter_values(self):
         for row in self.get_rows():
             for col in self.get_columns():
@@ -180,6 +181,10 @@ class LabelMatrix(object):
 
     def __str__(self):
         return str(self.df)
+
+    def _repr_html_(self):
+        return self.df._repr_html_()
+
 
 def get_cooccurrence_matrix(R, C):
 
