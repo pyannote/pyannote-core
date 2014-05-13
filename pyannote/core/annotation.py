@@ -720,29 +720,29 @@ class Annotation(object):
         # in case all durations were zero, there is no most frequent label
         return label if durations[label] > 0 else None
 
-    def __rshift__(self, timeline):
-        """Tag a timeline
+    # def __rshift__(self, timeline):
+    #     """Tag a timeline
 
-        Use expression 'tagged = annotation >> timeline'
+    #     Use expression 'tagged = annotation >> timeline'
 
-        Shortcut for :
-            >>> tagger = DirectTagger()
-            >>> tagged = tagger(annotation, timeline)
+    #     Shortcut for :
+    #         >>> tagger = DirectTagger()
+    #         >>> tagged = tagger(annotation, timeline)
 
-        Parameters
-        ----------
-        timeline : :class:`pyannote.base.timeline.Timeline`
+    #     Parameters
+    #     ----------
+    #     timeline : :class:`pyannote.base.timeline.Timeline`
 
-        Returns
-        -------
-        tagged : :class:`pyannote.base.annotation.Annotation`
-            Tagged timeline - one track per intersecting label.
+    #     Returns
+    #     -------
+    #     tagged : :class:`pyannote.base.annotation.Annotation`
+    #         Tagged timeline - one track per intersecting label.
 
-        """
-        from pyannote.algorithm.tagging import DirectTagger
-        if not isinstance(timeline, Timeline):
-            raise TypeError('direct tagging (>>) only works with timelines.')
-        return DirectTagger()(self, timeline)
+    #     """
+    #     from pyannote.algorithm.tagging import DirectTagger
+    #     if not isinstance(timeline, Timeline):
+    #         raise TypeError('direct tagging (>>) only works with timelines.')
+    #     return DirectTagger()(self, timeline)
 
     def translate(self, translation):
         """Translate labels
