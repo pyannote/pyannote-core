@@ -188,20 +188,22 @@ class LabelMatrix(object):
 
 def get_cooccurrence_matrix(R, C):
 
+    # initialize label matrix with zeros
     rows = R.labels()
     cols = C.labels()
-    nRows = len(rows)
-    nCols = len(cols)
+    K = np.zeros((len(rows), len(cols)), dtype=np.float)
+    M = LabelMatrix(data=K, rows=rows, columns=cols)
+    
+    # loop on intersecting tracks
+    for (r_segment, r_track), (c_segment, c_track) in R.co_iter(C):
+        # increment 
+        r_label = R[r_segment, r_track]
+        c_label = C[c_segment, c_track]
+        duration = (r_segment & c_segment).duration
+        M[r_label, c_label] += duration
 
-    K = np.zeros((nRows, nCols), dtype=np.float)
-    for r, row in enumerate(rows):
-        row_coverage = R.label_coverage(row)
-        for c, col in enumerate(cols):
-            col_coverage = C.label_coverage(col)
-            coverage = row_coverage.crop(col_coverage, mode='intersection')
-            K[r, c] = coverage.duration()
+    return M
 
-    return LabelMatrix(data=K, rows=rows, columns=cols)
 
 
 def get_tfidf_matrix(words, documents, idf=True, log=False):
