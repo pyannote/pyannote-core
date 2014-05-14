@@ -397,7 +397,7 @@ class Annotation(object):
 
         # find first non-existing track name for segment
         # eg. if speaker1 exists, try speaker2, then speaker3, ...
-        count = 1
+        count = 0
         while ('%s%d' % (prefix, count)) in existing_tracks:
             count += 1
 
