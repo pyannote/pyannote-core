@@ -390,13 +390,12 @@ class Annotation(object):
         # no candidate was provided or the provided candidate already exists
         # we need to create a brand new one
 
-        # by default (if prefix is not provided)
-        # use modality as prefix (eg. speaker1, speaker2, ...)
+        # by default (if prefix is not provided), use ''
         if prefix is None:
-            prefix = '' if self.modality is None else str(self.modality)
+            prefix = ''
 
         # find first non-existing track name for segment
-        # eg. if speaker1 exists, try speaker2, then speaker3, ...
+        # eg. if '0' exists, try '1', then '2', ...
         count = 0
         while ('%s%d' % (prefix, count)) in existing_tracks:
             count += 1
