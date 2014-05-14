@@ -812,14 +812,17 @@ class Annotation(object):
         Create new annotation where contiguous tracks with same label are
         merged into one longer track.
 
+        Parameters
+        ----------
+        collar : float
+            If collar is positive, also merge tracks separated by less than
+            collar duration.
+
         Returns
         -------
         annotation : Annotation
             New annotation where contiguous tracks with same label are merged
             into one long track.
-        collar : float
-            If collar is positive, also merge tracks separated by less than
-            collar duration.
 
         Remarks
         -------
