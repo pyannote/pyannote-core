@@ -806,7 +806,7 @@ class Annotation(object):
             anonymized[s, t] = Unknown()
         return anonymized
 
-    def smooth(self):
+    def smooth(self, collar=0.):
         """Smooth annotation
 
         Create new annotation where contiguous tracks with same label are
@@ -817,22 +817,36 @@ class Annotation(object):
         annotation : Annotation
             New annotation where contiguous tracks with same label are merged
             into one long track.
+        collar : float
+            If collar is positive, also merge tracks separated by less than
+            collar duration.
 
         Remarks
         -------
             Track names are lost in the process.
-
         """
 
+        # initialize an empty annotation
+        # with same uri and modality as original 
         smoothed = self.empty()
-
-        n = 0
         for label in self.labels():
-            coverage = self.label_coverage(label)
-            for segment in coverage:
-                smoothed[segment, n] = label
-                n = n+1
+            
+            # get timeline for current label
+            timeline = self.label_timeline(label)
 
+            # fill the gaps shorter than collar
+            if collar > 0.:
+                gaps = timeline.gaps()
+                for gap in gaps:
+                    if gap.duration < collar:
+                        timeline.add(gap)
+            
+            # reconstruct annotation with merged tracks            
+            for segment in timeline.coverage():
+                track = smoothed.new_track(segment)
+                smoothed[segment, track] = label
+
+        # return
         return smoothed
 
     def co_iter(self, other):
