@@ -68,13 +68,14 @@ def set_notebook_width(inches=None):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-def _setup():
+def _setup(ylim=None, yaxis=False):
     """Prepare figure"""
     fig, ax = plt.subplots()
     ax.set_xlim(_notebook.extent)
     ax.set_xlabel('Time')
-    ax.set_ylim((0, 1))
-    ax.axes.get_yaxis().set_visible(False)
+    if ylim is not None:
+        ax.set_ylim(ylim)
+    ax.axes.get_yaxis().set_visible(yaxis)
     return fig, ax
 
 def _render(fig):
@@ -86,28 +87,30 @@ def _render(fig):
     # return raw image data
     return data
 
-def _draw_segment(ax, segment, y, color, label=None):
+def _draw_segment(ax, segment, y, color, label=None, text=True, boundaries=True):
 
     # do nothing if segment is empty
     if not segment:
         return
 
     # draw segment
-    ax.hlines(y, segment.start, segment.end, color, lw=1)
-    ax.vlines(segment.start, y+0.05, y-0.05, color, lw=1)
-    ax.vlines(segment.end, y+0.05, y-0.05, color, lw=1)
+    ax.hlines(y, segment.start, segment.end, color, lw=1, label=label)
+    if boundaries:
+        ax.vlines(segment.start, y+0.05, y-0.05, color, lw=1)
+        ax.vlines(segment.end, y+0.05, y-0.05, color, lw=1)
 
     if label is None:
         return
 
     # draw label
-    text = ax.text(
-        segment.middle, 
-        y+0.05, 
-        codecs.encode(unicode(label), 'ascii', 'replace'),
-        horizontalalignment='center', 
-        fontsize=10
-    )
+    if text:
+        ax.text(
+            segment.middle, 
+            y+0.05, 
+            codecs.encode(unicode(label), 'ascii', 'replace'),
+            horizontalalignment='center', 
+            fontsize=10
+        )
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -122,7 +125,7 @@ def repr_segment(segment):
     if not _notebook.extent:
         set_notebook_crop(segment=segment)
 
-    fig, ax = _setup()
+    fig, ax = _setup(ylim=(0, 1))
     
     # segments are vertically centered and blue
     y = 0.5
@@ -198,7 +201,7 @@ def repr_timeline(timeline):
 
     cropped = timeline.crop(_notebook.extent, mode='loose')
 
-    fig, ax = _setup()
+    fig, ax = _setup(ylim=(0, 1))
     
     color = 'b'
     for segment, y in itertools.izip(cropped, _y(cropped)):
@@ -235,12 +238,65 @@ def repr_annotation(annotation):
         for i, (label, _) in enumerate(chart) 
     }
 
-    fig, ax = _setup()
+    fig, ax = _setup(ylim=(0, 1))
 
     for (segment, track, label), y in itertools.izip(
         cropped.itertracks(label=True), _y(segments)):
         color = colors[label]  # color = f(label)
         _draw_segment(ax, segment, y, color, label=label)
+
+
+    data = _render(fig)
+
+    # go back to previous figure size
+    plt.rcParams['figure.figsize'] = figsize
+
+    return data
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def repr_scores(scores):
+    """Get `png` data for `scores`"""
+
+    # remember current figure size 
+    figsize = plt.rcParams['figure.figsize']
+    # and update it for segment display
+    plt.rcParams['figure.figsize'] = (_notebook.width, 5)
+
+    if not _notebook.extent:
+        set_notebook_crop(segment=scores.get_timeline().extent())
+
+    cropped = scores.crop(_notebook.extent, mode='loose')
+    segments = [s for s, _ in cropped.itertracks()]
+
+    cm = get_cmap('gist_rainbow')
+    labels = sorted(scores.labels())
+    colors = {label: cm(1.*i/len(labels)) for i, label in enumerate(labels)}
+
+    m = scores._df.min().min()
+    M = scores._df.max().max()
+    ylim = (m - 0.1*(M-m), M + 0.1*(M-m))
+
+    fig, ax = _setup(yaxis=True, ylim=ylim)
+
+    for segment, track, label, value in cropped.itervalues():
+        color = colors[label]
+        y = value
+        _draw_segment(ax, segment, y, color, label=label, text=False, boundaries=False)
+
+    # for segment, track, label, value in cropped.nbest(1).itervalues():
+    #     color = colors[label]
+    #     y = value
+    #     _draw_segment(ax, segment, y, color, label=label, text=True, boundaries=True)
+
+    # get one handle per label and plot the corresponding legend
+    H, L = ax.get_legend_handles_labels()
+    handles = {}
+    for h, l in zip(H, L):
+        if l in labels:
+            handles[l] = h
+    ax.legend([handles[l] for l in sorted(handles)], sorted(handles)) 
+
 
     data = _render(fig)
 

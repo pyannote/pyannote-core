@@ -636,6 +636,10 @@ class Scores(AnnotationMixin, object):
 
         return new_scores
 
+    def _repr_png_(self):
+        from pyannote.core.notebook import repr_scores
+        return repr_scores(self)
+
 
 if __name__ == "__main__":
     import doctest
