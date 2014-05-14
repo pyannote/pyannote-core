@@ -609,7 +609,7 @@ class Annotation(object):
 
             self._labelNeedsUpdate = {l: False for l in self._labels}
 
-        return self._labels[label]
+        return self._labels[label].copy()
 
     def label_coverage(self, label):
         """
