@@ -436,49 +436,8 @@ class Transcription(nx.MultiDiGraph):
         return self.edges_iter(nbunch=nodes, data=data, keys=keys)
 
     # =========================================================================
-    # _anchored_{predecessors|successors} are far from optimal
-    # in this kind of situations
-    #       _______
-    #      /       \
-    # --- n -- a -- f' --
-    # 
-    # TODO: we should make sure not to look after f' for another anchored node
-    # 
-    def _anchored_successors(self, n):
-        """Get all first anchored successors"""
 
-        # loop on all outgoing edges
-        for t in self.successors(n):
-            
-            # if neighbor is anchored
-            # stop looking for (necessarily later) successors
-            if t.anchored:
-                yield t
-                continue
-
-            # if neighbor is not anchored
-            # look one level deeper
-            for tt in self._anchored_successors(t):
-                yield tt
-
-    def _anchored_predecessors(self, n):
-        """Get all first anchored predecessors"""
-
-        # loop on all incoming edges
-        for t in self.predecessors(n):
-            
-            # if predecessor is anchored
-            # stop looking for (necessarily earlier) predecessors
-            if t.anchored:
-                yield t
-                continue
-            
-            # if neighbor is not anchored
-            # look one level deeper
-            for tt in self._anchored_predecessors(t):
-                yield tt
-
-    def timerange(self, t1, t2, inside=True):
+    def timerange(self, t1, t2, inside=True, sort=None):
         """Infer edge timerange from graph structure
 
         a -- ... -- [ t1 ] -- A -- ... -- B -- [ t2 ] -- ... -- b
@@ -498,35 +457,47 @@ class Transcription(nx.MultiDiGraph):
         t1 = T(t1)
         t2 = T(t2)
 
-        start = None
-        end = None
+        # in case it is not provided, compute temporal sort
+        if sort is None:
+            sort = self.temporal_sort()
 
+        # if edge start is anchored, use it as start time
         if t1.anchored:
             start = t1
 
+        # otherwise, look for the closest anchored time in temporal order:
+        # - just after if inside is True
+        # - just before otherwise
+        else:
+            start = None
+            # find time index in temporal sort
+            istart = sort.index(t1)
+            # search just before or just after depending on 'inside' value
+            search = sort[istart+1:] if inside else sort[istart-1::-1]
+            for t in search:
+                if t.anchored:
+                    start = t
+                    break
+            # if we could not find any anchored time
+            # use document end of start depending on 'inside' value
+            if start is None:
+                start = TEnd if inside else TStart
+
+        # same treatment for the other end of edge
         if t2.anchored:
             end = t2
-
-        if inside:
-
-            if start is None:
-                s1 = [n for n in self._anchored_successors(t1)]
-                start = min(s1) if s1 else TStart
-            
-            if end is None:
-                p2 = [n for n in self._anchored_predecessors(t2)]
-                end = max(p2) if p2 else TEnd
-
         else:
-
-            if start is None:
-                p1 = [n for n in self._anchored_predecessors(t1)]
-                start = max(p1) if p1 else TStart
-
+            end = None
+            iend = sort.index(t2)
+            search = sort[iend-1::-1] if inside else sort[iend+1:]
+            for t in search:
+                if t.anchored:
+                    end = t
+                    break
             if end is None:
-                s2 = [n for n in self._anchored_successors(t2)]
-                end = min(s2) if s2 else TEnd
+                end = TStart if inside else TEnd
 
+        # return a 'Segment'
         return Segment(start=start, end=end)
 
     # =========================================================================
