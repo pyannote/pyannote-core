@@ -31,8 +31,7 @@ from networkx.readwrite.json_graph import node_link_data, node_link_graph
 from time import T, TStart, TEnd
 from segment import Segment
 from json import PYANNOTE_JSON_TRANSCRIPTION
-
-import itertools
+from util import pairwise
 
 
 class Transcription(nx.MultiDiGraph):
@@ -367,8 +366,34 @@ class Transcription(nx.MultiDiGraph):
 
         return g
 
-    def ordered_edges_iter(self, data=False, keys=False):
-        """Return an iterator over the edges in temporal/topological order.
+    def temporal_sort(self):
+        """Get nodes sorted in temporal order
+
+        Remark
+        ------
+        This relies on a combination of temporal ordering of anchored times
+        and topological ordering for drifting times.
+        To be 100% sure that one drifting time happens before another time,
+        check the ordering graph (method .ordering_graph()).
+        """
+
+        g = nx.DiGraph()
+
+        # add times
+        for t in self.nodes_iter():
+            g.add_node(t)
+
+        # add existing edges
+        for t1, t2 in self.edges_iter():
+            g.add_edge(t1, t2)
+
+        # connect pairs of consecutive anchored times
+        anchored = sorted(self.anchored())
+        for t1, t2 in pairwise(anchored):
+            g.add_edge(t1, t2)
+
+        return nx.topological_sort(g)
+
 
         Ordered edges are returned as tuples with optional data and keys
         in the order (t1, t2, key, data).
