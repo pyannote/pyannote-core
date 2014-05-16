@@ -12,8 +12,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -71,7 +71,8 @@ class Transcription(nx.MultiDiGraph):
         if t1.anchored and t2.anchored:
             assert t1 <= t2
 
-        super(Transcription, self).add_edge(t1, t2, key=key, attr_dict=attr_dict, **attrs)
+        super(Transcription, self).add_edge(
+            t1, t2, key=key, attr_dict=attr_dict, **attrs)
 
     def relabel_drifting_nodes(self, mapping=None):
         """Relabel drifting nodes
@@ -80,7 +81,6 @@ class Transcription(nx.MultiDiGraph):
         ----------
         mapping : dict, optional
             A dictionary with the old labels as keys and new labels as values.
-            
 
         Returns
         -------
@@ -104,7 +104,7 @@ class Transcription(nx.MultiDiGraph):
 
         Parameters
         ----------
-        source : Segment, 
+        source : Segment
         target : float or str, optional
 
         Returns
@@ -112,7 +112,7 @@ class Transcription(nx.MultiDiGraph):
         g : Transcription
             Sub-graph between source and target
         """
-        
+
         if isinstance(source, Segment):
             source, target = source.start, source.end
 
@@ -122,7 +122,7 @@ class Transcription(nx.MultiDiGraph):
         if source.anchored:
             before = [n for n in self.anchored() if n <= source]
             if before:
-                source = sorted(before)[-1] 
+                source = sorted(before)[-1]
 
         if target.anchored:
             after = [n for n in self.anchored() if n >= target]
@@ -147,7 +147,7 @@ class Transcription(nx.MultiDiGraph):
         ----------
         drifting_t :
             Existing drifting time in graph
-        another_t : 
+        another_t :
             Existing time in graph
         """
         # drifting_t and another_t must exist in graph
@@ -170,7 +170,7 @@ class Transcription(nx.MultiDiGraph):
     def anchor(self, drifting_t, anchored_t):
         """
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
+
         o -- [ D ] -- o  ==>  o -- [ A ] -- o
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,9 +179,9 @@ class Transcription(nx.MultiDiGraph):
 
         Parameters
         ----------
-        drifting_t : 
+        drifting_t :
             Drifting time to anchor
-        anchored_t : 
+        anchored_t :
             When to anchor `drifting_t`
 
         """
@@ -202,13 +202,13 @@ class Transcription(nx.MultiDiGraph):
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         o -- [ F ] -- o      o          o
-                               ⟍     ⟋   
+                               ⟍     ⟋
                         ==>     [ F ]
                                ⟋     ⟍
-        o -- [ f ] -- o      o          o    
+        o -- [ f ] -- o      o          o
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-        
+
         Align two (potentially drifting) times
 
         `one_t` and `another_t` cannot both be anchored at the same time
@@ -246,10 +246,10 @@ class Transcription(nx.MultiDiGraph):
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         p -- [ t1 ]       p         [ t1 ]
-                            ⟍     ⟋   
+                            ⟍     ⟋
                      ==>     [ t ]
                             ⟋     ⟍
-        p' -- [ t2 ]      p'        [ t2 ]    
+        p' -- [ t2 ]      p'        [ t2 ]
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -293,10 +293,10 @@ class Transcription(nx.MultiDiGraph):
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         [ t1 ] -- s       [ t1 ]         s
-                                ⟍     ⟋   
+                                ⟍     ⟋
                      ==>         [ t ]
                                 ⟋     ⟍
-        [ t2 ] -- s'      [ t2 ]        s'    
+        [ t2 ] -- s'      [ t2 ]        s'
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         """
@@ -439,7 +439,7 @@ class Transcription(nx.MultiDiGraph):
 
     def timerange(self, t1, t2, inside=True):
         """Infer edge timerange from graph structure
-        
+
         a -- ... -- [ t1 ] -- A -- ... -- B -- [ t2 ] -- ... -- b
 
         ==> [a, b] (inside=False) or [A, B] (inside=True)
@@ -452,7 +452,6 @@ class Transcription(nx.MultiDiGraph):
         Returns
         -------
         segment : Segment
-
         """
 
         t1 = T(t1)
