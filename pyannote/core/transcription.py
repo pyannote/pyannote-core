@@ -394,12 +394,19 @@ class Transcription(nx.MultiDiGraph):
 
         return nx.topological_sort(g)
 
+    # =========================================================================
+
+    def ordered_edges_iter(self, nbunch=None, data=False, keys=False):
+        """Return an iterator over the edges in temporal order.
 
         Ordered edges are returned as tuples with optional data and keys
         in the order (t1, t2, key, data).
 
         Parameters
         ----------
+        nbunch : iterable container, optional (default= all nodes)
+            A container of nodes. The container will be iterated
+            through once.
         data : bool, optional (default=False)
             If True, return edge attribute dict with each edge.
         keys : bool, optional (default=False)
@@ -409,15 +416,24 @@ class Transcription(nx.MultiDiGraph):
         -------
         edge_iter : iterator
             An iterator of (u,v), (u,v,d) or (u,v,key,d) tuples of edges.
+
+        Notes
+        -----
+        Nodes in nbunch that are not in the graph will be (quietly) ignored.
+        For the same reason you should not completely trust temporal_sort,
+        use ordered_edges_iter with care.
         """
 
-        # start by sorting nodes in temporal+topological order
-        o = self.ordering_graph()
-        nodes = nx.topological_sort(o)
+        # start by sorting nodes in temporal order
+        nodes = self.temporal_sort()
 
-        # iterate over edges using this very order
-        for _ in self.edges_iter(nbunch=nodes, data=data, keys=keys):
-            yield _
+        # only keep nbunch subset (while preserving the order)
+        if nbunch:
+            nbunch = list(nbunch)
+            nodes = [n for n in nodes if n in nbunch]
+
+        # iterate over edges using temporal order
+        return self.edges_iter(nbunch=nodes, data=data, keys=keys)
 
     # =========================================================================
     # _anchored_{predecessors|successors} are far from optimal
