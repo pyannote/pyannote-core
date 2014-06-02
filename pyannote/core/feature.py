@@ -12,8 +12,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -72,7 +72,8 @@ class BasePrecomputedSegmentFeature(BaseSegmentFeature):
     Parameters
     ----------
     data : numpy array
-        Feature vectors stored in such a way that data[i] is ith feature vector.
+        Feature vectors stored in such a way that data[i] is ith feature
+        vector.
     segment_iterator : :class:`SlidingWindow` or :class:`Timeline`
         Segment iterator.
         Its length must correspond to `data` length.
@@ -101,8 +102,9 @@ class BasePrecomputedSegmentFeature(BaseSegmentFeature):
         else:
             n = data.shape[0]
             if n != N:
-                raise ValueError("mismatch between number of segments (%d) "
-                                 "and number of feature vectors (%d)." % (N, n))
+                raise ValueError(
+                    "mismatch between number of segments (%d) "
+                    "and number of feature vectors (%d)." % (N, n))
 
         super(BasePrecomputedSegmentFeature, self).__init__(uri=uri)
         self.__data = data
@@ -258,7 +260,8 @@ class TimelinePrecomputedFeature(BasePrecomputedSegmentFeature):
     Parameters
     ----------
     data : numpy array
-        Feature vectors stored in such a way that data[i] is ith feature vector.
+        Feature vectors stored in such a way that data[i] is ith feature
+        vector.
     timeline : :class:`Timeline`
         Timeline whose length must correspond to `data` length
     uri : string, optional
@@ -372,7 +375,7 @@ class SlidingWindowFeature(object):
             firstFrame, frameNumber = self.sliding_window.segmentToRange(focus)
             indices = range(
                 min(n, max(0, firstFrame)),
-                min(n, max(0, firstFrame+frameNumber))
+                min(n, max(0, firstFrame + frameNumber))
             )
 
         if isinstance(focus, Timeline):
@@ -382,7 +385,7 @@ class SlidingWindowFeature(object):
                     segment)
                 indices += range(
                     min(n, max(0, firstFrame)),
-                    min(n, max(0, firstFrame+frameNumber))
+                    min(n, max(0, firstFrame + frameNumber))
                 )
 
         return np.take(self.data, indices, axis=0, out=None, mode='clip')

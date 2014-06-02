@@ -13,7 +13,7 @@
 # furnished to do so, subject to the following conditions:
 
 # The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
+#  all copies or substantial portions of the Software.
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,21 +25,11 @@
 
 from __future__ import unicode_literals
 
-from ._version import get_versions
-__version__ = get_versions()['version']
-del get_versions
+import itertools
 
-PYANNOTE_URI = 'uri'
-PYANNOTE_MODALITY = 'modality'
-PYANNOTE_SEGMENT = 'segment'
-PYANNOTE_TRACK = 'track'
-PYANNOTE_LABEL = 'label'
-PYANNOTE_SCORE = 'score'
-PYANNOTE_IDENTITY = 'identity'
 
-from time import T, TStart, TEnd
-from segment import Segment, SlidingWindow
-from timeline import Timeline
-from annotation import Annotation, Unknown
-from transcription import Transcription
-from scores import Scores
+def pairwise(iterable):
+    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return itertools.izip(a, b)

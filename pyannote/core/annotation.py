@@ -44,8 +44,8 @@ warnings.filterwarnings(
     Warning, 'pyannote.core.annotation'
 )
 
-
 class Unknown(object):
+
     nextID = 0
 
     @classmethod
@@ -57,13 +57,13 @@ class Unknown(object):
         cls.nextID += 1
         return cls.nextID
 
-    def __init__(self, format='Inconnu_%05d'):
+    def __init__(self, format='#{id:d}'):
         super(Unknown, self).__init__()
         self.ID = Unknown.next()
         self._format = format
 
     def __str__(self):
-        return self._format % self.ID
+        return self._format.format(id=self.ID)
 
     def __repr__(self):
         return str(self)
@@ -111,7 +111,7 @@ class Annotation(object):
 
         """
         annotation = cls(uri=uri, modality=modality)
-        for _, (segment, track, label) in df[[SEGMENT, TRACK, LABEL]].iterrows():
+        for _, (segment, track, label) in df[[PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]].iterrows():
             annotation[segment, track] = label
         return annotation
 
@@ -390,14 +390,13 @@ class Annotation(object):
         # no candidate was provided or the provided candidate already exists
         # we need to create a brand new one
 
-        # by default (if prefix is not provided)
-        # use modality as prefix (eg. speaker1, speaker2, ...)
+        # by default (if prefix is not provided), use ''
         if prefix is None:
-            prefix = '' if self.modality is None else str(self.modality)
+            prefix = ''
 
         # find first non-existing track name for segment
-        # eg. if speaker1 exists, try speaker2, then speaker3, ...
-        count = 1
+        # eg. if '0' exists, try '1', then '2', ...
+        count = 0
         while ('%s%d' % (prefix, count)) in existing_tracks:
             count += 1
 
@@ -609,7 +608,7 @@ class Annotation(object):
 
             self._labelNeedsUpdate = {l: False for l in self._labels}
 
-        return self._labels[label]
+        return self._labels[label].copy()
 
     def label_coverage(self, label):
         """
@@ -720,29 +719,29 @@ class Annotation(object):
         # in case all durations were zero, there is no most frequent label
         return label if durations[label] > 0 else None
 
-    def __rshift__(self, timeline):
-        """Tag a timeline
+    # def __rshift__(self, timeline):
+    #     """Tag a timeline
 
-        Use expression 'tagged = annotation >> timeline'
+    #     Use expression 'tagged = annotation >> timeline'
 
-        Shortcut for :
-            >>> tagger = DirectTagger()
-            >>> tagged = tagger(annotation, timeline)
+    #     Shortcut for :
+    #         >>> tagger = DirectTagger()
+    #         >>> tagged = tagger(annotation, timeline)
 
-        Parameters
-        ----------
-        timeline : :class:`pyannote.base.timeline.Timeline`
+    #     Parameters
+    #     ----------
+    #     timeline : :class:`pyannote.base.timeline.Timeline`
 
-        Returns
-        -------
-        tagged : :class:`pyannote.base.annotation.Annotation`
-            Tagged timeline - one track per intersecting label.
+    #     Returns
+    #     -------
+    #     tagged : :class:`pyannote.base.annotation.Annotation`
+    #         Tagged timeline - one track per intersecting label.
 
-        """
-        from pyannote.algorithm.tagging import DirectTagger
-        if not isinstance(timeline, Timeline):
-            raise TypeError('direct tagging (>>) only works with timelines.')
-        return DirectTagger()(self, timeline)
+    #     """
+    #     from pyannote.algorithm.tagging import DirectTagger
+    #     if not isinstance(timeline, Timeline):
+    #         raise TypeError('direct tagging (>>) only works with timelines.')
+    #     return DirectTagger()(self, timeline)
 
     def translate(self, translation):
         """Translate labels
@@ -807,11 +806,17 @@ class Annotation(object):
             anonymized[s, t] = Unknown()
         return anonymized
 
-    def smooth(self):
+    def smooth(self, collar=0.):
         """Smooth annotation
 
         Create new annotation where contiguous tracks with same label are
         merged into one longer track.
+
+        Parameters
+        ----------
+        collar : float
+            If collar is positive, also merge tracks separated by less than
+            collar duration.
 
         Returns
         -------
@@ -822,18 +827,29 @@ class Annotation(object):
         Remarks
         -------
             Track names are lost in the process.
-
         """
 
+        # initialize an empty annotation
+        # with same uri and modality as original 
         smoothed = self.empty()
-
-        n = 0
         for label in self.labels():
-            coverage = self.label_coverage(label)
-            for segment in coverage:
-                smoothed[segment, n] = label
-                n = n+1
+            
+            # get timeline for current label
+            timeline = self.label_timeline(label)
 
+            # fill the gaps shorter than collar
+            if collar > 0.:
+                gaps = timeline.gaps()
+                for gap in gaps:
+                    if gap.duration < collar:
+                        timeline.add(gap)
+            
+            # reconstruct annotation with merged tracks            
+            for segment in timeline.coverage():
+                track = smoothed.new_track(segment)
+                smoothed[segment, track] = label
+
+        # return
         return smoothed
 
     def co_iter(self, other):
