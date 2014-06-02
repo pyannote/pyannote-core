@@ -12,8 +12,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -39,13 +39,15 @@ from segment import Segment
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 class Notebook:
     pass
 
 _notebook = Notebook()
 _notebook.extent = None
-_DEFAULT_NOTEBOOK_WIDTH = 10
+_DEFAULT_NOTEBOOK_WIDTH = 20
 _notebook.width = _DEFAULT_NOTEBOOK_WIDTH
+
 
 def set_notebook_crop(segment=None, margin=0.1):
 
@@ -56,9 +58,10 @@ def set_notebook_crop(segment=None, margin=0.1):
         assert segment
         duration = segment.duration
         _notebook.extent = Segment(
-            segment.start-margin*duration, 
-            segment.end+margin*duration
+            segment.start - margin * duration,
+            segment.end + margin * duration
         )
+
 
 def set_notebook_width(inches=None):
     if inches is None:
@@ -67,6 +70,7 @@ def set_notebook_width(inches=None):
         _notebook.width = inches
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 def _setup(ylim=None, yaxis=False):
     """Prepare figure"""
@@ -78,6 +82,7 @@ def _setup(ylim=None, yaxis=False):
     ax.axes.get_yaxis().set_visible(yaxis)
     return fig, ax
 
+
 def _render(fig):
     """Render figure as png and return raw image data"""
     # render figure as png
@@ -87,7 +92,9 @@ def _render(fig):
     # return raw image data
     return data
 
-def _draw_segment(ax, segment, y, color, label=None, text=True, boundaries=True):
+
+def _draw_segment(ax, segment, y, color, label=None, text=True,
+                  boundaries=True):
 
     # do nothing if segment is empty
     if not segment:
@@ -96,8 +103,8 @@ def _draw_segment(ax, segment, y, color, label=None, text=True, boundaries=True)
     # draw segment
     ax.hlines(y, segment.start, segment.end, color, lw=1, label=label)
     if boundaries:
-        ax.vlines(segment.start, y+0.05, y-0.05, color, lw=1)
-        ax.vlines(segment.end, y+0.05, y-0.05, color, lw=1)
+        ax.vlines(segment.start, y + 0.05, y - 0.05, color, lw=1)
+        ax.vlines(segment.end, y + 0.05, y - 0.05, color, lw=1)
 
     if label is None:
         return
@@ -105,19 +112,20 @@ def _draw_segment(ax, segment, y, color, label=None, text=True, boundaries=True)
     # draw label
     if text:
         ax.text(
-            segment.middle, 
-            y+0.05, 
+            segment.middle,
+            y + 0.05,
             codecs.encode(unicode(label), 'ascii', 'replace'),
-            horizontalalignment='center', 
+            horizontalalignment='center',
             fontsize=10
         )
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 def repr_segment(segment):
     """Get `png` data for `segment`"""
-    
-    # remember current figure size 
+
+    # remember current figure size
     figsize = plt.rcParams['figure.figsize']
     # and update it for segment display
     plt.rcParams['figure.figsize'] = (_notebook.width, 1)
@@ -126,7 +134,7 @@ def repr_segment(segment):
         set_notebook_crop(segment=segment)
 
     fig, ax = _setup(ylim=(0, 1))
-    
+
     # segments are vertically centered and blue
     y = 0.5
     color = 'b'
@@ -140,6 +148,7 @@ def repr_segment(segment):
     return data
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 
 def _y(segments):
     """
@@ -156,7 +165,7 @@ def _y(segments):
 
     """
 
-    # up_to stores the largest end time 
+    # up_to stores the largest end time
     # displayed in each line (at the current iteration)
     # (at the beginning, there is only one empty line)
     up_to = [-np.inf]
@@ -168,7 +177,7 @@ def _y(segments):
         # so far, we do not know which line to use
         found = False
         # try each line until we find one that is ok
-        for i, u in enumerate(up_to): 
+        for i, u in enumerate(up_to):
             # if segment starts after the previous one
             # on the same line, then we add it to the line
             if segment.start >= u:
@@ -182,16 +191,17 @@ def _y(segments):
             up_to.append(segment.end)
 
     # from line numbers to actual y coordinates
-    y = 1. - 1./(len(up_to)+1) * (1+np.array(y))
+    y = 1. - 1. / (len(up_to) + 1) * (1 + np.array(y))
 
     return y
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 def repr_timeline(timeline):
     """Get `png` data for `timeline`"""
 
-    # remember current figure size 
+    # remember current figure size
     figsize = plt.rcParams['figure.figsize']
     # and update it for segment display
     plt.rcParams['figure.figsize'] = (_notebook.width, 1)
@@ -202,7 +212,7 @@ def repr_timeline(timeline):
     cropped = timeline.crop(_notebook.extent, mode='loose')
 
     fig, ax = _setup(ylim=(0, 1))
-    
+
     color = 'b'
     for segment, y in itertools.izip(cropped, _y(cropped)):
         _draw_segment(ax, segment, y, color)
@@ -216,10 +226,11 @@ def repr_timeline(timeline):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 def repr_annotation(annotation):
     """Get `png` data for `annotation`"""
 
-    # remember current figure size 
+    # remember current figure size
     figsize = plt.rcParams['figure.figsize']
     # and update it for segment display
     plt.rcParams['figure.figsize'] = (_notebook.width, 2)
@@ -234,17 +245,16 @@ def repr_annotation(annotation):
     chart = cropped.chart()
     cm = get_cmap('gist_rainbow')
     colors = {
-        label: cm(1.*i/len(chart))
-        for i, (label, _) in enumerate(chart) 
+        label: cm(1. * i / len(chart))
+        for i, (label, _) in enumerate(chart)
     }
 
     fig, ax = _setup(ylim=(0, 1))
 
     for (segment, track, label), y in itertools.izip(
-        cropped.itertracks(label=True), _y(segments)):
+            cropped.itertracks(label=True), _y(segments)):
         color = colors[label]  # color = f(label)
         _draw_segment(ax, segment, y, color, label=label)
-
 
     data = _render(fig)
 
@@ -255,10 +265,11 @@ def repr_annotation(annotation):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 def repr_scores(scores):
     """Get `png` data for `scores`"""
 
-    # remember current figure size 
+    # remember current figure size
     figsize = plt.rcParams['figure.figsize']
     # and update it for segment display
     plt.rcParams['figure.figsize'] = (_notebook.width, 5)
@@ -267,27 +278,29 @@ def repr_scores(scores):
         set_notebook_crop(segment=scores.get_timeline().extent())
 
     cropped = scores.crop(_notebook.extent, mode='loose')
-    segments = [s for s, _ in cropped.itertracks()]
 
     cm = get_cmap('gist_rainbow')
     labels = sorted(scores.labels())
-    colors = {label: cm(1.*i/len(labels)) for i, label in enumerate(labels)}
+    colors = {label: cm(1. * i / len(labels))
+              for i, label in enumerate(labels)}
 
     m = scores._df.min().min()
     M = scores._df.max().max()
-    ylim = (m - 0.1*(M-m), M + 0.1*(M-m))
+    ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
 
     fig, ax = _setup(yaxis=True, ylim=ylim)
 
     for segment, track, label, value in cropped.itervalues():
         color = colors[label]
         y = value
-        _draw_segment(ax, segment, y, color, label=label, text=False, boundaries=False)
+        _draw_segment(ax, segment, y, color, label=label, text=False,
+                      boundaries=False)
 
     # for segment, track, label, value in cropped.nbest(1).itervalues():
     #     color = colors[label]
     #     y = value
-    #     _draw_segment(ax, segment, y, color, label=label, text=True, boundaries=True)
+    #     _draw_segment(ax, segment, y, color, label=label, text=True,
+    #                   boundaries=True)
 
     # get one handle per label and plot the corresponding legend
     H, L = ax.get_legend_handles_labels()
@@ -295,8 +308,7 @@ def repr_scores(scores):
     for h, l in zip(H, L):
         if l in labels:
             handles[l] = h
-    ax.legend([handles[l] for l in sorted(handles)], sorted(handles)) 
-
+    ax.legend([handles[l] for l in sorted(handles)], sorted(handles))
 
     data = _render(fig)
 
@@ -307,25 +319,27 @@ def repr_scores(scores):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 def _shorten_long_text(text, max_length=30):
     suffix = "..."
     if len(text) > max_length:
-        return text[:max_length-len(suffix)] + suffix 
+        return text[:max_length - len(suffix)] + suffix
     else:
         return text
+
 
 def _remove_non_ascii(text):
     # list of characters to remove
     # those characters make resulting SVG invalid
     remove = [u"&", ]
     remove = {ord(r): u"" for r in remove}
-    ascii = unicode(codecs.encode(text, 'ascii', 'replace')) 
+    ascii = unicode(codecs.encode(text, 'ascii', 'replace'))
     return ascii.translate(remove)
+
 
 def _dottable(transcription):
     # create new graph with graphviz/dot layout instructions
     # (e.g. graph orientation, node and edge labels, etc.)
-
 
     # create a dumb networkx copy to avoid messing with input transcription
     dottable = transcription.copy()
@@ -336,9 +350,8 @@ def _dottable(transcription):
     # set shape, label and tooltip of each node
     for n in transcription.nodes_iter():
 
-
         dottable.node[n] = {
-            'label': str(n), 'tooltip': str(n), 
+            'label': str(n), 'tooltip': str(n),
             'shape': 'circle' if n.drifting else 'box'
         }
         # 'URL': 'javascript:console.log("{t}")'.format(t=n.T),
@@ -357,14 +370,16 @@ def _dottable(transcription):
     label_footer = "</table>>"
     tooltip_pattern = "[{name}] {value}"
 
-    for source, target, key, data in transcription.edges_iter(keys=True, data=True):
+    for source, target, key, data in transcription.edges_iter(
+        keys=True, data=True
+    ):
         tooltip = ""
         label = ""
         if data:
 
             # initialize label table
             label = label_header
-            
+
             for name, value in data.iteritems():
                 # remove non-ascii characters
                 name = _remove_non_ascii(name)
@@ -374,10 +389,10 @@ def _dottable(transcription):
                 # update label and tooltip
                 label += label_pattern.format(name=name, value=short_value)
                 tooltip += tooltip_pattern.format(name=name, value=value)
-            
+
             # close label table
             label += label_footer
-        
+
         dottable[source][target][key] = {
             'label': label,
             'labeltooltip': tooltip,
@@ -388,15 +403,15 @@ def _dottable(transcription):
 
     return dottable
 
+
 def _write_temporary_dot_file(transcription):
     _, path = tempfile.mkstemp('.dot')
     nx.write_dot(_dottable(transcription), path)
     return path
+
 
 def repr_transcription(transcription):
     """Get `svg` data for `transcription`"""
     path = _write_temporary_dot_file(transcription)
     data = subprocess.check_output(["dot", "-T", "svg", path])
     return data[data.find("<svg"):]
-
-
