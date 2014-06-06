@@ -478,6 +478,16 @@ class Annotation(object):
     def empty(self):
         return self.__class__(uri=self.uri, modality=self.modality)
 
+    @staticmethod
+    def _cmp_labels(label1, label2):
+        # unknown > not_unknown
+        # otherwise, just use regular cmp
+        u1 = isinstance(label1, Unknown)
+        u2 = isinstance(label2, Unknown)
+        if u1 == u2:
+            return cmp(label1, label2)
+        return u1 - u2
+
     def labels(self, unknown=True):
         """List of labels
 
@@ -491,16 +501,12 @@ class Annotation(object):
         -------
         labels : list
             Sorted list of labels
-
-        Remarks
-        -------
-            Labels are sorted based on their string representation.
         """
 
         if any([lnu for lnu in self._labelNeedsUpdate.values()]):
             self._updateLabels()
 
-        labels = sorted(self._labels, key=str)
+        labels = sorted(self._labels, cmp=self._cmp_labels)
 
         if not unknown:
             labels = [l for l in labels if not isinstance(l, Unknown)]
