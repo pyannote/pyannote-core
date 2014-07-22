@@ -193,10 +193,10 @@ def get_cooccurrence_matrix(R, C):
     cols = C.labels()
     K = np.zeros((len(rows), len(cols)), dtype=np.float)
     M = LabelMatrix(data=K, rows=rows, columns=cols)
-    
+
     # loop on intersecting tracks
     for (r_segment, r_track), (c_segment, c_track) in R.co_iter(C):
-        # increment 
+        # increment
         r_label = R[r_segment, r_track]
         c_label = C[c_segment, c_track]
         duration = (r_segment & c_segment).duration
