@@ -436,6 +436,14 @@ class SlidingWindow(object):
 
         return Segment(start, end)
 
+    def samplesToDuration(self, nSamples):
+        """Returns duration of samples"""
+        return self.rangeToSegment(0, nSamples).duration
+
+    def durationToSamples(self, duration):
+        """Returns samples in duration"""
+        return self.segmentToRange(Segment(0, duration))[1]
+
     def __getitem__(self, i):
         """
         Parameters
