@@ -1,4 +1,4 @@
-### Version 0.0.4 (2014-07-23)
+### Version 0.0.5 (2014-07-23)
 
   - feat(SlidingWindow): add durationToSamples (and vice-versa)
   - fix(Transcription): fix loading from JSON
