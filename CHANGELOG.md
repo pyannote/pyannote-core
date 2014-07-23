@@ -1,16 +1,24 @@
+### Version 0.0.4 (2014-07-23)
+
+  - feat(SlidingWindow): add durationToSamples (and vice-versa)
+  - fix(Transcription): fix loading from JSON
+  - fix(Transcription): fix cropping corner cases
+  - docs: add installation instruction for IPython display support
+  - docs(Scores): add IPython documentation for Scores
+
 ### Version 0.0.3 (2014-06-02)
 
-  - feat(Annotation):     add 'collar' param to .smooth()
+  - feat(Annotation): add 'collar' param to .smooth()
   - refactor(Annotation): remove support for >> operator
-  - maintain(Mapping):    remove label mapping data structure
-  - feat(LabelMatrix):    add IPython display
+  - maintain(Mapping): remove label mapping data structure
+  - feat(LabelMatrix): add IPython display
   - improve(LabelMatrix): 10x faster cooccurrence matrix
-  - feat(Scores):         add IPython display
-  - feat(Transcription):  add edge timerange prediction
-  - feat(Transcription):  add node temporal sort
-  - fix(Transcription):   make label_timeline return a copy
-  - fix(Transcription):   fix IPython display
-  - docs(Transcription):  add IPython documentation for Transcription
+  - feat(Scores): add IPython display
+  - feat(Transcription): add edge timerange prediction
+  - feat(Transcription): add node temporal sort
+  - fix(Transcription): make label_timeline return a copy
+  - fix(Transcription): fix IPython display
+  - docs(Transcription): add IPython documentation for Transcription
 
 ### Version 0.0.2 (2014-05-06)
 
