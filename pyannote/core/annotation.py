@@ -12,8 +12,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -43,6 +43,7 @@ warnings.filterwarnings(
     'ignore', 'Key-type optimization',
     Warning, 'pyannote.core.annotation'
 )
+
 
 class Unknown(object):
 
@@ -91,7 +92,7 @@ class Annotation(object):
     """
 
     @classmethod
-    def from_df(cls, df, uri=None, modality=None, aggfunc=np.mean):
+    def from_df(cls, df, uri=None, modality=None):
         """
 
         Parameters
@@ -102,17 +103,19 @@ class Annotation(object):
             Resource identifier
         modality : str, optional
             Modality
-        aggfunc : func
-            Value aggregation function in case of duplicate (segment, track,
-            label) tuples
 
         Returns
         -------
 
         """
         annotation = cls(uri=uri, modality=modality)
-        for _, (segment, track, label) in df[[PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]].iterrows():
+        for _, (segment, track, label) in df[
+            [PYANNOTE_SEGMENT,
+             PYANNOTE_TRACK,
+             PYANNOTE_LABEL]
+        ].iterrows():
             annotation[segment, track] = label
+
         return annotation
 
     def __init__(self, uri=None, modality=None):
@@ -475,6 +478,16 @@ class Annotation(object):
     def empty(self):
         return self.__class__(uri=self.uri, modality=self.modality)
 
+    @staticmethod
+    def _cmp_labels(label1, label2):
+        # unknown > not_unknown
+        # otherwise, just use regular cmp
+        u1 = isinstance(label1, Unknown)
+        u2 = isinstance(label2, Unknown)
+        if u1 == u2:
+            return cmp(label1, label2)
+        return u1 - u2
+
     def labels(self, unknown=True):
         """List of labels
 
@@ -488,16 +501,12 @@ class Annotation(object):
         -------
         labels : list
             Sorted list of labels
-
-        Remarks
-        -------
-            Labels are sorted based on their string representation.
         """
 
         if any([lnu for lnu in self._labelNeedsUpdate.values()]):
             self._updateLabels()
 
-        labels = sorted(self._labels, key=str)
+        labels = sorted(self._labels, cmp=self._cmp_labels)
 
         if not unknown:
             labels = [l for l in labels if not isinstance(l, Unknown)]
@@ -719,30 +728,6 @@ class Annotation(object):
         # in case all durations were zero, there is no most frequent label
         return label if durations[label] > 0 else None
 
-    # def __rshift__(self, timeline):
-    #     """Tag a timeline
-
-    #     Use expression 'tagged = annotation >> timeline'
-
-    #     Shortcut for :
-    #         >>> tagger = DirectTagger()
-    #         >>> tagged = tagger(annotation, timeline)
-
-    #     Parameters
-    #     ----------
-    #     timeline : :class:`pyannote.base.timeline.Timeline`
-
-    #     Returns
-    #     -------
-    #     tagged : :class:`pyannote.base.annotation.Annotation`
-    #         Tagged timeline - one track per intersecting label.
-
-    #     """
-    #     from pyannote.algorithm.tagging import DirectTagger
-    #     if not isinstance(timeline, Timeline):
-    #         raise TypeError('direct tagging (>>) only works with timelines.')
-    #     return DirectTagger()(self, timeline)
-
     def translate(self, translation):
         """Translate labels
 
@@ -830,10 +815,10 @@ class Annotation(object):
         """
 
         # initialize an empty annotation
-        # with same uri and modality as original 
+        # with same uri and modality as original
         smoothed = self.empty()
         for label in self.labels():
-            
+
             # get timeline for current label
             timeline = self.label_timeline(label)
 
@@ -843,8 +828,8 @@ class Annotation(object):
                 for gap in gaps:
                     if gap.duration < collar:
                         timeline.add(gap)
-            
-            # reconstruct annotation with merged tracks            
+
+            # reconstruct annotation with merged tracks
             for segment in timeline.coverage():
                 track = smoothed.new_track(segment)
                 smoothed[segment, track] = label
@@ -886,8 +871,7 @@ class Annotation(object):
         uri = data.get(PYANNOTE_URI, None)
         modality = data.get(PYANNOTE_MODALITY, None)
         annotation = cls(uri=uri, modality=modality)
-        for s, track, label in data[PYANNOTE_JSON_ANNOTATION]:
-            segment = Segment.from_json(s)
+        for segment, track, label in data[PYANNOTE_JSON_ANNOTATION]:
             annotation[segment, track] = label
         return annotation
 

@@ -12,8 +12,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,7 +34,7 @@ from setuptools import setup, find_packages
 setup(
 
     # package
-    namespace_packages = ['pyannote'],
+    namespace_packages=['pyannote'],
     packages=find_packages(),
     install_requires=[
         'banyan >=0.1.5',
@@ -43,7 +43,7 @@ setup(
         'networkx >= 1.8.1',
         'simplejson >= 3.4.1',
     ],
-    extras_require = {
+    extras_require={
         'notebook': [
             'matplotlib >= 1.3.1',
             'pygraphviz >= 1.2',
@@ -63,9 +63,9 @@ setup(
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+        "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
         "Programming Language :: Python :: 2.7",
         "Topic :: Scientific/Engineering"
-    ],        
+    ],
 )

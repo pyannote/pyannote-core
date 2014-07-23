@@ -3,8 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS (Hervé BREDIN - http://herve.niderb.fr)
-
+# Copyright (c) 2014 CNRS
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
 # in the Software without restriction, including without limitation the rights
@@ -12,8 +11,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -22,6 +21,10 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+# Authors
+# Hervé BREDIN - http://herve.niderb.fr
+
 
 from __future__ import unicode_literals
 
@@ -119,12 +122,12 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         return bool((self.end - self.start) > SEGMENT_PRECISION)
 
     def _get_duration(self):
-        return self.end-self.start if self else 0.
+        return self.end - self.start if self else 0.
     duration = property(fget=_get_duration)
     """Get segment duration, in seconds."""
 
     def _get_middle(self):
-        return .5*(self.start+self.end)
+        return .5 * (self.start + self.end)
     middle = property(fget=_get_middle)
     """Get segment middle time, in seconds."""
 
@@ -177,8 +180,10 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
             return False
 
         return (self.start == other.start) or \
-               (self.start < other.start and other.start < self.end-SEGMENT_PRECISION) or \
-               (self.start > other.start and self.start < other.end-SEGMENT_PRECISION)
+               (self.start < other.start and
+                other.start < self.end - SEGMENT_PRECISION) or \
+               (self.start > other.start and
+                self.start < other.end - SEGMENT_PRECISION)
 
     def overlaps(self, t):
         return self.start <= t and self.end >= t
@@ -238,10 +243,10 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         minutes, seconds = divmod(remainder, 60)
         if abs(days) > 0:
             return '%d:%02d:%02d:%02d.%03d' % (days, hours, minutes,
-                                               seconds, microseconds/1000)
+                                               seconds, microseconds / 1000)
         else:
             return '%02d:%02d:%02d.%03d' % (hours, minutes, seconds,
-                                            microseconds/1000)
+                                            microseconds / 1000)
 
     def pretty(self):
         """Human-readable representation of segments"""
@@ -351,7 +356,9 @@ class SlidingWindow(object):
             Index of frame whose middle is the closest to `timestamp`
 
         """
-        return int(np.rint((t-self.__start-.5*self.__duration)/self.__step))
+        return int(np.rint(
+            (t - self.__start - .5 * self.__duration) / self.__step
+        ))
 
     def segmentToRange(self, segment):
         """Convert segment to 0-indexed frame range
@@ -419,15 +426,23 @@ class SlidingWindow(object):
         # start += .5 * self.duration
         # subframe start time
         # start -= .5 * self.step
-        start = self.__start + (i0-.5)*self.__step + .5*self.__duration
-        duration = n*self.__step
-        end = start+duration
+        start = self.__start + (i0 - .5) * self.__step + .5 * self.__duration
+        duration = n * self.__step
+        end = start + duration
 
         # extend segment to the beginning of the timeline
         if i0 == 0:
             start = self.start
 
         return Segment(start, end)
+
+    def samplesToDuration(self, nSamples):
+        """Returns duration of samples"""
+        return self.rangeToSegment(0, nSamples).duration
+
+    def durationToSamples(self, duration):
+        """Returns samples in duration"""
+        return self.segmentToRange(Segment(0, duration))[1]
 
     def __getitem__(self, i):
         """
@@ -444,14 +459,14 @@ class SlidingWindow(object):
         """
 
         # window start time at ith position
-        start = self.__start + i*self.__step
+        start = self.__start + i * self.__step
 
         # in case segment starts after the end,
         # return an empty segment
         if start >= self.__end:
             return None
 
-        return Segment(start=start, end=start+self.__duration)
+        return Segment(start=start, end=start + self.__duration)
 
     def __iter__(self):
         """Sliding window iterator

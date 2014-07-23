@@ -54,3 +54,6 @@ coverage.xml
 docs/_build/
 
 doc/.ipynb_checkpoints
+
+# emacs temporary files
+*~
