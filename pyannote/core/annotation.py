@@ -871,8 +871,7 @@ class Annotation(object):
         uri = data.get(PYANNOTE_URI, None)
         modality = data.get(PYANNOTE_MODALITY, None)
         annotation = cls(uri=uri, modality=modality)
-        for s, track, label in data[PYANNOTE_JSON_ANNOTATION]:
-            segment = Segment.from_json(s)
+        for segment, track, label in data[PYANNOTE_JSON_ANNOTATION]:
             annotation[segment, track] = label
         return annotation
 
