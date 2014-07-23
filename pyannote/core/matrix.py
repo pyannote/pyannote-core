@@ -66,13 +66,6 @@ class LabelMatrix(object):
                 if not np.isnan(val):
                     yield row, col, val
 
-    def iter_values(self):
-        for row in self.get_rows():
-            for col in self.get_columns():
-                val = self.df.at[row, col]
-                if not np.isnan(val):
-                    yield row, col, val
-
     def argmax(self, axis=None):
         """
         Labels of the maximum values along an axis.
