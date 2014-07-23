@@ -99,7 +99,7 @@ class Transcription(nx.MultiDiGraph):
         return nx.relabel_nodes(self, old2new, copy=True), new2old
 
     def crop(self, source, target=None):
-        """Get subgraph between source and target
+        """Get minimum subgraph between source time and target time
 
         Parameters
         ----------
@@ -118,19 +118,67 @@ class Transcription(nx.MultiDiGraph):
         source = T(source)
         target = T(target)
 
-        if source.anchored:
-            before = [n for n in self.anchored() if n <= source]
-            if before:
-                source = sorted(before)[-1]
+        # sorted list of anchored times will be needed later
+        # make sure it is computed only once
+        if source.anchored or target.anchored:
+            anchored = sorted(self.anchored())
 
-        if target.anchored:
-            after = [n for n in self.anchored() if n >= target]
-            if after:
-                target = sorted(after)[0]
+        # ~~~ from_source = set of nodes reachable from source ~~~~~~~~~~~~~~~~
 
-        from_source = nx.algorithms.descendants(self, source)
-        to_target = nx.algorithms.ancestors(self, target)
-        nbunch = {source, target} | (from_source & to_target)
+        # source is drifting
+        if source.drifting:
+
+            if source not in self:
+                raise ValueError(
+                    'Drifting time %s is not in the transcription.' % source)
+            else:
+                from_source = {source} | nx.algorithms.descendants(self, source)
+
+        # source is anchored
+        else:
+
+            # if source is in graph, then it is easy
+            if source in self:
+                from_source = {source} | nx.algorithms.descendants(self, source)
+
+            # if source is not in graph,
+            # find anchored time just before source
+            else:
+                if source < anchored[0]:
+                    from_source = set(self)  # take no risk!
+                else:
+                    before = [n for n in anchored if n <= source][-1]
+                    from_source = {before} | nx.algorithms.descendants(self, before)
+
+        # ~~~ to_target = set of nodes from which target is reachable ~~~~~~~~~
+
+        # target is drifting
+        if target.drifting:
+
+            if target not in self:
+                raise ValueError(
+                    'Drifting time %s is not in the transcription.' % target)
+            else:
+                to_target = {target} | nx.algorithms.ancestors(self, target)
+
+        else:
+
+            # if target is in graph, then it is easy
+            if target in self:
+                to_target = {target} | nx.algorithms.ancestors(self, target)
+
+            # if target is not in graph,
+            # find anchored time just after target
+            else:
+                if target > anchored[-1]:
+                    to_target = set(self)  # take no risk!
+                else:
+                    after = [n for n in anchored if n >= target][0]
+                    to_target = {after} | nx.algorithms.ancestors(self, after)
+
+        # union of source, target and source-to-target paths
+        nbunch = from_source & to_target
+
         return self.subgraph(nbunch)
 
     # =========================================================================
