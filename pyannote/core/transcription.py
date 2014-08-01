@@ -203,12 +203,18 @@ class Transcription(nx.MultiDiGraph):
         for t, _, key, data in self.in_edges_iter(
             nbunch=[drifting_t], data=True, keys=True
         ):
+            # use lowest unused integer in case this key already exists
+            if self.has_edge(t, another_t, key=key):
+                key = None
             self.add_edge(t, another_t, key=key, attr_dict=data)
 
         # add a (another_t --> t) edge for each (drifting_t --> t) edge
         for _, t, key, data in self.edges_iter(
             nbunch=[drifting_t], data=True, keys=True
         ):
+            # use lowest unused integer in case this key already exists
+            if self.has_edge(another_t, t, key=key):
+                key = None
             self.add_edge(another_t, t, key=key, attr_dict=data)
 
         # remove drifting_t node (as it was replaced by another_t)
