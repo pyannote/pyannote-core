@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS (Hervé BREDIN - http://herve.niderb.fr)
+# Copyright (c) 2014 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,9 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+
+# AUTHORS
+# Hervé BREDIN - http://herve.niderb.fr
 
 from __future__ import unicode_literals
 
@@ -252,6 +255,7 @@ class Transcription(nx.MultiDiGraph):
 
     def align(self, one_t, another_t):
         """
+        Align two (potentially drifting) times
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
         o -- [ F ] -- o      o          o
@@ -262,15 +266,18 @@ class Transcription(nx.MultiDiGraph):
 
         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-        Align two (potentially drifting) times
-
-        `one_t` and `another_t` cannot both be anchored at the same time
-        In case `another_t` is anchored, this is similar to `anchor` method
-
         Parameters
         ----------
         one_t, another_t
             Two times to be aligned.
+
+        Notes
+        -----
+        * If both `one_t` and  `another_t` are drifting, the resulting graph
+        will no longer contain `one_t`.
+        * In case `another_t` is anchored, `align` is equivalent to `anchor`.
+        * `one_t` and `another_t` cannot be both anchored.
+
         """
 
         one_t = T(one_t)
