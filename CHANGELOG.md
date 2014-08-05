@@ -1,3 +1,7 @@
+### Version 0.1 (2014-08-05)
+
+  - fix(Transcription): fix potential edge/key conflict during alignment
+
 ### Version 0.0.5 (2014-07-23)
 
   - feat(SlidingWindow): add durationToSamples (and vice-versa)
