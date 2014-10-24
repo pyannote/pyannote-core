@@ -29,10 +29,7 @@
 from __future__ import unicode_literals
 
 from collections import namedtuple
-
 import numpy as np
-
-from json import PYANNOTE_JSON_SEGMENT
 
 SEGMENT_PRECISION = 1e-6
 
@@ -257,12 +254,11 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         return '<Segment(%g, %g)>' % (self.start, self.end)
 
     def for_json(self):
-        return {PYANNOTE_JSON_SEGMENT: [self.start, self.end]}
+        return {'start': self.start, 'end': self.end}
 
     @classmethod
     def from_json(cls, data):
-        start, end = data[PYANNOTE_JSON_SEGMENT]
-        return cls(start=start, end=end)
+        return cls(start=data['start'], end=data['end'])
 
     def _repr_png_(self):
         from pyannote.core.notebook import repr_segment

@@ -31,7 +31,7 @@ from . import PYANNOTE_URI
 from banyan import SortedSet
 from interval_tree import TimelineUpdator
 from segment import Segment
-from json import PYANNOTE_JSON_TIMELINE
+from json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 
 # ignore Banyan warning
 warnings.filterwarnings(
@@ -575,15 +575,18 @@ class Timeline(object):
         return timeline
 
     def for_json(self):
-        data = {PYANNOTE_JSON_TIMELINE: [s.for_json() for s in self]}
+        data = {PYANNOTE_JSON: self.__class__.__name__}
+        data[PYANNOTE_JSON_CONTENT] = [s.for_json() for s in self]
+
         if self.uri:
             data[PYANNOTE_URI] = self.uri
+
         return data
 
     @classmethod
     def from_json(cls, data):
-        segments = [Segment.from_json(s) for s in data[PYANNOTE_JSON_TIMELINE]]
         uri = data.get(PYANNOTE_URI, None)
+        segments = [Segment.from_json(s) for s in data[PYANNOTE_JSON_CONTENT]]
         return cls(segments=segments, uri=uri)
 
     def _repr_png_(self):

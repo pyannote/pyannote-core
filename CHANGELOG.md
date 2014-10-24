@@ -1,3 +1,7 @@
+### Version 0.2 (2014-10-24)
+
+  - breaking change: new PyAnnote JSON format
+
 ### Version 0.1 (2014-08-05)
 
   - fix(Transcription): fix potential edge/key conflict during alignment

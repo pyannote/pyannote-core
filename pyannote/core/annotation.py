@@ -36,7 +36,7 @@ from banyan import SortedDict
 from interval_tree import TimelineUpdator
 from segment import Segment
 from timeline import Timeline
-from json import PYANNOTE_JSON_ANNOTATION
+from json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 
 # ignore Banyan warning
 warnings.filterwarnings(
@@ -855,24 +855,35 @@ class Annotation(object):
                 yield (s, t), (S, T)
 
     def for_json(self):
-        data = {
-            PYANNOTE_JSON_ANNOTATION: [
-                [s.for_json(), t, l] for s, t, l in self.itertracks(label=True)
-            ],
-        }
+
+        data = {PYANNOTE_JSON: self.__class__.__name__}
+        content = [{PYANNOTE_SEGMENT: s.for_json(),
+                    PYANNOTE_TRACK: t,
+                    PYANNOTE_LABEL: l}
+            for s, t, l in self.itertracks(label=True)
+        ]
+        data[PYANNOTE_JSON_CONTENT] = content
+
         if self.uri:
             data[PYANNOTE_URI] = self.uri
+
         if self.modality:
             data[PYANNOTE_MODALITY] = self.modality
+
         return data
 
     @classmethod
     def from_json(cls, data):
+
         uri = data.get(PYANNOTE_URI, None)
         modality = data.get(PYANNOTE_MODALITY, None)
         annotation = cls(uri=uri, modality=modality)
-        for segment, track, label in data[PYANNOTE_JSON_ANNOTATION]:
+        for one in data[PYANNOTE_JSON_CONTENT]:
+            segment = Segment.from_json(one[PYANNOTE_SEGMENT])
+            track = one[PYANNOTE_TRACK]
+            label = one[PYANNOTE_LABEL]
             annotation[segment, track] = label
+
         return annotation
 
     def _repr_png_(self):
