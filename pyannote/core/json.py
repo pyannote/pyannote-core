@@ -27,10 +27,8 @@ from __future__ import unicode_literals
 
 import simplejson as json
 
-PYANNOTE_JSON_SEGMENT = 'S'
-PYANNOTE_JSON_TIMELINE = 'L'
-PYANNOTE_JSON_ANNOTATION = 'A'
-PYANNOTE_JSON_TRANSCRIPTION = 'T'
+PYANNOTE_JSON = 'pyannote'
+PYANNOTE_JSON_CONTENT = 'content'
 
 
 def object_hook(d):
@@ -41,22 +39,10 @@ def object_hook(d):
     ...   json.load(f, object_hook=object_hook)
     """
 
-    from segment import Segment
-    from timeline import Timeline
-    from annotation import Annotation
-    from transcription import Transcription
-
-    if PYANNOTE_JSON_SEGMENT in d:
-        return Segment.from_json(d)
-
-    if PYANNOTE_JSON_TIMELINE in d:
-        return Timeline.from_json(d)
-
-    if PYANNOTE_JSON_ANNOTATION in d:
-        return Annotation.from_json(d)
-
-    if PYANNOTE_JSON_TRANSCRIPTION in d:
-        return Transcription.from_json(d)
+    if PYANNOTE_JSON in d:
+        import pyannote.core
+        cls = getattr(pyannote.core, d[PYANNOTE_JSON])
+        return cls.from_json(d)
 
     return d
 

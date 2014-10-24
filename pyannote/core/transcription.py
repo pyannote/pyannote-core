@@ -33,7 +33,7 @@ from networkx.readwrite.json_graph import node_link_data, node_link_graph
 
 from time import T, TStart, TEnd
 from segment import Segment
-from json import PYANNOTE_JSON_TRANSCRIPTION
+from json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from util import pairwise
 
 
@@ -564,11 +564,14 @@ class Transcription(nx.MultiDiGraph):
     # =========================================================================
 
     def for_json(self):
-        return {PYANNOTE_JSON_TRANSCRIPTION: node_link_data(self)}
+
+        data = {PYANNOTE_JSON: self.__class__.__name__}
+        data[PYANNOTE_JSON_CONTENT] = node_link_data(self)
+        return data
 
     @classmethod
     def from_json(cls, data):
-        graph = node_link_graph(data[PYANNOTE_JSON_TRANSCRIPTION])
+        graph = node_link_graph(data[PYANNOTE_JSON_CONTENT])
         mapping = {node: T(node) for node in graph}
         graph = nx.relabel_nodes(graph, mapping)
         return cls(graph=graph, **graph.graph)
