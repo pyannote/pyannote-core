@@ -12,8 +12,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,11 +32,11 @@ PYANNOTE_JSON_TIMELINE = 'L'
 PYANNOTE_JSON_ANNOTATION = 'A'
 PYANNOTE_JSON_TRANSCRIPTION = 'T'
 
+
 def object_hook(d):
     """
     Usage
     -----
-    >>> import simplejson as json
     >>> with open('file.json', 'r') as f:
     ...   json.load(f, object_hook=object_hook)
     """
@@ -60,14 +60,14 @@ def object_hook(d):
 
     return d
 
+
 def load(path):
     with open(path, 'r') as f:
         data = json.load(f, encoding='utf-8', object_hook=object_hook)
     return data
 
+
 def dump(data, path):
     # TODO: add pyannote.core version
     with open(path, 'w') as f:
         json.dump(data, f, encoding='utf-8', for_json=True)
-
-
