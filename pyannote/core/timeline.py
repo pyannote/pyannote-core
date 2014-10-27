@@ -12,8 +12,8 @@
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
 
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
 
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,7 +27,7 @@ from __future__ import unicode_literals
 
 import warnings
 
-from . import PYANNOTE_URI
+from . import PYANNOTE_URI, PYANNOTE_SEGMENT
 from banyan import SortedSet
 from interval_tree import TimelineUpdator
 from segment import Segment
@@ -146,6 +146,12 @@ class Timeline(object):
         ]
 
     """
+
+    @classmethod
+    def from_df(cls, df, uri=None):
+        segments = list(df[PYANNOTE_SEGMENT])
+        timeline = cls(segments=segments, uri=uri)
+        return timeline
 
     def __init__(self, segments=None, uri=None):
 
