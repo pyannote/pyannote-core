@@ -31,7 +31,8 @@ import warnings
 
 import numpy as np
 
-from . import PYANNOTE_URI, PYANNOTE_MODALITY, PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
+from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
+    PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
 from banyan import SortedDict
 from interval_tree import TimelineUpdator
 from segment import Segment
@@ -270,14 +271,18 @@ class Annotation(object):
             elif mode == 'strict':
                 # TODO
                 # see above
-                for segment, other_segment in self.get_timeline().co_iter(other):
+                for segment, other_segment in \
+                        self.get_timeline().co_iter(other):
+
                     if segment in other_segment:
                         for track, label in self._tracks[segment].iteritems():
                             cropped[segment, track] = label
 
             elif mode == 'intersection':
                 # see above
-                for segment, other_segment in self.get_timeline().co_iter(other):
+                for segment, other_segment in \
+                        self.get_timeline().co_iter(other):
+
                     intersection = segment & other_segment
                     for track, label in self._tracks[segment].iteritems():
                         track = cropped.new_track(intersection,
@@ -664,7 +669,7 @@ class Annotation(object):
 
         if percent:
             total = np.sum([duration for _, duration in chart])
-            chart = [(label, duration/total) for (label, duration) in chart]
+            chart = [(label, duration / total) for (label, duration) in chart]
 
         return chart
 
@@ -711,7 +716,8 @@ class Annotation(object):
             segment = self.get_timeline().extent()
 
         # compute intersection duration for each label
-        durations = {lbl: self.label_timeline(lbl).crop(segment, mode='intersection').duration()
+        durations = {lbl: self.label_timeline(lbl)
+                     .crop(segment, mode='intersection').duration()
                      for lbl in self.labels()}
 
         # artifically reduce intersection duration of Unknown labels
@@ -860,8 +866,7 @@ class Annotation(object):
         content = [{PYANNOTE_SEGMENT: s.for_json(),
                     PYANNOTE_TRACK: t,
                     PYANNOTE_LABEL: l}
-            for s, t, l in self.itertracks(label=True)
-        ]
+                   for s, t, l in self.itertracks(label=True)]
         data[PYANNOTE_JSON_CONTENT] = content
 
         if self.uri:
