@@ -1,3 +1,8 @@
+### Version 0.2.1 (2014-10-30)
+
+  - feat: pyannote/core Docker image
+  - feat(Timeline): add from_df constructor
+
 ### Version 0.2 (2014-10-24)
 
   - breaking change: new PyAnnote JSON format
