@@ -1,3 +1,7 @@
+### Version 0.2.2 (2014-11-12)
+
+  - setup: use banyan 0.1.5.1 from GitHub
+
 ### Version 0.2.1 (2014-10-30)
 
   - feat: pyannote/core Docker image
