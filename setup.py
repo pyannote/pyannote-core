@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS (Hervé BREDIN - http://herve.niderb.fr)
+# Copyright (c) 2014 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# AUTHORS
+# Hervé BREDIN - http://herve.niderb.fr
+
+
 import versioneer
 versioneer.versionfile_source = 'pyannote/core/_version.py'
 versioneer.versionfile_build = versioneer.versionfile_source
@@ -37,11 +41,14 @@ setup(
     namespace_packages=['pyannote'],
     packages=find_packages(),
     install_requires=[
-        'banyan >=0.1.5',
+        'banyan == 0.1.5.1',
         'numpy >=1.7.1',
         'pandas >=0.13.1',
         'networkx >= 1.8.1',
         'simplejson >= 3.4.1',
+    ],
+    dependency_links=[
+        "http://github.com/pyannote/pyannote-banyan/archive/0.1.5.1.tar.gz#egg=banyan-0.1.5.1",
     ],
     extras_require={
         'notebook': [
