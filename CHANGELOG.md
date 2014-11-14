@@ -1,3 +1,7 @@
+### Version 0.2.3 (2014-11-14)
+
+  - fix: force revert to pandas 0.13.1 for Scores to work again...
+
 ### Version 0.2.2 (2014-11-12)
 
   - setup: use banyan 0.1.5.1 from GitHub

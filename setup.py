@@ -43,7 +43,7 @@ setup(
     install_requires=[
         'banyan == 0.1.5.1',
         'numpy >=1.7.1',
-        'pandas >=0.13.1',
+        'pandas == 0.13.1',
         'networkx >= 1.8.1',
         'simplejson >= 3.4.1',
     ],
