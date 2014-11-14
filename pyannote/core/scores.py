@@ -437,7 +437,7 @@ class Scores(AnnotationMixin, object):
             return [l for l in labels if not isinstance(l, Unknown)]
 
     def itervalues(self):
-        """Iterate over annotation as (segment, track, label, value) tuple"""
+        """Iterate over scores as (segment, track, label, value) tuple"""
 
         # make sure segment/track pairs are sorted
         self._df = self._df.sort_index()
