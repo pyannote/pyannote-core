@@ -52,7 +52,7 @@ def _kth(node, k):
         # if there are less than k elements in left child
         # then the kth element should be found in right child
         elif k > node.left.metadata.num:
-            return _kth(node.right, k-1-node.left.metadata.num)
+            return _kth(node.right, k - 1 - node.left.metadata.num)
 
         # if there are exactly k elements in left child
         # then the kth (0-indexed) element is in root node
@@ -63,7 +63,7 @@ def _kth(node, k):
         return node.key
 
     else:
-        return _kth(node.right, k-1)
+        return _kth(node.right, k - 1)
 
 
 def _index(node, segment, k):
@@ -78,7 +78,7 @@ def _index(node, segment, k):
     elif segment > node.key:
         return _index(node.right,
                       segment,
-                      k+1+(node.left.metadata.num if node.left else 0))
+                      k + 1 + (node.left.metadata.num if node.left else 0))
 
     else:
         return k + (node.left.metadata.num if node.left else 0)
@@ -88,9 +88,9 @@ def _debug(node, depth):
     """Print debug"""
 
     if node:
-        _debug(node.right, depth+4)
+        _debug(node.right, depth + 4)
         print " " * depth + repr(node.key) + " " + repr(node.metadata)
-        _debug(node.left, depth+4)
+        _debug(node.left, depth + 4)
 
 
 def _dfs(node):
@@ -280,7 +280,7 @@ class TimelineUpdator(object):
     def kth(self, k):
         """Get kth segment"""
         if k < 0:
-            return _kth(self.root, self.root.num+k)
+            return _kth(self.root, self.root.num + k)
         else:
             return _kth(self.root, k)
 
