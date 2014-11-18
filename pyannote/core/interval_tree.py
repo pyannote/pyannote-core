@@ -28,6 +28,10 @@
 
 from __future__ import unicode_literals
 
+from segment import Segment
+import numpy as np
+
+
 # =====================================================================
 # Helper functions
 # =====================================================================
@@ -284,7 +288,10 @@ class TimelineUpdator(object):
         return _index(self.root, segment, 0)
 
     def extent(self):
-        return self.root.metadata.extent
+        if self.root:
+            return self.root.metadata.extent
+        else:
+            return Segment(start=np.inf, end=-np.inf)
 
     def debug(self):
         _debug(self.root, 0)
