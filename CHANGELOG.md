@@ -1,3 +1,7 @@
+### Version 0.2.4 (2014-11-18)
+
+  - fix: extent of empty Timeline
+
 ### Version 0.2.3 (2014-11-14)
 
   - fix: force revert to pandas 0.13.1 for Scores to work again...
