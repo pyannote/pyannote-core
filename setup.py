@@ -41,14 +41,11 @@ setup(
     namespace_packages=['pyannote'],
     packages=find_packages(),
     install_requires=[
-        'banyan == 0.1.5.1',
+        'pyannote-banyan >= 0.1.6',
         'numpy >=1.7.1',
         'pandas == 0.13.1',
         'networkx >= 1.8.1',
         'simplejson >= 3.4.1',
-    ],
-    dependency_links=[
-        "http://github.com/pyannote/pyannote-banyan/archive/0.1.5.1.tar.gz#egg=banyan-0.1.5.1",
     ],
     extras_require={
         'notebook': [
