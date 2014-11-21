@@ -1,3 +1,7 @@
+### Version 0.2.5 (2014-11-21)
+
+  - setup: use pyannote-banyan 0.1.6
+
 ### Version 0.2.4 (2014-11-18)
 
   - fix: extent of empty Timeline
