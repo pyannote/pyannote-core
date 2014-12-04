@@ -29,7 +29,7 @@
 from __future__ import unicode_literals
 
 import numpy as np
-from pandas import MultiIndex, DataFrame, pivot_table
+from pandas import Index, MultiIndex, DataFrame, pivot_table
 
 from . import PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL, PYANNOTE_SCORE
 from annotation import Annotation, Unknown
@@ -37,264 +37,7 @@ from segment import Segment
 from timeline import Timeline
 
 
-class AnnotationMixin(object):
-
-    def get_timeline(self):
-        if self._timelineHasChanged:
-            self._timeline = Timeline(segments=[s for s, _ in self._df.index],
-                                      uri=self.uri)
-            self._timelineHasChanged = False
-        return self._timeline
-
-    def __len__(self):
-        """Number of annotated segments"""
-        return len(self.get_timeline())
-
-    def __nonzero__(self):
-        """False if annotation is empty"""
-        return len(self.get_timeline()) > 0
-
-    def __contains__(self, included):
-        """Check if segments are annotated
-
-        Parameters
-        ----------
-        included : `Segment` or `Timeline`
-
-        Returns
-        -------
-        contains : bool
-            True if every segment in `included` is annotated, False otherwise.
-        """
-        return included in self.get_timeline()
-
-    def __iter__(self):
-        """Iterate over sorted segments"""
-        return iter(self.get_timeline())
-
-    def __reversed__(self):
-        """Reverse iterate over sorted segments"""
-        return reversed(self.get_timeline())
-
-    def itersegments(self):
-        return iter(self.get_timeline())
-
-    def itertracks(self):
-        """Iterate over annotation as (segment, track) tuple"""
-
-        # make sure segment/track pairs are sorted
-        self._df = self._df.sort_index()
-
-        for (segment, track), _ in self._df.iterrows():
-            yield segment, track
-
-    def crop(self, focus, mode='strict'):
-        """Crop on focus
-
-        Parameters
-        ----------
-        focus : `Segment` or `Timeline`
-
-        mode : {'strict', 'loose', 'intersection'}
-            In 'strict' mode, only segments fully included in focus coverage are
-            kept. In 'loose' mode, any intersecting segment is kept unchanged.
-            In 'intersection' mode, only intersecting segments are kept and
-            replaced by their actual intersection with the focus.
-
-        Returns
-        -------
-        cropped : same type as caller
-            Cropped version of the caller containing only tracks matching
-            the provided focus and mode.
-
-        Remarks
-        -------
-        In 'intersection' mode, the best is done to keep the track names
-        unchanged. However, in some cases where two original segments are
-        cropped into the same resulting segments, conflicting track names are
-        modified to make sure no track is lost.
-
-        """
-        if isinstance(focus, Segment):
-
-            return self.crop(Timeline([focus], uri=self.uri), mode=mode)
-
-        elif isinstance(focus, Timeline):
-
-            # timeline made of all annotated segments
-            timeline = self.get_timeline()
-
-            # focus coverage
-            # coverage = focus.coverage()
-            coverage = focus.segmentation()
-
-            if mode in ['strict', 'loose']:
-
-                # segments (strictly or loosely) included in requested coverage
-                included = timeline.crop(coverage, mode=mode)
-
-                # boolean array: True if row must be kept, False otherwise
-                keep = [(s in included) for s, _ in self._df.index]
-
-                # crop-crop
-                A = self.__class__(uri=self.uri, modality=self.modality)
-                A._df = self._df[keep]
-
-                return A
-
-            elif mode == 'intersection':
-
-                # two original segments might be cropped into the same resulting
-                # segment -- therefore, we keep track of the mapping
-                intersection, mapping = timeline.crop(coverage,
-                                                      mode=mode, mapping=True)
-
-                # create new empty annotation
-                A = self.__class__(uri=self.uri, modality=self.modality)
-
-                for cropped in intersection:
-                    for original in mapping[cropped]:
-                        for track in self.tracks(original):
-                            # try to use original track name (candidate)
-                            # if it already exists, create a brand new one
-                            new_track = A.new_track(cropped, candidate=track)
-                            # copy each value, column by column
-                            for label in self._df.columns:
-                                value = self._df.get_value((original, track),
-                                                           label)
-                                A._df = A._df.set_value((cropped, new_track),
-                                                        label, value)
-
-                return A
-
-        else:
-            raise TypeError('')
-
-    def tracks(self, segment):
-        """Set of tracks for query segment
-
-        Parameters
-        ----------
-        segment : `Segment`
-            Query segment
-
-        Returns
-        -------
-        tracks : set
-            Set of tracks for query segment
-        """
-
-        try:
-            df = self._df.xs(segment)
-            existing_tracks = set(df.index)
-
-        except Exception, e:
-            existing_tracks = set([])
-
-        return existing_tracks
-
-    def has_track(self, segment, track):
-        """Check whether a given track exists
-
-        Parameters
-        ----------
-        segment : `Segment`
-            Query segment
-        track :
-            Query track
-
-        Returns
-        -------
-        exists : bool
-            True if track exists for segment
-        """
-        return (segment, track) in self._df.index
-
-    def get_track_by_name(self, track):
-        """Get all tracks with given name
-
-        Parameters
-        ----------
-        track : any valid track name
-            Requested name track
-
-        Returns
-        -------
-        tracks : list
-            List of (segment, track) tuples
-        """
-        try:
-            segments = list(self._df.xs(track, level=1).index)
-        except Exception, e:
-            segments = []
-        return [(s, track) for s in segments]
-
-    def copy(self):
-        A = self.__class__(uri=self.uri, modality=self.modality)
-        A._df = self._df.copy()
-        return A
-
-    def retrack(self):
-        """
-        """
-        A = self.copy()
-        reindex = MultiIndex.from_tuples([(s, n)
-                                          for n, (s, _) in enumerate(A._df.index)])
-        A._df.index = reindex
-        return A
-
-    def new_track(self, segment, candidate=None, prefix=None):
-        """Track name generator
-
-        Parameters
-        ----------
-        segment : Segment
-        prefix : str, optional
-        candidate : any valid track name
-
-
-        Returns
-        -------
-        track : str
-            New track name
-        """
-
-        # obtain list of existing tracks for segment
-        existing_tracks = self.tracks(segment)
-
-        # if candidate is provided, check whether it already exists
-        # in case it does not, use it
-        if candidate is not None:
-            if candidate not in existing_tracks:
-                return candidate
-
-        # no candidate was provided or the provided candidate already exists
-        # we need to create a brand new one
-
-        # by default (if prefix is not provided)
-        # use modality as prefix (eg. speaker1, speaker2, ...)
-        if prefix is None:
-            prefix = '' if self.modality is None else str(self.modality)
-
-        # find first non-existing track name for segment
-        # eg. if speaker1 exists, try speaker2, then speaker3, ...
-        count = 1
-        while ('%s%d' % (prefix, count)) in existing_tracks:
-            count += 1
-
-        # return first non-existing track name
-        return '%s%d' % (prefix, count)
-
-    def __str__(self):
-        """Human-friendly representation"""
-        if self:
-            self._df.sort_index(inplace=True)
-            return str(self._df)
-        else:
-            return ""
-
-
-class Scores(AnnotationMixin, object):
+class Scores(object):
     """
 
     Parameters
@@ -346,26 +89,65 @@ class Scores(AnnotationMixin, object):
         -------
 
         """
-        A = cls(uri=uri, modality=modality)
-        A._df = pivot_table(
+        dataframe = pivot_table(
             df, values=PYANNOTE_SCORE,
             rows=[PYANNOTE_SEGMENT, PYANNOTE_TRACK], cols=PYANNOTE_LABEL,
             aggfunc=aggfunc
         )
-        return A
 
-    def __init__(self, uri=None, modality=None):
+        annotation = Annotation(uri=uri, modality=modality)
+        for index, _ in dataframe.iterrows():
+            segment = Segment(*index[0])
+            track = index[1]
+            annotation[segment, track] = ''
+
+        labels = dataframe.columns
+
+        return cls(uri=uri, modality=modality,
+                   annotation=annotation, labels=labels,
+                   values=dataframe.values)
+
+    def __init__(self, uri=None, modality=None,
+                 annotation=None, labels=None,
+                 values=None, dtype=None):
+
         super(Scores, self).__init__()
 
-        index = MultiIndex(
-            levels=[[], []], labels=[[], []],
-            names=[PYANNOTE_SEGMENT, PYANNOTE_TRACK]
-        )
+        names = [PYANNOTE_SEGMENT + '_' + field
+                 for field in Segment._fields] + [PYANNOTE_TRACK]
 
-        self._df = DataFrame(index=index, dtype=np.float64)
+        if annotation:
+            annotation = annotation.copy()
+            index = Index(
+                [s + (t, ) for s, t in annotation.itertracks()],
+                name=names)
+
+        else:
+            annotation = Annotation(uri=uri, modality=modality)
+            index = MultiIndex(levels=[list() for name in names],
+                               labels=[list() for name in names],
+                               names=names)
+
+        self.annotation_ = annotation
+        columns = None if labels is None else list(labels)
+        data = None if values is None else np.array(values)
+        dtype = np.float if values is None else values.dtype
+
+        self.dataframe_ = DataFrame(data=data, dtype=dtype,
+                                    index=index, columns=columns)
+
+        self.hasChanged_ = True
+
         self.modality = modality
         self.uri = uri
-        self._timelineHasChanged = True
+
+    def copy(self):
+        self._reindexIfNeeded()
+        copied = self.__class__(uri=self.uri, modality=self.modality)
+        copied.dataframe_ = self.dataframe_.copy()
+        copied.annotation_ = self.annotation_.copy()
+        copied.hasChanged_ = self.hasChanged_
+        return copied
 
     # del scores[segment]
     # del scores[segment, :]
@@ -374,21 +156,157 @@ class Scores(AnnotationMixin, object):
 
         if isinstance(key, Segment):
             segment = key
-            self._df = self._df.drop(segment, axis=0)
-            self._timelineHasChanged = True
+            self.dataframe_.drop(tuple(segment), axis=0, inplace=True)
+            del self.annotation_[segment]
+            self.hasChanged_ = True
 
         elif isinstance(key, tuple) and len(key) == 2:
             segment, track = key
-            self._df = self._df.drop((segment, track), axis=0)
-            self._timelineHasChanged = True
+            self.dataframe_.drop(tuple(segment) + (track, ),
+                                 axis=0, inplace=True)
+            del self.annotation_[segment, track]
+            self.hasChanged_ = True
 
         else:
             raise KeyError('')
 
     # value = scores[segment, track, label]
     def __getitem__(self, key):
+
+        if len(key) == 2:
+            key = (key[0], '_', key[1])
+
         segment, track, label = key
-        return self._df.get_value((segment, track), label)
+        return self.dataframe_.at[tuple(segment) + (track, ), label]
+
+    # scores[segment, track, label] = value
+    # scores[segment, label] ==== scores[segment, '_', label]
+    def __setitem__(self, key, value):
+
+        if len(key) == 2:
+            key = (key[0], '_', key[1])
+
+        segment, track, label = key
+
+        self.dataframe_.at[tuple(segment) + (track,), label] = value
+        self.annotation_[segment, track] = label
+        self.hasChanged_ = True
+
+    def __len__(self):
+        """Number of annotated segments"""
+        return len(self.annotation_)
+
+    def __nonzero__(self):
+        """False if annotation is empty"""
+        return True if self.annotation_ else False
+
+    def __contains__(self, included):
+        """Check if segments are annotated
+
+        Parameters
+        ----------
+        included : `Segment` or `Timeline`
+
+        Returns
+        -------
+        contains : bool
+            True if every segment in `included` is annotated, False otherwise.
+        """
+        return included in self.annotation_
+
+    def __iter__(self):
+        """Iterate over sorted segments"""
+        return iter(self.annotation_.get_timeline())
+
+    def __reversed__(self):
+        """Reverse iterate over sorted segments"""
+        return reversed(self.annotation_.get_timeline())
+
+    def itersegments(self):
+        return iter(self)
+
+    def tracks(self, segment):
+        """Set of tracks for query segment
+
+        Parameters
+        ----------
+        segment : `Segment`
+            Query segment
+
+        Returns
+        -------
+        tracks : set
+            Set of tracks for query segment
+        """
+        return self.annotation_.get_tracks(segment)
+
+    def has_track(self, segment, track):
+        """Check whether a given track exists
+
+        Parameters
+        ----------
+        segment : `Segment`
+            Query segment
+        track :
+            Query track
+
+        Returns
+        -------
+        exists : bool
+            True if track exists for segment
+        """
+        return self.annotation_.has_track(segment, track)
+
+    def get_track_by_name(self, track):
+        """Get all tracks with given name
+
+        Parameters
+        ----------
+        track : any valid track name
+            Requested name track
+
+        Returns
+        -------
+        tracks : list
+            List of (segment, track) tuples
+        """
+        return self.annotation_.get_track_by_name(track)
+
+    def new_track(self, segment, candidate=None, prefix=None):
+        """Track name generator
+
+        Parameters
+        ----------
+        segment : Segment
+        prefix : str, optional
+        candidate : any valid track name
+
+
+        Returns
+        -------
+        track : str
+            New track name
+        """
+
+        return self.annotation_.new_track(segment, candidate=None, prefix=None)
+
+    def itertracks(self):
+        """Iterate over annotation as (segment, track) tuple"""
+        return self.annotation_.itertracks()
+
+    def itervalues(self):
+        """Iterate over scores as (segment, track, label, value) tuple"""
+
+        # make sure segment/track pairs are sorted
+        self._reindexIfNeeded()
+
+        # yield one (segment, track, label) tuple per loop
+        for index, columns in self.dataframe_.iterrows():
+            segment = Segment(*index[:-1])
+            track = index[-1]
+            for label, value in dict(columns).iteritems():
+                if not np.isnan(value):
+                    yield segment, track, label, value
 
     def get_track_scores(self, segment, track):
         """Get all scores for a given track.
@@ -404,13 +322,7 @@ class Scores(AnnotationMixin, object):
         scores : dict
             {label: score} dictionary
         """
-        return {l: self._df.get_value((segment, track), l) for l in self._df}
-
-    # scores[segment, track, label] = value
-    def __setitem__(self, key, value):
-        segment, track, label = key
-        self._df = self._df.set_value((segment, track), label, value)
-        self._timelineHasChanged = True
+        return dict(self.dataframe_.xs(tuple(segment) + (track, )))
 
     def labels(self, unknown=True):
         """List of labels
@@ -430,85 +342,86 @@ class Scores(AnnotationMixin, object):
         -------
             Labels are sorted based on their string representation.
         """
-        labels = sorted(self._df.columns, key=str)
+        labels = sorted(self.dataframe_.columns, key=str)
         if unknown:
             return labels
         else:
             return [l for l in labels if not isinstance(l, Unknown)]
 
-    def itervalues(self):
-        """Iterate over scores as (segment, track, label, value) tuple"""
+    def _reindexIfNeeded(self):
 
-        # make sure segment/track pairs are sorted
-        self._df = self._df.sort_index()
+        if not self.hasChanged_:
+            return
 
-        # yield one (segment, track, label) tuple per loop
-        labels = self._df.columns
-        for (segment, track), columns in self._df.iterrows():
-            for label in labels:
-                value = columns[label]
-                if np.isnan(value):
-                    continue
-                else:
-                    yield segment, track, label, value
+        names = [PYANNOTE_SEGMENT + '_' + field
+                 for field in Segment._fields] + [PYANNOTE_TRACK]
 
-    def _rank(self, invert):
+        new_index = Index(
+            [s + (t, ) for s, t in self.annotation_.itertracks()],
+            name=names)
 
-        if invert:
-            direction = 1.
+        self.dataframe_ = self.dataframe_.reindex(new_index)
 
-        else:
-            direction = -1.
+        self.hasChanged_ = False
 
-        def nan_rank(data):
+        return
 
-            # replace NaN by -inf or +inf depending on the requested direction
-            finite = np.isfinite(data)
-            fixed = np.where(finite, direction*data, -direction*np.inf)
+    def retrack(self):
+        """
+        """
 
-            # do the actual argsort
-            indices = np.argsort(fixed)
-            # get rank from argsort
-            rank = np.argsort(indices)
+        self._reindexIfNeeded()
+        retracked = self.copy()
 
-            # special treatment for inverted NaN scores
-            # (we want ranks to start at 0 even in case of NaN)
-            if invert:
-                rank = np.where(finite, rank-(len(data)-np.sum(finite)), np.nan)
-            else:
-                rank = np.where(finite, rank, np.nan)
-            return rank
+        annotation = self.annotation_.retrack()
+        retracked.annotation_ = annotation
 
-        return self._df.apply(nan_rank, axis=1)
+        names = [PYANNOTE_SEGMENT + '_' + field
+                 for field in Segment._fields] + [PYANNOTE_TRACK]
+        new_index = Index(
+            [s + (t, ) for s, t in annotation.itertracks()],
+            name=names)
+        retracked.dataframe_.index = new_index
 
-    def rank(self, invert=False):
+        return retracked
+
+    def apply(self, func, axis=0):
+
+        applied = self.copy()
+        applied.dataframe_ = self.dataframe_.apply(func, axis=axis)
+        applied.hasChanged_ = True
+
+        return applied
+
+    def rank(self, ascending=False):
         """
 
         Parameters
         ----------
-        invert : bool, optional
-            By default, larger scores are better.
-            Set `invert` to True to indicate smaller scores are better.
+        ascending : boolean, default False
+            False for ranks by high (0) to low (N-1)
 
         Returns
         -------
         rank : `Scores`
 
         """
-        A = self.__class__(uri=self.uri, modality=self.modality)
-        A._df = self._rank(invert)
-        return A
 
-    def nbest(self, n, invert=False):
+        ranked = self.copy()
+        ranked.dataframe_ = -1 + self.dataframe_.rank(axis=1,
+                                                      ascending=ascending)
+        ranked.hasChanged_ = True
+        return ranked
+
+    def nbest(self, n, ascending=False):
         """
 
         Parameters
         ----------
         n : int
             Size of n-best list
-        invert : bool, optional
-            By default, larger scores are better.
-            Set `invert` to True to indicate smaller scores are better.
+        ascending : boolean, default False
+            False for ranks by high (0) to low (N-1)
 
         Returns
         -------
@@ -516,14 +429,13 @@ class Scores(AnnotationMixin, object):
             New scores where only n-best are kept.
 
         """
-        df = self._df.copy()
-        nbest = self._rank(invert) < n
-        df[~nbest] = np.nan
 
-        A = self.__class__(uri=self.uri, modality=self.modality)
-        A._df = df
-
-        return A
+        filtered = self.copy()
+        ranked_ = -1 + self.dataframe_.rank(axis=1, ascending=ascending)
+        filtered.dataframe_ = filtered.dataframe_.where(ranked_ < n,
+                                                        other=np.NaN)
+        filtered.hasChanged_ = True
+        return filtered
 
     def subset(self, labels, invert=False):
         """Scores subset
@@ -543,6 +455,8 @@ class Scores(AnnotationMixin, object):
             Scores subset.
         """
 
+        self._reindexIfNeeded()
+
         if not isinstance(labels, set):
             raise TypeError('labels must be provided as a set of labels.')
 
@@ -551,10 +465,11 @@ class Scores(AnnotationMixin, object):
         else:
             labels = labels & set(self.labels())
 
-        A = self.__class__(uri=self.uri, modality=self.modality)
-        A._df = self._df[list(labels)]
+        subset = Scores(uri=self.uri, modality=self.modality)
+        subset.annotation_ = self.annotation_
+        subset.dataframe_ = self.dataframe_[list(labels)]
 
-        return A
+        return subset
 
     def to_annotation(self, threshold=-np.inf, posterior=False):
         """
@@ -572,72 +487,123 @@ class Scores(AnnotationMixin, object):
             `Unknown` instance.
         """
 
-        annotation = Annotation(uri=self.uri, modality=self.modality)
         if not self:
-            return annotation
+            return Annotation(uri=self.uri, modality=self.modality)
 
-        best = self.nbest(1, invert=False)
+        best = self.nbest(1, ascending=False)
+        large_enough = best.copy()
 
         if posterior:
+            unknown_posterior = 1. - self.dataframe_.sum(axis=1)
 
-            # compute unknown posterior
-            func = lambda p: 1. - np.nansum(p, axis=1)
-            Pu = self.apply(func, new_columns=['_'])
-
-            # threshold best target posterior
-            # with unknown posterior and threshold
-            for segment, track, label, value in best.itervalues():
-
-                if value < Pu[segment, track, '_'] or value < threshold:
-                    label = Unknown()
-
-                annotation[segment, track] = label
+            large_enough.dataframe_ = (
+                ((best.dataframe_.T > unknown_posterior) &
+                 (best.dataframe_.T > threshold)).T
+            )
 
         else:
 
-            # threshold best target score with threshold
-            for segment, track, label, value in best.itervalues():
-                if value < threshold:
-                    label = Unknown()
-                annotation[segment, track] = label
+            large_enough.dataframe_ = (
+                (best.dataframe_.T > threshold).T
+            )
+
+        large_enough.dataframe_.where(best.dataframe_.notnull(),
+                                      inplace=True, other=np.NaN)
+
+        annotation = Annotation(uri=self.uri, modality=self.modality)
+        for segment, track, label, value in large_enough.itervalues():
+            label = label if value else Unknown()
+            annotation[segment, track] = label
 
         return annotation
 
     def map(self, func):
         """Apply function to all values"""
-        A = self.__class__(uri=self.uri, modality=self.modality)
-        A._df = func(self._df)
-        return A
 
-    def apply(self, data_func, new_index=None, new_columns=None):
-        """Apply `data_func` on internal numpy array
+        mapped = self.copy()
+        mapped.dataframe_ = self.dataframe_.applymap(func)
+        mapped.hasChanged_ = True
+        return mapped
+
+    def crop(self, focus, mode='strict'):
+        """Crop on focus
 
         Parameters
         ----------
-        data_func : func
-            Function expecting (index x columns) numpy array as input
-        new_index : iterable, optional
-            When provided, these will be the index of returned array.
-        new_columns : iterable, optional
-            When provided, these will be the columns of returned array.
+        focus : `Segment` or `Timeline`
+
+        mode : {'strict', 'loose', 'intersection'}
+            In 'strict' mode, only segments fully included in focus coverage
+            are kept. In 'loose' mode, any intersecting segment is kept
+            unchanged. In 'intersection' mode, only intersecting segments are
+            kept and replaced by their actual intersection with the focus.
+
+        Returns
+        -------
+        cropped : same type as caller
+            Cropped version of the caller containing only tracks matching
+            the provided focus and mode.
+
+        Remarks
+        -------
+        In 'intersection' mode, the best is done to keep the track names
+        unchanged. However, in some cases where two original segments are
+        cropped into the same resulting segments, conflicting track names are
+        modified to make sure no track is lost.
+
         """
-        new_data = data_func(self._df.values)
 
-        if new_index is None:
-            new_index = self._df.index
+        if isinstance(focus, Segment):
+            return self.crop(Timeline([focus], uri=self.uri), mode=mode)
 
-        if new_columns is None:
-            new_columns = self._df.columns
+        self._reindexIfNeeded()
+        cropped = self.copy()
 
-        df = DataFrame(
-            data=new_data,
-            index=new_index,
-            columns=new_columns)
+        if mode in ['strict', 'loose']:
 
-        new_scores = self.__class__(uri=self.uri, modality=self.modality)
-        new_scores._df = df
+            new_annotation = self.annotation_.crop(focus, mode=mode)
+            keep = [new_annotation.has_track(segment, track)
+                    for segment, track in self.itertracks()]
+            cropped.dataframe_ = self.dataframe_[keep]
+            cropped.annotation_ = new_annotation
+            cropped.hasChanged_ = True
 
-        return new_scores
+            return cropped
+
+        elif mode in ['intersection']:
+
+            raise NotImplementedError('')
+
+            # # two original segments might be cropped into the same resulting
+            # # segment -- therefore, we keep track of the mapping
+            # intersection, mapping = timeline.crop(coverage,
+            #                                       mode=mode, mapping=True)
+            #
+            # # create new empty annotation
+            # A = self.__class__(uri=self.uri, modality=self.modality)
+            #
+            # for cropped in intersection:
+            #     for original in mapping[cropped]:
+            #         for track in self.tracks(original):
+            #             # try to use original track name (candidate)
+            #             # if it already exists, create a brand new one
+            #             new_track = A.new_track(cropped, candidate=track)
+            #             # copy each value, column by column
+            #             for label in self.dataframe_.columns:
+            #                 value = self.dataframe_.get_value((original, track),
+            #                                            label)
+            #                 A.dataframe_ = A.dataframe_.set_value((cropped, new_track),
+            #                                         label, value)
+            #
+            # return A
+
+    def __str__(self):
+        """Human-friendly representation"""
+        if self:
+            self._reindexIfNeeded()
+            return str(self.dataframe_)
+        else:
+            return ""
 
     def _repr_png_(self):
         from pyannote.core.notebook import repr_scores

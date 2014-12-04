@@ -1,3 +1,8 @@
+### Version 0.3 (2014-12-04)
+
+  - refactor: rewrote Scores internals
+  - setup: use pandas 0.15.1+
+
 ### Version 0.2.5 (2014-11-21)
 
   - setup: use pyannote-banyan 0.1.6
