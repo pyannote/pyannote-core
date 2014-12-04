@@ -43,7 +43,9 @@ setup(
     install_requires=[
         'pyannote-banyan >= 0.1.6',
         'numpy >=1.7.1',
-        'pandas == 0.13.1',
+        'pandas >= 0.15.1',
+        'numexpr >= 2.4',
+        'bottleneck >= 0.8.0',
         'networkx >= 1.8.1',
         'simplejson >= 3.4.1',
     ],
