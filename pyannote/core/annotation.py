@@ -570,8 +570,8 @@ class Annotation(object):
 
         Parameters
         ----------
-        labels : set
-            Set of labels
+        labels : iterable
+            Label iterable.
         invert : bool, optional
             If invert is True, extract all but requested `labels`
 
@@ -581,8 +581,7 @@ class Annotation(object):
             Annotation subset.
         """
 
-        if not isinstance(labels, set):
-            raise TypeError('labels must be provided as a set of labels.')
+        labels = set(labels)
 
         if invert:
             labels = set(self.labels()) - labels
@@ -595,6 +594,24 @@ class Annotation(object):
                 sub[segment, track] = label
 
         return sub
+
+    def update(self, annotation):
+        """Update existing annotations or create new ones
+
+        Parameters
+        ----------
+        annotation : Annotation
+            Updated (or new) annotations
+
+        Returns
+        -------
+        self : Annotation
+            Updated annotations.
+        """
+
+        for segment, track, label in annotation.itertracks(label=True):
+            self[segment, track] = label
+        return self
 
     def label_timeline(self, label):
         """Get timeline for a given label

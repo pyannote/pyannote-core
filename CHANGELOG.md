@@ -1,3 +1,8 @@
+### Version 0.3.1 (2015-01-26)
+
+  - feat: new Annotation.update method
+  - improve: Annotation.subset support for any label iterable
+
 ### Version 0.3 (2014-12-04)
 
   - refactor: rewrote Scores internals
