@@ -595,6 +595,24 @@ class Annotation(object):
 
         return sub
 
+    def update(self, annotation):
+        """Update existing annotations or create new ones
+
+        Parameters
+        ----------
+        annotation : Annotation
+            Updated (or new) annotations
+
+        Returns
+        -------
+        self : Annotation
+            Updated annotations.
+        """
+
+        for segment, track, label in annotation.itertracks(label=True):
+            self[segment, track] = label
+        return self
+
     def label_timeline(self, label):
         """Get timeline for a given label
 
