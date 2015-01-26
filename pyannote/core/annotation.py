@@ -570,8 +570,8 @@ class Annotation(object):
 
         Parameters
         ----------
-        labels : set
-            Set of labels
+        labels : iterable
+            Label iterable.
         invert : bool, optional
             If invert is True, extract all but requested `labels`
 
@@ -581,8 +581,7 @@ class Annotation(object):
             Annotation subset.
         """
 
-        if not isinstance(labels, set):
-            raise TypeError('labels must be provided as a set of labels.')
+        labels = set(labels)
 
         if invert:
             labels = set(self.labels()) - labels
