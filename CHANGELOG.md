@@ -1,3 +1,7 @@
+### Version 0.3.2 (2015-02-26)
+
+  - fix: Scores IPython display
+
 ### Version 0.3.1 (2015-01-26)
 
   - feat: new Annotation.update method
