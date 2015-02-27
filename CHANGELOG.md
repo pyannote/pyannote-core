@@ -1,4 +1,4 @@
-### Version 0.3.2 (2015-02-26)
+### Version 0.3.3 (2015-02-27)
 
   - fix: Scores IPython display
 

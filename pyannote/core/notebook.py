@@ -287,9 +287,10 @@ def repr_scores(scores):
     colors = {label: cm(1. * i / len(labels))
               for i, label in enumerate(labels)}
 
-    m = scores.dataframe_.min().min()
-    M = scores.dataframe_.max().max()
-    ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
+    data = scores.dataframe_.values
+    mu = np.nanmean(data)
+    sigma = np.nanstd(data)
+    ylim = (mu - 3 * sigma, mu + 3 * sigma)
 
     fig, ax = _setup(yaxis=True, ylim=ylim)
 
