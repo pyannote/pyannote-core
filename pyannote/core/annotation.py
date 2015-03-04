@@ -476,10 +476,19 @@ class Annotation(object):
         if isinstance(key, Segment):
             key = (key, '_')
 
+        # in case we create a new segment
+        # mark timeline as modified
         if key[0] not in self._tracks:
             self._tracks[key[0]] = {}
             self._timelineNeedsUpdate = True
 
+        # in case we modify an existing track
+        # mark old label as modified
+        if key[1] in self._tracks[key[0]]:
+            old_label = self._tracks[key[0]][key[1]]
+            self._labelNeedsUpdate[old_label] = True
+
+        # mark new label as modified
         self._tracks[key[0]][key[1]] = label
         self._labelNeedsUpdate[label] = True
 
