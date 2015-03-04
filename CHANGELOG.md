@@ -1,3 +1,7 @@
+### Version 0.3.4 (2015-03-04)
+
+  - fix: MAJOR bug in Annotation lazy-update
+
 ### Version 0.3.3 (2015-02-27)
 
   - fix: Scores IPython display
