@@ -6,6 +6,7 @@ RUN apt-get install -y python-pip python-dev build-essential
 RUN apt-get install -y gfortran libblas-dev liblapack-dev
 
 ADD . /src
+RUN pip install numexpr
 RUN pip install /src
 
 CMD ['python']
