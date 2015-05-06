@@ -1,3 +1,7 @@
+### Version 0.3.5 (2015-05-06)
+
+  - feat: LabelMatrix save/load methods
+
 ### Version 0.3.4 (2015-03-04)
 
   - fix: MAJOR bug in Annotation lazy-update
