@@ -1,4 +1,4 @@
-### Version 0.3.5 (2015-05-06)
+### Version 0.3.6 (2015-05-06)
 
   - feat: LabelMatrix save/load methods
 
