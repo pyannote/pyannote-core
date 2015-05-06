@@ -32,7 +32,17 @@ import numpy as np
 import pandas
 from segment import SEGMENT_PRECISION
 
+
 class LabelMatrix(object):
+
+    @classmethod
+    def load(cls, path):
+        m = cls()
+        m.df = pandas.read_pickle(path)
+        return m
+
+    def save(self, path):
+        self.df.to_pickle(path)
 
     def __init__(self, data=None, dtype=None, rows=None, columns=None):
         super(LabelMatrix, self).__init__()
@@ -60,7 +70,7 @@ class LabelMatrix(object):
 
     def __nonzero__(self):
         N, M = self.df.shape
-        return N*M != 0
+        return N * M != 0
 
     def itervalues(self):
         for row in self.get_rows():
@@ -199,7 +209,6 @@ def get_cooccurrence_matrix(R, C):
         M[r_label, c_label] += duration
 
     return M
-
 
 
 def get_tfidf_matrix(words, documents, idf=True, log=False):
