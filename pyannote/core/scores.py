@@ -32,9 +32,9 @@ import numpy as np
 from pandas import Index, MultiIndex, DataFrame, pivot_table
 
 from . import PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL, PYANNOTE_SCORE
-from annotation import Annotation, Unknown
-from segment import Segment
-from timeline import Timeline
+from .annotation import Annotation, Unknown
+from .segment import Segment
+from .timeline import Timeline
 
 
 class Scores(object):
@@ -197,6 +197,9 @@ class Scores(object):
         return len(self.annotation_)
 
     def __nonzero__(self):
+        return self.__bool__()
+        
+    def __bool__(self):
         """False if annotation is empty"""
         return True if self.annotation_ else False
 
@@ -304,7 +307,7 @@ class Scores(object):
         for index, columns in self.dataframe_.iterrows():
             segment = Segment(*index[:-1])
             track = index[-1]
-            for label, value in dict(columns).iteritems():
+            for label, value in six.iteritems(dict(columns)):
                 if not np.isnan(value):
                     yield segment, track, label, value
 
@@ -511,7 +514,7 @@ class Scores(object):
                                       inplace=True, other=np.NaN)
 
         annotation = Annotation(uri=self.uri, modality=self.modality)
-        for segment, track, label, value in large_enough.itervalues():
+        for segment, track, label, value in six.itervalues(large_enough):
             label = label if value else Unknown()
             annotation[segment, track] = label
 

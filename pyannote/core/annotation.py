@@ -28,6 +28,7 @@
 
 from __future__ import unicode_literals
 
+import six
 import itertools
 import operator
 import warnings
@@ -37,10 +38,10 @@ import numpy as np
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
 from banyan import SortedDict
-from interval_tree import TimelineUpdator
-from segment import Segment
-from timeline import Timeline
-from json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from .interval_tree import TimelineUpdator
+from .segment import Segment
+from .timeline import Timeline
+from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 
 # ignore Banyan warning
 warnings.filterwarnings(
@@ -64,7 +65,7 @@ class Unknown(object):
 
     def __init__(self, format='#{id:d}'):
         super(Unknown, self).__init__()
-        self.ID = Unknown.next()
+        self.ID = six.next(Unknown)
         self._format = format
 
     def __str__(self):
@@ -149,7 +150,7 @@ class Annotation(object):
 
     def _set_uri(self, uri):
         # update uri for all internal timelines
-        for _, timeline in self._labels.iteritems():
+        for _, timeline in six.iteritems(self._labels):
             timeline.uri = uri
         self._uri = uri
 
@@ -158,7 +159,7 @@ class Annotation(object):
     def _updateLabels(self):
 
         # (re-)initialize changed label timeline
-        for l, needsUpdate in self._labelNeedsUpdate.iteritems():
+        for l, needsUpdate in six.iteritems(self._labelNeedsUpdate):
             if needsUpdate:
                 self._labels[l] = Timeline(uri=self.uri)
 
@@ -170,7 +171,7 @@ class Annotation(object):
         self._labelNeedsUpdate = {l: False for l in self._labels}
 
         # remove "ghost" labels (i.e. label with empty timeline)
-        labels = self._labels.keys()
+        labels = list(six.iterkeys(self._labels))
         for l in labels:
             if not self._labels[l]:
                 self._labels.pop(l)
@@ -188,8 +189,8 @@ class Annotation(object):
         return iter(self._tracks)
 
     def itertracks(self, label=False):
-        for segment, tracks in self._tracks.items():
-            for track, lbl in tracks.iteritems():
+        for segment, tracks in six.iteritems(self._tracks):
+            for track, lbl in six.iteritems(tracks):
                 if label:
                     yield segment, track, lbl
                 else:
@@ -268,7 +269,7 @@ class Annotation(object):
                 # instead of segment, segment
                 # This would avoid calling ._tracks.get(segment)
                 for segment, _ in self.get_timeline().co_iter(other):
-                    for track, label in self._tracks[segment].iteritems():
+                    for track, label in six.iteritems(self._tracks[segment]):
                         cropped[segment, track] = label
 
             elif mode == 'strict':
@@ -278,7 +279,7 @@ class Annotation(object):
                         self.get_timeline().co_iter(other):
 
                     if segment in other_segment:
-                        for track, label in self._tracks[segment].iteritems():
+                        for track, label in six.iteritems(self._tracks[segment]):
                             cropped[segment, track] = label
 
             elif mode == 'intersection':
@@ -287,7 +288,7 @@ class Annotation(object):
                         self.get_timeline().co_iter(other):
 
                     intersection = segment & other_segment
-                    for track, label in self._tracks[segment].iteritems():
+                    for track, label in six.iteritems(self._tracks[segment]):
                         track = cropped.new_track(intersection,
                                                   candidate=track)
                         cropped[intersection, track] = label
@@ -350,14 +351,14 @@ class Annotation(object):
         copied = self.__class__(uri=self.uri, modality=self.modality)
 
         # deep copy internal track dictionary
-        _tracks = [(key, dict(value)) for (key, value) in self._tracks.items()]
+        _tracks = [(key, dict(value)) for (key, value) in six.iteritems(self._tracks)]
         copied._tracks = SortedDict(items=_tracks,
                                     key_type=(float, float),
                                     updator=TimelineUpdator)
 
         # deep copy internal label timelines
         _labels = {key: timeline.copy()
-                   for (key, timeline) in self._labels.iteritems()}
+                   for (key, timeline) in six.iteritems(self._labels)}
         copied._labels = _labels
 
         # deep copy need-update indicator
@@ -434,7 +435,7 @@ class Annotation(object):
             self._timelineNeedsUpdate = True
 
             # mark every label in tracks as modified
-            for track, label in tracks.iteritems():
+            for track, label in six.iteritems(tracks):
                 self._labelNeedsUpdate[label] = True
 
         # del annotation[segment, track]
@@ -497,12 +498,17 @@ class Annotation(object):
 
     @staticmethod
     def _cmp_labels(label1, label2):
+        if six.PY3:
+            def cmp(a, b):
+                return (a > b) - (a < b)
+
         # unknown > not_unknown
         # otherwise, just use regular cmp
         u1 = isinstance(label1, Unknown)
         u2 = isinstance(label2, Unknown)
         if u1 == u2:
             return cmp(label1, label2)
+                
         return u1 - u2
 
     def labels(self, unknown=True):
@@ -523,8 +529,13 @@ class Annotation(object):
         if any([lnu for lnu in self._labelNeedsUpdate.values()]):
             self._updateLabels()
 
-        labels = sorted(self._labels, cmp=self._cmp_labels)
-
+        if six.PY2:
+            labels = sorted(self._labels, cmp=self._cmp_labels)
+        else:
+            # XXX will only work for python > 3.2
+            from functools import cmp_to_key
+            labels = sorted(self._labels, key=cmp_to_key(self._cmp_labels))
+            
         if not unknown:
             labels = [l for l in labels if not isinstance(l, Unknown)]
 
@@ -641,7 +652,7 @@ class Annotation(object):
         if self._labelNeedsUpdate[label]:
             self._updateLabels()
 
-            for l, hasChanged in self._labelNeedsUpdate.iteritems():
+            for l, hasChanged in six.iteritems(self._labelNeedsUpdate):
                 if hasChanged:
                     self._labels[l] = Timeline(uri=self.uri)
 
@@ -758,7 +769,7 @@ class Annotation(object):
                     durations[lbl] = durations[lbl] - maxduration
 
         # find the most frequent label
-        label = max(durations.iteritems(), key=operator.itemgetter(1))[0]
+        label = max(six.iteritems(durations), key=operator.itemgetter(1))[0]
 
         # in case all durations were zero, there is no most frequent label
         return label if durations[label] > 0 else None

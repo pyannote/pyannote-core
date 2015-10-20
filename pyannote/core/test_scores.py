@@ -26,9 +26,6 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-from __future__ import unicode_literals
-
-
 from scores import Scores
 from segment import Segment
 import numpy as np

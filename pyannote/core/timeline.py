@@ -26,15 +26,13 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-from __future__ import unicode_literals
-
 import warnings
 
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
 from banyan import SortedSet
-from interval_tree import TimelineUpdator
-from segment import Segment
-from json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from .interval_tree import TimelineUpdator
+from .segment import Segment
+from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 
 # ignore Banyan warning
 warnings.filterwarnings(
@@ -172,8 +170,11 @@ class Timeline(object):
     def __len__(self):
         return self._segments.length()
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self._segments.length() > 0
+    
+    def __nonzero__(self):
+        return self.__bool__()
 
     def __iter__(self):
         return iter(self._segments)

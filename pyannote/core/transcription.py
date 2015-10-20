@@ -31,10 +31,10 @@ from __future__ import unicode_literals
 import networkx as nx
 from networkx.readwrite.json_graph import node_link_data, node_link_graph
 
-from time import T, TStart, TEnd
-from segment import Segment
-from json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
-from util import pairwise
+from .time import T, TStart, TEnd
+from .segment import Segment
+from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from .util import pairwise
 
 
 class Transcription(nx.MultiDiGraph):

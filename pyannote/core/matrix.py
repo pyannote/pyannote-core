@@ -28,6 +28,8 @@
 
 from __future__ import unicode_literals
 
+import six
+
 import numpy as np
 import pandas
 from segment import SEGMENT_PRECISION
@@ -51,11 +53,13 @@ class LabelMatrix(object):
         self.df = pandas.DataFrame(
             data=data, dtype=dtype, index=rows, columns=columns)
 
-    def __setitem__(self, (row, col), value):
+    def __setitem__(self, pos, value):
+        row, col = pos
         self.df = self.df.set_value(row, col, value)
         return self
 
-    def __getitem__(self, (row, col)):
+    def __getitem__(self, pos):
+        row, col = pos
         return self.df.at[row, col]
 
     def get_rows(self):
@@ -69,6 +73,9 @@ class LabelMatrix(object):
     shape = property(fget=__get_shape)
 
     def __nonzero__(self):
+        return self.__bool__()
+
+    def __bool__(self):
         N, M = self.df.shape
         return N * M != 0
 
@@ -100,16 +107,16 @@ class LabelMatrix(object):
 
         if axis == 0:
             return {c: r
-                    for (c, r) in self.df.idxmax(axis=axis).iteritems()}
+                    for (c, r) in six.iteritems(self.df.idxmax(axis=axis))}
 
         elif axis == 1:
             return {r: c
-                    for (r, c) in self.df.idxmax(axis=axis).iteritems()}
+                    for (r, c) in six.iteritems(self.df.idxmax(axis=axis))}
 
         else:
             values = [
                 (_r, _c, self.df.loc[_r, _c])
-                for (_c, _r) in self.df.idxmax(axis=0).iteritems()
+                for (_c, _r) in six.iteritems(self.df.idxmax(axis=0))
             ]
             r, c, _ = sorted(values, key=lambda v: v[2])[-1]
             return {r: c}
