@@ -59,13 +59,13 @@ class Unknown(object):
         cls.nextID = 0
 
     @classmethod
-    def next(cls):
+    def getNewID(cls):
         cls.nextID += 1
         return cls.nextID
 
     def __init__(self, format='#{id:d}'):
         super(Unknown, self).__init__()
-        self.ID = six.next(Unknown)
+        self.ID = Unknown.getNewID()
         self._format = format
 
     def __str__(self):
