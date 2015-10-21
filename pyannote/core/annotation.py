@@ -80,8 +80,17 @@ class Unknown(object):
     def __eq__(self, other):
         if isinstance(other, Unknown):
             return self.ID == other.ID
-        else:
-            return False
+        return False
+
+    def __lt__(self, other):
+        if isinstance(other, Unknown):
+            return self.ID < other.ID
+        return False
+
+    def __gt__(self, other):
+        if isinstance(other, Unknown):
+            return self.ID > other.ID
+        return True
 
 
 class Annotation(object):
