@@ -505,21 +505,6 @@ class Annotation(object):
     def empty(self):
         return self.__class__(uri=self.uri, modality=self.modality)
 
-    @staticmethod
-    def _cmp_labels(label1, label2):
-        if six.PY3:
-            def cmp(a, b):
-                return (a > b) - (a < b)
-
-        # unknown > not_unknown
-        # otherwise, just use regular cmp
-        u1 = isinstance(label1, Unknown)
-        u2 = isinstance(label2, Unknown)
-        if u1 == u2:
-            return cmp(label1, label2)
-                
-        return u1 - u2
-
     def labels(self, unknown=True):
         """List of labels
 
@@ -538,13 +523,8 @@ class Annotation(object):
         if any([lnu for lnu in self._labelNeedsUpdate.values()]):
             self._updateLabels()
 
-        if six.PY2:
-            labels = sorted(self._labels, cmp=self._cmp_labels)
-        else:
-            # XXX will only work for python > 3.2
-            from functools import cmp_to_key
-            labels = sorted(self._labels, key=cmp_to_key(self._cmp_labels))
-            
+        labels = sorted(self._labels)
+
         if not unknown:
             labels = [l for l in labels if not isinstance(l, Unknown)]
 
