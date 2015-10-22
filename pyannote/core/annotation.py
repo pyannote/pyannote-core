@@ -199,7 +199,7 @@ class Annotation(object):
 
     def itertracks(self, label=False):
         for segment, tracks in self._tracks.items():
-            for track, lbl in six.iteritems(tracks):
+            for track, lbl in sorted(six.iteritems(tracks)):
                 if label:
                     yield segment, track, lbl
                 else:

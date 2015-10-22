@@ -24,18 +24,15 @@ def test_creation(annotation):
                                                Segment(5.5, 7),
                                                Segment(8, 10)]
 
-    # XXX I have to sort the list to ensure that the two segments with
-    # the same span are always in the same order. This should be fixed
-    # somewhere else.
-    assert sorted(annotation.itertracks()) == sorted([(Segment(3, 5), '_'),
-                                                      (Segment(5.5, 7), '_'),
-                                                      (Segment(8, 10), '_'),
-                                                      (Segment(8, 10), 'anything')])
-    
-    assert sorted(annotation.itertracks(label=True)) == sorted([(Segment(3, 5), '_', 'Penny'),
-                                                                (Segment(5.5, 7), '_', 'Leonard'),
-                                                                (Segment(8, 10), '_', 'Penny'),
-                                                                (Segment(8, 10), 'anything', 'Sheldon')])
+    assert list(annotation.itertracks()) == [(Segment(3, 5), '_'),
+                                             (Segment(5.5, 7), '_'),
+                                             (Segment(8, 10), '_'),
+                                             (Segment(8, 10), 'anything')]
+
+    assert list(annotation.itertracks(label=True)) == [(Segment(3, 5), '_', 'Penny'),
+                                                       (Segment(5.5, 7), '_', 'Leonard'),
+                                                       (Segment(8, 10), '_', 'Penny'),
+                                                       (Segment(8, 10), 'anything', 'Sheldon')]
 
 def test_segments(annotation):
 
