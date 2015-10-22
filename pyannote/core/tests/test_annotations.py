@@ -17,6 +17,10 @@ def annotation():
 
     return annotation
 
+def test_copy(annotation):
+
+    copy = annotation.copy()
+    assert copy == annotation
 
 def test_creation(annotation):
 

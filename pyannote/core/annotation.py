@@ -365,7 +365,7 @@ class Annotation(object):
         copied = self.__class__(uri=self.uri, modality=self.modality)
 
         # deep copy internal track dictionary
-        _tracks = [(key, dict(value)) for (key, value) in six.iteritems(self._tracks)]
+        _tracks = [(key, dict(value)) for (key, value) in self._tracks.items()]
         copied._tracks = SortedDict(items=_tracks,
                                     key_type=(float, float),
                                     updator=TimelineUpdator)
