@@ -65,12 +65,10 @@ def test_labels(annotation):
     expected_res[Segment(8, 10), '_'] = 'Kaley Cuoco'
     expected_res[Segment(8, 10), 'anything'] = 'Jim Parsons'
 
-    
     mapping = {'Penny': 'Kaley Cuoco',
                'Sheldon': 'Jim Parsons',
                'Leonard': 'Johnny Galecki'}
-    # XXX how can we compare annotations?
-    #assert annotation.translate(mapping) == expected_res
+    assert annotation.translate(mapping) == expected_res
 
 
 def test_analyze(annotation):

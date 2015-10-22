@@ -216,10 +216,15 @@ class Annotation(object):
         return self._timeline
 
     def __eq__(self, other):
-        return self._tracks == other._tracks
+        pairOfTracks = six.moves.zip_longest(self.itertracks(label=True),
+                                             other.itertracks(label=True))
+        return all(t1 == t2 for t1, t2 in pairOfTracks)
 
     def __ne__(self, other):
-        return self._tracks != other._tracks
+        pairOfTracks = six.moves.zip_longest(self.itertracks(label=True),
+                                             other.itertracks(label=True))
+
+        return any(t1 != t2 for t1, t2 in pairOfTracks)
 
     def __contains__(self, included):
         """Inclusion
