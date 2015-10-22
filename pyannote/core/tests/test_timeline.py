@@ -31,14 +31,20 @@ def test_getter(timeline):
     assert str(timeline[1]) == "[1.000 --> 4.000]"
 
 
-def test_gaps(timeline):
+def test_extent(timeline):
 
     assert timeline.extent() == Segment(0.5, 10)
 
-    # XXX to be completed
-    #assert timeline.coverage() == ?
-    #assert timeline.gaps() == ?
+def test_coverage(timeline):
 
+    assert list(timeline.coverage()) == [Segment(0.5, 4),
+                                         Segment(5, 8),
+                                         Segment(8.5, 10)]
+
+def test_gaps(timeline):
+
+    assert list(timeline.gaps()) == [Segment(4, 5),
+                                     Segment(8, 8.5)]
 
 def test_crop(timeline):
 
@@ -54,7 +60,7 @@ def test_crop(timeline):
     expected_answer = Timeline(uri='MyAudioFile')
     expected_answer.add(Segment(5, 7))
     assert timeline.crop(selection, mode='strict') == expected_answer
-    
+
 
     expected_answer = Timeline(uri="pouet")
     expected_answer.add(Segment(1, 4))
@@ -80,4 +86,3 @@ def test_union():
 
     assert list(first_timeline.co_iter(second_timeline)) == [(Segment(2, 3), Segment(1.5, 4.5)),
                                                              (Segment(4, 5), Segment(1.5, 4.5))]
-

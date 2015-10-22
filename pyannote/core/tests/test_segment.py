@@ -26,7 +26,7 @@ def test_intersection():
 
 
 def test_inclusion():
-    
+
     segment = Segment(start=1, end=9)
     other_segment = Segment(5, 9)
 
