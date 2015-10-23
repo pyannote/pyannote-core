@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2015 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,10 +29,9 @@
 from __future__ import unicode_literals
 
 import six
-
 import numpy as np
 import pandas
-from segment import SEGMENT_PRECISION
+from .segment import SEGMENT_PRECISION
 
 
 class LabelMatrix(object):
