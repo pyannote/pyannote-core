@@ -30,6 +30,7 @@ from __future__ import unicode_literals
 
 import six
 import networkx as nx
+import itertools
 from networkx.readwrite.json_graph import node_link_data, node_link_graph
 
 from .time import T, TStart, TEnd
