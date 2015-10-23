@@ -190,8 +190,11 @@ class Annotation(object):
         """Number of segments"""
         return self._tracks.length()
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self._tracks.length() > 0
+
+    def __nonzero__(self):
+        return self.__bool__()
 
     def itersegments(self):
         """Segment iterator"""
