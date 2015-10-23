@@ -48,6 +48,7 @@ setup(
         'bottleneck >= 0.8.0',
         'networkx >= 1.8.1',
         'simplejson >= 3.4.1',
+        'six >= 1.10.0',
     ],
     extras_require={
         'notebook': [
