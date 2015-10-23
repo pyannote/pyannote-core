@@ -198,7 +198,7 @@ class Scores(object):
 
     def __nonzero__(self):
         return self.__bool__()
-        
+
     def __bool__(self):
         """False if annotation is empty"""
         return True if self.annotation_ else False
@@ -303,11 +303,14 @@ class Scores(object):
         # make sure segment/track pairs are sorted
         self._reindexIfNeeded()
 
+        labels = self.labels()
+
         # yield one (segment, track, label) tuple per loop
         for index, columns in self.dataframe_.iterrows():
             segment = Segment(*index[:-1])
             track = index[-1]
-            for label, value in six.iteritems(dict(columns)):
+            for label in labels:
+                value = columns[label]
                 if not np.isnan(value):
                     yield segment, track, label, value
 
