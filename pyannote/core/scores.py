@@ -514,7 +514,7 @@ class Scores(object):
                                       inplace=True, other=np.NaN)
 
         annotation = Annotation(uri=self.uri, modality=self.modality)
-        for segment, track, label, value in six.itervalues(large_enough):
+        for segment, track, label, value in large_enough.itervalues():
             label = label if value else Unknown()
             annotation[segment, track] = label
 
