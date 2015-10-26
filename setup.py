@@ -42,12 +42,13 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pyannote-banyan >= 0.1.6',
-        'numpy >=1.7.1',
-        'pandas == 0.15.2',
+        'numpy >= 1.7.1',
+        'pandas >= 0.17',
         'numexpr >= 2.4.0',
         'bottleneck >= 0.8.0',
         'networkx >= 1.8.1',
         'simplejson >= 3.4.1',
+        'six >= 1.10.0',
     ],
     extras_require={
         'notebook': [
@@ -71,7 +72,11 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
+        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
         "Topic :: Scientific/Engineering"
     ],
 )

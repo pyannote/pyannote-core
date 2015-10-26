@@ -109,6 +109,9 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         return super(Segment, cls).__new__(cls, start, end)
 
     def __nonzero__(self):
+        return self.__bool__()
+
+    def __bool__(self):
         """Use the expression 'if segment'
 
         Returns

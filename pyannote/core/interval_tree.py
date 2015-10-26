@@ -28,7 +28,7 @@
 
 from __future__ import unicode_literals
 
-from segment import Segment
+from .segment import Segment
 import numpy as np
 
 
@@ -89,7 +89,7 @@ def _debug(node, depth):
 
     if node:
         _debug(node.right, depth + 4)
-        print " " * depth + repr(node.key) + " " + repr(node.metadata)
+        print(" " * depth + repr(node.key) + " " + repr(node.metadata))
         _debug(node.left, depth + 4)
 
 

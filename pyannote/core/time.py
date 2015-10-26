@@ -87,6 +87,11 @@ class _TAnchored(float):
 
         return super(_TAnchored, self).__str__()
 
+    def __lt__(self, other):
+        if isinstance(other, _TDrifting):
+            return True
+        return float(self) < float(other)
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -144,6 +149,11 @@ class _TDrifting(str):
     @property
     def drifting(self):
         return True
+
+    def __lt__(self, other):
+        if isinstance(other, _TAnchored):
+            return False
+        return str(self) < str(other)
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
