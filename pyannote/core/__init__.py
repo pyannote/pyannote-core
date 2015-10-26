@@ -26,7 +26,7 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-from __future__ import unicode_literals
+
 
 from ._version import get_versions
 __version__ = get_versions()['version']
@@ -40,9 +40,9 @@ PYANNOTE_LABEL = 'label'
 PYANNOTE_SCORE = 'score'
 PYANNOTE_IDENTITY = 'identity'
 
-from time import T, TStart, TEnd
-from segment import Segment, SlidingWindow
-from timeline import Timeline
-from annotation import Annotation, Unknown
-from transcription import Transcription
-from scores import Scores
+from .time import T, TStart, TEnd
+from .segment import Segment, SlidingWindow
+from .timeline import Timeline
+from .annotation import Annotation, Unknown
+from .transcription import Transcription
+from .scores import Scores

@@ -26,13 +26,12 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-from __future__ import unicode_literals
-
-import itertools
-
+from six.moves import zip
+from itertools import tee
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    a, b = itertools.tee(iterable)
+    a, b = tee(iterable)
     next(b, None)
-    return itertools.izip(a, b)
+    return zip(a, b)
+

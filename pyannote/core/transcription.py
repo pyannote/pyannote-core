@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2015 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,15 @@
 
 from __future__ import unicode_literals
 
+import six
 import networkx as nx
+import itertools
 from networkx.readwrite.json_graph import node_link_data, node_link_graph
 
-from time import T, TStart, TEnd
-from segment import Segment
-from json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
-from util import pairwise
+from .time import T, TStart, TEnd
+from .segment import Segment
+from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from .util import pairwise
 
 
 class Transcription(nx.MultiDiGraph):
@@ -98,7 +100,7 @@ class Transcription(nx.MultiDiGraph):
         else:
             old2new = dict(mapping)
 
-        new2old = {new: old for old, new in old2new.iteritems()}
+        new2old = {new: old for old, new in six.iteritems(old2new)}
         return nx.relabel_nodes(self, old2new, copy=True), new2old
 
     def crop(self, source, target=None):
@@ -324,14 +326,14 @@ class Transcription(nx.MultiDiGraph):
         # and we don't want to loose data
         pred1 = self.predecessors(t1)
         for p in pred1:
-            for key, data in self[p][t1].iteritems():
+            for key, data in six.iteritems(self[p][t1]):
                 assert not data
 
         # make sure --[t2] incoming edges are empty
         # (for the same reason...)
         pred2 = self.predecessors(t2)
         for p in pred2:
-            for key, data in self[p][t2].iteritems():
+            for key, data in six.iteritems(self[p][t2]):
                 assert not data
 
         # let's get started (remove all incoming edges)
@@ -370,14 +372,14 @@ class Transcription(nx.MultiDiGraph):
         # and we don't want to loose data
         succ1 = self.successors(t1)
         for s in succ1:
-            for key, data in self[t1][s].iteritems():
+            for key, data in six.iteritems(self[t1][s]):
                 assert not data
 
         # make sure --[t2] outgoing edges are empty
         # (for the same reason...)
         succ2 = self.successors(t2)
         for s in succ2:
-            for key, data in self[t2][s].iteritems():
+            for key, data in six.iteritems(self[t2][s]):
                 assert not data
 
         # let's get started (remove all outgoing edges)

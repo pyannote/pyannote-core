@@ -1,3 +1,10 @@
+### Version 0.4 (2015-10-26)
+
+  - feat: Python 3 support
+  - feat: pytest test suite
+  - fix: Annotation comparison
+  - fix: deterministic order in Annotation.itertracks
+
 ### Version 0.3.6 (2015-05-06)
 
   - feat: LabelMatrix save/load methods
