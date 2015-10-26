@@ -36,10 +36,6 @@ def test_crop(transcription):
                                                             (5.5, 7.0),
                                                             (7.0, 'C')]
 
-# def test_anchor(transcription):
-#     transcription.anchor('A', 3)
-#     assert list(transcription.ordered_edges_iter()) == [(3, 'B'), (3, 5), (5, 5.5), (5.5, 7)]
-
 def test_anchor(transcription):
     transcription.anchor('A', 2)
     assert list(transcription.ordered_edges_iter()) == [(2, 'B'),
