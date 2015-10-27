@@ -1,3 +1,7 @@
+### Version 0.4.1 (2015-10-27)
+
+  - fix: update Scores.from_df to pandas 0.17
+
 ### Version 0.4 (2015-10-26)
 
   - feat: Python 3 support
