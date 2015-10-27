@@ -91,7 +91,7 @@ class Scores(object):
         """
         dataframe = pivot_table(
             df, values=PYANNOTE_SCORE,
-            rows=[PYANNOTE_SEGMENT, PYANNOTE_TRACK], cols=PYANNOTE_LABEL,
+            index=[PYANNOTE_SEGMENT, PYANNOTE_TRACK], columns=PYANNOTE_LABEL,
             aggfunc=aggfunc
         )
 
