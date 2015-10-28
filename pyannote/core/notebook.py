@@ -33,6 +33,7 @@ from IPython.core.pylabtools import print_figure
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
 import six.moves
+from unidecode import unidecode
 import codecs
 import tempfile
 import networkx as nx
@@ -333,13 +334,16 @@ def _shorten_long_text(text, max_length=30):
         return text
 
 
-def _remove_non_ascii(text):
-    # list of characters to remove
-    # those characters make resulting SVG invalid
-    remove = [u"&", ]
-    remove = {ord(r): u"" for r in remove}
-    ascii = unicode(codecs.encode(text, 'ascii', 'replace'))
-    return ascii.translate(remove)
+def _clean_text(text):
+
+    only_ascii = six.u(unidecode(six.u(text)))
+
+    # remove characters that make resulting SVG invalid
+    mapping = {}
+    mapping[ord(u'&')] = None
+    # mapping[ord(u'"')] = u"'"
+
+    return only_ascii.translate(mapping)
 
 
 def _dottable(transcription):
@@ -387,8 +391,8 @@ def _dottable(transcription):
 
             for name, value in six.iteritems(data):
                 # remove non-ascii characters
-                name = _remove_non_ascii(name)
-                value = _remove_non_ascii(value)
+                name = _clean_text(name)
+                value = _clean_text(value)
                 # shorten long value
                 short_value = _shorten_long_text(value)
                 # update label and tooltip
@@ -424,5 +428,5 @@ def _write_temporary_dot_file(transcription):
 def repr_transcription(transcription):
     """Get `svg` data for `transcription`"""
     path = _write_temporary_dot_file(transcription)
-    data = subprocess.check_output(["dot", "-T", "svg", path])
+    data = subprocess.check_output(["dot", "-T", "svg", path]).decode('ascii')
     return data[data.find("<svg"):]
