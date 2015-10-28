@@ -392,7 +392,7 @@ def _dottable(transcription):
             for name, value in six.iteritems(data):
                 # remove non-ascii characters
                 name = _clean_text(name)
-                value = _clean_text(value)
+                value = _clean_text(str(value))
                 # shorten long value
                 short_value = _shorten_long_text(value)
                 # update label and tooltip
