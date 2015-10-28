@@ -1,3 +1,8 @@
+### Version 0.4.2 (2015-10-28)
+
+  - fix: Python 2/3 notebook representations
+  - fix: bug in Scores with integer-values segments
+
 ### Version 0.4.1 (2015-10-27)
 
   - fix: update Scores.from_df to pandas 0.17
