@@ -336,7 +336,7 @@ def _shorten_long_text(text, max_length=30):
 
 def _clean_text(text):
 
-    only_ascii = six.u(unidecode(six.u(text)))
+    only_ascii = six.u(unidecode(text))
 
     # remove characters that make resulting SVG invalid
     mapping = {}
@@ -392,7 +392,7 @@ def _dottable(transcription):
             for name, value in six.iteritems(data):
                 # remove non-ascii characters
                 name = _clean_text(name)
-                value = _clean_text(value)
+                value = _clean_text(str(value))
                 # shorten long value
                 short_value = _shorten_long_text(value)
                 # update label and tooltip
