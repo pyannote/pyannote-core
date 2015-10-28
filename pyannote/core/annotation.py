@@ -929,7 +929,7 @@ class Annotation(object):
         return annotation
 
     def _repr_png_(self):
-        from pyannote.core.notebook import repr_annotation
+        from .notebook import repr_annotation
         return repr_annotation(self)
 
 

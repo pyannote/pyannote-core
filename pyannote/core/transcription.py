@@ -581,5 +581,5 @@ class Transcription(nx.MultiDiGraph):
     # === IPython Notebook displays ===========================================
 
     def _repr_svg_(self):
-        from notebook import repr_transcription
+        from .notebook import repr_transcription
         return repr_transcription(self)

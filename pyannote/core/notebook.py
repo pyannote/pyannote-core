@@ -31,14 +31,14 @@ from __future__ import unicode_literals
 from IPython.core.pylabtools import print_figure
 import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
-import itertools
+import six.moves
 import codecs
 import tempfile
 import networkx as nx
 import numpy as np
 import subprocess
 
-from segment import Segment
+from .segment import Segment
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -117,7 +117,7 @@ def _draw_segment(ax, segment, y, color, label=None, text=True,
         ax.text(
             segment.middle,
             y + 0.05,
-            codecs.encode(unicode(label), 'ascii', 'replace'),
+            codecs.encode(six.u(label), 'ascii', 'replace'),
             horizontalalignment='center',
             fontsize=10
         )
@@ -217,7 +217,7 @@ def repr_timeline(timeline):
     fig, ax = _setup(ylim=(0, 1))
 
     color = 'b'
-    for segment, y in itertools.izip(cropped, _y(cropped)):
+    for segment, y in six.moves.zip(cropped, _y(cropped)):
         _draw_segment(ax, segment, y, color)
 
     data = _render(fig)
@@ -254,7 +254,7 @@ def repr_annotation(annotation):
 
     fig, ax = _setup(ylim=(0, 1))
 
-    for (segment, track, label), y in itertools.izip(
+    for (segment, track, label), y in six.moves.zip(
             cropped.itertracks(label=True), _y(segments)):
         color = colors[label]  # color = f(label)
         _draw_segment(ax, segment, y, color, label=label)
@@ -384,7 +384,7 @@ def _dottable(transcription):
             # initialize label table
             label = label_header
 
-            for name, value in data.iteritems():
+            for name, value in six.iteritems(data):
                 # remove non-ascii characters
                 name = _remove_non_ascii(name)
                 value = _remove_non_ascii(value)
@@ -396,6 +396,12 @@ def _dottable(transcription):
 
             # close label table
             label += label_footer
+
+        if not tooltip:
+            tooltip = " "
+
+        if not label:
+            label = " "
 
         dottable[source][target][key] = {
             'label': label,

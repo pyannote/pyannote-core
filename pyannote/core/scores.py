@@ -612,7 +612,7 @@ class Scores(object):
             return ""
 
     def _repr_png_(self):
-        from pyannote.core.notebook import repr_scores
+        from .notebook import repr_scores
         return repr_scores(self)
 
 

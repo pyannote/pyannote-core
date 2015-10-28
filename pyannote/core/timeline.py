@@ -172,7 +172,7 @@ class Timeline(object):
 
     def __bool__(self):
         return self._segments.length() > 0
-    
+
     def __nonzero__(self):
         return self.__bool__()
 
@@ -600,7 +600,7 @@ class Timeline(object):
         return cls(segments=segments, uri=uri)
 
     def _repr_png_(self):
-        from pyannote.core.notebook import repr_timeline
+        from .notebook import repr_timeline
         return repr_timeline(self)
 
 

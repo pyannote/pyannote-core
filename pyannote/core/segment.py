@@ -265,7 +265,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         return cls(start=data['start'], end=data['end'])
 
     def _repr_png_(self):
-        from pyannote.core.notebook import repr_segment
+        from .notebook import repr_segment
         return repr_segment(self)
 
 
