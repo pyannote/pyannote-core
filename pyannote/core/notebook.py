@@ -336,7 +336,7 @@ def _shorten_long_text(text, max_length=30):
 
 def _clean_text(text):
 
-    only_ascii = six.u(unidecode(six.u(text)))
+    only_ascii = six.u(unidecode(text))
 
     # remove characters that make resulting SVG invalid
     mapping = {}
