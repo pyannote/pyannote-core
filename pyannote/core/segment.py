@@ -132,6 +132,11 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
     middle = property(fget=_get_middle)
     """Get segment middle time, in seconds."""
 
+    def __iter__(self):
+        """Makes sure tuple(segment) is a tuple of float"""
+        yield float(self.start)
+        yield float(self.end)
+
     def copy(self):
         """Duplicate segment."""
         return Segment(start=self.start, end=self.end)
