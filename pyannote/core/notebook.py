@@ -27,6 +27,7 @@
 # Hervé BREDIN - http://herve.niderb.fr
 
 from __future__ import unicode_literals
+from __future__ import print_function
 
 from IPython.core.pylabtools import print_figure
 import matplotlib.pyplot as plt
