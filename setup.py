@@ -52,9 +52,9 @@ setup(
     ],
     extras_require={
         'notebook': [
-            'matplotlib >= 1.3.1',
+            'matplotlib >= 1.4.3',
             'pygraphviz >= 1.2',
-            'ipython >= 2.0.0',
+            'jupyter >= 1.0.0',
         ],
     },
     # versioneer
