@@ -1,3 +1,7 @@
+### Version 0.4.4 (2015-11-02)
+
+  - feat: Travis continuous integration
+
 ### Version 0.4.3 (2015-10-28)
 
   - fix: Python 2/3 notebook representations
