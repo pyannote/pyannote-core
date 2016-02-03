@@ -42,21 +42,21 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pyannote-banyan >= 0.1.6',
-        'numpy >= 1.7.1',
-        'pandas >= 0.17',
-        'numexpr >= 2.4.0',
-        'bottleneck >= 0.8.0',
-        'networkx >= 1.8.1',
-        'simplejson >= 3.4.1',
+        'numpy >= 1.10.4',
+        'pandas >= 0.17.1',
+        'numexpr >= 2.4.6',
+        'bottleneck >= 1.0.0',
+        'networkx >= 1.10.0',
+        'simplejson >= 3.8.1',
         'six >= 1.10.0',
     ],
     extras_require={
         'notebook': [
-            'matplotlib >= 1.4.3',
-            'pygraphviz >= 1.2',
-            'jupyter >= 1.0.0',
+            'matplotlib >= 1.5.1',
+            'pygraphviz >= 1.3.1',
+            'jupyter >= 4.1.0',
             'pydot2 >= 1.0.33',
-            'unidecode >= 0.4.18'
+            'unidecode >= 0.4.19'
         ],
     },
     # versioneer

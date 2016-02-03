@@ -1,3 +1,9 @@
+### Version 0.4.5 (2016-02-03)
+
+  - feat: deterministic order in Annotation.co_iter
+  - fix: LabelMatrix.argmax corner case
+  - setup: update dependencies
+
 ### Version 0.4.4 (2015-11-02)
 
   - feat: Travis continuous integration

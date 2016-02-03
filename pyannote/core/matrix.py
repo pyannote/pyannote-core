@@ -113,11 +113,7 @@ class LabelMatrix(object):
                     for (r, c) in six.iteritems(self.df.idxmax(axis=axis))}
 
         else:
-            values = [
-                (_r, _c, self.df.loc[_r, _c])
-                for (_c, _r) in six.iteritems(self.df.idxmax(axis=0))
-            ]
-            r, c, _ = sorted(values, key=lambda v: v[2])[-1]
+            r, c, _ = max(self.itervalues(), key=lambda rcv: rcv[2])
             return {r: c}
 
     def __neg__(self):
