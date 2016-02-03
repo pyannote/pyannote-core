@@ -892,8 +892,8 @@ class Annotation(object):
         """
 
         for s, S in self.get_timeline().co_iter(other.get_timeline()):
-            tracks = self.get_tracks(s)
-            other_tracks = other.get_tracks(S)
+            tracks = sorted(self.get_tracks(s))
+            other_tracks = sorted(other.get_tracks(S))
             for t, T in itertools.product(tracks, other_tracks):
                 yield (s, t), (S, T)
 
