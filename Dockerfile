@@ -1,5 +1,5 @@
 FROM pyannote/base
 MAINTAINER Hervé Bredin <bredin@limsi.fr>
 
-ADD . /src
-RUN pip install /src
+RUN pip install pyannote.core
+RUN pip install pyannote.core[notebook]
