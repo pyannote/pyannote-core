@@ -1,4 +1,4 @@
-### Version 0.4.5 (2016-02-03)
+### Version 0.4.6 (2016-02-04)
 
   - feat: deterministic order in Annotation.co_iter
   - fix: LabelMatrix.argmax corner case
