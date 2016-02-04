@@ -54,7 +54,7 @@ setup(
         'notebook': [
             'matplotlib >= 1.5.1',
             'pygraphviz >= 1.3.1',
-            'jupyter >= 4.1.0',
+            'jupyter >= 1.0.0',
             'pydot2 >= 1.0.33',
             'unidecode >= 0.4.19'
         ],
