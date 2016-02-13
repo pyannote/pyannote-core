@@ -44,7 +44,6 @@ from .segment import Segment
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 class Notebook:
     pass
 
@@ -113,16 +112,6 @@ def _draw_segment(ax, segment, y, color, label=None, text=True,
 
     if label is None:
         return
-
-    # draw label
-    if text:
-        ax.text(
-            segment.middle,
-            y + 0.05,
-            codecs.encode(six.u(label), 'ascii', 'replace'),
-            horizontalalignment='center',
-            fontsize=10
-        )
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -231,7 +220,6 @@ def repr_timeline(timeline):
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 def repr_annotation(annotation):
     """Get `png` data for `annotation`"""
 
@@ -244,11 +232,13 @@ def repr_annotation(annotation):
         set_notebook_crop(segment=annotation.get_timeline().extent())
 
     cropped = annotation.crop(_notebook.extent, mode='intersection')
+
     segments = [s for s, _ in cropped.itertracks()]
+    labels = cropped.labels()
 
     # one color per label
-    chart = cropped.chart()
     cm = get_cmap('gist_rainbow')
+    chart = cropped.chart()
     colors = {
         label: cm(1. * i / len(chart))
         for i, (label, _) in enumerate(chart)
@@ -260,6 +250,17 @@ def repr_annotation(annotation):
             cropped.itertracks(label=True), _y(segments)):
         color = colors[label]  # color = f(label)
         _draw_segment(ax, segment, y, color, label=label)
+
+    # get one handle per label and plot the corresponding legend
+    H, L = ax.get_legend_handles_labels()
+    handles = {}
+    for h, l in zip(H, L):
+        if l in labels:
+            handles[l] = h
+
+    ax.legend([handles[l] for l in sorted(handles)], sorted(handles),
+              bbox_to_anchor=(0, 1), loc=3,
+              ncol=5, borderaxespad=0., frameon=False)
 
     data = _render(fig)
 
@@ -280,7 +281,7 @@ def repr_scores(scores):
     plt.rcParams['figure.figsize'] = (_notebook.width, 5)
 
     if not _notebook.extent:
-        set_notebook_crop(segment=scores.get_timeline().extent())
+        set_notebook_crop(segment=scores.to_annotation().get_timeline().extent())
 
     cropped = scores.crop(_notebook.extent, mode='loose')
 
@@ -302,19 +303,17 @@ def repr_scores(scores):
         _draw_segment(ax, segment, y, color, label=label, text=False,
                       boundaries=False)
 
-    # for segment, track, label, value in cropped.nbest(1).itervalues():
-    #     color = colors[label]
-    #     y = value
-    #     _draw_segment(ax, segment, y, color, label=label, text=True,
-    #                   boundaries=True)
-
     # get one handle per label and plot the corresponding legend
     H, L = ax.get_legend_handles_labels()
     handles = {}
     for h, l in zip(H, L):
         if l in labels:
             handles[l] = h
-    ax.legend([handles[l] for l in sorted(handles)], sorted(handles))
+
+    ncol = 5
+    ax.legend([handles[l] for l in sorted(handles)], sorted(handles),
+              bbox_to_anchor=(0, 1), loc=3,
+              ncol=5, borderaxespad=0., frameon=False)
 
     data = _render(fig)
 
