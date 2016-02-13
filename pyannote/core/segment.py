@@ -237,7 +237,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         if self:
             return '[%.3f --> %.3f]' % (self.start, self.end)
         else:
-            return '∅'
+            return '[]'
 
     def _pretty(self, seconds):
         from datetime import timedelta
