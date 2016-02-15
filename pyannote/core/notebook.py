@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2106 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -34,86 +34,143 @@ import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
 import six.moves
 from unidecode import unidecode
-import codecs
 import tempfile
 import networkx as nx
 import numpy as np
 import subprocess
-
-from .segment import Segment
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-class Notebook:
-    pass
-
-_notebook = Notebook()
-_notebook.extent = None
-_DEFAULT_NOTEBOOK_WIDTH = 20
-_notebook.width = _DEFAULT_NOTEBOOK_WIDTH
+from itertools import cycle, product
 
 
-def set_notebook_crop(segment=None, margin=0.1):
+class Notebook(object):
 
-    if segment is None:
-        _notebook.extent = None
-    else:
-        assert isinstance(segment, Segment)
-        assert segment
-        duration = segment.duration
-        _notebook.extent = Segment(
-            segment.start - margin * duration,
-            segment.end + margin * duration
-        )
+    def __init__(self):
+        super(Notebook, self).__init__()
+        self.reset()
 
+    def reset(self):
+        linewidth = [2, 4]
+        linestyle = ['solid', 'dashed', 'dotted']
 
-def set_notebook_width(inches=None):
-    if inches is None:
-        _notebook.width = _DEFAULT_NOTEBOOK_WIDTH
-    else:
-        _notebook.width = inches
+        cm = get_cmap('Set1')
+        colors = [cm(1. * i / 8) for i in range(9)]
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        self._style_generator = cycle(product(linewidth, linestyle, colors))
+        self._style = {None: (1, 'solid', (0.0, 0.0, 0.0))}
+        del self.crop
+        del self.width
 
+    def crop():
+        doc = "The crop property."
+        def fget(self):
+            return self._crop
+        def fset(self, segment):
+            self._crop = segment
+        def fdel(self):
+            self._crop = None
+        return locals()
+    crop = property(**crop())
 
-def _setup(ylim=None, yaxis=False):
-    """Prepare figure"""
-    fig, ax = plt.subplots()
-    ax.set_xlim(_notebook.extent)
-    ax.set_xlabel('Time')
-    if ylim is not None:
-        ax.set_ylim(ylim)
-    ax.axes.get_yaxis().set_visible(yaxis)
-    return fig, ax
+    def width():
+        doc = "The width property."
+        def fget(self):
+            return self._width
+        def fset(self, value):
+            self._width = value
+        def fdel(self):
+            self._width = 20
+        return locals()
+    width = property(**width())
 
+    def __getitem__(self, label):
+        if label not in self._style:
+            self._style[label] = next(self._style_generator)
+        return self._style[label]
 
-def _render(fig):
-    """Render figure as png and return raw image data"""
-    # render figure as png
-    data = print_figure(fig, 'png')
-    # prevent IPython notebook from displaying the figure
-    plt.close(fig)
-    # return raw image data
-    return data
+    def setup(self, ylim=None, yaxis=False):
+        """Prepare figure"""
+        fig, ax = plt.subplots()
+        ax.set_xlim(self.crop)
+        ax.set_xlabel('Time')
+        if ylim is not None:
+            ax.set_ylim(ylim)
+        ax.axes.get_yaxis().set_visible(yaxis)
+        return fig, ax
 
+    def render(self, fig):
+        """Render figure as png and return raw image data"""
+        # render figure as png
+        data = print_figure(fig, 'png')
+        # prevent IPython notebook from displaying the figure
+        plt.close(fig)
+        # return raw image data
+        return data
 
-def _draw_segment(ax, segment, y, color, label=None, text=True,
-                  boundaries=True):
+    def draw_segment(self, ax, segment, y, label=None, boundaries=True):
 
-    # do nothing if segment is empty
-    if not segment:
-        return
+        # do nothing if segment is empty
+        if not segment:
+            return
 
-    # draw segment
-    ax.hlines(y, segment.start, segment.end, color, lw=1, label=label)
-    if boundaries:
-        ax.vlines(segment.start, y + 0.05, y - 0.05, color, lw=1)
-        ax.vlines(segment.end, y + 0.05, y - 0.05, color, lw=1)
+        linewidth, linestyle, color = self[label]
 
-    if label is None:
-        return
+        # draw segment
+        ax.hlines(y, segment.start, segment.end, color,
+                 linewidth=linewidth, linestyle=linestyle, label=label)
+        if boundaries:
+            ax.vlines(segment.start, y + 0.05, y - 0.05,
+                      color, linewidth=linewidth, linestyle=linestyle)
+            ax.vlines(segment.end, y + 0.05, y - 0.05,
+                      color, linewidth=linewidth, linestyle=linestyle)
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if label is None:
+            return
+
+    def get_y(self, segments):
+        """
+
+        Parameters
+        ----------
+        segments : iterator
+            `Segment` iterator (sorted)
+
+        Returns
+        -------
+        y : np.array
+            y coordinates of each segment
+
+        """
+
+        # up_to stores the largest end time
+        # displayed in each line (at the current iteration)
+        # (at the beginning, there is only one empty line)
+        up_to = [-np.inf]
+
+        # y[k] indicates on which line to display kth segment
+        y = []
+
+        for segment in segments:
+            # so far, we do not know which line to use
+            found = False
+            # try each line until we find one that is ok
+            for i, u in enumerate(up_to):
+                # if segment starts after the previous one
+                # on the same line, then we add it to the line
+                if segment.start >= u:
+                    found = True
+                    y.append(i)
+                    up_to[i] = segment.end
+                    break
+            # in case we went out of lines, create a new one
+            if not found:
+                y.append(len(up_to))
+                up_to.append(segment.end)
+
+        # from line numbers to actual y coordinates
+        y = 1. - 1. / (len(up_to) + 1) * (1 + np.array(y))
+
+        return y
+
+notebook = Notebook()
 
 
 def repr_segment(segment):
@@ -122,74 +179,23 @@ def repr_segment(segment):
     # remember current figure size
     figsize = plt.rcParams['figure.figsize']
     # and update it for segment display
-    plt.rcParams['figure.figsize'] = (_notebook.width, 1)
+    plt.rcParams['figure.figsize'] = (notebook._width, 1)
 
-    if not _notebook.extent:
-        set_notebook_crop(segment=segment)
+    if not notebook.crop:
+        notebook.crop = segment
 
-    fig, ax = _setup(ylim=(0, 1))
+    fig, ax = notebook.setup(ylim=(0, 1))
 
     # segments are vertically centered and blue
     y = 0.5
-    color = 'b'
-    _draw_segment(ax, segment, y, color)
+    notebook.draw_segment(ax, segment, y)
 
-    data = _render(fig)
+    data = notebook.render(fig)
 
     # go back to previous figure size
     plt.rcParams['figure.figsize'] = figsize
 
     return data
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-def _y(segments):
-    """
-
-    Parameters
-    ----------
-    segments : iterator
-        `Segment` iterator (sorted)
-
-    Returns
-    -------
-    y : np.array
-        y coordinates of each segment
-
-    """
-
-    # up_to stores the largest end time
-    # displayed in each line (at the current iteration)
-    # (at the beginning, there is only one empty line)
-    up_to = [-np.inf]
-
-    # y[k] indicates on which line to display kth segment
-    y = []
-
-    for segment in segments:
-        # so far, we do not know which line to use
-        found = False
-        # try each line until we find one that is ok
-        for i, u in enumerate(up_to):
-            # if segment starts after the previous one
-            # on the same line, then we add it to the line
-            if segment.start >= u:
-                found = True
-                y.append(i)
-                up_to[i] = segment.end
-                break
-        # in case we went out of lines, create a new one
-        if not found:
-            y.append(len(up_to))
-            up_to.append(segment.end)
-
-    # from line numbers to actual y coordinates
-    y = 1. - 1. / (len(up_to) + 1) * (1 + np.array(y))
-
-    return y
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 def repr_timeline(timeline):
@@ -198,20 +204,19 @@ def repr_timeline(timeline):
     # remember current figure size
     figsize = plt.rcParams['figure.figsize']
     # and update it for segment display
-    plt.rcParams['figure.figsize'] = (_notebook.width, 1)
+    plt.rcParams['figure.figsize'] = (notebook._width, 1)
 
-    if not _notebook.extent and timeline:
-        set_notebook_crop(segment=timeline.extent())
+    if not notebook.crop and timeline:
+        notebook.crop = timeline.extent()
 
-    cropped = timeline.crop(_notebook.extent, mode='loose')
+    cropped = timeline.crop(notebook.crop, mode='loose')
 
-    fig, ax = _setup(ylim=(0, 1))
+    fig, ax = notebook.setup(ylim=(0, 1))
 
-    color = 'b'
-    for segment, y in six.moves.zip(cropped, _y(cropped)):
-        _draw_segment(ax, segment, y, color)
+    for segment, y in six.moves.zip(cropped, notebook.get_y(cropped)):
+        notebook.draw_segment(ax, segment, y)
 
-    data = _render(fig)
+    data = notebook.render(fig)
 
     # go back to previous figure size
     plt.rcParams['figure.figsize'] = figsize
@@ -226,30 +231,20 @@ def repr_annotation(annotation):
     # remember current figure size
     figsize = plt.rcParams['figure.figsize']
     # and update it for segment display
-    plt.rcParams['figure.figsize'] = (_notebook.width, 2)
+    plt.rcParams['figure.figsize'] = (notebook._width, 2)
 
-    if not _notebook.extent:
-        set_notebook_crop(segment=annotation.get_timeline().extent())
+    if not notebook.crop:
+        notebook.crop = annotation.get_timeline().extent()
 
-    cropped = annotation.crop(_notebook.extent, mode='intersection')
-
-    segments = [s for s, _ in cropped.itertracks()]
+    cropped = annotation.crop(notebook.crop, mode='intersection')
     labels = cropped.labels()
+    segments = [s for s, _ in cropped.itertracks()]
 
-    # one color per label
-    cm = get_cmap('gist_rainbow')
-    chart = cropped.chart()
-    colors = {
-        label: cm(1. * i / len(chart))
-        for i, (label, _) in enumerate(chart)
-    }
-
-    fig, ax = _setup(ylim=(0, 1))
+    fig, ax = notebook.setup(ylim=(0, 1))
 
     for (segment, track, label), y in six.moves.zip(
-            cropped.itertracks(label=True), _y(segments)):
-        color = colors[label]  # color = f(label)
-        _draw_segment(ax, segment, y, color, label=label)
+            cropped.itertracks(label=True), notebook.get_y(segments)):
+        notebook.draw_segment(ax, segment, y, label=label)
 
     # get one handle per label and plot the corresponding legend
     H, L = ax.get_legend_handles_labels()
@@ -262,7 +257,7 @@ def repr_annotation(annotation):
               bbox_to_anchor=(0, 1), loc=3,
               ncol=5, borderaxespad=0., frameon=False)
 
-    data = _render(fig)
+    data = notebook.render(fig)
 
     # go back to previous figure size
     plt.rcParams['figure.figsize'] = figsize
@@ -278,30 +273,24 @@ def repr_scores(scores):
     # remember current figure size
     figsize = plt.rcParams['figure.figsize']
     # and update it for segment display
-    plt.rcParams['figure.figsize'] = (_notebook.width, 5)
+    plt.rcParams['figure.figsize'] = (notebook._width, 5)
 
-    if not _notebook.extent:
-        set_notebook_crop(segment=scores.to_annotation().get_timeline().extent())
+    if not notebook.crop:
+        notebook.crop = scores.to_annotation().get_timeline().extent()
 
-    cropped = scores.crop(_notebook.extent, mode='loose')
-
-    cm = get_cmap('gist_rainbow')
-    labels = sorted(scores.labels())
-    colors = {label: cm(1. * i / len(labels))
-              for i, label in enumerate(labels)}
+    cropped = scores.crop(notebook.crop, mode='loose')
+    labels = cropped.labels()
 
     data = scores.dataframe_.values
     mu = np.nanmean(data)
     sigma = np.nanstd(data)
     ylim = (mu - 3 * sigma, mu + 3 * sigma)
 
-    fig, ax = _setup(yaxis=True, ylim=ylim)
+    fig, ax = notebook.setup(yaxis=True, ylim=ylim)
 
     for segment, track, label, value in cropped.itervalues():
-        color = colors[label]
         y = value
-        _draw_segment(ax, segment, y, color, label=label, text=False,
-                      boundaries=False)
+        notebook.draw_segment(ax, segment, y, label=label, boundaries=False)
 
     # get one handle per label and plot the corresponding legend
     H, L = ax.get_legend_handles_labels()
@@ -315,7 +304,7 @@ def repr_scores(scores):
               bbox_to_anchor=(0, 1), loc=3,
               ncol=5, borderaxespad=0., frameon=False)
 
-    data = _render(fig)
+    data = notebook.render(fig)
 
     # go back to previous figure size
     plt.rcParams['figure.figsize'] = figsize

@@ -46,3 +46,4 @@ from .timeline import Timeline
 from .annotation import Annotation, Unknown
 from .transcription import Transcription
 from .scores import Scores
+from .notebook import notebook
