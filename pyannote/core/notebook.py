@@ -95,15 +95,6 @@ class Notebook(object):
         ax.axes.get_yaxis().set_visible(yaxis)
         return ax
 
-    def render(self, fig):
-        """Render figure as png and return raw image data"""
-        # render figure as png
-        data = print_figure(fig, 'png')
-        # prevent IPython notebook from displaying the figure
-        plt.close(fig)
-        # return raw image data
-        return data
-
     def draw_segment(self, ax, segment, y, label=None, boundaries=True):
 
         # do nothing if segment is empty
@@ -276,9 +267,9 @@ def repr_segment(segment):
     plt.rcParams['figure.figsize'] = (notebook.width, 1)
     fig, ax = plt.subplots()
     notebook.plot_segment(segment, ax=ax)
-    data = notebook.render(fig)
+    data = print_figure(fig, 'png')
+    plt.close(fig)
     plt.rcParams['figure.figsize'] = figsize
-
     return data
 
 
@@ -289,9 +280,9 @@ def repr_timeline(timeline):
     plt.rcParams['figure.figsize'] = (notebook.width, 1)
     fig, ax = plt.subplots()
     notebook.plot_timeline(timeline, ax=ax)
-    data = notebook.render(fig)
+    data = print_figure(fig, 'png')
+    plt.close(fig)
     plt.rcParams['figure.figsize'] = figsize
-
     return data
 
 
@@ -302,9 +293,9 @@ def repr_annotation(annotation):
     plt.rcParams['figure.figsize'] = (notebook.width, 2)
     fig, ax = plt.subplots()
     notebook.plot_annotation(annotation, ax=ax)
-    data = notebook.render(fig)
+    data = print_figure(fig, 'png')
+    plt.close(fig)
     plt.rcParams['figure.figsize'] = figsize
-
     return data
 
 
@@ -315,9 +306,9 @@ def repr_scores(scores):
     plt.rcParams['figure.figsize'] = (notebook.width, 2)
     fig, ax = plt.subplots()
     notebook.plot_scores(scores, ax=ax)
-    data = notebook.render(fig)
+    data = print_figure(fig, 'png')
+    plt.close(fig)
     plt.rcParams['figure.figsize'] = figsize
-
     return data
 
 
