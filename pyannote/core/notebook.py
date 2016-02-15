@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2106 CNRS
+# Copyright (c) 2014-2016 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -86,15 +86,14 @@ class Notebook(object):
             self._style[label] = next(self._style_generator)
         return self._style[label]
 
-    def setup(self, ylim=None, yaxis=False):
-        """Prepare figure"""
-        fig, ax = plt.subplots()
+    def setup(self, ax=None, ylim=(0, 1), yaxis=False):
+        if ax is None:
+            ax = plt.gca()
         ax.set_xlim(self.crop)
         ax.set_xlabel('Time')
-        if ylim is not None:
-            ax.set_ylim(ylim)
+        ax.set_ylim(ylim)
         ax.axes.get_yaxis().set_visible(yaxis)
-        return fig, ax
+        return ax
 
     def render(self, fig):
         """Render figure as png and return raw image data"""
@@ -170,29 +169,114 @@ class Notebook(object):
 
         return y
 
+
+    def __call__(self, resource):
+
+        if isinstance(resource, Segment):
+            self.plot_segment(resource)
+
+        elif isinstance(resource, Timeline):
+            self.plot_timeline(resource)
+
+        elif isinstance(resource, Annotation):
+            self.plot_annotation(resource)
+
+        elif isinstance(resource, Scores):
+            self.plot_scores(resource)
+
+
+    def plot_segment(self, segment, ax=None):
+
+        if not self.crop:
+            self.crop = segment
+
+        ax = self.setup(ax=ax)
+        self.draw_segment(ax, segment, 0.5)
+
+
+    def plot_timeline(self, timeline, ax=None):
+
+        if not self.crop and timeline:
+            self.crop = timeline.extent()
+
+        cropped = timeline.crop(self.crop, mode='loose')
+
+        ax = self.setup(ax=ax)
+
+        for segment, y in six.moves.zip(cropped, self.get_y(cropped)):
+            self.draw_segment(ax, segment, y)
+
+
+    def plot_annotation(self, annotation, ax=None):
+
+        if not self.crop:
+            self.crop = annotation.get_timeline().extent()
+
+        cropped = annotation.crop(self.crop, mode='intersection')
+        labels = cropped.labels()
+        segments = [s for s, _ in cropped.itertracks()]
+
+        ax = self.setup(ax=ax)
+
+        for (segment, track, label), y in six.moves.zip(
+                cropped.itertracks(label=True), self.get_y(segments)):
+            self.draw_segment(ax, segment, y, label=label)
+
+        # get one handle per label and plot the corresponding legend
+        H, L = ax.get_legend_handles_labels()
+        handles = {}
+        for h, l in zip(H, L):
+            if l in labels:
+                handles[l] = h
+
+        ax.legend([handles[l] for l in sorted(handles)], sorted(handles),
+                  bbox_to_anchor=(0, 1), loc=3,
+                  ncol=5, borderaxespad=0., frameon=False)
+
+
+    def plot_scores(self, scores, ax=None):
+
+        if not self.crop:
+            self.crop = scores.to_annotation().get_timeline().extent()
+
+        cropped = scores.crop(notebook.crop, mode='loose')
+        labels = cropped.labels()
+
+        data = scores.dataframe_.values
+        mu = np.nanmean(data)
+        sigma = np.nanstd(data)
+        ylim = (mu - 3 * sigma, mu + 3 * sigma)
+
+        ax = self.setup(ax=ax, yaxis=True, ylim=ylim)
+
+        for segment, track, label, value in cropped.itervalues():
+            y = value
+            self.draw_segment(ax, segment, y, label=label, boundaries=False)
+
+        # get one handle per label and plot the corresponding legend
+        H, L = ax.get_legend_handles_labels()
+        handles = {}
+        for h, l in zip(H, L):
+            if l in labels:
+                handles[l] = h
+
+        ncol = 5
+        ax.legend([handles[l] for l in sorted(handles)], sorted(handles),
+                  bbox_to_anchor=(0, 1), loc=3,
+                  ncol=5, borderaxespad=0., frameon=False)
+
+
 notebook = Notebook()
 
 
 def repr_segment(segment):
     """Get `png` data for `segment`"""
 
-    # remember current figure size
     figsize = plt.rcParams['figure.figsize']
-    # and update it for segment display
-    plt.rcParams['figure.figsize'] = (notebook._width, 1)
-
-    if not notebook.crop:
-        notebook.crop = segment
-
-    fig, ax = notebook.setup(ylim=(0, 1))
-
-    # segments are vertically centered and blue
-    y = 0.5
-    notebook.draw_segment(ax, segment, y)
-
+    plt.rcParams['figure.figsize'] = (notebook.width, 1)
+    fig, ax = plt.subplots()
+    notebook.plot_segment(segment, ax=ax)
     data = notebook.render(fig)
-
-    # go back to previous figure size
     plt.rcParams['figure.figsize'] = figsize
 
     return data
@@ -201,117 +285,40 @@ def repr_segment(segment):
 def repr_timeline(timeline):
     """Get `png` data for `timeline`"""
 
-    # remember current figure size
     figsize = plt.rcParams['figure.figsize']
-    # and update it for segment display
-    plt.rcParams['figure.figsize'] = (notebook._width, 1)
-
-    if not notebook.crop and timeline:
-        notebook.crop = timeline.extent()
-
-    cropped = timeline.crop(notebook.crop, mode='loose')
-
-    fig, ax = notebook.setup(ylim=(0, 1))
-
-    for segment, y in six.moves.zip(cropped, notebook.get_y(cropped)):
-        notebook.draw_segment(ax, segment, y)
-
+    plt.rcParams['figure.figsize'] = (notebook.width, 1)
+    fig, ax = plt.subplots()
+    notebook.plot_timeline(timeline, ax=ax)
     data = notebook.render(fig)
-
-    # go back to previous figure size
     plt.rcParams['figure.figsize'] = figsize
 
     return data
 
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 def repr_annotation(annotation):
     """Get `png` data for `annotation`"""
 
-    # remember current figure size
     figsize = plt.rcParams['figure.figsize']
-    # and update it for segment display
-    plt.rcParams['figure.figsize'] = (notebook._width, 2)
-
-    if not notebook.crop:
-        notebook.crop = annotation.get_timeline().extent()
-
-    cropped = annotation.crop(notebook.crop, mode='intersection')
-    labels = cropped.labels()
-    segments = [s for s, _ in cropped.itertracks()]
-
-    fig, ax = notebook.setup(ylim=(0, 1))
-
-    for (segment, track, label), y in six.moves.zip(
-            cropped.itertracks(label=True), notebook.get_y(segments)):
-        notebook.draw_segment(ax, segment, y, label=label)
-
-    # get one handle per label and plot the corresponding legend
-    H, L = ax.get_legend_handles_labels()
-    handles = {}
-    for h, l in zip(H, L):
-        if l in labels:
-            handles[l] = h
-
-    ax.legend([handles[l] for l in sorted(handles)], sorted(handles),
-              bbox_to_anchor=(0, 1), loc=3,
-              ncol=5, borderaxespad=0., frameon=False)
-
+    plt.rcParams['figure.figsize'] = (notebook.width, 2)
+    fig, ax = plt.subplots()
+    notebook.plot_annotation(annotation, ax=ax)
     data = notebook.render(fig)
-
-    # go back to previous figure size
     plt.rcParams['figure.figsize'] = figsize
 
     return data
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 def repr_scores(scores):
     """Get `png` data for `scores`"""
 
-    # remember current figure size
     figsize = plt.rcParams['figure.figsize']
-    # and update it for segment display
-    plt.rcParams['figure.figsize'] = (notebook._width, 5)
-
-    if not notebook.crop:
-        notebook.crop = scores.to_annotation().get_timeline().extent()
-
-    cropped = scores.crop(notebook.crop, mode='loose')
-    labels = cropped.labels()
-
-    data = scores.dataframe_.values
-    mu = np.nanmean(data)
-    sigma = np.nanstd(data)
-    ylim = (mu - 3 * sigma, mu + 3 * sigma)
-
-    fig, ax = notebook.setup(yaxis=True, ylim=ylim)
-
-    for segment, track, label, value in cropped.itervalues():
-        y = value
-        notebook.draw_segment(ax, segment, y, label=label, boundaries=False)
-
-    # get one handle per label and plot the corresponding legend
-    H, L = ax.get_legend_handles_labels()
-    handles = {}
-    for h, l in zip(H, L):
-        if l in labels:
-            handles[l] = h
-
-    ncol = 5
-    ax.legend([handles[l] for l in sorted(handles)], sorted(handles),
-              bbox_to_anchor=(0, 1), loc=3,
-              ncol=5, borderaxespad=0., frameon=False)
-
+    plt.rcParams['figure.figsize'] = (notebook.width, 2)
+    fig, ax = plt.subplots()
+    notebook.plot_scores(scores, ax=ax)
     data = notebook.render(fig)
-
-    # go back to previous figure size
     plt.rcParams['figure.figsize'] = figsize
 
     return data
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 def _shorten_long_text(text, max_length=30):
