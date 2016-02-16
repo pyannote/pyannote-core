@@ -251,7 +251,6 @@ class Notebook(object):
             if l in labels:
                 handles[l] = h
 
-        ncol = 5
         ax.legend([handles[l] for l in sorted(handles)], sorted(handles),
                   bbox_to_anchor=(0, 1), loc=3,
                   ncol=5, borderaxespad=0., frameon=False)
