@@ -818,9 +818,9 @@ class Annotation(object):
 
         """
 
-        if generator is 'string':
+        if generator == 'string':
             generator = string_generator()
-        elif generator is 'int':
+        elif generator == 'int':
             generator = int_generator()
 
         mapping = {label: next(generator) for label in self.labels()}
@@ -844,9 +844,9 @@ class Annotation(object):
 
         """
 
-        if generator is 'string':
+        if generator == 'string':
             generator = string_generator()
-        elif generator is 'int':
+        elif generator == 'int':
             generator = int_generator()
 
         anonymized = self.empty()
