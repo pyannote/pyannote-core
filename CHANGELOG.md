@@ -1,4 +1,4 @@
-### Version 0.5 (2016-02-17)
+### Version 0.5.1 (2016-02-17)
 
   - improve: notebook display
   - improve: Annotation.anonymize_{tracks|labels} no longer use Unknown instances
