@@ -39,6 +39,9 @@ import networkx as nx
 import numpy as np
 import subprocess
 from itertools import cycle, product, groupby
+from .segment import Segment
+from .timeline import Timeline
+from .annotation import Annotation
 
 
 class Notebook(object):
