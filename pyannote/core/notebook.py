@@ -231,9 +231,9 @@ class Notebook(object):
         labels = cropped.labels()
 
         data = scores.dataframe_.values
-        mu = np.nanmean(data)
-        sigma = np.nanstd(data)
-        ylim = (mu - 3 * sigma, mu + 3 * sigma)
+        m = np.nanmin(data)
+        M = np.nanmax(data)
+        ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
 
         ax = self.setup(ax=ax, yaxis=True, ylim=ylim)
 
