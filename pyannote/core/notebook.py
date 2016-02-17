@@ -89,11 +89,14 @@ class Notebook(object):
             self._style[label] = next(self._style_generator)
         return self._style[label]
 
-    def setup(self, ax=None, ylim=(0, 1), yaxis=False):
+    def setup(self, ax=None, ylim=(0, 1), yaxis=False, time=True):
         if ax is None:
             ax = plt.gca()
         ax.set_xlim(self.crop)
-        ax.set_xlabel('Time')
+        if time:
+            ax.set_xlabel('Time')
+        else:
+            ax.set_xticklabels([])
         ax.set_ylim(ylim)
         ax.axes.get_yaxis().set_visible(yaxis)
         return ax
@@ -164,44 +167,43 @@ class Notebook(object):
         return y
 
 
-    def __call__(self, resource):
+    def __call__(self, resource, time=True, legend=True):
 
         if isinstance(resource, Segment):
-            self.plot_segment(resource)
+            self.plot_segment(resource, time=time)
 
         elif isinstance(resource, Timeline):
-            self.plot_timeline(resource)
+            self.plot_timeline(resource, time=time)
 
         elif isinstance(resource, Annotation):
-            self.plot_annotation(resource)
+            self.plot_annotation(resource, time=time, legend=legend)
 
         elif isinstance(resource, Scores):
-            self.plot_scores(resource)
+            self.plot_scores(resource, time=time, legend=legend)
 
 
-    def plot_segment(self, segment, ax=None):
+    def plot_segment(self, segment, ax=None, time=True):
 
         if not self.crop:
             self.crop = segment
 
-        ax = self.setup(ax=ax)
+        ax = self.setup(ax=ax, time=time)
         self.draw_segment(ax, segment, 0.5)
 
-
-    def plot_timeline(self, timeline, ax=None):
+    def plot_timeline(self, timeline, ax=None, time=True):
 
         if not self.crop and timeline:
             self.crop = timeline.extent()
 
         cropped = timeline.crop(self.crop, mode='loose')
 
-        ax = self.setup(ax=ax)
+        ax = self.setup(ax=ax, time=time)
 
         for segment, y in six.moves.zip(cropped, self.get_y(cropped)):
             self.draw_segment(ax, segment, y)
 
 
-    def plot_annotation(self, annotation, ax=None):
+    def plot_annotation(self, annotation, ax=None, time=True, legend=True):
 
         if not self.crop:
             self.crop = annotation.get_timeline().extent()
@@ -210,22 +212,24 @@ class Notebook(object):
         labels = cropped.labels()
         segments = [s for s, _ in cropped.itertracks()]
 
-        ax = self.setup(ax=ax)
+        ax = self.setup(ax=ax, time=time)
 
         for (segment, track, label), y in six.moves.zip(
                 cropped.itertracks(label=True), self.get_y(segments)):
             self.draw_segment(ax, segment, y, label=label)
 
-        # this gets exactly one legend handle and one legend label per label
-        # (avoids repeated legends for repeated tracks with same label)
-        H, L = ax.get_legend_handles_labels()
-        HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
-                     key=lambda h_l: h_l[1])
-        H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
-        ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
-                  ncol=5, borderaxespad=0., frameon=False)
 
-    def plot_scores(self, scores, ax=None):
+        if legend:
+            # this gets exactly one legend handle and one legend label per label
+            # (avoids repeated legends for repeated tracks with same label)
+            H, L = ax.get_legend_handles_labels()
+            HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
+                         key=lambda h_l: h_l[1])
+            H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
+            ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
+                      ncol=5, borderaxespad=0., frameon=False)
+
+    def plot_scores(self, scores, ax=None, time=True, legend=True):
 
         if not self.crop:
             self.crop = scores.to_annotation().get_timeline().extent()
@@ -238,20 +242,22 @@ class Notebook(object):
         M = np.nanmax(data)
         ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
 
-        ax = self.setup(ax=ax, yaxis=True, ylim=ylim)
+        ax = self.setup(ax=ax, yaxis=True, ylim=ylim, time=time)
 
         for segment, track, label, value in cropped.itervalues():
             y = value
             self.draw_segment(ax, segment, y, label=label, boundaries=False)
 
-        # this gets exactly one legend handle and one legend label per label
-        # (avoids repeated legends for repeated tracks with same label)
-        H, L = ax.get_legend_handles_labels()
-        HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
-                     key=lambda h_l: h_l[1])
-        H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
-        ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
-                  ncol=5, borderaxespad=0., frameon=False)
+
+        if legend:
+            # this gets exactly one legend handle and one legend label per label
+            # (avoids repeated legends for repeated tracks with same label)
+            H, L = ax.get_legend_handles_labels()
+            HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
+                         key=lambda h_l: h_l[1])
+            H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
+            ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
+                      ncol=5, borderaxespad=0., frameon=False)
 
 
 notebook = Notebook()
