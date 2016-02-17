@@ -38,7 +38,7 @@ import tempfile
 import networkx as nx
 import numpy as np
 import subprocess
-from itertools import cycle, product
+from itertools import cycle, product, groupby
 
 
 class Notebook(object):
@@ -213,17 +213,14 @@ class Notebook(object):
                 cropped.itertracks(label=True), self.get_y(segments)):
             self.draw_segment(ax, segment, y, label=label)
 
-        # get one handle per label and plot the corresponding legend
+        # this gets exactly one legend handle and one legend label per label
+        # (avoids repeated legends for repeated tracks with same label)
         H, L = ax.get_legend_handles_labels()
-        handles = {}
-        for h, l in zip(H, L):
-            if l in labels:
-                handles[l] = h
-
-        ax.legend([handles[l] for l in sorted(handles)], sorted(handles),
-                  bbox_to_anchor=(0, 1), loc=3,
+        HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
+                     key=lambda h_l: h_l[1])
+        H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
+        ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
                   ncol=5, borderaxespad=0., frameon=False)
-
 
     def plot_scores(self, scores, ax=None):
 
@@ -244,15 +241,13 @@ class Notebook(object):
             y = value
             self.draw_segment(ax, segment, y, label=label, boundaries=False)
 
-        # get one handle per label and plot the corresponding legend
+        # this gets exactly one legend handle and one legend label per label
+        # (avoids repeated legends for repeated tracks with same label)
         H, L = ax.get_legend_handles_labels()
-        handles = {}
-        for h, l in zip(H, L):
-            if l in labels:
-                handles[l] = h
-
-        ax.legend([handles[l] for l in sorted(handles)], sorted(handles),
-                  bbox_to_anchor=(0, 1), loc=3,
+        HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
+                     key=lambda h_l: h_l[1])
+        H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
+        ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
                   ncol=5, borderaxespad=0., frameon=False)
 
 
