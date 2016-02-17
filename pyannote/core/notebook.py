@@ -203,6 +203,8 @@ class Notebook(object):
         for segment, y in six.moves.zip(cropped, self.get_y(cropped)):
             self.draw_segment(ax, segment, y)
 
+        # ax.set_aspect(3. / self.crop.duration)
+
 
     def plot_annotation(self, annotation, ax=None, time=True, legend=True):
 
@@ -219,6 +221,7 @@ class Notebook(object):
                 cropped.itertracks(label=True), self.get_y(segments)):
             self.draw_segment(ax, segment, y, label=label)
 
+        # ax.set_aspect(3. / self.crop.duration)
 
         if legend:
             # this gets exactly one legend handle and one legend label per label
@@ -249,6 +252,7 @@ class Notebook(object):
             y = value
             self.draw_segment(ax, segment, y, label=label, boundaries=False)
 
+        # ax.set_aspect(6. / ((ylim[1] - ylim[0]) * self.crop.duration))
 
         if legend:
             # this gets exactly one legend handle and one legend label per label
