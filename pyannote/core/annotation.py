@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2016 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -42,6 +42,7 @@ from .interval_tree import TimelineUpdator
 from .segment import Segment
 from .timeline import Timeline
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from .util import string_generator, int_generator
 
 # ignore Banyan warning
 warnings.filterwarnings(
@@ -801,11 +802,14 @@ class Annotation(object):
     def __mod__(self, translation):
         return self.translate(translation)
 
-    def anonymize_labels(self):
+    def anonymize_labels(self, generator='string'):
         """Anonmyize labels
 
-        Create a new annotation where labels are anonymized, ie. each label
-        is replaced by a unique `Unknown` instance.
+        Create a new annotation where labels are anonymized.
+
+        Parameters
+        ----------
+        generator : {'string', 'int', iterator}, optional
 
         Returns
         -------
@@ -813,25 +817,42 @@ class Annotation(object):
             New annotation with anonymized labels.
 
         """
-        translation = {label: Unknown() for label in self.labels()}
-        return self % translation
 
-    def anonymize_tracks(self):
+        if generator == 'string':
+            generator = string_generator()
+        elif generator == 'int':
+            generator = int_generator()
+
+        mapping = {label: next(generator) for label in self.labels()}
+        return self.translate(mapping)
+
+    def anonymize_tracks(self, generator='string'):
         """
         Anonymize tracks
 
-        Create a new annotation where each track is anonymized, i.e. the label
-        of each track is set to a unique `Unknown` instance
+        Create a new annotation where each track has a unique label.
+
+        Parameters
+        ----------
+        generator : {'string', 'int', iterator}, optional
+            Default to 'string'.
 
         Returns
         -------
         anonymized : `Annotation`
-            Anonymized annotation
+            New annotation with anonymized tracks.
 
         """
+
+        if generator == 'string':
+            generator = string_generator()
+        elif generator == 'int':
+            generator = int_generator()
+
         anonymized = self.empty()
         for s, t, _ in self.itertracks(label=True):
-            anonymized[s, t] = Unknown()
+            anonymized[s, t] = next(generator)
+
         return anonymized
 
     def smooth(self, collar=0.):

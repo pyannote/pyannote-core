@@ -27,7 +27,6 @@
 # Hervé BREDIN - http://herve.niderb.fr
 
 
-
 from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
@@ -46,3 +45,8 @@ from .timeline import Timeline
 from .annotation import Annotation, Unknown
 from .transcription import Transcription
 from .scores import Scores
+
+try:
+    from .notebook import notebook
+except ImportError as e:
+    pass

@@ -1,3 +1,9 @@
+### Version 0.5 (2016-02-17)
+
+  - improve: notebook display
+  - improve: Annotation.anonymize_{tracks|labels} no longer use Unknown instances
+  - improve: empty segments are now printed as "[]"
+
 ### Version 0.4.7 (2016-02-04)
 
   - feat: deterministic order in Annotation.co_iter

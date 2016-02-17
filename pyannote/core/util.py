@@ -26,8 +26,12 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
+from __future__ import unicode_literals
 from six.moves import zip
 from itertools import tee
+from itertools import product
+from string import ascii_uppercase
+
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
@@ -35,3 +39,40 @@ def pairwise(iterable):
     next(b, None)
     return zip(a, b)
 
+
+def string_generator():
+    """Label generator
+
+    Usage
+    -----
+    t = string_generator()
+    next(t) -> 'A'    # start with 1-letter labels
+    ...               # from A to Z
+    next(t) -> 'Z'
+    next(t) -> 'AA'   # then 2-letters labels
+    next(t) -> 'AB'   # from AA to ZZ
+    ...
+    next(t) -> 'ZY'
+    next(t) -> 'ZZ'
+    next(t) -> 'AAA'  # then 3-letters labels
+    ...               # (you get the idea)
+    """
+
+    # label length
+    r = 1
+
+    # infinite loop
+    while True:
+
+        # generate labels with current length
+        for c in product(ascii_uppercase, repeat=r):
+            yield ''.join(c)
+
+        # increment label length when all possibilities are exhausted
+        r = r + 1
+
+def int_generator():
+    i = 0
+    while True:
+        yield i
+        i = i + 1
