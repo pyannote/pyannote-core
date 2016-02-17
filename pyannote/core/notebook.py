@@ -42,6 +42,7 @@ from itertools import cycle, product, groupby
 from .segment import Segment
 from .timeline import Timeline
 from .annotation import Annotation
+from .scores import Scores
 
 
 class Notebook(object):
