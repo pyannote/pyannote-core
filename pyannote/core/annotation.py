@@ -532,7 +532,7 @@ class Annotation(object):
         if any([lnu for lnu in self._labelNeedsUpdate.values()]):
             self._updateLabels()
 
-        labels = sorted(self._labels)
+        labels = sorted(self._labels, key=str)
 
         if not unknown:
             labels = [l for l in labels if not isinstance(l, Unknown)]
@@ -913,8 +913,8 @@ class Annotation(object):
         """
 
         for s, S in self.get_timeline().co_iter(other.get_timeline()):
-            tracks = sorted(self.get_tracks(s))
-            other_tracks = sorted(other.get_tracks(S))
+            tracks = sorted(self.get_tracks(s), key=str)
+            other_tracks = sorted(other.get_tracks(S), key=str)
             for t, T in itertools.product(tracks, other_tracks):
                 yield (s, t), (S, T)
 
