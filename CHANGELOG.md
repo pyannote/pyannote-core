@@ -1,3 +1,8 @@
+### Version 0.5.2 (2016-02-19)
+
+  - feat: Annotation * Annotation returns cooccurrence matrix
+  - fix: Annotation.itertracks would raise a UnicodeDecodeError in some cases
+
 ### Version 0.5.1 (2016-02-17)
 
   - improve: notebook display
