@@ -44,6 +44,7 @@ setup(
         'pyannote-banyan >= 0.1.6',
         'numpy >= 1.10.4',
         'pandas >= 0.17.1',
+        'xarray >= 0.7.0',
         'numexpr >= 2.4.6',
         'bottleneck >= 1.0.0',
         'networkx >= 1.10.0',

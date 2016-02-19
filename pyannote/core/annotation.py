@@ -38,6 +38,7 @@ import numpy as np
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
 from banyan import SortedDict
+from xarray import DataArray
 from .interval_tree import TimelineUpdator
 from .segment import Segment
 from .timeline import Timeline
@@ -203,7 +204,9 @@ class Annotation(object):
 
     def itertracks(self, label=False):
         for segment, tracks in self._tracks.items():
-            for track, lbl in sorted(six.iteritems(tracks)):
+            for track, lbl in sorted(
+                six.iteritems(tracks),
+                key=lambda tl: (str(tl[0]), str(tl[1]))):
                 if label:
                     yield segment, track, lbl
                 else:
@@ -917,6 +920,25 @@ class Annotation(object):
             other_tracks = sorted(other.get_tracks(S), key=str)
             for t, T in itertools.product(tracks, other_tracks):
                 yield (s, t), (S, T)
+
+    def __mul__(self, other):
+        """Compute cooccurrence matrix"""
+
+        i = self.labels()
+        j = other.labels()
+
+        matrix = DataArray(
+            np.zeros((len(i), len(j))),
+            coords=[('i', i), ('j', j)])
+
+        for (segment, track), (other_segment, other_track) in self.co_iter(other):
+            label = self[segment, track]
+            other_label = other[other_segment, other_track]
+            duration = (segment & other_segment).duration
+            matrix.loc[label, other_label] += duration
+
+        return matrix
+
 
     def for_json(self):
 
