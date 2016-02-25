@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2016 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -50,13 +50,19 @@ def object_hook(d):
     return d
 
 
-def load(path):
-    with open(path, 'r') as f:
-        data = json.load(f, encoding='utf-8', object_hook=object_hook)
-    return data
+def load(fp):
+    return json.load(fp, encoding='utf-8', object_hook=object_hook)
 
 
-def dump(data, path):
-    # TODO: add pyannote.core version
-    with open(path, 'w') as f:
-        json.dump(data, f, encoding='utf-8', for_json=True)
+def load_from(path):
+    with open(path, 'r') as fp:
+        return load(fp)
+
+
+def dump(resource, fp):
+    json.dump(resource, fp, encoding='utf-8', for_json=True)
+
+
+def dump_to(resource, path):
+    with open(path, 'w') as fp:
+        dump(resource, fp)
