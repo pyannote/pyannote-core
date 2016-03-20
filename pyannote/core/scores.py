@@ -188,6 +188,10 @@ class Scores(object):
 
         segment, track, label = key
 
+        # do not add empty track
+        if not segment:
+            return
+
         self.dataframe_.at[tuple(segment) + (track,), label] = value
         self.annotation_[segment, track] = label
         self.hasChanged_ = True
