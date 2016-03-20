@@ -1,7 +1,11 @@
+### Version 0.6.1 (2016-03-20)
+
+  - fix: prevent adding empty segments in Annotation and Scores
+
 ### Version 0.6 (2016-02-25)
 
   - BREAKING: pyannote.core.json.{load|dump} expects file handles
-  - feat: load_from, dump_to 
+  - feat: load_from, dump_to
 
 ### Version 0.5.2 (2016-02-19)
 
