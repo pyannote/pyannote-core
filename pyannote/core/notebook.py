@@ -30,7 +30,6 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 from IPython.core.pylabtools import print_figure
-import matplotlib.pyplot as plt
 from matplotlib.cm import get_cmap
 import six.moves
 from unidecode import unidecode
@@ -91,6 +90,7 @@ class Notebook(object):
         return self._style[label]
 
     def setup(self, ax=None, ylim=(0, 1), yaxis=False, time=True):
+        import matplotlib.pyplot as plt
         if ax is None:
             ax = plt.gca()
         ax.set_xlim(self.crop)
@@ -270,7 +270,7 @@ notebook = Notebook()
 
 def repr_segment(segment):
     """Get `png` data for `segment`"""
-
+    import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']
     plt.rcParams['figure.figsize'] = (notebook.width, 1)
     fig, ax = plt.subplots()
@@ -283,7 +283,7 @@ def repr_segment(segment):
 
 def repr_timeline(timeline):
     """Get `png` data for `timeline`"""
-
+    import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']
     plt.rcParams['figure.figsize'] = (notebook.width, 1)
     fig, ax = plt.subplots()
@@ -296,7 +296,7 @@ def repr_timeline(timeline):
 
 def repr_annotation(annotation):
     """Get `png` data for `annotation`"""
-
+    import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']
     plt.rcParams['figure.figsize'] = (notebook.width, 2)
     fig, ax = plt.subplots()
@@ -309,7 +309,7 @@ def repr_annotation(annotation):
 
 def repr_scores(scores):
     """Get `png` data for `scores`"""
-
+    import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']
     plt.rcParams['figure.figsize'] = (notebook.width, 2)
     fig, ax = plt.subplots()
