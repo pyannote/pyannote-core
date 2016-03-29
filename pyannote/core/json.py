@@ -54,6 +54,10 @@ def load(fp):
     return json.load(fp, encoding='utf-8', object_hook=object_hook)
 
 
+def loads(s):
+    return json.loads(s, encoding='utf-8', object_hook=object_hook)
+
+
 def load_from(path):
     with open(path, 'r') as fp:
         return load(fp)
@@ -61,6 +65,10 @@ def load_from(path):
 
 def dump(resource, fp):
     json.dump(resource, fp, encoding='utf-8', for_json=True)
+
+
+def dumps(resource):
+    return json.dumps(resource, encoding='utf-8', for_json=True)
 
 
 def dump_to(resource, path):
