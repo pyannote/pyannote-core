@@ -1,3 +1,7 @@
+### Version 0.6.4 (2016-06-06)
+
+  - fix: Python 3 support in pyannote.core.features
+
 ### Version 0.6.3 (2016-03-29)
 
   - setup: versioneer 0.15

@@ -35,8 +35,8 @@ Features.
 from __future__ import unicode_literals
 
 import numpy as np
-from segment import Segment
-from timeline import Timeline
+from .segment import Segment
+from .timeline import Timeline
 
 
 class SlidingWindowFeature(object):
