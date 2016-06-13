@@ -1,3 +1,7 @@
+### Version 0.6.5 (2016-06-13)
+
+  - BREAKING: make segmentToRange deterministic wrt. segment duration
+
 ### Version 0.6.4 (2016-06-06)
 
   - fix: Python 3 support in pyannote.core.features
