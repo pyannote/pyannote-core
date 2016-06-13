@@ -389,11 +389,10 @@ class SlidingWindow(object):
         """
         # find closest frame to segment start
         i0 = self.__closest_frame(segment.start)
-        # find closest frame to segment end
-        j0 = self.__closest_frame(segment.end)
-        # return frame range as (start_frame, number_of_frame) tuple
-        i0 = max(0, i0)
-        n = j0 - i0
+
+        # number of steps to cover segment duration
+        n = int(segment.duration / self.step) + 1
+
         return i0, n
 
     def rangeToSegment(self, i0, n):
