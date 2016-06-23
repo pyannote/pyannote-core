@@ -385,7 +385,7 @@ class Annotation(object):
         # deep copy need-update indicator
         copied._labelNeedsUpdate = dict(self._labelNeedsUpdate)
 
-        copied._timelineNeedsUpdate = self._timelineNeedsUpdate
+        copied._timelineNeedsUpdate = True
 
         return copied
 
