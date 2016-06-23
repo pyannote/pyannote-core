@@ -1,3 +1,7 @@
+### Version 0.6.6 (2016-06-23)
+
+  - fix: force internal timeline update after copy
+
 ### Version 0.6.5 (2016-06-13)
 
   - BREAKING: make segmentToRange deterministic wrt. segment duration
