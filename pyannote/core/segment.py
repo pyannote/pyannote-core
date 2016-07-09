@@ -404,7 +404,7 @@ class SlidingWindow(object):
                 j_ = (focus.end - self.start) / self.step
                 j = int(np.floor(j_))
 
-                return np.array(range(i, j + 1))
+                return np.array(range(i, j + 1), dtype=np.int64)
 
             elif mode == 'strict':
 
@@ -418,7 +418,7 @@ class SlidingWindow(object):
                 j_ = (focus.end - self.duration - self.start) / self.step
                 j = int(np.floor(j_))
 
-                return np.array(range(i, j + 1))
+                return np.array(range(i, j + 1), dtype=np.int64)
 
             elif mode == 'center':
 
@@ -434,7 +434,7 @@ class SlidingWindow(object):
                     n_ = np.rint(fixed / self.step)
                     j = i + int(n_)
 
-                return np.array(range(i, j + 1))
+                return np.array(range(i, j + 1), dtype=np.int64)
 
             else:
                 raise ValueError('mode must be "loose", "strict", or "center"')
