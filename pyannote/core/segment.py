@@ -365,6 +365,65 @@ class SlidingWindow(object):
             (t - self.__start - .5 * self.__duration) / self.__step
         ))
 
+    def crop(self, focus, mode='loose'):
+        """Crop sliding window
+
+        Parameters
+        ----------
+        focus : `Segment` or `Timeline`
+        mode : {'strict', 'loose', 'intersection'}
+            In 'strict' mode, only indices of segments fully included in focus
+            coverage are returned. In 'loose' mode, indiceis of any intersecting
+            segment are returned.
+
+        Returns
+        -------
+        indices : np.array
+            Array of unique indices of matching segments
+        """
+
+        from .timeline import Timeline
+
+        if isinstance(focus, Segment):
+
+            if mode == 'loose':
+
+                # find smallest integer i such that
+                # self.start + i x self.step + self.duration >= focus.start
+                i_ = (focus.start - self.duration - self.start) / self.step
+                i = int(np.ceil(i_))
+
+                # find largest integer j such that
+                # self.start + j x self.step <= focus.end
+                j_ = (focus.end - self.start) / self.step
+                j = int(np.floor(j_))
+
+                return np.array(range(i, j + 1))
+
+            elif mode == 'strict':
+
+                # find smallest integer i such that
+                # self.start + i x self.step >= focus.start
+                i_ = (focus.start - self.start) / self.step
+                i = int(np.ceil(i_))
+
+                # find largest integer j such that
+                # self.start + j x self.step + self.duration <= focus.end
+                j_ = (focus.end - self.duration - self.start) / self.step
+                j = int(np.floor(j_))
+
+                return np.array(range(i, j + 1))
+
+            else:
+                raise ValueError('mode must be "loose" or "strict"')
+
+        elif isinstance(focus, Timeline):
+            return np.unique(np.hstack([
+                self.crop(s, mode=mode) for s in focus.coverage()]))
+
+        else:
+            raise TypeError('focus must be a Segment or a Timeline.')
+
     def segmentToRange(self, segment):
         """Convert segment to 0-indexed frame range
 
