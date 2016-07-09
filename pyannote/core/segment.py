@@ -365,6 +365,87 @@ class SlidingWindow(object):
             (t - self.__start - .5 * self.__duration) / self.__step
         ))
 
+    def crop(self, focus, mode='loose', fixed=None):
+        """Crop sliding window
+
+        Parameters
+        ----------
+        focus : `Segment` or `Timeline`
+        mode : {'strict', 'loose', 'center', 'fixed'}, optional
+            In 'strict' mode, only indices of segments fully included in focus
+            coverage are returned. In 'loose' mode, indices of any intersecting
+            segment are returned. In 'center' mode, first and last positions are
+            chosen to be the positions whose centers are the closest to the
+            focus start and end times. Defaults to 'loose'.
+        fixed : float, optional
+            When provided and mode is 'center', overrides focus duration. This
+            might be useful to avoid float rounding errors and to make sure the
+            number of positions is deterministic.
+
+        Returns
+        -------
+        indices : np.array
+            Array of unique indices of matching segments
+        """
+
+        from .timeline import Timeline
+
+        if isinstance(focus, Segment):
+
+            if mode == 'loose':
+
+                # find smallest integer i such that
+                # self.start + i x self.step + self.duration >= focus.start
+                i_ = (focus.start - self.duration - self.start) / self.step
+                i = int(np.ceil(i_))
+
+                # find largest integer j such that
+                # self.start + j x self.step <= focus.end
+                j_ = (focus.end - self.start) / self.step
+                j = int(np.floor(j_))
+
+                return np.array(range(i, j + 1))
+
+            elif mode == 'strict':
+
+                # find smallest integer i such that
+                # self.start + i x self.step >= focus.start
+                i_ = (focus.start - self.start) / self.step
+                i = int(np.ceil(i_))
+
+                # find largest integer j such that
+                # self.start + j x self.step + self.duration <= focus.end
+                j_ = (focus.end - self.duration - self.start) / self.step
+                j = int(np.floor(j_))
+
+                return np.array(range(i, j + 1))
+
+            elif mode == 'center':
+
+                # find window position whose center is the closest to focus.start
+                i = self.__closest_frame(focus.start)
+
+                if fixed is None:
+                    # find window position whose center is the closest to focus.end
+                    j = self.__closest_frame(focus.end)
+
+                else:
+                    # make sure the number of returned position is fixed
+                    n_ = np.rint(fixed / self.step)
+                    j = i + int(n_)
+
+                return np.array(range(i, j + 1))
+
+            else:
+                raise ValueError('mode must be "loose", "strict", or "center"')
+
+        elif isinstance(focus, Timeline):
+            return np.unique(np.hstack([
+                self.crop(s, mode=mode, fixed=fixed) for s in focus.coverage()]))
+
+        else:
+            raise TypeError('focus must be a Segment or a Timeline.')
+
     def segmentToRange(self, segment):
         """Convert segment to 0-indexed frame range
 

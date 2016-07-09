@@ -45,6 +45,7 @@ from .timeline import Timeline
 from .annotation import Annotation, Unknown
 from .transcription import Transcription
 from .scores import Scores
+from .feature import SlidingWindowFeature
 
 try:
     from .notebook import notebook
