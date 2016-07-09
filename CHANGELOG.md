@@ -1,3 +1,9 @@
+### Version 0.7 (dev)
+
+  - feat: new SlidingWindow.crop method
+  - feat: new 'mode' parameter to SlidingWindowFeature.crop method
+  - doc: updated notebooks for SlidingWindow and SlidingWindowFeature
+
 ### Version 0.6.6 (2016-06-23)
 
   - fix: force internal timeline update after copy
