@@ -89,40 +89,45 @@ class SlidingWindowFeature(object):
             else:
                 yield self.data[i]
 
-    def crop(self, focus):
-        """Get set of feature vector for given segment
+    def crop(self, focus, mode='loose', fixed=None):
+        """Extract frames as numpy array
 
         Parameters
         ----------
         focus : Segment or Timeline
+        mode : {'loose', 'strict', 'center', 'fixed'}, optional
+            In 'strict' mode, only frames fully included in focus coverage are
+            returned. In 'loose' mode, any intersecting frames are returned. In
+            'center' mode, first and last frames are chosen to be the positions
+            whose centers are the closest to the focus start and end times.
+            Defaults to 'loose'.
+        fixed : float, optional
+            When provided and mode is 'center', override focus duration to make
+            sure two `focus` with the same duration always result in the same
+            (fixed) number of frames being selected.
 
         Returns
         -------
         data : numpy array
             (nSamples, nFeatures) numpy array
+
+        See also
+        --------
+        SlidingWindow.crop
+
         """
+        indices = self.sliding_window.crop(focus, mode=mode, fixed=fixed)
 
+        # special case when 'fixed' duration cropping is requested
+        # mode='clip' ensure the correct number of samples is returned
+        # even in case of out-of-bounds indices
+        if mode == 'center' and fixed is not None:
+            return np.take(self.data, indices, axis=0, out=None, mode='clip')
+
+        # in all other cases, out-of-bounds indices are removed first
         n = self.getNumber()
-
-        if isinstance(focus, Segment):
-            firstFrame, frameNumber = self.sliding_window.segmentToRange(focus)
-            indices = range(
-                min(n, max(0, firstFrame)),
-                min(n, max(0, firstFrame + frameNumber))
-            )
-
-        if isinstance(focus, Timeline):
-            indices = []
-            for segment in focus.coverage():
-                firstFrame, frameNumber = self.sliding_window.segmentToRange(
-                    segment)
-                indices += range(
-                    min(n, max(0, firstFrame)),
-                    min(n, max(0, firstFrame + frameNumber))
-                )
-
-        return np.take(self.data, indices, axis=0, out=None, mode='clip')
-
+        indices = indices[np.where((indices > -1) * (indices < n))]
+        return np.take(self.data, indices, axis=0, out=None)
 
 if __name__ == "__main__":
     import doctest
