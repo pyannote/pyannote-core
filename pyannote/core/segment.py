@@ -365,18 +365,22 @@ class SlidingWindow(object):
             (t - self.__start - .5 * self.__duration) / self.__step
         ))
 
-    def crop(self, focus, mode='loose'):
+    def crop(self, focus, mode='loose', fixed=None):
         """Crop sliding window
 
         Parameters
         ----------
         focus : `Segment` or `Timeline`
-        mode : {'strict', 'loose', 'center'}
+        mode : {'strict', 'loose', 'center', 'fixed'}, optional
             In 'strict' mode, only indices of segments fully included in focus
             coverage are returned. In 'loose' mode, indices of any intersecting
-            segment are returned. In 'center' mode, first and last positions
-            are chosen to be the positions whose centers are the closest to
-            the focus start and end times.
+            segment are returned. In 'center' mode, first and last positions are
+            chosen to be the positions whose centers are the closest to the
+            focus start and end times. Defaults to 'loose'.
+        fixed : float, optional
+            When provided and mode is 'center', overrides focus duration. This
+            might be useful to avoid float rounding errors and to make sure the
+            number of positions is deterministic.
 
         Returns
         -------
@@ -421,8 +425,14 @@ class SlidingWindow(object):
                 # find window position whose center is the closest to focus.start
                 i = self.__closest_frame(focus.start)
 
-                # find window position whose center is the closest to focus.end
-                j = self.__closest_frame(focus.end)
+                if fixed is None:
+                    # find window position whose center is the closest to focus.end
+                    j = self.__closest_frame(focus.end)
+
+                else:
+                    # make sure the number of returned position is fixed
+                    n_ = np.rint(fixed / self.step)
+                    j = i + int(n_)
 
                 return np.array(range(i, j + 1))
 
