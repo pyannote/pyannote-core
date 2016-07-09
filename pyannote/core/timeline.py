@@ -221,6 +221,28 @@ class Timeline(object):
             yield segment, other_segment
 
     def crop(self, other, mode='intersection', mapping=False):
+        """Crop timeline
+
+        Parameters
+        ----------
+        other : `Segment` or `Timeline`
+
+        mode : {'strict', 'loose', 'intersection'}, optional
+            In 'strict' mode, only segments fully included in focus coverage
+            are kept. In 'loose' mode, any intersecting segment is kept
+            unchanged. In 'intersection' mode, only intersecting segments are
+            kept and replaced by their actual intersection with the focus.
+        mapping : boolean, optional
+            [FIXME] When True and mode is 'intersection', also returns the list of
+            original corresponding segments.
+
+        Returns
+        -------
+        cropped : Timeline
+            Cropped timeline.
+        mapping : dict (if mapping is True and mode is 'intersection')
+        """
+
 
         if isinstance(other, Segment):
             other = Timeline(segments=[other], uri=self.uri)
