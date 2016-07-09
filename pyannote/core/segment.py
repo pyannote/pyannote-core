@@ -371,10 +371,12 @@ class SlidingWindow(object):
         Parameters
         ----------
         focus : `Segment` or `Timeline`
-        mode : {'strict', 'loose', 'intersection'}
+        mode : {'strict', 'loose', 'center'}
             In 'strict' mode, only indices of segments fully included in focus
-            coverage are returned. In 'loose' mode, indiceis of any intersecting
-            segment are returned.
+            coverage are returned. In 'loose' mode, indices of any intersecting
+            segment are returned. In 'center' mode, first and last positions
+            are chosen to be the positions whose centers are the closest to
+            the focus start and end times.
 
         Returns
         -------
@@ -414,8 +416,18 @@ class SlidingWindow(object):
 
                 return np.array(range(i, j + 1))
 
+            elif mode == 'center':
+
+                # find window position whose center is the closest to focus.start
+                i = self.__closest_frame(focus.start)
+
+                # find window position whose center is the closest to focus.end
+                j = self.__closest_frame(focus.end)
+
+                return np.array(range(i, j + 1))
+
             else:
-                raise ValueError('mode must be "loose" or "strict"')
+                raise ValueError('mode must be "loose", "strict", or "center"')
 
         elif isinstance(focus, Timeline):
             return np.unique(np.hstack([
