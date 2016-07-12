@@ -1,6 +1,6 @@
-### Version 0.7.1 (2016-07-09)
+### Version 0.7.2 (2016-07-12)
 
-  - feat: new SlidingWindow.crop method
+  - feat: new SlidingWindow.{samples|crop} methods
   - feat: new 'mode' parameter to SlidingWindowFeature.crop method
   - doc: updated notebooks for SlidingWindow and SlidingWindowFeature
 
