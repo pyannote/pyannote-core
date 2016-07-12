@@ -365,6 +365,31 @@ class SlidingWindow(object):
             (t - self.__start - .5 * self.__duration) / self.__step
         ))
 
+    def samples(self, from_duration, mode='strict'):
+        """Number of frames
+        Parameters
+        ----------
+        from_duration : float
+            Duration in seconds.
+        mode : {'strict', 'loose', 'center'}
+            In 'strict' mode, computes the maximum number of consecutive frames
+            that can be fitted into a segment with duration `from_duration`.
+            In 'loose' mode, computes the maximum number of consecutive frames
+            intersecting a segment with duration `from_duration`.
+            In 'center' mode, computes the average number of consecutive frames
+            where the first one is centered on the start time and the last one
+            is centered on the end time of a segment with duration
+            `from_duration`.
+        """
+        if mode == 'strict':
+            return int(np.floor((from_duration - self.duration) / self.step))
+
+        elif mode == 'loose':
+            return int(np.floor((from_duration + self.duration) / self.step))
+
+        elif mode == 'center':
+            return int(np.rint((from_duration / self.step)))
+
     def crop(self, focus, mode='loose', fixed=None):
         """Crop sliding window
 
@@ -392,6 +417,9 @@ class SlidingWindow(object):
 
         if isinstance(focus, Segment):
 
+            if fixed is not None:
+                n = self.samples(fixed, mode=mode)
+
             if mode == 'loose':
 
                 # find smallest integer i such that
@@ -399,12 +427,16 @@ class SlidingWindow(object):
                 i_ = (focus.start - self.duration - self.start) / self.step
                 i = int(np.ceil(i_))
 
-                # find largest integer j such that
-                # self.start + j x self.step <= focus.end
-                j_ = (focus.end - self.start) / self.step
-                j = int(np.floor(j_))
+                if fixed is None:
+                    # find largest integer j such that
+                    # self.start + j x self.step <= focus.end
+                    j_ = (focus.end - self.start) / self.step
+                    j = int(np.floor(j_))
+                    return np.array(range(i, j + 1), dtype=np.int64)
 
-                return np.array(range(i, j + 1), dtype=np.int64)
+                else:
+                    return np.array(range(i, i + n), dtype=np.int64)
+
 
             elif mode == 'strict':
 
@@ -413,12 +445,16 @@ class SlidingWindow(object):
                 i_ = (focus.start - self.start) / self.step
                 i = int(np.ceil(i_))
 
-                # find largest integer j such that
-                # self.start + j x self.step + self.duration <= focus.end
-                j_ = (focus.end - self.duration - self.start) / self.step
-                j = int(np.floor(j_))
+                if fixed is None:
+                    # find largest integer j such that
+                    # self.start + j x self.step + self.duration <= focus.end
+                    j_ = (focus.end - self.duration - self.start) / self.step
+                    j = int(np.floor(j_))
+                    return np.array(range(i, j + 1), dtype=np.int64)
 
-                return np.array(range(i, j + 1), dtype=np.int64)
+                else:
+                    return np.array(range(i, i + n), dtype=np.int64)
+
 
             elif mode == 'center':
 
@@ -428,13 +464,10 @@ class SlidingWindow(object):
                 if fixed is None:
                     # find window position whose center is the closest to focus.end
                     j = self.__closest_frame(focus.end)
+                    return np.array(range(i, j + 1), dtype=np.int64)
 
                 else:
-                    # make sure the number of returned position is fixed
-                    n_ = np.rint(fixed / self.step)
-                    j = i + int(n_)
-
-                return np.array(range(i, j + 1), dtype=np.int64)
+                    return np.array(range(i, i + n), dtype=np.int64)
 
             else:
                 raise ValueError('mode must be "loose", "strict", or "center"')
@@ -524,6 +557,7 @@ class SlidingWindow(object):
     def samplesToDuration(self, nSamples):
         """Returns duration of samples"""
         return self.rangeToSegment(0, nSamples).duration
+
 
     def durationToSamples(self, duration):
         """Returns samples in duration"""
