@@ -1,3 +1,7 @@
+### Version 0.7.3 (2016-11-01)
+
+  - feat: SlidingWindowFeature notebook display
+
 ### Version 0.7.2 (2016-07-12)
 
   - feat: new SlidingWindow.{samples|crop} methods

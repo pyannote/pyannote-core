@@ -65,7 +65,7 @@ setup(
     description=('PyAnnote core'),
     author='Hervé Bredin',
     author_email='bredin@limsi.fr',
-    url='http://herve.niderb.fr/',
+    url='http://pyannote.github.io/',
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Science/Research",
