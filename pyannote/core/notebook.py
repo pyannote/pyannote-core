@@ -29,7 +29,10 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 
-from IPython.core.pylabtools import print_figure
+try:
+    from IPython.core.pylabtools import print_figure
+except Exception as e:
+    pass
 from matplotlib.cm import get_cmap
 import six.moves
 from unidecode import unidecode
@@ -264,6 +267,22 @@ class Notebook(object):
             ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
                       ncol=5, borderaxespad=0., frameon=False)
 
+    def plot_feature(self, feature, ax=None, time=True):
+
+        if not self.crop:
+            self.crop = feature.getExtent()
+
+        window = feature.sliding_window
+        indices = window.crop(self.crop, mode='loose')
+        t = [window[i].middle for i in indices]
+
+        data = np.take(feature.data, indices, axis=0, mode='clip')
+        m = np.nanmin(data)
+        M = np.nanmax(data)
+        ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
+
+        ax = self.setup(ax=ax, yaxis=False, ylim=ylim, time=time)
+        ax.plot(t, data)
 
 notebook = Notebook()
 
@@ -314,6 +333,19 @@ def repr_scores(scores):
     plt.rcParams['figure.figsize'] = (notebook.width, 2)
     fig, ax = plt.subplots()
     notebook.plot_scores(scores, ax=ax)
+    data = print_figure(fig, 'png')
+    plt.close(fig)
+    plt.rcParams['figure.figsize'] = figsize
+    return data
+
+
+def repr_feature(feature):
+    """Get `png` data for `feature`"""
+    import matplotlib.pyplot as plt
+    figsize = plt.rcParams['figure.figsize']
+    plt.rcParams['figure.figsize'] = (notebook.width, 2)
+    fig, ax = plt.subplots()
+    notebook.plot_feature(feature, ax=ax)
     data = print_figure(fig, 'png')
     plt.close(fig)
     plt.rcParams['figure.figsize'] = figsize

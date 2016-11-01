@@ -129,6 +129,11 @@ class SlidingWindowFeature(object):
         indices = indices[np.where((indices > -1) * (indices < n))]
         return np.take(self.data, indices, axis=0, out=None)
 
+    def _repr_png_(self):
+        from .notebook import repr_feature
+        return repr_feature(self)
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()
