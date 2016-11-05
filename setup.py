@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2016 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -62,7 +62,8 @@ setup(
 
     # PyPI
     name='pyannote.core',
-    description=('PyAnnote core'),
+    description=('Advanced data structures for handling '
+                 'temporal segments with attached labels.'),
     author='Hervé Bredin',
     author_email='bredin@limsi.fr',
     url='http://pyannote.github.io/',

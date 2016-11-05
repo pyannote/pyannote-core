@@ -104,7 +104,6 @@ class Annotation(object):
         uniform resource identifier of annotated document
     modality : string, optional
         name of annotated modality
-
     """
 
     @classmethod
@@ -622,23 +621,26 @@ class Annotation(object):
 
         return sub
 
-    def update(self, annotation):
+    def update(self, annotation, copy=False):
         """Update existing annotations or create new ones
 
         Parameters
         ----------
         annotation : Annotation
             Updated (or new) annotations
+        copy : bool, optional
+            Create a copy before updating. Defaults to False.
 
         Returns
         -------
-        self : Annotation
+        updated : Annotation
             Updated annotations.
         """
 
+        result = self.copy() if copy else self
         for segment, track, label in annotation.itertracks(label=True):
-            self[segment, track] = label
-        return self
+            result[segment, track] = label
+        return result
 
     def label_timeline(self, label):
         """Get timeline for a given label

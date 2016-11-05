@@ -1,3 +1,7 @@
+### Version 0.8 (2016-11-05)
+
+  - feat: add "copy" option to Annotation.update
+
 ### Version 0.7.3 (2016-11-01)
 
   - feat: SlidingWindowFeature notebook display
