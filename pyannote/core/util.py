@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2016 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -40,8 +40,15 @@ def pairwise(iterable):
     return zip(a, b)
 
 
-def string_generator():
+def string_generator(skip=[]):
     """Label generator
+
+    Parameters
+    ----------
+    skip : list or set
+        List of labels that must be skipped.
+        This option is useful in case you want to make sure generated labels
+        are different from a pre-existing set of labels.
 
     Usage
     -----
@@ -66,6 +73,8 @@ def string_generator():
 
         # generate labels with current length
         for c in product(ascii_uppercase, repeat=r):
+            if c in skip:
+                continue
             yield ''.join(c)
 
         # increment label length when all possibilities are exhausted
