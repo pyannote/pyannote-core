@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2017 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -256,17 +256,19 @@ class TimelineUpdator(object):
 
             # number of segments in tree
             self.num = 1
-            if left:
-                self.num += left.num
-            if right:
-                self.num += right.num
-
             # extent of tree
             self.extent = key
+
             if left:
-                self.extent = self.extent | left.extent
+                self.num += left.num
+                self.extent = (min(self.extent[0], left.extent[0]),
+                               max(self.extent[1], left.extent[1]))
             if right:
-                self.extent = self.extent | right.extent
+                self.num += right.num
+                self.extent = (min(self.extent[0], right.extent[0]),
+                               max(self.extent[1], right.extent[1]))
+
+            self.extent = Segment(*self.extent)
 
         def __repr__(self):
             return '{extent: %s, num: %d}' % (repr(self.extent), self.num)
