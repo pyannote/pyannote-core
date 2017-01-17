@@ -1,3 +1,7 @@
+### Version 0.9 (2017-01_17)
+
+  - improve: speed up Timeline and Annotation
+
 ### Version 0.8 (2016-11-05)
 
   - feat: add "copy" option to Annotation.update
