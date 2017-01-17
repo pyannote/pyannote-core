@@ -123,17 +123,31 @@ class Annotation(object):
         -------
 
         """
+
+        df = df[[PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]]
+
         annotation = cls(uri=uri, modality=modality)
-        for _, (segment, track, label) in df[
-            [PYANNOTE_SEGMENT,
-             PYANNOTE_TRACK,
-             PYANNOTE_LABEL]
-        ].iterrows():
-            annotation[segment, track] = label
+
+        annotation._tracks = SortedDict(key_type=(float, float),
+                                        updator=TimelineUpdator)
+
+        for row in df.itertuples():
+            if row[1] in annotation._tracks:
+                annotation._tracks[row[1]][row[2]] = row[3]
+            else:
+                annotation._tracks[row[1]] = {row[2]: row[3]}
+
+        annotation._labels = {label: None for label in df['label'].unique()}
+        annotation._labelNeedsUpdate = {
+            label: True for label in annotation._labels}
+
+        annotation._timeline = None
+        annotation._timelineNeedsUpdate = True
 
         return annotation
 
     def __init__(self, uri=None, modality=None):
+
         super(Annotation, self).__init__()
 
         self._uri = uri
@@ -152,7 +166,7 @@ class Annotation(object):
         self._labelNeedsUpdate = {}
 
         # timeline meant to store all annotated segments
-        self._timeline = Timeline(uri=uri)
+        self._timeline = None
         self._timelineNeedsUpdate = True
 
     def _get_uri(self):
@@ -168,24 +182,25 @@ class Annotation(object):
 
     def _updateLabels(self):
 
-        # (re-)initialize changed label timeline
-        for l, needsUpdate in six.iteritems(self._labelNeedsUpdate):
-            if needsUpdate:
-                self._labels[l] = Timeline(uri=self.uri)
+        # list of labels that needs to be updated
+        update = set(
+            label for label, update in self._labelNeedsUpdate.items() if update)
 
-        # fill changed label timeline
-        for segment, track, l in self.itertracks(label=True):
-            if self._labelNeedsUpdate[l]:
-                self._labels[l].add(segment)
+        # accumulate segments for updated labels
+        _segments = {label: [] for label in update}
+        for segment, track, label in self.itertracks(label=True):
+            if label in update:
+                _segments[label].append(segment)
 
-        self._labelNeedsUpdate = {l: False for l in self._labels}
-
-        # remove "ghost" labels (i.e. label with empty timeline)
-        labels = list(six.iterkeys(self._labels))
-        for l in labels:
-            if not self._labels[l]:
-                self._labels.pop(l)
-                self._labelNeedsUpdate.pop(l)
+        # create timeline with accumulated segments for updated labels
+        for label in update:
+            if _segments[label]:
+                self._labels[label] = Timeline(
+                    segments=_segments[label], uri=self.uri)
+                self._labelNeedsUpdate[label] = False
+            else:
+                self._labels.pop(label)
+                self._labelNeedsUpdate.pop(label)
 
     def __len__(self):
         """Number of segments"""
