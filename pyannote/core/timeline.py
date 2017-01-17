@@ -220,6 +220,49 @@ class Timeline(object):
         for segment, other_segment in self._segments.co_iter(other._segments):
             yield segment, other_segment
 
+    def crop_iter(self, other, mode='intersection', mapping=False):
+        """Crop timeline
+
+        Parameters
+        ----------
+        other : `Segment` or `Timeline`
+
+        mode : {'strict', 'loose', 'intersection'}, optional
+            In 'strict' mode, only segments fully included in focus coverage
+            are kept. In 'loose' mode, any intersecting segment is kept
+            unchanged. In 'intersection' mode, only intersecting segments are
+            kept and replaced by their actual intersection with the focus.
+        """
+
+        if isinstance(other, Segment):
+
+            other = Timeline(segments=[other], uri=self.uri)
+            for yielded in self.crop(other, mode=mode, mapping=mapping):
+                yield yielded
+
+        elif isinstance(other, Timeline):
+
+            if mode == 'loose':
+                for segment, _ in self.co_iter(other):
+                    yield segment
+
+            elif mode == 'strict':
+                for segment, other_segment in self.co_iter(other):
+                    if segment in other_segment:
+                        yield segment
+
+            elif mode == 'intersection':
+                if mapping:
+                    for segment, other_segment in self.co_iter(other):
+                        inter = segment & other_segment
+                        yield segment, inter
+                else:
+                    for segment, other_segment in self.co_iter(other):
+                        yield segment & other_segment
+
+            else:
+                raise NotImplementedError("unsupported mode: '%s'" % mode)
+
     def crop(self, other, mode='intersection', mapping=False):
         """Crop timeline
 
@@ -242,38 +285,15 @@ class Timeline(object):
             Cropped timeline.
         mapping : dict (if mapping is True and mode is 'intersection')
         """
+        if mode == 'intersection' and mapping:
+            segments, mapping = [], {}
+            for segment, inter in self.crop_iter(other, mode=mode, mapping=mapping):
+                segments.append(segment)
+                mapping[inter] = mapping.get(inter, list()) + [segment]
+            return Timeline(segments=segments, uri=self.uri), mapping
 
-
-        if isinstance(other, Segment):
-            other = Timeline(segments=[other], uri=self.uri)
-            return self.crop(other, mode=mode, mapping=mapping)
-
-        elif isinstance(other, Timeline):
-
-            if mode == 'loose':
-                segments = [segment for segment, _ in self.co_iter(other)]
-                return Timeline(segments=segments, uri=self.uri)
-
-            elif mode == 'strict':
-                segments = [segment
-                            for segment, other_segment in self.co_iter(other)
-                            if segment in other_segment]
-                return Timeline(segments=segments, uri=self.uri)
-
-            elif mode == 'intersection':
-                if mapping:
-                    mapping = {}
-                    for segment, other_segment in self.co_iter(other):
-                        inter = segment & other_segment
-                        mapping[inter] = mapping.get(inter, list()) + [segment]
-                    return Timeline(segments=mapping, uri=self.uri), mapping
-                else:
-                    segments = [segment & other_segment
-                                for segment, other_segment in self.co_iter(other)]
-                    return Timeline(segments=segments, uri=self.uri)
-
-            else:
-                raise NotImplementedError("unsupported mode: '%s'" % mode)
+        segments = [s for s in self.crop_iter(other, mode=mode)]
+        return Timeline(segments=segments, uri=self.uri)
 
     def overlapping(self, timestamp):
         """Get list of segments overlapping `timestamp`"""
@@ -400,27 +420,18 @@ class Timeline(object):
         """
         return self._segments.extent()
 
-    def coverage(self):
+    def coverage_iter(self):
         """Timeline coverage
 
         The coverage of timeline is the timeline with the minimum number of
         segments with exactly the same time span as the original timeline.
         It is (by definition) unique and does not contain any overlapping
         segments.
-
-        Returns
-        -------
-        coverage : Timeline
-            Timeline coverage
-
         """
-
-        # make sure URI attribute is kept.
-        coverage = Timeline(uri=self.uri)
 
         # The coverage of an empty timeline is an empty timeline.
         if not self:
-            return coverage
+            return
 
         # Principle:
         #   * gather all segments with no gap between them
@@ -443,16 +454,30 @@ class Timeline(object):
 
             # If there actually is a gap,
             else:
-                # Add new segment to the timeline coverage
-                coverage.add(new_segment)
+                yield new_segment
+
                 # Initialize new coverage segment as next segment
                 # (right after the gap)
                 new_segment = segment
 
         # Add new segment to the timeline coverage
-        coverage.add(new_segment)
+        yield new_segment
 
-        return coverage
+    def coverage(self):
+        """Timeline coverage
+
+        The coverage of timeline is the timeline with the minimum number of
+        segments with exactly the same time span as the original timeline.
+        It is (by definition) unique and does not contain any overlapping
+        segments.
+
+        Returns
+        -------
+        coverage : Timeline
+            Timeline coverage
+        """
+        segments = [s for s in self.coverage_iter()]
+        return Timeline(segments=segments, uri=self.uri)
 
     def duration(self):
         """Timeline duration
@@ -466,7 +491,44 @@ class Timeline(object):
 
         # The timeline duration is the sum of the durations
         # of the segments in the timeline coverage.
-        return sum([s.duration for s in self.coverage()])
+        return sum(s.duration for s in self.coverage_iter())
+
+    def gaps_iter(self, focus=None):
+
+        if focus is None:
+            focus = self.extent()
+
+        if not isinstance(focus, (Segment, Timeline)):
+            raise TypeError("unsupported operand type(s) for -':"
+                            "%s and Timeline." % type(focus).__name__)
+
+        # segment focus
+        if isinstance(focus, Segment):
+
+            # `end` is meant to store the end time of former segment
+            # initialize it with beginning of provided segment `focus`
+            end = focus.start
+
+            # focus on the intersection of timeline and provided segment
+            for segment in self.crop(focus, mode='intersection').coverage():
+
+                # add gap between each pair of consecutive segments
+                # if there is no gap, segment is empty, therefore not added
+                yield Segment(start=end, end=segment.start)
+
+                # keep track of the end of former segment
+                end = segment.end
+
+            # add final gap (if not empty)
+            yield Segment(start=end, end=focus.end)
+
+        # timeline focus
+        elif isinstance(focus, Timeline):
+
+            # yield gaps for every segment in coverage of provided timeline
+            for segment in focus.coverage():
+                for gap in self.gaps_iter(focus=segment):
+                    yield gap
 
     def gaps(self, focus=None):
         """Timeline gaps
@@ -480,56 +542,9 @@ class Timeline(object):
         gaps : Timeline
             Timeline made of all gaps from original timeline, and delimited
             by provided segment or timeline.
-
-        Raises
-        ------
-        TypeError when `focus` is neither None, Segment nor Timeline
-
-        Examples
-        --------
-
         """
-        if focus is None:
-            focus = self.extent()
-
-        if not isinstance(focus, (Segment, Timeline)):
-            raise TypeError("unsupported operand type(s) for -':"
-                            "%s and Timeline." % type(focus).__name__)
-
-        # segment focus
-        if isinstance(focus, Segment):
-
-            # starts with an empty timeline
-            timeline = self.empty()
-
-            # `end` is meant to store the end time of former segment
-            # initialize it with beginning of provided segment `focus`
-            end = focus.start
-
-            # focus on the intersection of timeline and provided segment
-            for segment in self.crop(focus, mode='intersection').coverage():
-
-                # add gap between each pair of consecutive segments
-                # if there is no gap, segment is empty, therefore not added
-                timeline.add(Segment(start=end, end=segment.start))
-
-                # keep track of the end of former segment
-                end = segment.end
-
-            # add final gap (if not empty)
-            timeline.add(Segment(start=end, end=focus.end))
-
-        # other_timeline - timeline
-        elif isinstance(focus, Timeline):
-
-            # starts with an empty timeline
-            timeline = self.empty()
-
-            # add gaps for every segment in coverage of provided timeline
-            for segment in focus.coverage():
-                timeline.update(self.gaps(focus=segment))
-
-        return timeline
+        segments = [s for s in self.gaps_iter(focus=focus)]
+        return Timeline(segments=segments, uri=self.uri)
 
     def segmentation(self):
         """Non-overlapping timeline
