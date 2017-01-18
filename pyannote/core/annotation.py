@@ -595,12 +595,14 @@ class Annotation(object):
             result[segment, track] = label
         return result
 
-    def label_timeline(self, label):
+    def label_timeline(self, label, copy=True):
         """Get timeline for a given label
 
         Parameters
         ----------
         label :
+        copy : bool, optional
+            Defaults to True.
 
         Returns
         -------
@@ -614,17 +616,10 @@ class Annotation(object):
         if self._labelNeedsUpdate[label]:
             self._updateLabels()
 
-            for l, hasChanged in six.iteritems(self._labelNeedsUpdate):
-                if hasChanged:
-                    self._labels[l] = Timeline(uri=self.uri)
+        if copy:
+            return self._labels[label].copy()
 
-            for segment, track, l in self.itertracks(label=True):
-                if self._labelNeedsUpdate[l]:
-                    self._labels[l].add(segment)
-
-            self._labelNeedsUpdate = {l: False for l in self._labels}
-
-        return self._labels[label].copy()
+        return self._labels[label]
 
     def label_coverage(self, label):
         """
@@ -637,17 +632,10 @@ class Annotation(object):
         -------
 
         """
-        if label not in self.labels():
-            return Timeline(uri=self.uri)
-
-        return self.label_timeline(label).coverage()
+        return self.label_timeline(label, copy=False).coverage()
 
     def label_duration(self, label):
-
-        if label not in self.labels():
-            return 0.
-
-        return self.label_timeline(label).duration()
+        return self.label_timeline(label, copy=False).duration()
 
     def chart(self, percent=False):
         """
@@ -714,7 +702,7 @@ class Annotation(object):
             segment = self.get_timeline(copy=False).extent()
 
         # compute intersection duration for each label
-        durations = {lbl: self.label_timeline(lbl)
+        durations = {lbl: self.label_timeline(lbl, copy=False)
                      .crop(segment, mode='intersection').duration()
                      for lbl in self.labels()}
 
@@ -836,7 +824,7 @@ class Annotation(object):
         for label in self.labels():
 
             # get timeline for current label
-            timeline = self.label_timeline(label)
+            timeline = self.label_timeline(label, copy=True)
 
             # fill the gaps shorter than collar
             if collar > 0.:
