@@ -393,9 +393,8 @@ class Timeline(object):
 
         # if is provided
         # apply it to each segment before adding them
-        else:
-            return Timeline(segments=[segment_func(s) for s in self._segments],
-                            uri=self.uri)
+        return Timeline(segments=[segment_func(s) for s in self._segments],
+                        uri=self.uri)
 
     def extent(self):
         """Timeline extent
@@ -604,22 +603,21 @@ class Timeline(object):
         # start with an empty copy
         timeline = Timeline(uri=self.uri)
 
-        if len(timestamps) > 0:
-            segments = []
-            start = timestamps[0]
-            for end in timestamps[1:]:
+        if len(timestamps) == 0:
+            return Timeline(uri=self.uri)
 
-                # only add segments that are covered by original timeline
-                segment = Segment(start=start, end=end)
-                if segment and coverage.overlapping(segment.middle):
-                    segments.append(segment)
-                # next segment...
+        segments = []
+        start = timestamps[0]
+        for end in timestamps[1:]:
+            # only add segments that are covered by original timeline
+            segment = Segment(start=start, end=end)
+            if segment and coverage.overlapping(segment.middle):
+                segments.append(segment)
+            # next segment...
+            start = end
 
-                start = end
+        return Timeline(segments=segments, uri=self.uri)
 
-            timeline._segments.update(segments)
-
-        return timeline
 
     def for_json(self):
         data = {PYANNOTE_JSON: self.__class__.__name__}
