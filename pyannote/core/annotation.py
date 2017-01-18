@@ -622,14 +622,15 @@ class Annotation(object):
         return self._labels[label]
 
     def label_coverage(self, label):
-        """
+        """Return label coverage (or support)
 
         Parameters
         ----------
-        label :
+        label : any valid label
 
         Returns
         -------
+        coverage : Timeline
 
         """
         return self.label_timeline(label, copy=False).coverage()
