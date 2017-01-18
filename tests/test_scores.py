@@ -203,8 +203,8 @@ def test_str(scores):
     assert str(scores) == (
         "                                         A    B    C    D\n"
         "segment_start segment_end track                          \n"
-        "0             2.5         track        0.2  0.3  0.4  0.1\n"
-        "3             4.0         other_track  NaN  0.1  0.3  0.1\n"
+        "0.0           2.5         track        0.2  0.3  0.4  0.1\n"
+        "3.0           4.0         other_track  NaN  0.1  0.3  0.1\n"
         "                          track        0.4  0.5  NaN  NaN")
 
 def test_get(scores):
