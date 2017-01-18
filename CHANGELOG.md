@@ -1,4 +1,11 @@
-### Version 0.9 (2017-01_17)
+### Version 0.10 (2017-18-01)
+
+  - feat: add 'copy' parameter to Annotation.{label|get}_timeline()
+  - improve: speed-up Timeline.extent()
+  - chore: move tests at root directory
+  - chore: remove support for Unknown labels
+
+### Version 0.9 (2017-01-17)
 
   - improve: speed up Timeline and Annotation
 
