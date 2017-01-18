@@ -46,10 +46,9 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .util import string_generator, int_generator
 
 # ignore Banyan warning
-warnings.filterwarnings(
-    'ignore', 'Key-type optimization',
-    Warning, 'pyannote.core.annotation'
-)
+warnings.filterwarnings('ignore',
+    'Key-type optimization unimplemented with callback metadata.',
+    Warning)
 
 
 class Unknown(object):
