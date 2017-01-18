@@ -32,9 +32,53 @@ import numpy as np
 from pandas import Index, MultiIndex, DataFrame, pivot_table
 
 from . import PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL, PYANNOTE_SCORE
-from .annotation import Annotation, Unknown
+from .annotation import Annotation
 from .segment import Segment
 from .timeline import Timeline
+
+
+class Unknown(object):
+
+    nextID = 0
+
+    @classmethod
+    def reset(cls):
+        cls.nextID = 0
+
+    @classmethod
+    def getNewID(cls):
+        cls.nextID += 1
+        return cls.nextID
+
+    def __init__(self, format='#{id:d}'):
+        super(Unknown, self).__init__()
+        self.ID = Unknown.getNewID()
+        self._format = format
+
+    def __str__(self):
+        return self._format.format(id=self.ID)
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(self.ID)
+
+    def __eq__(self, other):
+        if isinstance(other, Unknown):
+            return self.ID == other.ID
+        return False
+
+    def __lt__(self, other):
+        if isinstance(other, Unknown):
+            return self.ID < other.ID
+        return False
+
+    def __gt__(self, other):
+        if isinstance(other, Unknown):
+            return self.ID > other.ID
+        return True
+
 
 
 class Scores(object):
@@ -223,11 +267,11 @@ class Scores(object):
 
     def __iter__(self):
         """Iterate over sorted segments"""
-        return iter(self.annotation_.get_timeline())
+        return iter(self.annotation_.get_timeline(copy=False))
 
     def __reversed__(self):
         """Reverse iterate over sorted segments"""
-        return reversed(self.annotation_.get_timeline())
+        return reversed(self.annotation_.get_timeline(copy=False))
 
     def itersegments(self):
         return iter(self)
@@ -334,14 +378,8 @@ class Scores(object):
         """
         return dict(self.dataframe_.xs(tuple(segment) + (track, )))
 
-    def labels(self, unknown=True):
+    def labels(self):
         """List of labels
-
-        Parameters
-        ----------
-        unknown : bool, optional
-            When False, do not return Unknown instances
-            When True, return any label (even Unknown instances)
 
         Returns
         -------
@@ -352,11 +390,7 @@ class Scores(object):
         -------
             Labels are sorted based on their string representation.
         """
-        labels = sorted(self.dataframe_.columns, key=str)
-        if unknown:
-            return labels
-        else:
-            return [l for l in labels if not isinstance(l, Unknown)]
+        return sorted(self.dataframe_.columns, key=str)
 
     def _reindexIfNeeded(self):
 

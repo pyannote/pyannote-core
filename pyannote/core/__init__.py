@@ -42,7 +42,7 @@ PYANNOTE_IDENTITY = 'identity'
 from .time import T, TStart, TEnd
 from .segment import Segment, SlidingWindow
 from .timeline import Timeline
-from .annotation import Annotation, Unknown
+from .annotation import Annotation
 from .transcription import Transcription
 from .scores import Scores
 from .feature import SlidingWindowFeature

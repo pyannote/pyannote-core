@@ -30,7 +30,7 @@ import pytest
 
 from pyannote.core import Scores
 from pyannote.core import Segment
-from pyannote.core import Unknown
+from pyannote.core.scores import Unknown
 import numpy as np
 
 

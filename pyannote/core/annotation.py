@@ -46,53 +46,9 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .util import string_generator, int_generator
 
 # ignore Banyan warning
-warnings.filterwarnings(
-    'ignore', 'Key-type optimization',
-    Warning, 'pyannote.core.annotation'
-)
-
-
-class Unknown(object):
-
-    nextID = 0
-
-    @classmethod
-    def reset(cls):
-        cls.nextID = 0
-
-    @classmethod
-    def getNewID(cls):
-        cls.nextID += 1
-        return cls.nextID
-
-    def __init__(self, format='#{id:d}'):
-        super(Unknown, self).__init__()
-        self.ID = Unknown.getNewID()
-        self._format = format
-
-    def __str__(self):
-        return self._format.format(id=self.ID)
-
-    def __repr__(self):
-        return str(self)
-
-    def __hash__(self):
-        return hash(self.ID)
-
-    def __eq__(self, other):
-        if isinstance(other, Unknown):
-            return self.ID == other.ID
-        return False
-
-    def __lt__(self, other):
-        if isinstance(other, Unknown):
-            return self.ID < other.ID
-        return False
-
-    def __gt__(self, other):
-        if isinstance(other, Unknown):
-            return self.ID > other.ID
-        return True
+warnings.filterwarnings('ignore',
+    'Key-type optimization unimplemented with callback metadata.',
+    Warning)
 
 
 class Annotation(object):
@@ -230,10 +186,12 @@ class Annotation(object):
         self._timeline = Timeline(segments=self._tracks, uri=self.uri)
         self._timelineNeedsUpdate = False
 
-    def get_timeline(self):
+    def get_timeline(self, copy=True):
         """Get timeline made of annotated segments"""
         if self._timelineNeedsUpdate:
             self._updateTimeline()
+        if copy:
+            return self._timeline.copy()
         return self._timeline
 
     def __eq__(self, other):
@@ -263,7 +221,7 @@ class Annotation(object):
             False otherwise
 
         """
-        return included in self.get_timeline()
+        return included in self.get_timeline(copy=False)
 
     def crop(self, other, mode='intersection'):
         """Crop annotation
@@ -303,7 +261,7 @@ class Annotation(object):
                 # update co_iter to yield (segment, tracks), (segment, tracks)
                 # instead of segment, segment
                 # This would avoid calling ._tracks.get(segment)
-                for segment, _ in self.get_timeline().co_iter(other):
+                for segment, _ in self.get_timeline(copy=False).co_iter(other):
                     for track, label in six.iteritems(self._tracks[segment]):
                         cropped[segment, track] = label
 
@@ -311,7 +269,7 @@ class Annotation(object):
                 # TODO
                 # see above
                 for segment, other_segment in \
-                        self.get_timeline().co_iter(other):
+                        self.get_timeline(copy=False).co_iter(other):
 
                     if segment in other_segment:
                         for track, label in six.iteritems(self._tracks[segment]):
@@ -320,7 +278,7 @@ class Annotation(object):
             elif mode == 'intersection':
                 # see above
                 for segment, other_segment in \
-                        self.get_timeline().co_iter(other):
+                        self.get_timeline(copy=False).co_iter(other):
 
                     intersection = segment & other_segment
                     for track, label in six.iteritems(self._tracks[segment]):
@@ -537,41 +495,25 @@ class Annotation(object):
     def empty(self):
         return self.__class__(uri=self.uri, modality=self.modality)
 
-    def labels(self, unknown=True):
+    def labels(self):
         """List of labels
-
-        Parameters
-        ----------
-        unknown : bool, optional
-            When False, do not return Unknown instances
-            When True, return any label (even Unknown instances)
 
         Returns
         -------
         labels : list
             Sorted list of labels
         """
-
         if any([lnu for lnu in self._labelNeedsUpdate.values()]):
             self._updateLabels()
+        return sorted(self._labels, key=str)
 
-        labels = sorted(self._labels, key=str)
-
-        if not unknown:
-            labels = [l for l in labels if not isinstance(l, Unknown)]
-
-        return labels
-
-    def get_labels(self, segment, unknown=True, unique=True):
+    def get_labels(self, segment, unique=True):
         """Local set of labels
 
         Parameters
         ----------
         segment : Segment
             Segments to get label from.
-        unknown : bool, optional
-            When False, do not return Unknown instances
-            When True, return any label (even Unknown instances)
         unique : bool, optional
             When False, return the list of (possibly repeated) labels.
             When True (default), return the set of labels
@@ -582,25 +524,21 @@ class Annotation(object):
 
         Examples
         --------
-
-            >>> annotation = Annotation()
-            >>> segment = Segment(0, 2)
-            >>> annotation[segment, 'speaker1'] = 'Bernard'
-            >>> annotation[segment, 'speaker2'] = 'John'
-            >>> print sorted(annotation.get_labels(segment))
-            set(['Bernard', 'John'])
-            >>> print annotation.get_labels(Segment(1, 2))
-            set([])
+        >>> annotation = Annotation()
+        >>> segment = Segment(0, 2)
+        >>> annotation[segment, 'speaker1'] = 'Bernard'
+        >>> annotation[segment, 'speaker2'] = 'John'
+        >>> print sorted(annotation.get_labels(segment))
+        set(['Bernard', 'John'])
+        >>> print annotation.get_labels(Segment(1, 2))
+        set([])
 
         """
 
         labels = self._tracks.get(segment, {}).values()
 
-        if not unknown:
-            labels = [l for l in labels if not isinstance(l, Unknown)]
-
         if unique:
-            labels = set(labels)
+            return set(labels)
 
         return labels
 
@@ -657,12 +595,14 @@ class Annotation(object):
             result[segment, track] = label
         return result
 
-    def label_timeline(self, label):
+    def label_timeline(self, label, copy=True):
         """Get timeline for a given label
 
         Parameters
         ----------
         label :
+        copy : bool, optional
+            Defaults to True.
 
         Returns
         -------
@@ -676,40 +616,27 @@ class Annotation(object):
         if self._labelNeedsUpdate[label]:
             self._updateLabels()
 
-            for l, hasChanged in six.iteritems(self._labelNeedsUpdate):
-                if hasChanged:
-                    self._labels[l] = Timeline(uri=self.uri)
+        if copy:
+            return self._labels[label].copy()
 
-            for segment, track, l in self.itertracks(label=True):
-                if self._labelNeedsUpdate[l]:
-                    self._labels[l].add(segment)
-
-            self._labelNeedsUpdate = {l: False for l in self._labels}
-
-        return self._labels[label].copy()
+        return self._labels[label]
 
     def label_coverage(self, label):
-        """
+        """Return label coverage (or support)
 
         Parameters
         ----------
-        label :
+        label : any valid label
 
         Returns
         -------
+        coverage : Timeline
 
         """
-        if label not in self.labels():
-            return Timeline(uri=self.uri)
-
-        return self.label_timeline(label).coverage()
+        return self.label_timeline(label, copy=False).coverage()
 
     def label_duration(self, label):
-
-        if label not in self.labels():
-            return 0.
-
-        return self.label_timeline(label).duration()
+        return self.label_timeline(label, copy=False).duration()
 
     def chart(self, percent=False):
         """
@@ -737,18 +664,14 @@ class Annotation(object):
 
         return chart
 
-    def argmax(self, segment=None, known_first=False):
+    def argmax(self, segment=None):
         """Get most frequent label
-
 
         Parameters
         ----------
         segment : Segment, optional
             Section of annotation where to look for the most frequent label.
             Defaults to whole annotation extent.
-        known_first: bool, optional
-            If True, artificially reduces the duration of intersection of
-            `Unknown` labels so that 'known' labels are returned first.
 
         Returns
         -------
@@ -777,20 +700,12 @@ class Annotation(object):
         # if segment is not provided, just look for the overall most frequent
         # label (ie. set segment to the extent of the annotation)
         if segment is None:
-            segment = self.get_timeline().extent()
+            segment = self.get_timeline(copy=False).extent()
 
         # compute intersection duration for each label
-        durations = {lbl: self.label_timeline(lbl)
+        durations = {lbl: self.label_timeline(lbl, copy=False)
                      .crop(segment, mode='intersection').duration()
                      for lbl in self.labels()}
-
-        # artifically reduce intersection duration of Unknown labels
-        # so that 'known' labels are returned first
-        if known_first:
-            maxduration = max(durations.values())
-            for lbl in durations.keys():
-                if isinstance(lbl, Unknown):
-                    durations[lbl] = durations[lbl] - maxduration
 
         # find the most frequent label
         label = max(six.iteritems(durations), key=operator.itemgetter(1))[0]
@@ -910,7 +825,7 @@ class Annotation(object):
         for label in self.labels():
 
             # get timeline for current label
-            timeline = self.label_timeline(label)
+            timeline = self.label_timeline(label, copy=True)
 
             # fill the gaps shorter than collar
             if collar > 0.:
@@ -937,8 +852,9 @@ class Annotation(object):
         ---------
         (segment, track), (other_segment, other_track)
         """
-
-        for s, S in self.get_timeline().co_iter(other.get_timeline()):
+        timeline = self.get_timeline(copy=False)
+        other_timeline = other.get_timeline(copy=False)
+        for s, S in timeline.co_iter(other_timeline):
             tracks = sorted(self.get_tracks(s), key=str)
             other_tracks = sorted(other.get_tracks(S), key=str)
             for t, T in itertools.product(tracks, other_tracks):
