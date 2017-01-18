@@ -37,6 +37,50 @@ from .segment import Segment
 from .timeline import Timeline
 
 
+class Unknown(object):
+
+    nextID = 0
+
+    @classmethod
+    def reset(cls):
+        cls.nextID = 0
+
+    @classmethod
+    def getNewID(cls):
+        cls.nextID += 1
+        return cls.nextID
+
+    def __init__(self, format='#{id:d}'):
+        super(Unknown, self).__init__()
+        self.ID = Unknown.getNewID()
+        self._format = format
+
+    def __str__(self):
+        return self._format.format(id=self.ID)
+
+    def __repr__(self):
+        return str(self)
+
+    def __hash__(self):
+        return hash(self.ID)
+
+    def __eq__(self, other):
+        if isinstance(other, Unknown):
+            return self.ID == other.ID
+        return False
+
+    def __lt__(self, other):
+        if isinstance(other, Unknown):
+            return self.ID < other.ID
+        return False
+
+    def __gt__(self, other):
+        if isinstance(other, Unknown):
+            return self.ID > other.ID
+        return True
+
+
+
 class Scores(object):
     """
 
