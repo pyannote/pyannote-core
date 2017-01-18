@@ -493,41 +493,25 @@ class Annotation(object):
     def empty(self):
         return self.__class__(uri=self.uri, modality=self.modality)
 
-    def labels(self, unknown=True):
+    def labels(self):
         """List of labels
-
-        Parameters
-        ----------
-        unknown : bool, optional
-            When False, do not return Unknown instances
-            When True, return any label (even Unknown instances)
 
         Returns
         -------
         labels : list
             Sorted list of labels
         """
-
         if any([lnu for lnu in self._labelNeedsUpdate.values()]):
             self._updateLabels()
+        return sorted(self._labels, key=str)
 
-        labels = sorted(self._labels, key=str)
-
-        if not unknown:
-            labels = [l for l in labels if not isinstance(l, Unknown)]
-
-        return labels
-
-    def get_labels(self, segment, unknown=True, unique=True):
+    def get_labels(self, segment, unique=True):
         """Local set of labels
 
         Parameters
         ----------
         segment : Segment
             Segments to get label from.
-        unknown : bool, optional
-            When False, do not return Unknown instances
-            When True, return any label (even Unknown instances)
         unique : bool, optional
             When False, return the list of (possibly repeated) labels.
             When True (default), return the set of labels
@@ -538,25 +522,21 @@ class Annotation(object):
 
         Examples
         --------
-
-            >>> annotation = Annotation()
-            >>> segment = Segment(0, 2)
-            >>> annotation[segment, 'speaker1'] = 'Bernard'
-            >>> annotation[segment, 'speaker2'] = 'John'
-            >>> print sorted(annotation.get_labels(segment))
-            set(['Bernard', 'John'])
-            >>> print annotation.get_labels(Segment(1, 2))
-            set([])
+        >>> annotation = Annotation()
+        >>> segment = Segment(0, 2)
+        >>> annotation[segment, 'speaker1'] = 'Bernard'
+        >>> annotation[segment, 'speaker2'] = 'John'
+        >>> print sorted(annotation.get_labels(segment))
+        set(['Bernard', 'John'])
+        >>> print annotation.get_labels(Segment(1, 2))
+        set([])
 
         """
 
         labels = self._tracks.get(segment, {}).values()
 
-        if not unknown:
-            labels = [l for l in labels if not isinstance(l, Unknown)]
-
         if unique:
-            labels = set(labels)
+            return set(labels)
 
         return labels
 
@@ -693,18 +673,14 @@ class Annotation(object):
 
         return chart
 
-    def argmax(self, segment=None, known_first=False):
+    def argmax(self, segment=None):
         """Get most frequent label
-
 
         Parameters
         ----------
         segment : Segment, optional
             Section of annotation where to look for the most frequent label.
             Defaults to whole annotation extent.
-        known_first: bool, optional
-            If True, artificially reduces the duration of intersection of
-            `Unknown` labels so that 'known' labels are returned first.
 
         Returns
         -------
@@ -739,14 +715,6 @@ class Annotation(object):
         durations = {lbl: self.label_timeline(lbl)
                      .crop(segment, mode='intersection').duration()
                      for lbl in self.labels()}
-
-        # artifically reduce intersection duration of Unknown labels
-        # so that 'known' labels are returned first
-        if known_first:
-            maxduration = max(durations.values())
-            for lbl in durations.keys():
-                if isinstance(lbl, Unknown):
-                    durations[lbl] = durations[lbl] - maxduration
 
         # find the most frequent label
         label = max(six.iteritems(durations), key=operator.itemgetter(1))[0]

@@ -32,7 +32,7 @@ import numpy as np
 from pandas import Index, MultiIndex, DataFrame, pivot_table
 
 from . import PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL, PYANNOTE_SCORE
-from .annotation import Annotation, Unknown
+from .annotation import Annotation
 from .segment import Segment
 from .timeline import Timeline
 
@@ -378,14 +378,8 @@ class Scores(object):
         """
         return dict(self.dataframe_.xs(tuple(segment) + (track, )))
 
-    def labels(self, unknown=True):
+    def labels(self):
         """List of labels
-
-        Parameters
-        ----------
-        unknown : bool, optional
-            When False, do not return Unknown instances
-            When True, return any label (even Unknown instances)
 
         Returns
         -------
@@ -396,11 +390,7 @@ class Scores(object):
         -------
             Labels are sorted based on their string representation.
         """
-        labels = sorted(self.dataframe_.columns, key=str)
-        if unknown:
-            return labels
-        else:
-            return [l for l in labels if not isinstance(l, Unknown)]
+        return sorted(self.dataframe_.columns, key=str)
 
     def _reindexIfNeeded(self):
 
