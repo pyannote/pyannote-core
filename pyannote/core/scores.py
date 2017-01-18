@@ -267,11 +267,11 @@ class Scores(object):
 
     def __iter__(self):
         """Iterate over sorted segments"""
-        return iter(self.annotation_.get_timeline())
+        return iter(self.annotation_.get_timeline(copy=False))
 
     def __reversed__(self):
         """Reverse iterate over sorted segments"""
-        return reversed(self.annotation_.get_timeline())
+        return reversed(self.annotation_.get_timeline(copy=False))
 
     def itersegments(self):
         return iter(self)

@@ -186,10 +186,12 @@ class Annotation(object):
         self._timeline = Timeline(segments=self._tracks, uri=self.uri)
         self._timelineNeedsUpdate = False
 
-    def get_timeline(self):
+    def get_timeline(self, copy=True):
         """Get timeline made of annotated segments"""
         if self._timelineNeedsUpdate:
             self._updateTimeline()
+        if copy:
+            return self._timeline.copy()
         return self._timeline
 
     def __eq__(self, other):
@@ -219,7 +221,7 @@ class Annotation(object):
             False otherwise
 
         """
-        return included in self.get_timeline()
+        return included in self.get_timeline(copy=False)
 
     def crop(self, other, mode='intersection'):
         """Crop annotation
@@ -259,7 +261,7 @@ class Annotation(object):
                 # update co_iter to yield (segment, tracks), (segment, tracks)
                 # instead of segment, segment
                 # This would avoid calling ._tracks.get(segment)
-                for segment, _ in self.get_timeline().co_iter(other):
+                for segment, _ in self.get_timeline(copy=False).co_iter(other):
                     for track, label in six.iteritems(self._tracks[segment]):
                         cropped[segment, track] = label
 
@@ -267,7 +269,7 @@ class Annotation(object):
                 # TODO
                 # see above
                 for segment, other_segment in \
-                        self.get_timeline().co_iter(other):
+                        self.get_timeline(copy=False).co_iter(other):
 
                     if segment in other_segment:
                         for track, label in six.iteritems(self._tracks[segment]):
@@ -276,7 +278,7 @@ class Annotation(object):
             elif mode == 'intersection':
                 # see above
                 for segment, other_segment in \
-                        self.get_timeline().co_iter(other):
+                        self.get_timeline(copy=False).co_iter(other):
 
                     intersection = segment & other_segment
                     for track, label in six.iteritems(self._tracks[segment]):
@@ -709,7 +711,7 @@ class Annotation(object):
         # if segment is not provided, just look for the overall most frequent
         # label (ie. set segment to the extent of the annotation)
         if segment is None:
-            segment = self.get_timeline().extent()
+            segment = self.get_timeline(copy=False).extent()
 
         # compute intersection duration for each label
         durations = {lbl: self.label_timeline(lbl)
@@ -861,8 +863,9 @@ class Annotation(object):
         ---------
         (segment, track), (other_segment, other_track)
         """
-
-        for s, S in self.get_timeline().co_iter(other.get_timeline()):
+        timeline = self.get_timeline(copy=False)
+        other_timeline = other.get_timeline(copy=False)
+        for s, S in timeline.co_iter(other_timeline):
             tracks = sorted(self.get_tracks(s), key=str)
             other_tracks = sorted(other.get_tracks(S), key=str)
             for t, T in itertools.product(tracks, other_tracks):

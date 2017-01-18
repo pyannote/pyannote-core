@@ -40,10 +40,18 @@ def test_creation(annotation):
 
 def test_segments(annotation):
 
-    assert annotation.get_timeline() == Timeline([Segment(3, 5),
+    assert annotation.get_timeline(copy=False) == Timeline([Segment(3, 5),
                                                   Segment(5.5, 7),
                                                   Segment(8, 10)],
                                                  uri="TheBigBangTheory.Season01.Episode01")
+
+def test_segments_copy(annotation):
+
+    assert annotation.get_timeline(copy=True) == Timeline([Segment(3, 5),
+                                                  Segment(5.5, 7),
+                                                  Segment(8, 10)],
+                                                 uri="TheBigBangTheory.Season01.Episode01")
+
 
 
 def test_tracks(annotation):
