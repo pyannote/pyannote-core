@@ -212,7 +212,7 @@ class Notebook(object):
     def plot_annotation(self, annotation, ax=None, time=True, legend=True):
 
         if not self.crop:
-            self.crop = annotation.get_timeline().extent()
+            self.crop = annotation.get_timeline(copy=False).extent()
 
         cropped = annotation.crop(self.crop, mode='intersection')
         labels = cropped.labels()
@@ -239,7 +239,7 @@ class Notebook(object):
     def plot_scores(self, scores, ax=None, time=True, legend=True):
 
         if not self.crop:
-            self.crop = scores.to_annotation().get_timeline().extent()
+            self.crop = scores.to_annotation().get_timeline(copy=False).extent()
 
         cropped = scores.crop(notebook.crop, mode='loose')
         labels = cropped.labels()
