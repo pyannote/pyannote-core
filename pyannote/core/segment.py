@@ -749,7 +749,3 @@ class SlidingWindow(object):
             duration=duration, step=step, start=start, end=end
         )
         return sliding_window
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
