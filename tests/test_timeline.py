@@ -72,7 +72,7 @@ def test_crop(timeline):
 def test_crop_mapping():
 
     timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
-    cropped, mapping = timeline.crop(Segment(1, 2), mapping=True)
+    cropped, mapping = timeline.crop(Segment(1, 2), returns_mapping=True)
 
     expected_cropped = Timeline([Segment(1, 2)])
     assert cropped == expected_cropped

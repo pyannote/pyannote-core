@@ -220,79 +220,97 @@ class Timeline(object):
         for segment, other_segment in self._segments.co_iter(other._segments):
             yield segment, other_segment
 
-    def crop_iter(self, other, mode='intersection', mapping=False):
-        """Crop timeline
+    def crop_iter(self, support, mode='intersection', returns_mapping=False):
+        """Like `crop` but returns a segment iterator instead
 
-        Parameters
-        ----------
-        other : `Segment` or `Timeline`
-
-        mode : {'strict', 'loose', 'intersection'}, optional
-            In 'strict' mode, only segments fully included in focus coverage
-            are kept. In 'loose' mode, any intersecting segment is kept
-            unchanged. In 'intersection' mode, only intersecting segments are
-            kept and replaced by their actual intersection with the focus.
+        See also
+        --------
+        :func:`pyannote.core.Timeline.crop`
         """
 
-        if isinstance(other, Segment):
-
-            other = Timeline(segments=[other], uri=self.uri)
-            for yielded in self.crop(other, mode=mode, mapping=mapping):
+        if isinstance(support, Segment):
+            support = Timeline(segments=[support], uri=self.uri)
+            for yielded in self.crop_iter(support, mode=mode,
+                                          returns_mapping=returns_mapping):
                 yield yielded
 
-        elif isinstance(other, Timeline):
+        elif isinstance(support, Timeline):
 
             if mode == 'loose':
-                for segment, _ in self.co_iter(other):
+                for segment, _ in self.co_iter(support):
                     yield segment
 
             elif mode == 'strict':
-                for segment, other_segment in self.co_iter(other):
+                for segment, other_segment in self.co_iter(support):
                     if segment in other_segment:
                         yield segment
 
             elif mode == 'intersection':
-                if mapping:
-                    for segment, other_segment in self.co_iter(other):
-                        inter = segment & other_segment
-                        yield segment, inter
+                if returns_mapping:
+                    for segment, other_segment in self.co_iter(support):
+                        mapped_to = segment & other_segment
+                        yield segment, mapped_to
                 else:
-                    for segment, other_segment in self.co_iter(other):
+                    for segment, other_segment in self.co_iter(support):
                         yield segment & other_segment
 
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
 
-    def crop(self, other, mode='intersection', mapping=False):
-        """Crop timeline
+    def crop(self, support, mode='intersection', returns_mapping=False):
+        """Crop timeline to new support
 
         Parameters
         ----------
-        other : `Segment` or `Timeline`
-
+        support : `Segment` or `Timeline`
+            If `support` is a `Timeline`, its coverage is used as support.
         mode : {'strict', 'loose', 'intersection'}, optional
-            In 'strict' mode, only segments fully included in focus coverage
-            are kept. In 'loose' mode, any intersecting segment is kept
-            unchanged. In 'intersection' mode, only intersecting segments are
-            kept and replaced by their actual intersection with the focus.
-        mapping : boolean, optional
-            [FIXME] When True and mode is 'intersection', also returns the list of
-            original corresponding segments.
+            Controls how segments that are not fully included in `support` are
+            handled. 'strict' mode only keeps fully included segments. 'loose'
+            mode keeps any intersecting segment. 'intersection' mode keeps any
+            intersecting segment but replace them by their actual intersection.
+        returns_mapping : bool, optional
+            In 'intersection' mode, return a dictionary whose keys are segments
+            of the cropped timeline, and values are list of the original
+            segments that were cropped. Defaults to False.
 
         Returns
         -------
         cropped : Timeline
-            Cropped timeline.
-        mapping : dict (if mapping is True and mode is 'intersection')
+            Cropped timelnie
+        mapping : dict
+            When 'returns_mapping' is True, dictionary whose keys are segments
+            of 'cropped', and values are lists of corresponding original
+            segments.
+
+        Example
+        -------
+
+        >>> timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
+        >>> timeline.crop(Segment(1, 3))
+        <Timeline(uri=None, segments=[<Segment(1, 2)>])>
+
+        >>> timeline.crop(Segment(1, 3), mode='loose')
+        <Timeline(uri=None, segments=[<Segment(0, 2)>, <Segment(1, 2)>])>
+
+        >>> timeline.crop(Segment(1, 3), mode='strict')
+        <Timeline(uri=None, segments=[<Segment(1, 2)>])>
+
+        >>> cropped, mapping = timeline.crop(Segment(1, 3), returns_mapping=True)
+        >>> print(mapping)
+        {<Segment(1, 2)>: [<Segment(0, 2)>, <Segment(1, 2)>]}
         """
-        if mode == 'intersection' and mapping:
+
+        if mode == 'intersection' and returns_mapping:
             segments, mapping = [], {}
-            for segment, inter in self.crop_iter(other, mode=mode, mapping=True):
-                segments.append(inter)
-                mapping[inter] = mapping.get(inter, list()) + [segment]
+            for segment, mapped_to in self.crop_iter(support,
+                                                     mode='intersection',
+                                                     returns_mapping=True):
+                segments.append(mapped_to)
+                mapping[mapped_to] = mapping.get(mapped_to, list()) + [segment]
             return Timeline(segments=segments, uri=self.uri), mapping
 
-        segments = [s for s in self.crop_iter(other, mode=mode)]
+        segments = [s for s in self.crop_iter(support, mode=mode)]
         return Timeline(segments=segments, uri=self.uri)
 
     def overlapping(self, timestamp):
