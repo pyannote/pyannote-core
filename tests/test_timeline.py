@@ -69,6 +69,16 @@ def test_crop(timeline):
 
     timeline.crop(selection, mode='loose') == expected_answer
 
+def test_crop_mapping():
+
+    timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
+    cropped, mapping = timeline.crop(Segment(1, 2), mapping=True)
+
+    expected_cropped = Timeline([Segment(1, 2)])
+    assert cropped == expected_cropped
+
+    expected_mapping = {Segment(1, 2): [Segment(0, 2), Segment(1, 2)]}
+    assert mapping == expected_mapping
 
 def test_union():
     first_timeline = Timeline([Segment(0, 1),

@@ -287,8 +287,8 @@ class Timeline(object):
         """
         if mode == 'intersection' and mapping:
             segments, mapping = [], {}
-            for segment, inter in self.crop_iter(other, mode=mode, mapping=mapping):
-                segments.append(segment)
+            for segment, inter in self.crop_iter(other, mode=mode, mapping=True):
+                segments.append(inter)
                 mapping[inter] = mapping.get(inter, list()) + [segment]
             return Timeline(segments=segments, uri=self.uri), mapping
 
