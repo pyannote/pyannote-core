@@ -357,7 +357,7 @@ class Timeline(object):
 
         Parameters
         ----------
-        support : `Segment` or `Timeline`
+        support : Segment or Timeline
             If `support` is a `Timeline`, its coverage is used as support.
         mode : {'strict', 'loose', 'intersection'}, optional
             Controls how segments that are not fully included in `support` are
@@ -372,7 +372,7 @@ class Timeline(object):
         Returns
         -------
         cropped : Timeline
-            Cropped timelnie
+            Cropped timeline
         mapping : dict
             When 'returns_mapping' is True, dictionary whose keys are segments
             of 'cropped', and values are lists of corresponding original
