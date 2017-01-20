@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2017 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,119 +26,142 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
+"""
+#######
+Segment
+#######
+
+.. plot:: pyplots/segment.py
+
+:class:`pyannote.core.Segment` instances describe temporal fragments (*e.g.* of an audio file). The segment depicted above can be defined like that:
+
+.. ipython::
+
+  In [1]: from pyannote.core import Segment
+
+  In [2]: segment = Segment(start=5, end=15)
+
+  In [3]: print(segment)
+
+It is nothing more than 2-tuples augmented with several useful methods and properties:
+
+.. ipython::
+
+  In [4]: start, end = segment
+
+  In [5]: start
+
+  In [6]: segment.end
+
+  In [7]: segment.duration  # duration (read-only)
+
+  In [8]: segment.middle  # middle (read-only)
+
+  In [9]: segment & Segment(3, 12)  # intersection
+
+  In [10]: segment | Segment(3, 12)  # union
+
+  In [11]: segment.overlaps(3)  # does segment overlap time t=3?
+
+See :class:`pyannote.core.Segment` for the complete reference.
+"""
+
 
 from __future__ import unicode_literals
 
 from collections import namedtuple
 import numpy as np
 
+# 1 μs (one microsecond)
 SEGMENT_PRECISION = 1e-6
 
 
 class Segment(namedtuple('Segment', ['start', 'end'])):
     """
-    Temporal interval defined by its `start` and `end` times.
-
-    Multiple segment operators are available -- including intersection (&),
-    inclusion (in), emptiness test, start/end time shifting (+, -, >>, <<).
-    They are illustrated in **Examples** section.
-
-    Comparison of two segments is also available (==, !=, <, <=, >, >=).
-    Two segments are equal iff they have identical start and end times.
-    Segment S is smaller than segment T iff S.start < T.start or if they have
-    the same start time and S.end < T.start.
+    Time interval
 
     Parameters
     ----------
-    start, end : float
-        `start` and `end` times, in seconds.
+    start : float
+        interval start time, in seconds.
+    end : float
+        interval end time, in seconds.
 
-    Returns
-    -------
-    segment : Segment
-        New segment with `start` and `end` times.
 
-    Examples
-    --------
-    Create a new temporal interval between 00:13.000 and 00:37.000.
+    Segments can be compared and sorted using the standard operators:
 
-        >>> segment = Segment(start=13., end=37)
-        >>> print segment
-        [13.000 --> 37.000]
+    >>> Segment(0, 1) == Segment(0, 1.)
+    True
+    >>> Segment(0, 1) != Segment(3, 4)
+    True
+    >>> Segment(0, 1) < Segment(2, 3)
+    True
+    >>> Segment(0, 1) < Segment(0, 2)
+    True
+    >>> Segment(1, 2) < Segment(0, 3)
+    False
 
-    Inclusion, intersection, union & gap
+    Note
+    ----
+    A segment is smaller than another segment if one of these two conditions is verified:
 
-        >>> s1 = Segment(1, 2)
-        >>> s2 = Segment(0, 3)
-        >>> if s1 in s2:
-        ...    print "Segment %s is included in segment %s." % (s1, s2)
-        Segment [1.000 --> 2.000] is included in segment [0.000 --> 3.000].
-        >>> s3 = Segment(2, 5)
-        >>> print s1 & s3
-        ∅
-        >>> print s2 & s3
-        [2.000 --> 3.000]
-        >>> print s2 | s3
-        [0.000 --> 5.000]
-        >>> print s1 ^ Segment(5, 7)
-        [2.000 --> 5.000]
-
-    Test whether segment is empty or not.
-
-        >>> if not Segment(10, 10):
-        ...    print "Segment is empty."
-        Segment is empty.
-
-    Comparison
-
-        >>> s1 = Segment(1, 3)
-        >>> s2 = Segment(1, 3)
-        >>> s3 = Segment(2, 6)
-        >>> s4 = Segment(1, 2)
-        >>> for s in sorted([s1, s2, s3, s4]):
-        ...    print s
-        [1.000 --> 2.000]
-        [1.000 --> 3.000]
-        [1.000 --> 3.000]
-        [2.000 --> 6.000]
+      - `segment.start < other_segment.start`
+      - `segment.start == other_segment.start` and `segment.end < other_segment.end`
 
     """
 
     def __new__(cls, start=0., end=0.):
-        # add default values
         return super(Segment, cls).__new__(cls, start, end)
 
     def __nonzero__(self):
         return self.__bool__()
 
     def __bool__(self):
-        """Use the expression 'if segment'
+        """Emptiness
 
-        Returns
-        -------
-        valid : bool
-            False is segment is empty, True otherwise.
+        >>> if segment:
+        ...    # segment is not empty.
+        ... else:
+        ...    # segment is empty.
 
+        Note
+        ----
+        A segment is considered empty if its end time is smaller than its
+        start time, or its duration is smaller than 1μs.
         """
         return bool((self.end - self.start) > SEGMENT_PRECISION)
 
     def _get_duration(self):
         return self.end - self.start if self else 0.
     duration = property(fget=_get_duration)
-    """Get segment duration, in seconds."""
+    """Segment duration (read-only)"""
 
     def _get_middle(self):
         return .5 * (self.start + self.end)
     middle = property(fget=_get_middle)
-    """Get segment middle time, in seconds."""
+    """Segment mid-time (read-only)"""
 
     def __iter__(self):
-        """Makes sure tuple(segment) is a tuple of float"""
+        """Unpack segment boundaries as float
+
+        >>> segment = Segment(start=1, end=2)
+        >>> isinstance(segment.start, int)  # segment.start is int
+        True
+        >>> start, end = segment
+        >>> isinstance(start, float)        # start is float
+        True
+        """
         yield float(self.start)
         yield float(self.end)
 
     def copy(self):
-        """Duplicate segment."""
+        """Get a copy of the segment
+
+        Returns
+        -------
+        copy : Segment
+            Copy of the segment.
+        """
         return Segment(start=self.start, end=self.end)
 
     # ------------------------------------------------------- #
@@ -146,24 +169,33 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
     # ------------------------------------------------------- #
 
     def __contains__(self, other):
-        """Use the expression 'other in segment'
+        """Inclusion
 
-        Returns
-        -------
-        contains : bool
-            True if other segment is fully included, False otherwise
-
+        >>> segment = Segment(start=0, end=10)
+        >>> Segment(start=3, end=10) in segment:
+        True
+        >>> Segment(start=5, end=15) in segment:
+        False
         """
         return (self.start <= other.start) and (self.end >= other.end)
 
     def __and__(self, other):
-        """Use the expression 'segment & other'
+        """Intersection
 
-        Returns
-        -------
-        segment : Segment
-            Intersection of the two segments
+        >>> segment = Segment(0, 10)
+        >>> other_segment = Segment(5, 15)
+        >>> segment & other_segment
+        <Segment(5, 10)>
 
+        Note
+        ----
+        When the intersection is empty, an empty segment is returned:
+
+        >>> segment = Segment(0, 10)
+        >>> other_segment = Segment(15, 20)
+        >>> intersection = segment & other_segment
+        >>> if not intersection:
+        ...    # intersection is empty.
         """
         start = max(self.start, other.start)
         end = min(self.end, other.end)
@@ -179,9 +211,10 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
 
         Returns
         -------
-        intersects : bool
+        intersect : bool
             True if segments intersect, False otherwise
         """
+
         if not self or not other:
             return False
 
@@ -192,17 +225,38 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
                 self.start < other.end - SEGMENT_PRECISION)
 
     def overlaps(self, t):
-        return self.start <= t and self.end >= t
+        """Check if segment overlaps a given time
 
-    def __or__(self, other):
-        """Use the expression 'segment | other'
+        Parameters
+        ----------
+        t : float
+            Time, in seconds.
 
         Returns
         -------
-        segment : Segment
-            Shortest segment that contains both segments
-
+        overlap: bool
+            True if segment overlaps time t, False otherwise.
         """
+        return self.start <= t and self.end >= t
+
+    def __or__(self, other):
+        """Union
+
+        >>> segment = Segment(0, 10)
+        >>> other_segment = Segment(5, 15)
+        >>> segment | other_segment
+        <Segment(0, 15)>
+
+        Note
+        ----
+        When a gap exists between the segment, their union covers the gap as well:
+
+        >>> segment = Segment(0, 10)
+        >>> other_segment = Segment(15, 20)
+        >>> segment | other_segment
+        <Segment(0, 20)
+        """
+
         # if segment is empty, union is the other one
         if not self:
             return other
@@ -216,60 +270,95 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         return Segment(start=start, end=end)
 
     def __xor__(self, other):
-        """Use the expression 'segment ^ other'
+        """Gap
 
-        Returns
-        -------
-        segment : Segment
-            Gap between the two segments
+        >>> segment = Segment(0, 10)
+        >>> other_segment = Segment(15, 20)
+        >>> segment ^ other_segment
+        <Segment(10, 15)
 
+        Note
+        ----
+        The gap between a segment and an empty segment is not defined.
+
+        >>> segment = Segment(0, 10)
+        >>> empty_segment = Segment(11, 11)
+        >>> segment ^ empty_segment
+        ValueError: The gap between a segment and an empty segment is not defined.
         """
+
         # if segment is empty, xor is not defined
         if (not self) or (not other):
-            raise ValueError('')
+            raise ValueError(
+                'The gap between a segment and an empty segment '
+                'is not defined.')
 
         start = min(self.end, other.end)
         end = max(self.start, other.start)
         return Segment(start=start, end=end)
 
-    def __str__(self):
-        """Use the expression str(segment)"""
-        if self:
-            return '[%.3f --> %.3f]' % (self.start, self.end)
-        else:
-            return '[]'
-
-    def _pretty(self, seconds):
+    def _str_helper(self, seconds):
         from datetime import timedelta
+        negative = seconds < 0
+        seconds = abs(seconds)
         td = timedelta(seconds=seconds)
-        days = td.days
-        seconds = td.seconds
+        seconds = td.seconds + 86400 * td.days
         microseconds = td.microseconds
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
-        if abs(days) > 0:
-            return '%d:%02d:%02d:%02d.%03d' % (days, hours, minutes,
-                                               seconds, microseconds / 1000)
-        else:
-            return '%02d:%02d:%02d.%03d' % (hours, minutes, seconds,
-                                            microseconds / 1000)
+        return '%s%02d:%02d:%02d.%03d' % (
+            '-' if negative else ' ', hours, minutes,
+            seconds, microseconds / 1000)
 
-    def pretty(self):
-        """Human-readable representation of segments"""
-        return '[%s --> %s]' % (self._pretty(self.start),
-                                self._pretty(self.end))
+    def __str__(self):
+        """Human-readable representation
+
+        >>> print(Segment(1337, 1337 + 0.42))
+        [ 00:22:17.000 -->  00:22:17.420]
+
+        Note
+        ----
+        Empty segments are printed as "[]"
+        """
+        if self:
+            return '[%s --> %s]' % (self._str_helper(self.start),
+                                    self._str_helper(self.end))
+        return '[]'
 
     def __repr__(self):
+        """Computer-readable representation
+
+        >>> Segment(1337, 1337 + 0.42)
+        <Segment(1337, 1337.42)>
+        """
         return '<Segment(%g, %g)>' % (self.start, self.end)
 
     def for_json(self):
+        """Serialization
+
+        See also
+        --------
+        :mod:`pyannote.core.json`
+        """
         return {'start': self.start, 'end': self.end}
 
     @classmethod
     def from_json(cls, data):
+        """Deserialization
+
+        See also
+        --------
+        :mod:`pyannote.core.json`
+        """
         return cls(start=data['start'], end=data['end'])
 
     def _repr_png_(self):
+        """IPython notebook support
+
+        See also
+        --------
+        :mod:`pyannote.core.notebook`
+        """
         from .notebook import repr_segment
         return repr_segment(self)
 
@@ -367,6 +456,7 @@ class SlidingWindow(object):
 
     def samples(self, from_duration, mode='strict'):
         """Number of frames
+
         Parameters
         ----------
         from_duration : float
@@ -380,6 +470,7 @@ class SlidingWindow(object):
             where the first one is centered on the start time and the last one
             is centered on the end time of a segment with duration
             `from_duration`.
+
         """
         if mode == 'strict':
             return int(np.floor((from_duration - self.duration) / self.step))

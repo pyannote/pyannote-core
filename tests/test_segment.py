@@ -6,7 +6,7 @@ def test_creation():
     e = 9.
     segment = Segment(start=s, end=e)
 
-    assert str(segment) == "[1.000 --> 9.000]"
+    assert str(segment) == "[ 00:00:01.000 -->  00:00:09.000]"
     assert segment.end == 9
     assert segment.duration == 8
     assert segment.middle == 5

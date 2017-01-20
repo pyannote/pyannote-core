@@ -28,7 +28,7 @@ def test_iteration(timeline):
 def test_getter(timeline):
 
     assert len(timeline) == 6
-    assert str(timeline[1]) == "[1.000 --> 4.000]"
+    assert str(timeline[1]) == "[ 00:00:01.000 -->  00:00:04.000]"
 
 
 def test_extent(timeline):
