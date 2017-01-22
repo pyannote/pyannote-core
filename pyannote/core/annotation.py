@@ -84,9 +84,6 @@ class Annotation(object):
 
         annotation = cls(uri=uri, modality=modality)
 
-        annotation._tracks = SortedDict(key_type=(float, float),
-                                        updator=TimelineUpdator)
-
         for row in df.itertuples():
             if row[1] in annotation._tracks:
                 annotation._tracks[row[1]][row[2]] = row[3]
