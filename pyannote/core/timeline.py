@@ -352,7 +352,7 @@ class Timeline(object):
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
 
-    def crop(self, support, mode='intersection', returns_mapping=False):
+    def crop(self, support, mode='intersection', returns_mapping=False, mapping=False):
         """Crop timeline to new support
 
         Parameters
@@ -396,6 +396,12 @@ class Timeline(object):
         {<Segment(1, 2)>: [<Segment(0, 2)>, <Segment(1, 2)>]}
 
         """
+
+        if mapping:
+            returns_mapping = mapping
+            warnings.warn(
+                "'mapping' parameter has been renamed to 'returns_mapping'.",
+                DeprecationWarning)
 
         if mode == 'intersection' and returns_mapping:
             segments, mapping = [], {}

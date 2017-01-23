@@ -325,6 +325,12 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
                                     self._str_helper(self.end))
         return '[]'
 
+    def pretty(self):
+        warnings.warn(
+            '"pretty" has been replaced by "__str__"',
+            DeprecationWarning)
+        return self.__str__()
+
     def __repr__(self):
         """Computer-readable representation
 
