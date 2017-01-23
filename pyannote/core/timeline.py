@@ -689,7 +689,7 @@ class Timeline(object):
                 for gap in self.gaps_iter(support=segment):
                     yield gap
 
-    def gaps(self, support=None):
+    def gaps(self, support=None, focus=None):
         """Gaps
 
         A picture is worth a thousand words::
@@ -717,6 +717,13 @@ class Timeline(object):
         :func:`pyannote.core.Timeline.extent`
 
         """
+
+        if focus is not None:
+            support = focus
+            warnings.warn(
+                "'focus' parameter has been renamed to 'support'.",
+                DeprecationWarning)
+
         segments = [s for s in self.gaps_iter(support=support)]
         return Timeline(segments=segments, uri=self.uri)
 
