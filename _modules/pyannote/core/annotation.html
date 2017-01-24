@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.annotation &mdash; pyannote.core 1.0a documentation</title>
+  <title>pyannote.core.annotation &mdash; pyannote.core 0.11 documentation</title>
   
 
   
@@ -33,7 +33,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="pyannote.core 1.0a documentation" href="../../../index.html"/>
+    <link rel="top" title="pyannote.core 0.11 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                1.0
+                0.11
               </div>
             
           
@@ -90,6 +90,7 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 </ul>
 
             
@@ -552,7 +553,10 @@
                     <span class="n">_tracks</span><span class="p">[</span><span class="n">segment</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracks</span>
                     <span class="n">_labels</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tracks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
-                <span class="n">cropped</span><span class="o">.</span><span class="n">_tracks</span> <span class="o">=</span> <span class="n">_tracks</span>
+                <span class="n">cropped</span><span class="o">.</span><span class="n">_tracks</span> <span class="o">=</span> <span class="n">SortedDict</span><span class="p">(</span>
+                    <span class="n">_tracks</span><span class="p">,</span>
+                    <span class="n">key_type</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+                    <span class="n">updator</span><span class="o">=</span><span class="n">TimelineUpdator</span><span class="p">)</span>
 
                 <span class="n">cropped</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">_labels</span><span class="p">}</span>
                 <span class="n">cropped</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">_labels</span><span class="p">}</span>
@@ -577,7 +581,10 @@
                     <span class="n">_tracks</span><span class="p">[</span><span class="n">segment</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracks</span>
                     <span class="n">_labels</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tracks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
-                <span class="n">cropped</span><span class="o">.</span><span class="n">_tracks</span> <span class="o">=</span> <span class="n">_tracks</span>
+                <span class="n">cropped</span><span class="o">.</span><span class="n">_tracks</span> <span class="o">=</span> <span class="n">SortedDict</span><span class="p">(</span>
+                    <span class="n">_tracks</span><span class="p">,</span>
+                    <span class="n">key_type</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+                    <span class="n">updator</span><span class="o">=</span><span class="n">TimelineUpdator</span><span class="p">)</span>
 
                 <span class="n">cropped</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">_labels</span><span class="p">}</span>
                 <span class="n">cropped</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">_labels</span><span class="p">}</span>
@@ -1476,7 +1483,7 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'1.0a',
+            VERSION:'0.11',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true
