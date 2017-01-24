@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2016 CNRS
+# Copyright (c) 2014-2017 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
+
 from __future__ import unicode_literals
 
 import simplejson as json
@@ -35,9 +36,8 @@ PYANNOTE_JSON_CONTENT = 'content'
 
 
 def object_hook(d):
-    """
-    Usage
-    -----
+    """Utility function for deserialization
+
     >>> with open('file.json', 'r') as f:
     ...   json.load(f, object_hook=object_hook)
     """
@@ -51,26 +51,92 @@ def object_hook(d):
 
 
 def load(fp):
+    """Deserialize
+
+    Parameters
+    ----------
+    fp : file
+        File containing serialized `pyannote.core` data structure
+
+    Returns
+    -------
+    deserialized : `pyannote.core` data structure
+    """
+
     return json.load(fp, encoding='utf-8', object_hook=object_hook)
 
 
 def loads(s):
+    """Deserialize
+
+    Parameters
+    ----------
+    s : string
+        String containing serialized `pyannote.core` data structure
+
+    Returns
+    -------
+    deserialized : `pyannote.core` data structure
+    """
     return json.loads(s, encoding='utf-8', object_hook=object_hook)
 
 
 def load_from(path):
+    """Deserialize
+
+    Parameters
+    ----------
+    path : string
+        Path to file containing serialized `pyannote.core` data structure
+
+    Returns
+    -------
+    deserialized : `pyannote.core` data structure
+    """
+
     with open(path, 'r') as fp:
         return load(fp)
 
 
 def dump(resource, fp):
+    """Serialize
+
+    Parameters
+    ----------
+    resource : `pyannote.core` data structure
+        Resource to deserialize
+    fp : file
+        File in which `resource` serialization is written
+    """
+
     json.dump(resource, fp, encoding='utf-8', for_json=True)
 
 
 def dumps(resource):
+    """Serialize to string
+
+    Parameters
+    ----------
+    resource : `pyannote.core` data structure
+
+    Returns
+    -------
+    serialization : string
+
+    """
     return json.dumps(resource, encoding='utf-8', for_json=True)
 
 
 def dump_to(resource, path):
+    """Serialize
+
+    Parameters
+    ----------
+    resource : `pyannote.core` data structure
+        Resource to deserialize
+    path : string
+        Path to file in which `resource` serialization is written
+    """
+
     with open(path, 'w') as fp:
         dump(resource, fp)
