@@ -35,6 +35,7 @@ Timeline
 
 :class:`pyannote.core.Timeline` instances are ordered sets of non-empty
 segments:
+
   - ordered, because segments are sorted by start time (and end time in case of tie)
   - set, because one cannot add twice the same segment
   - non-empty, because one cannot add empty segments (*i.e.* start >= end)

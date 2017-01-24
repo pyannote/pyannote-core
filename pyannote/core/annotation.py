@@ -36,6 +36,7 @@ Annotation
 
 :class:`pyannote.core.Annotation` instances are ordered sets of non-empty
 tracks:
+
   - ordered, because segments are sorted by start time (and end time in case of tie)
   - set, because one cannot add twice the same track
   - non-empty, because one cannot add empty track
