@@ -1,0 +1,2011 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Reference &mdash; pyannote.core 1.0a documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="pyannote.core 1.0a documentation" href="index.html"/>
+        <link rel="prev" title="Serialization" href="serialization.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pyannote.core
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Available data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-structures">Data structures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#segment">Segment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#timeline">Timeline</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#annotation">Annotation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyannote.core.json">Serialization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-pyannote.core.notebook">Visualization</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Visualization</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">pyannote.core</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+ 
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Reference</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/reference.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="reference">
+<h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="data-structures">
+<h2>Data structures<a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="segment">
+<h3>Segment<a class="headerlink" href="#segment" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyannote.core.Segment">
+<em class="property">class </em><code class="descclassname">pyannote.core.</code><code class="descname">Segment</code><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time interval</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; interval start time, in seconds.</li>
+<li><strong>end</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; interval end time, in seconds.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Segments can be compared and sorted using the standard operators:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>A segment is smaller than another segment if one of these two conditions is verified:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li><cite>segment.start &lt; other_segment.start</cite></li>
+<li><cite>segment.start == other_segment.start</cite> and <cite>segment.end &lt; other_segment.end</cite></li>
+</ul>
+</div></blockquote>
+</div>
+<dl class="method">
+<dt id="pyannote.core.Segment.__and__">
+<code class="descname">__and__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__and__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__and__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intersection</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other_segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">&amp;</span> <span class="n">other_segment</span>
+<span class="go">&lt;Segment(5, 10)&gt;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>When the intersection is empty, an empty segment is returned:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other_segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">intersection</span> <span class="o">=</span> <span class="n">segment</span> <span class="o">&amp;</span> <span class="n">other_segment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">intersection</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="c1"># intersection is empty.</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.__bool__">
+<code class="descname">__bool__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__bool__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__bool__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emptiness</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">segment</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="c1"># segment is not empty.</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="c1"># segment is empty.</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A segment is considered empty if its end time is smaller than its
+start time, or its duration is smaller than 1μs.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.__contains__">
+<code class="descname">__contains__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inclusion</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="ow">in</span> <span class="n">segment</span><span class="p">:</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span> <span class="ow">in</span> <span class="n">segment</span><span class="p">:</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.__iter__">
+<code class="descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unpack segment boundaries as float</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>  <span class="c1"># segment.start is int</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">segment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">isinstance</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>        <span class="c1"># start is float</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.__or__">
+<code class="descname">__or__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__or__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__or__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Union</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other_segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">|</span> <span class="n">other_segment</span>
+<span class="go">&lt;Segment(0, 15)&gt;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>When a gap exists between the segment, their union covers the gap as well:</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other_segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">|</span> <span class="n">other_segment</span>
+<span class="go">&lt;Segment(0, 20)</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computer-readable representation</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="mi">1337</span><span class="p">,</span> <span class="mi">1337</span> <span class="o">+</span> <span class="mf">0.42</span><span class="p">)</span>
+<span class="go">&lt;Segment(1337, 1337.42)&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-readable representation</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1337</span><span class="p">,</span> <span class="mi">1337</span> <span class="o">+</span> <span class="mf">0.42</span><span class="p">))</span>
+<span class="go">[ 00:22:17.000 --&gt;  00:22:17.420]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Empty segments are printed as &#8220;[]&#8221;</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.__xor__">
+<code class="descname">__xor__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__xor__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__xor__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gap</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">other_segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">^</span> <span class="n">other_segment</span>
+<span class="go">&lt;Segment(10, 15)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The gap between a segment and an empty segment is not defined.</p>
+<div class="last highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">empty_segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">^</span> <span class="n">empty_segment</span>
+<span class="go">ValueError: The gap between a segment and an empty segment is not defined.</span>
+</pre></div>
+</div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the segment</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>copy</strong> &#8211; Copy of the segment.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyannote.core.Segment.duration">
+<code class="descname">duration</code><a class="headerlink" href="#pyannote.core.Segment.duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Segment duration (read-only)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.for_json">
+<code class="descname">for_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.for_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.for_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialization</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#module-pyannote.core.json" title="pyannote.core.json"><code class="xref py py-mod docutils literal"><span class="pre">pyannote.core.json</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyannote.core.Segment.from_json">
+<em class="property">classmethod </em><code class="descname">from_json</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialization</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#module-pyannote.core.json" title="pyannote.core.json"><code class="xref py py-mod docutils literal"><span class="pre">pyannote.core.json</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.intersects">
+<code class="descname">intersects</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.intersects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.intersects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether two segments intersect each other</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a>) &#8211; Other segment</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>intersect</strong> &#8211; True if segments intersect, False otherwise</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyannote.core.Segment.middle">
+<code class="descname">middle</code><a class="headerlink" href="#pyannote.core.Segment.middle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Segment mid-time (read-only)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Segment.overlaps">
+<code class="descname">overlaps</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.overlaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.overlaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if segment overlaps a given time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>t</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Time, in seconds.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>overlap</strong> &#8211; True if segment overlaps time t, False otherwise.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="timeline">
+<h3>Timeline<a class="headerlink" href="#timeline" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyannote.core.Timeline">
+<em class="property">class </em><code class="descclassname">pyannote.core.</code><code class="descname">Timeline</code><span class="sig-paren">(</span><em>segments=None</em>, <em>uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Ordered set of segments.</p>
+<p>A timeline can be seen as an ordered set of non-empty segments (Segment).
+Segments can overlap &#8211; though adding an already exisiting segment to a
+timeline does nothing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>segments</strong> (<em>Segment iterator</em><em>, </em><em>optional</em>) &#8211; initial set of segments</li>
+<li><strong>uri</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a><em>, </em><em>optional</em>) &#8211; name of segmented resource</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>timeline</strong> &#8211; New timeline</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyannote.core.Timeline.__bool__">
+<code class="descname">__bool__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__bool__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__bool__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emptiness</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">timeline</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="c1"># timeline is empty</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="c1"># timeline is not empty</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.__contains__">
+<code class="descname">__contains__</code><span class="sig-paren">(</span><em>included</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inclusion</p>
+<p>Check whether every segment of <cite>included</cite> does exist in timeline.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>included</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) &#8211; Segment or timeline being checked for inclusion</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>contains</strong> &#8211; True if every segment in <cite>included</cite> exists in timeline,
+False otherwise</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline1</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">13.37</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline2</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline1</span> <span class="ow">in</span> <span class="n">timeline2</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline2</span> <span class="ow">in</span> <span class="n">timeline1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">13.37</span><span class="p">)</span> <span class="ow">in</span> <span class="n">timeline1</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.__eq__">
+<code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equality</p>
+<p>Two timelines are equal if and only if their segments are equal.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline1</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline2</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline3</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline1</span> <span class="o">==</span> <span class="n">timeline2</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline1</span> <span class="o">==</span> <span class="n">timeline3</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.__getitem__">
+<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>k</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get segment by index (in chronological order)</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">first_segment</span> <span class="o">=</span> <span class="n">timeline</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">second_segment</span> <span class="o">=</span> <span class="n">timeline</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Negative indexing is not supported.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.__iter__">
+<code class="descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__iter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over segments (in chronological order)</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">timeline</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="c1"># do something with the segment</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><code class="xref py py-class docutils literal"><span class="pre">pyannote.core.Segment</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.__len__">
+<code class="descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of segments</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">timeline</span><span class="p">)</span>  <span class="c1"># timeline contains three segments</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.__ne__">
+<code class="descname">__ne__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__ne__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inequality</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computer-readable representation</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">13.37</span><span class="p">)])</span>
+<span class="go">&lt;Timeline(uri=None, segments=[&lt;Segment(0, 10)&gt;, &lt;Segment(1, 13.37)&gt;])&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-readable representation</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">13.37</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">timeline</span><span class="p">)</span>
+<span class="go">[[ 00:00:00.000 --&gt;  00:00:10.000]</span>
+<span class="go"> [ 00:00:01.000 --&gt;  00:00:13.370]]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyannote.core.Timeline.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#pyannote.core.Timeline.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.add">
+<code class="descname">add</code><span class="sig-paren">(</span><em>segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a segment (in place)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>segment</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a>) &#8211; Segment that is being added</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>self</strong> &#8211; Updated timeline.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If the timeline already contains this segment, it will not be added
+again, as a timeline is meant to be a <strong>set</strong> of segments (not a list).</p>
+<p class="last">If the segment is empty, it will not be added either, as a timeline
+only contains non-empty segments.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.co_iter">
+<code class="descname">co_iter</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.co_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.co_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over pairs of intersecting segments</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline1</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline2</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">segment1</span><span class="p">,</span> <span class="n">segment2</span> <span class="ow">in</span> <span class="n">timeline1</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">timeline2</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">segment1</span><span class="p">,</span> <span class="n">segment2</span><span class="p">)</span>
+<span class="go">(&lt;Segment(0, 2)&gt;, &lt;Segment(1, 3)&gt;)</span>
+<span class="go">(&lt;Segment(1, 2)&gt;, &lt;Segment(1, 3)&gt;)</span>
+<span class="go">(&lt;Segment(3, 4)&gt;, &lt;Segment(3, 5)&gt;)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) &#8211; Second timeline</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>iterable</strong> &#8211; Yields pairs of intersecting segments in chronological order.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a>, <a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a>) iterable</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><em>segment_func=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the timeline</p>
+<p>If <cite>segment_func</cite> is provided, it is applied to each segment first.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>segment_func</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#callable" title="(in Python v2.7)"><em>callable</em></a><em>, </em><em>optional</em>) &#8211; Callable that takes a segment as input, and returns a segment.
+Defaults to identity function (segment_func(segment) = segment)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>timeline</strong> &#8211; Copy of the timeline</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.crop">
+<code class="descname">crop</code><span class="sig-paren">(</span><em>support</em>, <em>mode='intersection'</em>, <em>returns_mapping=False</em>, <em>mapping=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.crop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crop timeline to new support</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>support</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) &#8211; If <cite>support</cite> is a <cite>Timeline</cite>, its support is used.</li>
+<li><strong>mode</strong> (<em>{'strict'</em><em>, </em><em>'loose'</em><em>, </em><em>'intersection'}</em><em>, </em><em>optional</em>) &#8211; Controls how segments that are not fully included in <cite>support</cite> are
+handled. &#8216;strict&#8217; mode only keeps fully included segments. &#8216;loose&#8217;
+mode keeps any intersecting segment. &#8216;intersection&#8217; mode keeps any
+intersecting segment but replace them by their actual intersection.</li>
+<li><strong>returns_mapping</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; In &#8216;intersection&#8217; mode, return a dictionary whose keys are segments
+of the cropped timeline, and values are list of the original
+segments that were cropped. Defaults to False.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>cropped</strong> (<em>Timeline</em>) &#8211; Cropped timeline</li>
+<li><strong>mapping</strong> (<em>dict</em>) &#8211; When &#8216;returns_mapping&#8217; is True, dictionary whose keys are segments
+of &#8216;cropped&#8217;, and values are lists of corresponding original
+segments.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="go">&lt;Timeline(uri=None, segments=[&lt;Segment(1, 2)&gt;])&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;loose&#39;</span><span class="p">)</span>
+<span class="go">&lt;Timeline(uri=None, segments=[&lt;Segment(0, 2)&gt;, &lt;Segment(1, 2)&gt;])&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">)</span>
+<span class="go">&lt;Timeline(uri=None, segments=[&lt;Segment(1, 2)&gt;])&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cropped</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="n">timeline</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">returns_mapping</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span>
+<span class="go">{&lt;Segment(1, 2)&gt;: [&lt;Segment(0, 2)&gt;, &lt;Segment(1, 2)&gt;]}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.crop_iter">
+<code class="descname">crop_iter</code><span class="sig-paren">(</span><em>support</em>, <em>mode='intersection'</em>, <em>returns_mapping=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.crop_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.crop_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <cite>crop</cite> but returns a segment iterator instead</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyannote.core.Timeline.crop" title="pyannote.core.Timeline.crop"><code class="xref py py-func docutils literal"><span class="pre">pyannote.core.Timeline.crop()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.duration">
+<code class="descname">duration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timeline duration</p>
+<p>The timeline duration is the sum of the durations of the segments
+in the timeline support.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>duration</strong> &#8211; Duration of timeline support, in seconds.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.empty">
+<code class="descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an empty copy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>empty</strong> &#8211; Empty timeline using the same &#8216;uri&#8217; attribute.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.extent">
+<code class="descname">extent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.extent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extent</p>
+<p>The extent of a timeline is the segment of minimum duration that
+contains every segments of the timeline. It is unique, by definition.
+The extent of an empty timeline is an empty segment.</p>
+<p>A picture is worth a thousand words:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">timeline</span>
+<span class="o">|------|</span>    <span class="o">|------|</span>     <span class="o">|----|</span>
+  <span class="o">|--|</span>    <span class="o">|-----|</span>     <span class="o">|----------|</span>
+
+<span class="n">timeline</span><span class="o">.</span><span class="n">extent</span><span class="p">()</span>
+<span class="o">|--------------------------------|</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>extent</strong> &#8211; Timeline extent</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span><span class="o">.</span><span class="n">extent</span><span class="p">()</span>
+<span class="go">&lt;Segment(0, 10)&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.for_json">
+<code class="descname">for_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.for_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.for_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialization</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#module-pyannote.core.json" title="pyannote.core.json"><code class="xref py py-mod docutils literal"><span class="pre">pyannote.core.json</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyannote.core.Timeline.from_json">
+<em class="property">classmethod </em><code class="descname">from_json</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialization</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#module-pyannote.core.json" title="pyannote.core.json"><code class="xref py py-mod docutils literal"><span class="pre">pyannote.core.json</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.gaps">
+<code class="descname">gaps</code><span class="sig-paren">(</span><em>support=None</em>, <em>focus=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.gaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.gaps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gaps</p>
+<p>A picture is worth a thousand words:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">timeline</span>
+<span class="o">|------|</span>    <span class="o">|------|</span>     <span class="o">|----|</span>
+  <span class="o">|--|</span>    <span class="o">|-----|</span>     <span class="o">|----------|</span>
+
+<span class="n">timeline</span><span class="o">.</span><span class="n">gaps</span><span class="p">()</span>
+       <span class="o">|--|</span>        <span class="o">|--|</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>support</strong> (<a class="reference external" href="https://docs.python.org/2/library/constants.html#None" title="(in Python v2.7)"><em>None</em></a><em>, </em><a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) &#8211; Support in which gaps are looked for. Defaults to timeline extent</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>gaps</strong> &#8211; Timeline made of all gaps from original timeline, and delimited
+by provided support</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyannote.core.Timeline.extent" title="pyannote.core.Timeline.extent"><code class="xref py py-func docutils literal"><span class="pre">pyannote.core.Timeline.extent()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.gaps_iter">
+<code class="descname">gaps_iter</code><span class="sig-paren">(</span><em>support=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.gaps_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.gaps_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <cite>gaps</cite> but returns a segment iterator instead</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyannote.core.Timeline.gaps" title="pyannote.core.Timeline.gaps"><code class="xref py py-func docutils literal"><span class="pre">pyannote.core.Timeline.gaps()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.index">
+<code class="descname">index</code><span class="sig-paren">(</span><em>segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get index of (existing) segment</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>segment</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a>) &#8211; Segment that is being looked for.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>position</strong> &#8211; Index of <cite>segment</cite> in timeline</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.overlapping">
+<code class="descname">overlapping</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.overlapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.overlapping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of segments overlapping <cite>t</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>t</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Timestamp, in seconds.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>segments</strong> &#8211; List of all segments of timeline containing time t</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.segmentation">
+<code class="descname">segmentation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.segmentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.segmentation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Segmentation</p>
+<p>Create the unique timeline with same support and same set of segment
+boundaries as original timeline, but with no overlapping segments.</p>
+<p>A picture is worth a thousand words:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">timeline</span>
+<span class="o">|------|</span>    <span class="o">|------|</span>     <span class="o">|----|</span>
+  <span class="o">|--|</span>    <span class="o">|-----|</span>     <span class="o">|----------|</span>
+
+<span class="n">timeline</span><span class="o">.</span><span class="n">segmentation</span><span class="p">()</span>
+<span class="o">|-|--|-|</span>  <span class="o">|-|---|--|</span>  <span class="o">|--|----|--|</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>timeline</strong> &#8211; (unique) timeline with same support and same set of segment
+boundaries as original timeline, but with no overlapping segments.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.support">
+<code class="descname">support</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.support" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timeline support</p>
+<p>The support of a timeline is the timeline with the minimum number of
+segments with exactly the same time span as the original timeline. It
+is (by definition) unique and does not contain any overlapping
+segments.</p>
+<p>A picture is worth a thousand words:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">timeline</span>
+<span class="o">|------|</span>    <span class="o">|------|</span>     <span class="o">|----|</span>
+  <span class="o">|--|</span>    <span class="o">|-----|</span>     <span class="o">|----------|</span>
+
+<span class="n">timeline</span><span class="o">.</span><span class="n">support</span><span class="p">()</span>
+<span class="o">|------|</span>  <span class="o">|--------|</span>  <span class="o">|----------|</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>support</strong> &#8211; Timeline support</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.support_iter">
+<code class="descname">support_iter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.support_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.support_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <cite>support</cite> but returns a segment iterator instead</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyannote.core.Timeline.support" title="pyannote.core.Timeline.support"><code class="xref py py-func docutils literal"><span class="pre">pyannote.core.Timeline.support()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.union">
+<code class="descname">union</code><span class="sig-paren">(</span><em>timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.union" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create new timeline made of union of segments</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeline</strong> (<a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) &#8211; Timeline whose segments are being added</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>union</strong> &#8211; New timeline containing the union of both timelines.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This does the same as timeline.update(...) except it returns a new
+timeline, and the original one is not modified.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Timeline.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add every segments of an existing timeline (in place)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>timeline</strong> (<a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) &#8211; Timeline whose segments are being added</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>self</strong> &#8211; Updated timeline</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Only segments that do not already exist will be added, as a timeline is
+meant to be a <strong>set</strong> of segments (not a list).</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="annotation">
+<h3>Annotation<a class="headerlink" href="#annotation" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="pyannote.core.Annotation">
+<em class="property">class </em><code class="descclassname">pyannote.core.</code><code class="descname">Annotation</code><span class="sig-paren">(</span><em>uri=None</em>, <em>modality=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>uri</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a><em>, </em><em>optional</em>) &#8211; name of annotated resource (e.g. audio or video file)</li>
+<li><strong>modality</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a><em>, </em><em>optional</em>) &#8211; name of annotated modality</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>annotation</strong> &#8211; New annotation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyannote.core.Annotation.__bool__">
+<code class="descname">__bool__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__bool__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__bool__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emptiness</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">annotation</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="c1"># annotation is empty</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="c1"># annotation is not empty</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.__contains__">
+<code class="descname">__contains__</code><span class="sig-paren">(</span><em>included</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__contains__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inclusion</p>
+<p>Check whether every segment of <cite>included</cite> does exist in annotation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>included</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) &#8211; Segment or timeline being checked for inclusion</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>contains</strong> &#8211; True if every segment in <cite>included</cite> exists in timeline,
+False otherwise</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.__delitem__">
+<code class="descname">__delitem__</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__delitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete one track</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Delete all tracks of a segment</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.__eq__">
+<code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__eq__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Equality</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span> <span class="o">==</span> <span class="n">other</span>
+</pre></div>
+</div>
+<p>Two annotations are equal if and only if their tracks and associated
+labels are equal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.__getitem__">
+<code class="descname">__getitem__</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get track label</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">label</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">annotation[segment]</span></code> is equivalent to <code class="docutils literal"><span class="pre">annotation[segment,</span> <span class="pre">'_']</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.__len__">
+<code class="descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of segments</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>  <span class="c1"># annotation contains three segments</span>
+<span class="go">3</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.__mul__">
+<code class="descname">__mul__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__mul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__mul__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cooccurrence (or confusion) matrix</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">matrix</span> <span class="o">=</span> <span class="n">annotation</span> <span class="o">*</span> <span class="n">other</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">matrix</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">]</span>   <span class="c1"># duration of cooccurrence between labels</span>
+<span class="go">                           # &#39;A&#39; from `annotation` and &#39;a&#39; from `other`</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation"><em>Annotation</em></a>) &#8211; Second annotation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cooccurrence</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">DataArray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.__ne__">
+<code class="descname">__ne__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__ne__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__ne__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inequality</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.__setitem__">
+<code class="descname">__setitem__</code><span class="sig-paren">(</span><em>key</em>, <em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add new or update existing track</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+</pre></div>
+</div>
+<p>If (segment, track) does not exist, it is added.
+If (segment, track) already exists, it is updated.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">annotation[segment]</span> <span class="pre">=</span> <span class="pre">label</span></code> is equivalent to <code class="docutils literal"><span class="pre">annotation[segment,</span> <span class="pre">'_']</span> <span class="pre">=</span> <span class="pre">label</span></code></p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If <cite>segment</cite> is empty, it does nothing.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Human-friendly representation</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyannote.core.Annotation.__weakref__">
+<code class="descname">__weakref__</code><a class="headerlink" href="#pyannote.core.Annotation.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.argmax">
+<code class="descname">argmax</code><span class="sig-paren">(</span><em>support=None</em>, <em>segment=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.argmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.argmax" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get label with longest duration</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>support</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a><em>, </em><em>optional</em>) &#8211; Find label with longest duration within provided support.
+Defaults to whole extent.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>label</strong> &#8211; Label with longest intersection</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">any existing label or <a class="reference external" href="https://docs.python.org/2/library/constants.html#None" title="(in Python v2.7)">None</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span> <span class="o">=</span> <span class="n">Annotation</span><span class="p">(</span><span class="n">modality</span><span class="o">=</span><span class="s1">&#39;speaker&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="s1">&#39;speaker1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Alice&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="s1">&#39;speaker1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Bob&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is such a talker!&quot;</span> <span class="o">%</span> <span class="n">annotation</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span>
+<span class="go">Bob is such a talker!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="ow">not</span> <span class="n">annotation</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">support</span><span class="p">):</span>
+<span class="gp">... </span>   <span class="nb">print</span> <span class="s2">&quot;No label intersecting </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">segment</span>
+<span class="go">No label intersection [22 --&gt; 23]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.chart">
+<code class="descname">chart</code><span class="sig-paren">(</span><em>percent=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.chart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.chart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get labels chart (from longest to shortest duration)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>percent</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Return list of (label, percentage) tuples.
+Defaults to returning list of (label, duration) tuples.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>chart</strong> &#8211; List of (label, duration), sorted by duration in decreasing order.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.co_iter">
+<code class="descname">co_iter</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.co_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.co_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over pairs of intersecting tracks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>other</strong> (<a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation"><em>Annotation</em></a>) &#8211; Second annotation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>iterable</strong> &#8211; Yields pairs of intersectins tracks, in chronological (then
+alphabetical) order.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">(<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a>, <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)">object</a>), (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a>, <a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)">object</a>) iterable</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyannote.core.Timeline.co_iter" title="pyannote.core.Timeline.co_iter"><code class="xref py py-func docutils literal"><span class="pre">co_iter()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.copy">
+<code class="descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a copy of the annotation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>annotation</strong> &#8211; Copy of the annotation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.crop">
+<code class="descname">crop</code><span class="sig-paren">(</span><em>support</em>, <em>mode=u'intersection'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.crop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Crop annotation to new support</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>support</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) &#8211; If <cite>support</cite> is a <cite>Timeline</cite>, its support is used.</li>
+<li><strong>mode</strong> (<em>{'strict'</em><em>, </em><em>'loose'</em><em>, </em><em>'intersection'}</em><em>, </em><em>optional</em>) &#8211; Controls how segments that are not fully included in <cite>support</cite> are
+handled. &#8216;strict&#8217; mode only keeps fully included segments. &#8216;loose&#8217;
+mode keeps any intersecting segment. &#8216;intersection&#8217; mode keeps any
+intersecting segment but replace them by their actual intersection.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>cropped</strong> &#8211; Cropped annotation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In &#8216;intersection&#8217; mode, the best is done to keep the track names
+unchanged. However, in some cases where two original segments are
+cropped into the same resulting segments, conflicting track names are
+modified to make sure no track is lost.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.empty">
+<code class="descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an empty copy</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>empty</strong> &#8211; Empty annotation using the same &#8216;uri&#8217; and &#8216;modality&#8217; attributes.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.for_json">
+<code class="descname">for_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.for_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.for_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialization</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#module-pyannote.core.json" title="pyannote.core.json"><code class="xref py py-mod docutils literal"><span class="pre">pyannote.core.json</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="pyannote.core.Annotation.from_json">
+<em class="property">classmethod </em><code class="descname">from_json</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialization</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#module-pyannote.core.json" title="pyannote.core.json"><code class="xref py py-mod docutils literal"><span class="pre">pyannote.core.json</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.get_labels">
+<code class="descname">get_labels</code><span class="sig-paren">(</span><em>segment</em>, <em>unique=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query labels by segment</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>segment</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a>) &#8211; Query</li>
+<li><strong>unique</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; When False, return the list of (possibly repeated) labels.
+Defaults to returning the set of labels.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>labels</strong> &#8211; Set of labels for <cite>segment</cite> if it exists, empty set otherwise.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#set" title="(in Python v2.7)">set</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span> <span class="o">=</span> <span class="n">Annotation</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">,</span> <span class="s1">&#39;speaker1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Bernard&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">,</span> <span class="s1">&#39;speaker2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;John&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">annotation</span><span class="o">.</span><span class="n">get_labels</span><span class="p">(</span><span class="n">segment</span><span class="p">))</span>
+<span class="go">set([&#39;Bernard&#39;, &#39;John&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">annotation</span><span class="o">.</span><span class="n">get_labels</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="go">set([])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.get_timeline">
+<code class="descname">get_timeline</code><span class="sig-paren">(</span><em>copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_timeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get timeline made of all annotated segments</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Defaults (True) to returning a copy of the internal timeline.
+Set to False to return the actual internal timeline (faster).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>timeline</strong> &#8211; Timeline made of all annotated segments.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In case copy is set to False, be careful <strong>not</strong> to modify the returned
+timeline, as it may lead to weird subsequent behavior of the annotation
+instance.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.get_tracks">
+<code class="descname">get_tracks</code><span class="sig-paren">(</span><em>segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_tracks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query tracks by segment</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>segment</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a>) &#8211; Query</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>tracks</strong> &#8211; Set of tracks</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#set" title="(in Python v2.7)">set</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This will return an empty set if segment does not exist.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.has_track">
+<code class="descname">has_track</code><span class="sig-paren">(</span><em>segment</em>, <em>track</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.has_track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.has_track" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check whether a given track exists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>segment</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a>) &#8211; Query segment</li>
+<li><strong>track</strong> &#8211; Query track</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>exists</strong> &#8211; True if track exists for segment</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.itersegments">
+<code class="descname">itersegments</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.itersegments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.itersegments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over segments (in chronological order)</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">annotation</span><span class="o">.</span><span class="n">itersegments</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="c1"># do something with the segment</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><code class="xref py py-class docutils literal"><span class="pre">pyannote.core.Segment</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.itertracks">
+<code class="descname">itertracks</code><span class="sig-paren">(</span><em>label=False</em>, <em>yield_label=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.itertracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.itertracks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over tracks (in chronological order)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>yield_label</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; When True, yield (segment, track, label) tuples, such that
+annotation[segment, track] == label. Defaults to yielding
+(segment, track) tuple.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">annotation</span><span class="o">.</span><span class="n">itertracks</span><span class="p">():</span>
+<span class="gp">... </span>    <span class="c1"># do something with the track</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">annotation</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="c1"># do something with the track and its label</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.label_duration">
+<code class="descname">label_duration</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.label_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.label_duration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Label duration</p>
+<p>Equivalent to <code class="docutils literal"><span class="pre">Annotation.label_timeline(label).duration()</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) &#8211; Query</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>duration</strong> &#8211; Duration, in seconds.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyannote.core.Annotation.label_timeline" title="pyannote.core.Annotation.label_timeline"><code class="xref py py-func docutils literal"><span class="pre">label_timeline()</span></code></a>
+<a class="reference internal" href="#pyannote.core.Timeline.duration" title="pyannote.core.Timeline.duration"><code class="xref py py-func docutils literal"><span class="pre">duration()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.label_support">
+<code class="descname">label_support</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.label_support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.label_support" title="Permalink to this definition">¶</a></dt>
+<dd><p>Label support</p>
+<p>Equivalent to <code class="docutils literal"><span class="pre">Annotation.label_timeline(label).support()</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) &#8211; Query</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>support</strong> &#8211; Label support</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyannote.core.Annotation.label_timeline" title="pyannote.core.Annotation.label_timeline"><code class="xref py py-func docutils literal"><span class="pre">label_timeline()</span></code></a>
+<a class="reference internal" href="#pyannote.core.Timeline.support" title="pyannote.core.Timeline.support"><code class="xref py py-func docutils literal"><span class="pre">support()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.label_timeline">
+<code class="descname">label_timeline</code><span class="sig-paren">(</span><em>label</em>, <em>copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.label_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.label_timeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query segments by label</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#object" title="(in Python v2.7)"><em>object</em></a>) &#8211; Query</li>
+<li><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Defaults (True) to returning a copy of the internal timeline.
+Set to False to return the actual internal timeline (faster).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>timeline</strong> &#8211; Timeline made of all segments for which at least one track is
+annotated as label</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If label does not exist, this will return an empty timeline.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In case copy is set to False, be careful <strong>not</strong> to modify the returned
+timeline, as it may lead to weird subsequent behavior of the annotation
+instance.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.labels">
+<code class="descname">labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get sorted list of labels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>labels</strong> &#8211; Sorted list of labels</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#list" title="(in Python v2.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.new_track">
+<code class="descname">new_track</code><span class="sig-paren">(</span><em>segment</em>, <em>candidate=None</em>, <em>prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.new_track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.new_track" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a new track name for given segment</p>
+<p>Ensures that the returned track name does not already
+exist for the given segment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>segment</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a>) &#8211; Segment for which a new track name is generated.</li>
+<li><strong>candidate</strong> (<em>any valid track name</em><em>, </em><em>optional</em>) &#8211; When provided, try this candidate name first.</li>
+<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; Track name prefix. Defaults to the empty string &#8216;&#8217;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>name</strong> &#8211; New track name</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.relabel_tracks">
+<code class="descname">relabel_tracks</code><span class="sig-paren">(</span><em>generator=u'string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.relabel_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.relabel_tracks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Relabel tracks</p>
+<p>Create a new annotation where each track has a unique label.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>generator</strong> (<em>'string'</em><em>, </em><em>'int'</em><em> or </em><em>iterable</em><em>, </em><em>optional</em>) &#8211; If &#8216;string&#8217; (default) relabel tracks to &#8216;A&#8217;, &#8216;B&#8217;, &#8216;C&#8217;, ... If &#8216;int&#8217;
+relabel to 0, 1, 2, ... If iterable, use it to generate labels.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>renamed</strong> &#8211; New annotation with relabeled tracks.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.rename_labels">
+<code class="descname">rename_labels</code><span class="sig-paren">(</span><em>mapping=None</em>, <em>generator=u'string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_labels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename labels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>mapping</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; {old_name: new_name} mapping dictionary.</li>
+<li><strong>generator</strong> (<em>'string'</em><em>, </em><em>'int'</em><em> or </em><em>iterable</em><em>, </em><em>optional</em>) &#8211; If &#8216;string&#8217; (default) rename label to &#8216;A&#8217;, &#8216;B&#8217;, &#8216;C&#8217;, ... If &#8216;int&#8217;,
+rename to 0, 1, 2, etc. If iterable, use it to generate labels.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>renamed</strong> &#8211; Annotation where labels have been renamed</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Unmapped labels are kept unchanged.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Parameter <cite>generator</cite> has no effect when <cite>mapping</cite> is provided.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.rename_tracks">
+<code class="descname">rename_tracks</code><span class="sig-paren">(</span><em>generator=u'string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_tracks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename all tracks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>generator</strong> (<em>'string'</em><em>, </em><em>'int'</em><em>, or </em><em>iterable</em><em>, </em><em>optional</em>) &#8211; If &#8216;string&#8217; (default) rename tracks to &#8216;A&#8217;, &#8216;B&#8217;, &#8216;C&#8217;, etc.
+If &#8216;int&#8217;, rename tracks to 0, 1, 2, etc.
+If iterable, use it to generate track names.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>renamed</strong> &#8211; Copy of the original annotation where tracks are renamed.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Example</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span> <span class="o">=</span> <span class="n">Annotation</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;b&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;b&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="s1">&#39;a&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="s1">&#39;c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;c&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+<span class="go">[ 00:00:00.000 --&gt;  00:00:01.000] a a</span>
+<span class="go">[ 00:00:00.000 --&gt;  00:00:01.000] b b</span>
+<span class="go">[ 00:00:01.000 --&gt;  00:00:02.000] a a</span>
+<span class="go">[ 00:00:01.000 --&gt;  00:00:03.000] c c</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">annotation</span><span class="o">.</span><span class="n">rename_tracks</span><span class="p">(</span><span class="n">generator</span><span class="o">=</span><span class="s1">&#39;int&#39;</span><span class="p">))</span>
+<span class="go">[ 00:00:00.000 --&gt;  00:00:01.000] 0 a</span>
+<span class="go">[ 00:00:00.000 --&gt;  00:00:01.000] 1 b</span>
+<span class="go">[ 00:00:01.000 --&gt;  00:00:02.000] 2 a</span>
+<span class="go">[ 00:00:01.000 --&gt;  00:00:03.000] 3 c</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.subset">
+<code class="descname">subset</code><span class="sig-paren">(</span><em>labels</em>, <em>invert=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.subset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.subset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Filter annotation by labels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>labels</strong> (<em>iterable</em>) &#8211; List of filtered labels</li>
+<li><strong>invert</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; If invert is True, extract all but requested labels</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>filtered</strong> &#8211; Filtered annotation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.support">
+<code class="descname">support</code><span class="sig-paren">(</span><em>collar=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.support" title="Permalink to this definition">¶</a></dt>
+<dd><p>Annotation support</p>
+<p>The support of an annotation is an annotation where contiguous tracks
+with same label are merged into one unique covering track.</p>
+<p>A picture is worth a thousand words:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">collar</span>
+<span class="o">|---|</span>
+
+<span class="n">annotation</span>
+<span class="o">|--</span><span class="n">A</span><span class="o">--|</span> <span class="o">|--</span><span class="n">A</span><span class="o">--|</span>     <span class="o">|-</span><span class="n">B</span><span class="o">-|</span>
+  <span class="o">|-</span><span class="n">B</span><span class="o">-|</span>    <span class="o">|--</span><span class="n">C</span><span class="o">--|</span>     <span class="o">|----</span><span class="n">B</span><span class="o">-----|</span>
+
+<span class="n">annotation</span><span class="o">.</span><span class="n">support</span><span class="p">(</span><span class="n">collar</span><span class="p">)</span>
+<span class="o">|------</span><span class="n">A</span><span class="o">------|</span>     <span class="o">|------</span><span class="n">B</span><span class="o">------|</span>
+  <span class="o">|-</span><span class="n">B</span><span class="o">-|</span>    <span class="o">|--</span><span class="n">C</span><span class="o">--|</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>collar</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a><em>, </em><em>optional</em>) &#8211; Merge tracks with same label and separated by less than <cite>collar</cite>
+seconds. This is why &#8216;A&#8217; tracks are merged in above figure.
+Defaults to 0.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>support</strong> &#8211; Annotation support</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Track names are lost in the process.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>annotation</em>, <em>copy=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add every track of an existing annotation (in place)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>annotation</strong> (<a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation"><em>Annotation</em></a>) &#8211; Annotation whose tracks are being added</li>
+<li><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Return a copy of the annotation. Defaults to updating the
+annotation in-place.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>self</strong> &#8211; Updated annotation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Existing tracks are updated with the new label.</p>
+</div>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyannote.core.Annotation.uri">
+<code class="descname">uri</code><a class="headerlink" href="#pyannote.core.Annotation.uri" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resource identifier</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-pyannote.core.json">
+<span id="serialization"></span><h2>Serialization<a class="headerlink" href="#module-pyannote.core.json" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyannote.core.json.dump">
+<code class="descclassname">pyannote.core.json.</code><code class="descname">dump</code><span class="sig-paren">(</span><em>resource</em>, <em>fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>resource</strong> (<cite>pyannote.core</cite> data structure) &#8211; Resource to deserialize</li>
+<li><strong>fp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#file" title="(in Python v2.7)"><em>file</em></a>) &#8211; File in which <cite>resource</cite> serialization is written</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.json.dump_to">
+<code class="descclassname">pyannote.core.json.</code><code class="descname">dump_to</code><span class="sig-paren">(</span><em>resource</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>resource</strong> (<cite>pyannote.core</cite> data structure) &#8211; Resource to deserialize</li>
+<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Path to file in which <cite>resource</cite> serialization is written</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.json.dumps">
+<code class="descclassname">pyannote.core.json.</code><code class="descname">dumps</code><span class="sig-paren">(</span><em>resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dumps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dumps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize to string</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>resource</strong> (<cite>pyannote.core</cite> data structure) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>serialization</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)">string</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.json.load">
+<code class="descclassname">pyannote.core.json.</code><code class="descname">load</code><span class="sig-paren">(</span><em>fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fp</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#file" title="(in Python v2.7)"><em>file</em></a>) &#8211; File containing serialized <cite>pyannote.core</cite> data structure</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>deserialized</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><cite>pyannote.core</cite> data structure</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.json.load_from">
+<code class="descclassname">pyannote.core.json.</code><code class="descname">load_from</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#load_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load_from" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Path to file containing serialized <cite>pyannote.core</cite> data structure</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>deserialized</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><cite>pyannote.core</cite> data structure</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.json.loads">
+<code class="descclassname">pyannote.core.json.</code><code class="descname">loads</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.loads" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deserialize</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>s</strong> (<a class="reference external" href="https://docs.python.org/2/library/string.html#module-string" title="(in Python v2.7)"><em>string</em></a>) &#8211; String containing serialized <cite>pyannote.core</cite> data structure</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>deserialized</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><cite>pyannote.core</cite> data structure</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.json.object_hook">
+<code class="descclassname">pyannote.core.json.</code><code class="descname">object_hook</code><span class="sig-paren">(</span><em>d</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#object_hook"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.object_hook" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility function for deserialization</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;file.json&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+<span class="gp">... </span>  <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">object_hook</span><span class="o">=</span><span class="n">object_hook</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyannote.core.notebook">
+<span id="visualization"></span><h2>Visualization<a class="headerlink" href="#module-pyannote.core.notebook" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>Visualization<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="pyannote.core.notebook.repr_annotation">
+<code class="descclassname">pyannote.core.notebook.</code><code class="descname">repr_annotation</code><span class="sig-paren">(</span><em>annotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get <cite>png</cite> data for <cite>annotation</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.notebook.repr_feature">
+<code class="descclassname">pyannote.core.notebook.</code><code class="descname">repr_feature</code><span class="sig-paren">(</span><em>feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_feature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get <cite>png</cite> data for <cite>feature</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.notebook.repr_scores">
+<code class="descclassname">pyannote.core.notebook.</code><code class="descname">repr_scores</code><span class="sig-paren">(</span><em>scores</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_scores" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get <cite>png</cite> data for <cite>scores</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.notebook.repr_segment">
+<code class="descclassname">pyannote.core.notebook.</code><code class="descname">repr_segment</code><span class="sig-paren">(</span><em>segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_segment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get <cite>png</cite> data for <cite>segment</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.notebook.repr_timeline">
+<code class="descclassname">pyannote.core.notebook.</code><code class="descname">repr_timeline</code><span class="sig-paren">(</span><em>timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_timeline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get <cite>png</cite> data for <cite>timeline</cite></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyannote.core.notebook.repr_transcription">
+<code class="descclassname">pyannote.core.notebook.</code><code class="descname">repr_transcription</code><span class="sig-paren">(</span><em>transcription</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_transcription"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_transcription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get <cite>svg</cite> data for <cite>transcription</cite></p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="serialization.html" class="btn btn-neutral" title="Serialization" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hervé Bredin.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.0a',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
