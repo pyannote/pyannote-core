@@ -43,7 +43,8 @@ API documentation
    :maxdepth: 3
 
    reference
-
+   changelog
+   
 Indices and tables
 ==================
 

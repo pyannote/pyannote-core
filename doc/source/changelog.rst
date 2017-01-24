@@ -1,0 +1,215 @@
+##########
+CHANGELOGS
+##########
+
+Version 0.11 (2017-24-01)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  - feat: add (Sphinx-based) documentation
+  - chore: move sample notebooks to /notebook
+  - feat: add unit tests
+  - BREAKING: rename some Timeline and Annotation methods
+
+Version 0.10 (2017-18-01)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: add 'copy' parameter to Annotation.{label\|get}\_timeline()
+-  improve: speed-up Timeline.extent()
+-  chore: move tests at root directory
+-  chore: remove support for Unknown labels
+
+Version 0.9 (2017-01-17)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  improve: speed up Timeline and Annotation
+
+Version 0.8 (2016-11-05)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: add "copy" option to Annotation.update
+
+Version 0.7.3 (2016-11-01)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: SlidingWindowFeature notebook display
+
+Version 0.7.2 (2016-07-12)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: new SlidingWindow.{samples\|crop} methods
+-  feat: new 'mode' parameter to SlidingWindowFeature.crop method
+-  doc: updated notebooks for SlidingWindow and SlidingWindowFeature
+
+Version 0.6.6 (2016-06-23)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix: force internal timeline update after copy
+
+Version 0.6.5 (2016-06-13)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  BREAKING: make segmentToRange deterministic wrt. segment duration
+
+Version 0.6.4 (2016-06-06)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix: Python 3 support in pyannote.core.features
+
+Version 0.6.3 (2016-03-29)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  setup: versioneer 0.15
+
+Version 0.6.1 (2016-03-20)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix: prevent adding empty segments in Annotation and Scores
+
+Version 0.6 (2016-02-25)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  BREAKING: pyannote.core.json.{load\|dump} expects file handles
+-  feat: load\_from, dump\_to
+
+Version 0.5.2 (2016-02-19)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: Annotation \* Annotation returns cooccurrence matrix
+-  fix: Annotation.itertracks would raise a UnicodeDecodeError in some
+   cases
+
+Version 0.5.1 (2016-02-17)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  improve: notebook display
+-  improve: Annotation.anonymize\_{tracks\|labels} no longer use Unknown
+   instances
+-  improve: empty segments are now printed as "[]"
+
+Version 0.4.7 (2016-02-04)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: deterministic order in Annotation.co\_iter
+-  fix: LabelMatrix.argmax corner case
+-  setup: update dependencies
+
+Version 0.4.4 (2015-11-02)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: Travis continuous integration
+
+Version 0.4.3 (2015-10-28)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix: Python 2/3 notebook representations
+-  fix: bug in Scores with integer-values segments
+
+Version 0.4.1 (2015-10-27)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix: update Scores.from\_df to pandas 0.17
+
+Version 0.4 (2015-10-26)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: Python 3 support
+-  feat: pytest test suite
+-  fix: Annotation comparison
+-  fix: deterministic order in Annotation.itertracks
+
+Version 0.3.6 (2015-05-06)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: LabelMatrix save/load methods
+
+Version 0.3.4 (2015-03-04)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix: MAJOR bug in Annotation lazy-update
+
+Version 0.3.3 (2015-02-27)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix: Scores IPython display
+
+Version 0.3.1 (2015-01-26)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: new Annotation.update method
+-  improve: Annotation.subset support for any label iterable
+
+Version 0.3 (2014-12-04)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  refactor: rewrote Scores internals
+-  setup: use pandas 0.15.1+
+
+Version 0.2.5 (2014-11-21)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  setup: use pyannote-banyan 0.1.6
+
+Version 0.2.4 (2014-11-18)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix: extent of empty Timeline
+
+Version 0.2.3 (2014-11-14)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix: force revert to pandas 0.13.1 for Scores to work again...
+
+Version 0.2.2 (2014-11-12)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  setup: use banyan 0.1.5.1 from GitHub
+
+Version 0.2.1 (2014-10-30)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: pyannote/core Docker image
+-  feat(Timeline): add from\_df constructor
+
+Version 0.2 (2014-10-24)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  breaking change: new PyAnnote JSON format
+
+Version 0.1 (2014-08-05)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  fix(Transcription): fix potential edge/key conflict during alignment
+
+Version 0.0.5 (2014-07-23)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat(SlidingWindow): add durationToSamples (and vice-versa)
+-  fix(Transcription): fix loading from JSON
+-  fix(Transcription): fix cropping corner cases
+-  docs: add installation instruction for IPython display support
+-  docs(Scores): add IPython documentation for Scores
+
+Version 0.0.3 (2014-06-02)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat(Annotation): add 'collar' param to .smooth()
+-  refactor(Annotation): remove support for >> operator
+-  maintain(Mapping): remove label mapping data structure
+-  feat(LabelMatrix): add IPython display
+-  improve(LabelMatrix): 10x faster cooccurrence matrix
+-  feat(Scores): add IPython display
+-  feat(Transcription): add edge timerange prediction
+-  feat(Transcription): add node temporal sort
+-  fix(Transcription): make label\_timeline return a copy
+-  fix(Transcription): fix IPython display
+-  docs(Transcription): add IPython documentation for Transcription
+
+Version 0.0.2 (2014-05-06)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  feat: Transcription data structure (annotation graph)
+
+Version 0.0.1 (2014-05-02)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+-  first public version
