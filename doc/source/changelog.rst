@@ -1,14 +1,14 @@
-##########
-CHANGELOGS
-##########
+#########
+Changelog
+#########
 
 Version 0.11 (2017-24-01)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  - feat: add (Sphinx-based) documentation
-  - chore: move sample notebooks to /notebook
-  - feat: add unit tests
-  - BREAKING: rename some Timeline and Annotation methods
+- feat: add (Sphinx-based) documentation
+- chore: move sample notebooks to /notebook
+- feat: add unit tests
+- BREAKING: rename some Timeline and Annotation methods
 
 Version 0.10 (2017-18-01)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
