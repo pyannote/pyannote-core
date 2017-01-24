@@ -11,11 +11,42 @@ def annotation():
         uri='TheBigBangTheory.Season01.Episode01',
         modality='speaker')
     annotation[Segment(3, 5), '_'] = 'Penny'
-    annotation[Segment(5.5, 7), '_',] = 'Leonard'
+    annotation[Segment(5.5, 7), '_'] = 'Leonard'
     annotation[Segment(8, 10), '_'] = 'Penny'
     annotation[Segment(8, 10), 'anything'] = 'Sheldon'
 
     return annotation
+
+
+def test_crop(annotation):
+    expected = Annotation(
+        uri='TheBigBangTheory.Season01.Episode01',
+        modality='speaker')
+    expected[Segment(5.5, 7), '_'] = 'Leonard'
+    expected[Segment(8, 9), '_'] = 'Penny'
+    expected[Segment(8, 9), 'anything'] = 'Sheldon'
+    actual = annotation.crop(Segment(5, 9))
+    assert actual == expected, str(actual)
+
+def test_crop_loose(annotation):
+    expected = Annotation(
+        uri='TheBigBangTheory.Season01.Episode01',
+        modality='speaker')
+    expected[Segment(5.5, 7), '_'] = 'Leonard'
+    expected[Segment(8, 10), '_'] = 'Penny'
+    expected[Segment(8, 10), 'anything'] = 'Sheldon'
+    actual = annotation.crop(Segment(5, 9), mode='loose')
+    assert actual == expected, str(actual)
+
+def test_crop_strict(annotation):
+    expected = Annotation(
+        uri='TheBigBangTheory.Season01.Episode01',
+        modality='speaker')
+    expected[Segment(5.5, 7), '_'] = 'Leonard'
+    actual = annotation.crop(Segment(5, 9), mode='strict')
+    assert actual == expected, str(actual)
+
+
 
 def test_copy(annotation):
 

@@ -415,7 +415,10 @@ class Annotation(object):
                     _tracks[segment] = tracks
                     _labels.update(tracks.values())
 
-                cropped._tracks = _tracks
+                cropped._tracks = SortedDict(
+                    _tracks,
+                    key_type=(float, float),
+                    updator=TimelineUpdator)
 
                 cropped._labelNeedsUpdate = {label: True for label in _labels}
                 cropped._labels = {label: None for label in _labels}
@@ -440,7 +443,10 @@ class Annotation(object):
                     _tracks[segment] = tracks
                     _labels.update(tracks.values())
 
-                cropped._tracks = _tracks
+                cropped._tracks = SortedDict(
+                    _tracks,
+                    key_type=(float, float),
+                    updator=TimelineUpdator)
 
                 cropped._labelNeedsUpdate = {label: True for label in _labels}
                 cropped._labels = {label: None for label in _labels}
