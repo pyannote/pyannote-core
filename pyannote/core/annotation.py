@@ -169,12 +169,38 @@ class Annotation(object):
         """Segment iterator"""
         return iter(self._tracks)
 
-    def itertracks(self, label=False):
+    def itertracks(self, label=False, yield_label=False):
+        """Iterate over tracks (in chronological order)
+
+        Parameters
+        ----------
+        yield_label : bool, optional
+            When True, yield (segment, track, label) tuples, such that
+            annotation[segment, track] == label. Defaults to yielding
+            (segment, track) tuple.
+
+        Examples
+        --------
+
+        >>> for segment, track in annotation.itertracks():
+        ...     # do something with the track
+
+        >>> for segment, track, label in annotation.itertracks(yield_label=True):
+        ...     # do something with the track and its label
+        """
+
+        if label:
+            warnings.warn(
+                '"label" parameter has been renamed to "yield_label".',
+                DeprecationWarning
+            )
+            yield_label = label
+
         for segment, tracks in self._tracks.items():
             for track, lbl in sorted(
                 six.iteritems(tracks),
                 key=lambda tl: (str(tl[0]), str(tl[1]))):
-                if label:
+                if yield_label:
                     yield segment, track, lbl
                 else:
                     yield segment, track
@@ -357,14 +383,6 @@ class Annotation(object):
         copied._timelineNeedsUpdate = True
 
         return copied
-
-    def retrack(self):
-        """
-        """
-        retracked = self.__class__(uri=self.uri, modality=self.modality)
-        for n, (s, _, label) in enumerate(self.itertracks(label=True)):
-            retracked[s, n] = label
-        return retracked
 
     def new_track(self, segment, candidate=None, prefix=None):
         """Track name generator
@@ -619,18 +637,33 @@ class Annotation(object):
         return self._labels[label]
 
     def label_coverage(self, label):
-        """Return label coverage (or support)
+        warnings.warn(
+            '"label_coverage" has been renamed to "label_support".',
+            DeprecationWarning)
+        return self.label_support(label)
+
+    def label_support(self, label):
+        """Label support
+
+        Equivalent to ``Annotation.label_timeline(label).support()``
 
         Parameters
         ----------
-        label : any valid label
+        label : object
+            Query
 
         Returns
         -------
-        coverage : Timeline
+        support : Timeline
+            Label support
+
+        See also
+        --------
+        :func:`~pyannote.core.Annotation.label_timeline`
+        :func:`~pyannote.core.Timeline.support`
 
         """
-        return self.label_timeline(label, copy=False).coverage()
+        return self.label_timeline(label, copy=False).support()
 
     def label_duration(self, label):
         return self.label_timeline(label, copy=False).duration()
@@ -661,14 +694,14 @@ class Annotation(object):
 
         return chart
 
-    def argmax(self, segment=None):
-        """Get most frequent label
+    def argmax(self, support=None, segment=None):
+        """Get label with longest duration
 
         Parameters
         ----------
-        segment : Segment, optional
-            Section of annotation where to look for the most frequent label.
-            Defaults to whole annotation extent.
+        support : Segment or Timeline, optional
+            Find label with longest duration within provided support.
+            Defaults to whole extent.
 
         Returns
         -------
@@ -677,109 +710,161 @@ class Annotation(object):
 
         Examples
         --------
-
-            >>> annotation = Annotation(modality='speaker')
-            >>> annotation[Segment(0, 10), 'speaker1'] = 'Alice'
-            >>> annotation[Segment(8, 20), 'speaker1'] = 'Bob'
-            >>> print "%s is such a talker!" % annotation.argmax()
-            Bob is such a talker!
-            >>> segment = Segment(22, 23)
-            >>> if not annotation.argmax(segment):
-            ...    print "No label intersecting %s" % segment
-            No label intersection [22 --> 23]
+        >>> annotation = Annotation(modality='speaker')
+        >>> annotation[Segment(0, 10), 'speaker1'] = 'Alice'
+        >>> annotation[Segment(8, 20), 'speaker1'] = 'Bob'
+        >>> print "%s is such a talker!" % annotation.argmax()
+        Bob is such a talker!
+        >>> segment = Segment(22, 23)
+        >>> if not annotation.argmax(support):
+        ...    print "No label intersecting %s" % segment
+        No label intersection [22 --> 23]
 
         """
 
-        # if annotation is empty, obviously there is no most frequent label
-        if not self:
+        if segment is not None:
+            warnings.warn(
+                '"segment" parameter has been renamed to "support".',
+                DeprecationWarning)
+            support = segment
+
+        cropped = self
+        if support is not None:
+            cropped = cropped.crop(support, mode='intersection')
+
+        if not cropped:
             return None
 
-        # if segment is not provided, just look for the overall most frequent
-        # label (ie. set segment to the extent of the annotation)
-        if segment is None:
-            segment = self.get_timeline(copy=False).extent()
-
-        # compute intersection duration for each label
-        durations = {lbl: self.label_timeline(lbl, copy=False)
-                     .crop(segment, mode='intersection').duration()
-                     for lbl in self.labels()}
-
-        # find the most frequent label
-        label = max(six.iteritems(durations), key=operator.itemgetter(1))[0]
-
-        # in case all durations were zero, there is no most frequent label
-        return label if durations[label] > 0 else None
+        return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
+                   key=lambda x: x[1])[0]
 
     def translate(self, translation):
-        """Translate labels
-
-        Parameters
-        ----------
-        translation: dict
-            Label translation.
-            Labels with no associated translation are kept unchanged.
-
-        Returns
-        -------
-        translated : :class:`Annotation`
-            New annotation with translated labels.
-        """
-
-        assert isinstance(translation, dict)
-
-        # create an empty copy
-        translated = self.empty()
-
-        for segment, track, label in self.itertracks(label=True):
-            # only transform labels that have an actual translation
-            # in the provided dictionary, keep the others as they are.
-            translated[segment, track] = translation.get(label, label)
-
-        return translated
+        warnings.warn(
+            '"translate" has been replaced by "rename_labels".',
+            DeprecationWarning)
+        return self.rename_labels(mapping=translation)
 
     def __mod__(self, translation):
-        return self.translate(translation)
+        warnings.warn(
+            'support for "%" operator will be removed.',
+            DeprecationWarning)
+        return self.rename_labels(mapping=translation)
 
-    def anonymize_labels(self, generator='string'):
-        """Anonmyize labels
+    def retrack(self):
+        warnings.warn(
+            '"retrack" has been renamed to "rename_tracks".',
+            DeprecationWarning)
+        return self.rename_tracks(generator='int')
 
-        Create a new annotation where labels are anonymized.
+    def rename_tracks(self, generator='string'):
+        """Rename all tracks
 
         Parameters
         ----------
-        generator : {'string', 'int', iterator}, optional
+        generator : 'string', 'int', or iterable, optional
+            If 'string' (default) rename tracks to 'A', 'B', 'C', etc.
+            If 'int', rename tracks to 0, 1, 2, etc.
+            If iterable, use it to generate track names.
 
         Returns
         -------
-        anonymized : :class:`Annotation`
-            New annotation with anonymized labels.
+        renamed : Annotation
+            Copy of the original annotation where tracks are renamed.
 
+        Example
+        -------
+        >>> annotation = Annotation()
+        >>> annotation[Segment(0, 1), 'a'] = 'a'
+        >>> annotation[Segment(0, 1), 'b'] = 'b'
+        >>> annotation[Segment(1, 2), 'a'] = 'a'
+        >>> annotation[Segment(1, 3), 'c'] = 'c'
+        >>> print(annotation)
+        [ 00:00:00.000 -->  00:00:01.000] a a
+        [ 00:00:00.000 -->  00:00:01.000] b b
+        [ 00:00:01.000 -->  00:00:02.000] a a
+        [ 00:00:01.000 -->  00:00:03.000] c c
+        >>> print(annotation.rename_tracks(generator='int'))
+        [ 00:00:00.000 -->  00:00:01.000] 0 a
+        [ 00:00:00.000 -->  00:00:01.000] 1 b
+        [ 00:00:01.000 -->  00:00:02.000] 2 a
+        [ 00:00:01.000 -->  00:00:03.000] 3 c
         """
+
+        renamed = self.__class__(uri=self.uri, modality=self.modality)
 
         if generator == 'string':
             generator = string_generator()
         elif generator == 'int':
             generator = int_generator()
 
-        mapping = {label: next(generator) for label in self.labels()}
-        return self.translate(mapping)
+        # TODO speed things up by working directly with annotation internals
+        for s, _, label in self.itertracks(label=True):
+            renamed[s, next(generator)] = label
+        return renamed
 
-    def anonymize_tracks(self, generator='string'):
+    def rename_labels(self, mapping=None, generator='string'):
+        """Rename labels
+
+        Parameters
+        ----------
+        mapping : dict, optional
+            {old_name: new_name} mapping dictionary.
+        generator : 'string', 'int' or iterable, optional
+            If 'string' (default) rename label to 'A', 'B', 'C', ... If 'int',
+            rename to 0, 1, 2, etc. If iterable, use it to generate labels.
+
+        Returns
+        -------
+        renamed : Annotation
+            Annotation where labels have been renamed
+
+        Note
+        ----
+        Unmapped labels are kept unchanged.
+
+        Note
+        ----
+        Parameter `generator` has no effect when `mapping` is provided.
+
         """
-        Anonymize tracks
+
+        if mapping is None:
+            if generator == 'string':
+                generator = string_generator()
+            elif generator == 'int':
+                generator = int_generator()
+            # generate mapping
+            mapping = {label: next(generator) for label in self.labels()}
+
+        renamed = self.empty()
+        for segment, track, label in self.itertracks(label=True):
+            # only transform labels that have an actual translation
+            # in the provided dictionary, keep the others as they are.
+            renamed[segment, track] = mapping.get(label, label)
+
+        return renamed
+
+    def anonymize_labels(self, generator='string'):
+        warnings.warn(
+            "'anonymize_labels' has been replaced by 'rename_labels'",
+            DeprecationWarning)
+        return self.rename_labels(generator=generator)
+
+    def relabel_tracks(self, generator='string'):
+        """Relabel tracks
 
         Create a new annotation where each track has a unique label.
 
         Parameters
         ----------
-        generator : {'string', 'int', iterator}, optional
-            Default to 'string'.
+        generator : 'string', 'int' or iterable, optional
+            If 'string' (default) relabel tracks to 'A', 'B', 'C', ... If 'int'
+            relabel to 0, 1, 2, ... If iterable, use it to generate labels.
 
         Returns
         -------
-        anonymized : `Annotation`
-            New annotation with anonymized tracks.
-
+        renamed : Annotation
+            New annotation with relabeled tracks.
         """
 
         if generator == 'string':
@@ -787,38 +872,59 @@ class Annotation(object):
         elif generator == 'int':
             generator = int_generator()
 
-        anonymized = self.empty()
+        relabeled = self.empty()
         for s, t, _ in self.itertracks(label=True):
-            anonymized[s, t] = next(generator)
+            relabeled[s, t] = next(generator)
 
-        return anonymized
+        return relabeled
 
-    def smooth(self, collar=0.):
-        """Smooth annotation
+    def anonymize_tracks(self, generator='string'):
+        warnings.warn(
+            "'anonymize_tracks' has been replaced by 'relabel_tracks'",
+            DeprecationWarning)
+        return self.relabel_tracks(generator=generator)
 
-        Create new annotation where contiguous tracks with same label are
-        merged into one longer track.
+    def support(self, collar=0.):
+        """Annotation support
+
+        The support of an annotation is an annotation where contiguous tracks
+        with same label are merged into one unique covering track.
+
+        A picture is worth a thousand words::
+
+            collar
+            |---|
+
+            annotation
+            |--A--| |--A--|     |-B-|
+              |-B-|    |--C--|     |----B-----|
+
+            annotation.support(collar)
+            |------A------|     |------B------|
+              |-B-|    |--C--|
 
         Parameters
         ----------
-        collar : float
-            If collar is positive, also merge tracks separated by less than
-            collar duration.
+        collar : float, optional
+            Merge tracks with same label and separated by less than `collar`
+            seconds. This is why 'A' tracks are merged in above figure.
+            Defaults to 0.
 
         Returns
         -------
-        annotation : Annotation
-            New annotation where contiguous tracks with same label are merged
-            into one long track.
+        support : Annotation
+            Annotation support
 
-        Remarks
-        -------
-            Track names are lost in the process.
+        Note
+        ----
+        Track names are lost in the process.
         """
+
+        generator = string_generator()
 
         # initialize an empty annotation
         # with same uri and modality as original
-        smoothed = self.empty()
+        support = self.empty()
         for label in self.labels():
 
             # get timeline for current label
@@ -836,8 +942,13 @@ class Annotation(object):
                 track = smoothed.new_track(segment)
                 smoothed[segment, track] = label
 
-        # return
-        return smoothed
+        return support
+
+    def smooth(self, collar=0.):
+        warnings.warn(
+            '"smooth" has been renamed to "coverage".',
+            DeprecationWarning)
+        return self.coverage(collar=collar)
 
     def co_iter(self, other):
         """
