@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2017 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,8 @@ Timeline
 
 .. plot:: pyplots/timeline.py
 
-:class:`pyannote.core.Timeline` instances are ordered set of non-empty segments:
+:class:`pyannote.core.Timeline` instances are ordered sets of non-empty
+segments:
   - ordered, because segments are sorted by start time (and end time in case of tie)
   - set, because one cannot add twice the same segment
   - non-empty, because one cannot add empty segments (*i.e.* start >= end)
@@ -75,7 +76,7 @@ Several convenient methods are available. Here are a few examples:
   In [3]: timeline.extent()    # extent
   Out[3]: <Segment(1, 20)>
 
-  In [5]: timeline.coverage()  # coverage, or support
+  In [5]: timeline.support()  # support
   Out[5]: <Timeline(uri=my_audio_file, segments=[<Segment(1, 5)>, <Segment(6, 20)>])>
 
   In [6]: timeline.duration()  # support duration
@@ -307,6 +308,11 @@ class Timeline(object):
         (<Segment(1, 2)>, <Segment(1, 3)>)
         (<Segment(3, 4)>, <Segment(3, 5)>)
 
+        Parameters
+        ----------
+        other : Timeline
+            Second timeline
+
         Returns
         -------
         iterable : (Segment, Segment) iterable
@@ -358,7 +364,7 @@ class Timeline(object):
         Parameters
         ----------
         support : Segment or Timeline
-            If `support` is a `Timeline`, its coverage is used as support.
+            If `support` is a `Timeline`, its support is used.
         mode : {'strict', 'loose', 'intersection'}, optional
             Controls how segments that are not fully included in `support` are
             handled. 'strict' mode only keeps fully included segments. 'loose'
@@ -568,15 +574,15 @@ class Timeline(object):
         """
         return self._segments.extent()
 
-    def coverage_iter(self):
-        """Like `coverage` but returns a segment iterator instead
+    def support_iter(self):
+        """Like `support` but returns a segment iterator instead
 
         See also
         --------
-        :func:`pyannote.core.Timeline.coverage`
+        :func:`pyannote.core.Timeline.support`
         """
 
-        # The coverage of an empty timeline is an empty timeline.
+        # The support of an empty timeline is an empty timeline.
         if not self:
             return
 
@@ -588,35 +594,35 @@ class Timeline(object):
         #   there is no need to perform an exhaustive segment clustering.
         #   We just have to consider them in their natural order.
 
-        # Initialize new coverage segment
+        # Initialize new support segment
         # as very first segment of the timeline
         new_segment = self._segments.kth(0)
 
         for segment in self:
 
-            # If there is no gap between new coverage segment and next segment,
+            # If there is no gap between new support segment and next segment,
             if not (segment ^ new_segment):
-                # Extend new coverage segment using next segment
+                # Extend new support segment using next segment
                 new_segment |= segment
 
             # If there actually is a gap,
             else:
                 yield new_segment
 
-                # Initialize new coverage segment as next segment
+                # Initialize new support segment as next segment
                 # (right after the gap)
                 new_segment = segment
 
-        # Add new segment to the timeline coverage
+        # Add new segment to the timeline support
         yield new_segment
 
-    def coverage(self):
-        """Timeline coverage (or support)
+    def support(self):
+        """Timeline support
 
-        The coverage (or support) of a timeline is the timeline with the
-        minimum number of segments with exactly the same time span as the
-        original timeline. It is (by definition) unique and does not contain
-        any overlapping segments.
+        The support of a timeline is the timeline with the minimum number of
+        segments with exactly the same time span as the original timeline. It
+        is (by definition) unique and does not contain any overlapping
+        segments.
 
         A picture is worth a thousand words::
 
@@ -624,32 +630,38 @@ class Timeline(object):
             |------|    |------|     |----|
               |--|    |-----|     |----------|
 
-            timeline.coverage()
+            timeline.support()
             |------|  |--------|  |----------|
 
         Returns
         -------
-        coverage : Timeline
-            Timeline coverage
+        support : Timeline
+            Timeline support
         """
-        segments = [s for s in self.coverage_iter()]
+        segments = [s for s in self.support_iter()]
         return Timeline(segments=segments, uri=self.uri)
+
+    def coverage(self):
+        warnings.warn(
+            '"coverage" has been renamed to "support".',
+            DeprecationWarning)
+        return self.support()
 
     def duration(self):
         """Timeline duration
 
         The timeline duration is the sum of the durations of the segments
-        in the timeline coverage.
+        in the timeline support.
 
         Returns
         -------
         duration : float
-            Duration of timeline coverage, in seconds.
+            Duration of timeline support, in seconds.
         """
 
         # The timeline duration is the sum of the durations
-        # of the segments in the timeline coverage.
-        return sum(s.duration for s in self.coverage_iter())
+        # of the segments in the timeline support.
+        return sum(s.duration for s in self.support_iter())
 
     def gaps_iter(self, support=None):
         """Like `gaps` but returns a segment iterator instead
@@ -675,7 +687,7 @@ class Timeline(object):
             end = support.start
 
             # support on the intersection of timeline and provided segment
-            for segment in self.crop(support, mode='intersection').coverage():
+            for segment in self.crop(support, mode='intersection').support():
 
                 # add gap between each pair of consecutive segments
                 # if there is no gap, segment is empty, therefore not added
@@ -690,8 +702,8 @@ class Timeline(object):
         # timeline support
         elif isinstance(support, Timeline):
 
-            # yield gaps for every segment in coverage of provided timeline
-            for segment in support.coverage():
+            # yield gaps for every segment in support of provided timeline
+            for segment in support.support():
                 for gap in self.gaps_iter(support=segment):
                     yield gap
 
@@ -736,7 +748,7 @@ class Timeline(object):
     def segmentation(self):
         """Segmentation
 
-        Create the unique timeline with same coverage and same set of segment
+        Create the unique timeline with same support and same set of segment
         boundaries as original timeline, but with no overlapping segments.
 
         A picture is worth a thousand words::
@@ -751,11 +763,11 @@ class Timeline(object):
         Returns
         -------
         timeline : Timeline
-            (unique) timeline with same coverage and same set of segment
+            (unique) timeline with same support and same set of segment
             boundaries as original timeline, but with no overlapping segments.
         """
         # COMPLEXITY: O(n)
-        coverage = self.coverage()
+        support = self.support()
 
         # COMPLEXITY: O(n.log n)
         # get all boundaries (sorted)
@@ -785,7 +797,7 @@ class Timeline(object):
         for end in timestamps[1:]:
             # only add segments that are covered by original timeline
             segment = Segment(start=start, end=end)
-            if segment and coverage.overlapping(segment.middle):
+            if segment and support.overlapping(segment.middle):
                 segments.append(segment)
             # next segment...
             start = end

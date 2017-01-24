@@ -15,7 +15,6 @@ def timeline():
 
     return t
 
-
 def test_iteration(timeline):
 
     assert list(timeline) == [Segment(0.5, 3),
@@ -26,23 +25,18 @@ def test_iteration(timeline):
                               Segment(8.5, 10)]
 
 def test_getter(timeline):
-
     assert len(timeline) == 6
     assert str(timeline[1]) == "[ 00:00:01.000 -->  00:00:04.000]"
 
-
 def test_extent(timeline):
-
     assert timeline.extent() == Segment(0.5, 10)
 
-def test_coverage(timeline):
-
-    assert list(timeline.coverage()) == [Segment(0.5, 4),
-                                         Segment(5, 8),
-                                         Segment(8.5, 10)]
+def test_support(timeline):
+    assert list(timeline.support()) == [Segment(0.5, 4),
+                                        Segment(5, 8),
+                                        Segment(8.5, 10)]
 
 def test_gaps(timeline):
-
     assert list(timeline.gaps()) == [Segment(4, 5),
                                      Segment(8, 8.5)]
 
