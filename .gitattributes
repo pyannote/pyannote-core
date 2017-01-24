@@ -1,1 +1,2 @@
 pyannote/core/_version.py export-subst
+doc/source/conf.py export-subst
