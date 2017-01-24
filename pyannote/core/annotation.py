@@ -396,7 +396,7 @@ class Annotation(object):
 
         if isinstance(support, Segment):
             support = Timeline(segments=[support], uri=self.uri)
-            cropped = self.crop(support, mode=mode)
+            return self.crop(support, mode=mode)
 
         elif isinstance(support, Timeline):
 
@@ -448,7 +448,6 @@ class Annotation(object):
                 cropped._timeline = None
 
                 return cropped
-
 
             elif mode == 'intersection':
 
