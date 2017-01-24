@@ -15,7 +15,6 @@ def timeline():
 
     return t
 
-
 def test_iteration(timeline):
 
     assert list(timeline) == [Segment(0.5, 3),
@@ -26,23 +25,18 @@ def test_iteration(timeline):
                               Segment(8.5, 10)]
 
 def test_getter(timeline):
-
     assert len(timeline) == 6
-    assert str(timeline[1]) == "[1.000 --> 4.000]"
-
+    assert str(timeline[1]) == "[ 00:00:01.000 -->  00:00:04.000]"
 
 def test_extent(timeline):
-
     assert timeline.extent() == Segment(0.5, 10)
 
-def test_coverage(timeline):
-
-    assert list(timeline.coverage()) == [Segment(0.5, 4),
-                                         Segment(5, 8),
-                                         Segment(8.5, 10)]
+def test_support(timeline):
+    assert list(timeline.support()) == [Segment(0.5, 4),
+                                        Segment(5, 8),
+                                        Segment(8.5, 10)]
 
 def test_gaps(timeline):
-
     assert list(timeline.gaps()) == [Segment(4, 5),
                                      Segment(8, 8.5)]
 
@@ -69,6 +63,16 @@ def test_crop(timeline):
 
     timeline.crop(selection, mode='loose') == expected_answer
 
+def test_crop_mapping():
+
+    timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
+    cropped, mapping = timeline.crop(Segment(1, 2), returns_mapping=True)
+
+    expected_cropped = Timeline([Segment(1, 2)])
+    assert cropped == expected_cropped
+
+    expected_mapping = {Segment(1, 2): [Segment(0, 2), Segment(1, 2)]}
+    assert mapping == expected_mapping
 
 def test_union():
     first_timeline = Timeline([Segment(0, 1),

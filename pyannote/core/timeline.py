@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2017 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,67 @@
 
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
+
+"""
+########
+Timeline
+########
+
+.. plot:: pyplots/timeline.py
+
+:class:`pyannote.core.Timeline` instances are ordered sets of non-empty
+segments:
+
+  - ordered, because segments are sorted by start time (and end time in case of tie)
+  - set, because one cannot add twice the same segment
+  - non-empty, because one cannot add empty segments (*i.e.* start >= end)
+
+There are two ways to define the timeline depicted above:
+
+.. ipython::
+
+  In [25]: from pyannote.core import Timeline, Segment
+
+  In [26]: timeline = Timeline()
+     ....: timeline.add(Segment(1, 5))
+     ....: timeline.add(Segment(6, 8))
+     ....: timeline.add(Segment(12, 18))
+     ....: timeline.add(Segment(7, 20))
+     ....:
+
+  In [27]: segments = [Segment(1, 5), Segment(6, 8), Segment(12, 18), Segment(7, 20)]
+     ....: timeline = Timeline(segments=segments, uri='my_audio_file')  # faster
+     ....:
+
+  In [9]: for segment in timeline:
+     ...:     print(segment)
+     ...:
+  [ 00:00:01.000 -->  00:00:05.000]
+  [ 00:00:06.000 -->  00:00:08.000]
+  [ 00:00:07.000 -->  00:00:20.000]
+  [ 00:00:12.000 -->  00:00:18.000]
+
+
+.. note::
+
+  The optional *uri*  keyword argument can be used to remember which document it describes.
+
+Several convenient methods are available. Here are a few examples:
+
+.. ipython::
+
+  In [3]: timeline.extent()    # extent
+  Out[3]: <Segment(1, 20)>
+
+  In [5]: timeline.support()  # support
+  Out[5]: <Timeline(uri=my_audio_file, segments=[<Segment(1, 5)>, <Segment(6, 20)>])>
+
+  In [6]: timeline.duration()  # support duration
+  Out[6]: 18
+
+
+See :class:`pyannote.core.Timeline` for the complete reference.
+"""
 
 import warnings
 
@@ -69,83 +130,6 @@ class Timeline(object):
     -------
     timeline : Timeline
         New timeline
-
-    Examples
-    --------
-    Create a new empty timeline
-
-        >>> timeline = Timeline()
-        >>> if not timeline:
-        ...    print "Timeline is empty."
-        Timeline is empty.
-
-    Add one segment (+=)
-
-        >>> segment = Segment(0, 1)
-        >>> timeline.add(segment)
-        >>> if len(timeline) == 1:
-        ...    print "Timeline contains only one segment."
-        Timeline contains only one segment.
-
-    Add all segments from another timeline
-
-        >>> other_timeline = Timeline([Segment(0.5, 3), Segment(6, 8)])
-        >>> timeline.update(other_timeline)
-
-    Get timeline extent, coverage & duration
-
-        >>> extent = timeline.extent()
-        >>> print extent
-        [0 --> 8]
-        >>> coverage = timeline.coverage()
-        >>> print coverage
-        [
-           [0 --> 3]
-           [6 --> 8]
-        ]
-        >>> duration = timeline.duration()
-        >>> print "Timeline covers a total of %g seconds." % duration
-        Timeline covers a total of 5 seconds.
-
-    Iterate over (sorted) timeline segments
-
-        >>> for segment in timeline:
-        ...    print segment
-        [0 --> 1]
-        [0.5 --> 3]
-        [6 --> 8]
-
-    Segmentation
-
-        >>> segmentation = timeline.segmentation()
-        >>> print segmentation
-        [
-           [0 --> 0.5]
-           [0.5 --> 1]
-           [1 --> 3]
-           [6 --> 8]
-        ]
-
-    Gaps
-
-        >>> timeline = timeline.copy()
-        >>> print timeline
-        [
-           [0 --> 1]
-           [0.5 --> 3]
-           [6 --> 8]
-        ]
-        >>> print timeline.gaps()
-        [
-           [3 --> 6]
-        ]
-        >>> segment = Segment(0, 10)
-        >>> print timeline.gaps(segment)
-        [
-           [3 --> 6]
-           [8 --> 10]
-        ]
-
     """
 
     @classmethod
@@ -168,164 +152,346 @@ class Timeline(object):
         self.uri = uri
 
     def __len__(self):
-        return self._segments.length()
+        """Number of segments
 
-    def __bool__(self):
-        return self._segments.length() > 0
+        >>> len(timeline)  # timeline contains three segments
+        3
+        """
+        return self._segments.length()
 
     def __nonzero__(self):
         return self.__bool__()
 
+    def __bool__(self):
+        """Emptiness
+
+        >>> if timeline:
+        ...    # timeline is empty
+        ... else:
+        ...    # timeline is not empty
+        """
+        return self._segments.length() > 0
+
     def __iter__(self):
+        """Iterate over segments (in chronological order)
+
+        >>> for segment in timeline:
+        ...     # do something with the segment
+
+        See also
+        --------
+        :class:`pyannote.core.Segment` describes how segments are sorted.
+        """
         return iter(self._segments)
 
     def __getitem__(self, k):
-        """Returns kth segment"""
+        """Get segment by index (in chronological order)
+
+        >>> first_segment = timeline[0]
+        >>> second_segment = timeline[1]
+
+        Note
+        ----
+        Negative indexing is not supported.
+        """
         return self._segments.kth(k)
 
     def __eq__(self, other):
+        """Equality
+
+        Two timelines are equal if and only if their segments are equal.
+
+        >>> timeline1 = Timeline([Segment(0, 1), Segment(2, 3)])
+        >>> timeline2 = Timeline([Segment(2, 3), Segment(0, 1)])
+        >>> timeline3 = Timeline([Segment(2, 3)])
+        >>> timeline1 == timeline2
+        True
+        >>> timeline1 == timeline3
+        False
+        """
         return self._segments == other._segments
 
     def __ne__(self, other):
+        """Inequality"""
         return self._segments != other._segments
 
     def index(self, segment):
-        """Index of segment
+        """Get index of (existing) segment
 
-        Parameter
-        ---------
+        Parameters
+        ----------
         segment : Segment
+            Segment that is being looked for.
 
-        Raises
-        ------
-        ValueError if the segment is not present
+        Returns
+        -------
+        position : int
+            Index of `segment` in timeline
         """
         return self._segments.index(segment)
 
     def add(self, segment):
-        """Add segment"""
-        if segment:
-            self._segments.add(segment)
-
-    def update(self, timeline):
-        """Add `timeline` segments"""
-        self._segments.update(timeline._segments)
-
-    def union(self, other):
-        """Create new timeline made of union of segments"""
-        segments = self._segments.union(other._segments)
-        return Timeline(segments=segments, uri=self.uri)
-
-    def co_iter(self, other):
-        for segment, other_segment in self._segments.co_iter(other._segments):
-            yield segment, other_segment
-
-    def crop_iter(self, other, mode='intersection', mapping=False):
-        """Crop timeline
+        """Add a segment (in place)
 
         Parameters
         ----------
-        other : `Segment` or `Timeline`
+        segment : Segment
+            Segment that is being added
 
-        mode : {'strict', 'loose', 'intersection'}, optional
-            In 'strict' mode, only segments fully included in focus coverage
-            are kept. In 'loose' mode, any intersecting segment is kept
-            unchanged. In 'intersection' mode, only intersecting segments are
-            kept and replaced by their actual intersection with the focus.
+        Returns
+        -------
+        self : Timeline
+            Updated timeline.
+
+        Note
+        ----
+        If the timeline already contains this segment, it will not be added
+        again, as a timeline is meant to be a **set** of segments (not a list).
+
+        If the segment is empty, it will not be added either, as a timeline
+        only contains non-empty segments.
+        """
+        if segment:
+            self._segments.add(segment)
+        return self
+
+    def update(self, timeline):
+        """Add every segments of an existing timeline (in place)
+
+        Parameters
+        ----------
+        timeline : Timeline
+            Timeline whose segments are being added
+
+        Returns
+        -------
+        self : Timeline
+            Updated timeline
+
+        Note
+        ----
+        Only segments that do not already exist will be added, as a timeline is
+        meant to be a **set** of segments (not a list).
+
+        """
+        self._segments.update(timeline._segments)
+        return self
+
+    def union(self, timeline):
+        """Create new timeline made of union of segments
+
+        Parameters
+        ----------
+        timeline : Timeline
+            Timeline whose segments are being added
+
+        Returns
+        -------
+        union : Timeline
+            New timeline containing the union of both timelines.
+
+        Note
+        ----
+        This does the same as timeline.update(...) except it returns a new
+        timeline, and the original one is not modified.
+        """
+        segments = self._segments.union(timeline._segments)
+        return Timeline(segments=segments, uri=self.uri)
+
+    def co_iter(self, other):
+        """Iterate over pairs of intersecting segments
+
+        >>> timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
+        >>> timeline2 = Timeline([Segment(1, 3), Segment(3, 5)])
+        >>> for segment1, segment2 in timeline1.co_iter(timeline2):
+        ...     print(segment1, segment2)
+        (<Segment(0, 2)>, <Segment(1, 3)>)
+        (<Segment(1, 2)>, <Segment(1, 3)>)
+        (<Segment(3, 4)>, <Segment(3, 5)>)
+
+        Parameters
+        ----------
+        other : Timeline
+            Second timeline
+
+        Returns
+        -------
+        iterable : (Segment, Segment) iterable
+            Yields pairs of intersecting segments in chronological order.
+        """
+        for segment, other_segment in self._segments.co_iter(other._segments):
+            yield segment, other_segment
+
+    def crop_iter(self, support, mode='intersection', returns_mapping=False):
+        """Like `crop` but returns a segment iterator instead
+
+        See also
+        --------
+        :func:`pyannote.core.Timeline.crop`
         """
 
-        if isinstance(other, Segment):
-
-            other = Timeline(segments=[other], uri=self.uri)
-            for yielded in self.crop(other, mode=mode, mapping=mapping):
+        if isinstance(support, Segment):
+            support = Timeline(segments=[support], uri=self.uri)
+            for yielded in self.crop_iter(support, mode=mode,
+                                          returns_mapping=returns_mapping):
                 yield yielded
 
-        elif isinstance(other, Timeline):
+        elif isinstance(support, Timeline):
 
             if mode == 'loose':
-                for segment, _ in self.co_iter(other):
+                for segment, _ in self.co_iter(support):
                     yield segment
 
             elif mode == 'strict':
-                for segment, other_segment in self.co_iter(other):
+                for segment, other_segment in self.co_iter(support):
                     if segment in other_segment:
                         yield segment
 
             elif mode == 'intersection':
-                if mapping:
-                    for segment, other_segment in self.co_iter(other):
-                        inter = segment & other_segment
-                        yield segment, inter
+                if returns_mapping:
+                    for segment, other_segment in self.co_iter(support):
+                        mapped_to = segment & other_segment
+                        yield segment, mapped_to
                 else:
-                    for segment, other_segment in self.co_iter(other):
+                    for segment, other_segment in self.co_iter(support):
                         yield segment & other_segment
 
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
 
-    def crop(self, other, mode='intersection', mapping=False):
-        """Crop timeline
+    def crop(self, support, mode='intersection', returns_mapping=False, mapping=False):
+        """Crop timeline to new support
 
         Parameters
         ----------
-        other : `Segment` or `Timeline`
-
+        support : Segment or Timeline
+            If `support` is a `Timeline`, its support is used.
         mode : {'strict', 'loose', 'intersection'}, optional
-            In 'strict' mode, only segments fully included in focus coverage
-            are kept. In 'loose' mode, any intersecting segment is kept
-            unchanged. In 'intersection' mode, only intersecting segments are
-            kept and replaced by their actual intersection with the focus.
-        mapping : boolean, optional
-            [FIXME] When True and mode is 'intersection', also returns the list of
-            original corresponding segments.
+            Controls how segments that are not fully included in `support` are
+            handled. 'strict' mode only keeps fully included segments. 'loose'
+            mode keeps any intersecting segment. 'intersection' mode keeps any
+            intersecting segment but replace them by their actual intersection.
+        returns_mapping : bool, optional
+            In 'intersection' mode, return a dictionary whose keys are segments
+            of the cropped timeline, and values are list of the original
+            segments that were cropped. Defaults to False.
 
         Returns
         -------
         cropped : Timeline
-            Cropped timeline.
-        mapping : dict (if mapping is True and mode is 'intersection')
+            Cropped timeline
+        mapping : dict
+            When 'returns_mapping' is True, dictionary whose keys are segments
+            of 'cropped', and values are lists of corresponding original
+            segments.
+
+        Examples
+        --------
+
+        >>> timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
+        >>> timeline.crop(Segment(1, 3))
+        <Timeline(uri=None, segments=[<Segment(1, 2)>])>
+
+        >>> timeline.crop(Segment(1, 3), mode='loose')
+        <Timeline(uri=None, segments=[<Segment(0, 2)>, <Segment(1, 2)>])>
+
+        >>> timeline.crop(Segment(1, 3), mode='strict')
+        <Timeline(uri=None, segments=[<Segment(1, 2)>])>
+
+        >>> cropped, mapping = timeline.crop(Segment(1, 3), returns_mapping=True)
+        >>> print(mapping)
+        {<Segment(1, 2)>: [<Segment(0, 2)>, <Segment(1, 2)>]}
+
         """
-        if mode == 'intersection' and mapping:
+
+        if mapping:
+            returns_mapping = mapping
+            warnings.warn(
+                "'mapping' parameter has been renamed to 'returns_mapping'.",
+                DeprecationWarning)
+
+        if mode == 'intersection' and returns_mapping:
             segments, mapping = [], {}
-            for segment, inter in self.crop_iter(other, mode=mode, mapping=mapping):
-                segments.append(segment)
-                mapping[inter] = mapping.get(inter, list()) + [segment]
+            for segment, mapped_to in self.crop_iter(support,
+                                                     mode='intersection',
+                                                     returns_mapping=True):
+                segments.append(mapped_to)
+                mapping[mapped_to] = mapping.get(mapped_to, list()) + [segment]
             return Timeline(segments=segments, uri=self.uri), mapping
 
-        segments = [s for s in self.crop_iter(other, mode=mode)]
+        segments = [s for s in self.crop_iter(support, mode=mode)]
         return Timeline(segments=segments, uri=self.uri)
 
-    def overlapping(self, timestamp):
-        """Get list of segments overlapping `timestamp`"""
-        return self._segments.overlapping(timestamp)
+    def overlapping(self, t):
+        """Get list of segments overlapping `t`
+
+        Parameters
+        ----------
+        t : float
+            Timestamp, in seconds.
+
+        Returns
+        -------
+        segments : list
+            List of all segments of timeline containing time t
+
+        """
+        return self._segments.overlapping(t)
 
     def __str__(self):
-        """Human-friendly representation"""
+        """Human-readable representation
 
-        string = "[\n"
-        for segment in self._segments:
-            string += "   %s\n" % str(segment)
+        >>> timeline = Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])
+        >>> print(timeline)
+        [[ 00:00:00.000 -->  00:00:10.000]
+         [ 00:00:01.000 -->  00:00:13.370]]
+
+        """
+
+        n = len(self._segments)
+        string = "["
+        for i, segment in enumerate(self._segments):
+            string += str(segment)
+            string += "\n " if i+1 < n else ""
         string += "]"
         return string
 
     def __repr__(self):
+        """Computer-readable representation
+
+        >>> Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])
+        <Timeline(uri=None, segments=[<Segment(0, 10)>, <Segment(1, 13.37)>])>
+
+        """
+
         return "<Timeline(uri=%s, segments=%s)>" % (self.uri,
                                                     list(self._segments))
 
     def __contains__(self, included):
         """Inclusion
 
-        Use expression 'segment in timeline' or 'other_timeline in timeline'
+        Check whether every segment of `included` does exist in timeline.
 
         Parameters
         ----------
-        included : `Segment` or `Timeline`
+        included : Segment or Timeline
+            Segment or timeline being checked for inclusion
 
         Returns
         -------
         contains : bool
             True if every segment in `included` exists in timeline,
             False otherwise
+
+        Examples
+        --------
+        >>> timeline1 = Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])
+        >>> timeline2 = Timeline(segments=[Segment(0, 10)])
+        >>> timeline1 in timeline2
+        False
+        >>> timeline2 in timeline1
+        >>> Segment(1, 13.37) in timeline1
+        True
 
         """
 
@@ -336,53 +502,36 @@ class Timeline(object):
             return self._segments.issuperset(included._segments)
 
         else:
-            raise TypeError()
+            raise TypeError(
+                'Checking for inclusion only supports Segment and '
+                'Timeline instances')
 
     def empty(self):
-        """Empty copy of a timeline.
+        """Return an empty copy
 
-        Examples
-        --------
-
-            >>> timeline = Timeline(uri="MyVideo.avi")
-            >>> timeline += [Segment(0, 1), Segment(2, 3)]
-            >>> empty = timeline.empty()
-            >>> print empty.uri
-            MyVideo.avi
-            >>> print empty
-            [
-            ]
+        Returns
+        -------
+        empty : Timeline
+            Empty timeline using the same 'uri' attribute.
 
         """
         return Timeline(uri=self.uri)
 
     def copy(self, segment_func=None):
-        """Duplicate timeline.
+        """Get a copy of the timeline
 
-        If segment_func is provided, apply it to each segment first.
+        If `segment_func` is provided, it is applied to each segment first.
 
         Parameters
         ----------
-        segment_func : function
+        segment_func : callable, optional
+            Callable that takes a segment as input, and returns a segment.
+            Defaults to identity function (segment_func(segment) = segment)
 
         Returns
         -------
         timeline : Timeline
-            A (possibly modified) copy of the timeline
-
-        Examples
-        --------
-
-            >>> timeline = Timeline(uri="MyVideo.avi")
-            >>> timeline += [Segment(0, 1), Segment(2, 3)]
-            >>> cp = timeline.copy()
-            >>> print cp.uri
-            MyVideo.avi
-            >>> print cp
-            [
-               [0 --> 1]
-               [2 --> 3]
-            ]
+            Copy of the timeline
 
         """
 
@@ -397,11 +546,20 @@ class Timeline(object):
                         uri=self.uri)
 
     def extent(self):
-        """Timeline extent
+        """Extent
 
         The extent of a timeline is the segment of minimum duration that
         contains every segments of the timeline. It is unique, by definition.
         The extent of an empty timeline is an empty segment.
+
+        A picture is worth a thousand words::
+
+            timeline
+            |------|    |------|     |----|
+              |--|    |-----|     |----------|
+
+            timeline.extent()
+            |--------------------------------|
 
         Returns
         -------
@@ -410,25 +568,22 @@ class Timeline(object):
 
         Examples
         --------
-
-            >>> timeline = Timeline(uri="MyVideo.avi")
-            >>> timeline += [Segment(0, 1), Segment(9, 10)]
-            >>> print timeline.extent()
-            [0 --> 10]
+        >>> timeline = Timeline(segments=[Segment(0, 1), Segment(9, 10)])
+        >>> timeline.extent()
+        <Segment(0, 10)>
 
         """
         return self._segments.extent()
 
-    def coverage_iter(self):
-        """Timeline coverage
+    def support_iter(self):
+        """Like `support` but returns a segment iterator instead
 
-        The coverage of timeline is the timeline with the minimum number of
-        segments with exactly the same time span as the original timeline.
-        It is (by definition) unique and does not contain any overlapping
-        segments.
+        See also
+        --------
+        :func:`pyannote.core.Timeline.support`
         """
 
-        # The coverage of an empty timeline is an empty timeline.
+        # The support of an empty timeline is an empty timeline.
         if not self:
             return
 
@@ -440,76 +595,100 @@ class Timeline(object):
         #   there is no need to perform an exhaustive segment clustering.
         #   We just have to consider them in their natural order.
 
-        # Initialize new coverage segment
+        # Initialize new support segment
         # as very first segment of the timeline
         new_segment = self._segments.kth(0)
 
         for segment in self:
 
-            # If there is no gap between new coverage segment and next segment,
+            # If there is no gap between new support segment and next segment,
             if not (segment ^ new_segment):
-                # Extend new coverage segment using next segment
+                # Extend new support segment using next segment
                 new_segment |= segment
 
             # If there actually is a gap,
             else:
                 yield new_segment
 
-                # Initialize new coverage segment as next segment
+                # Initialize new support segment as next segment
                 # (right after the gap)
                 new_segment = segment
 
-        # Add new segment to the timeline coverage
+        # Add new segment to the timeline support
         yield new_segment
 
-    def coverage(self):
-        """Timeline coverage
+    def support(self):
+        """Timeline support
 
-        The coverage of timeline is the timeline with the minimum number of
-        segments with exactly the same time span as the original timeline.
-        It is (by definition) unique and does not contain any overlapping
+        The support of a timeline is the timeline with the minimum number of
+        segments with exactly the same time span as the original timeline. It
+        is (by definition) unique and does not contain any overlapping
         segments.
+
+        A picture is worth a thousand words::
+
+            timeline
+            |------|    |------|     |----|
+              |--|    |-----|     |----------|
+
+            timeline.support()
+            |------|  |--------|  |----------|
 
         Returns
         -------
-        coverage : Timeline
-            Timeline coverage
+        support : Timeline
+            Timeline support
         """
-        segments = [s for s in self.coverage_iter()]
+        segments = [s for s in self.support_iter()]
         return Timeline(segments=segments, uri=self.uri)
+
+    def coverage(self):
+        warnings.warn(
+            '"coverage" has been renamed to "support".',
+            DeprecationWarning)
+        return self.support()
 
     def duration(self):
         """Timeline duration
 
+        The timeline duration is the sum of the durations of the segments
+        in the timeline support.
+
         Returns
         -------
         duration : float
-            Duration of timeline coverage, in seconds.
-
+            Duration of timeline support, in seconds.
         """
 
         # The timeline duration is the sum of the durations
-        # of the segments in the timeline coverage.
-        return sum(s.duration for s in self.coverage_iter())
+        # of the segments in the timeline support.
+        return sum(s.duration for s in self.support_iter())
 
-    def gaps_iter(self, focus=None):
+    def gaps_iter(self, support=None):
+        """Like `gaps` but returns a segment iterator instead
 
-        if focus is None:
-            focus = self.extent()
+        See also
+        --------
+        :func:`pyannote.core.Timeline.gaps`
 
-        if not isinstance(focus, (Segment, Timeline)):
+        """
+
+        if support is None:
+            support = self.extent()
+
+        if not isinstance(support, (Segment, Timeline)):
             raise TypeError("unsupported operand type(s) for -':"
-                            "%s and Timeline." % type(focus).__name__)
+                            "%s and Timeline." % type(support).__name__)
 
-        # segment focus
-        if isinstance(focus, Segment):
+        # segment support
+        if isinstance(support, Segment):
 
             # `end` is meant to store the end time of former segment
-            # initialize it with beginning of provided segment `focus`
-            end = focus.start
+            # initialize it with beginning of provided segment `support`
+            end = support.start
 
-            # focus on the intersection of timeline and provided segment
-            for segment in self.crop(focus, mode='intersection').coverage():
+            # support on the intersection of timeline and provided segment
+            for segment in self.crop(support, mode='intersection').support():
 
                 # add gap between each pair of consecutive segments
                 # if there is no gap, segment is empty, therefore not added
@@ -519,69 +698,77 @@ class Timeline(object):
                 end = segment.end
 
             # add final gap (if not empty)
-            yield Segment(start=end, end=focus.end)
+            yield Segment(start=end, end=support.end)
 
-        # timeline focus
-        elif isinstance(focus, Timeline):
+        # timeline support
+        elif isinstance(support, Timeline):
 
-            # yield gaps for every segment in coverage of provided timeline
-            for segment in focus.coverage():
-                for gap in self.gaps_iter(focus=segment):
+            # yield gaps for every segment in support of provided timeline
+            for segment in support.support():
+                for gap in self.gaps_iter(support=segment):
                     yield gap
 
-    def gaps(self, focus=None):
-        """Timeline gaps
+    def gaps(self, support=None, focus=None):
+        """Gaps
+
+        A picture is worth a thousand words::
+
+            timeline
+            |------|    |------|     |----|
+              |--|    |-----|     |----------|
+
+            timeline.gaps()
+                   |--|        |--|
 
         Parameters
         ----------
-        focus : None, Segment or Timeline
+        support : None, Segment or Timeline
+            Support in which gaps are looked for. Defaults to timeline extent
 
         Returns
         -------
         gaps : Timeline
             Timeline made of all gaps from original timeline, and delimited
-            by provided segment or timeline.
+            by provided support
+
+        See also
+        --------
+        :func:`pyannote.core.Timeline.extent`
+
         """
-        segments = [s for s in self.gaps_iter(focus=focus)]
+
+        if focus is not None:
+            support = focus
+            warnings.warn(
+                "'focus' parameter has been renamed to 'support'.",
+                DeprecationWarning)
+
+        segments = [s for s in self.gaps_iter(support=support)]
         return Timeline(segments=segments, uri=self.uri)
 
     def segmentation(self):
-        """Non-overlapping timeline
+        """Segmentation
 
-        Create the unique timeline with same coverage and same set of segment
+        Create the unique timeline with same support and same set of segment
         boundaries as original timeline, but with no overlapping segments.
 
-        A picture is worth a thousand words:
+        A picture is worth a thousand words::
 
-            Original timeline:
+            timeline
             |------|    |------|     |----|
               |--|    |-----|     |----------|
 
-            Non-overlapping timeline
+            timeline.segmentation()
             |-|--|-|  |-|---|--|  |--|----|--|
 
         Returns
         -------
         timeline : Timeline
-
-        Examples
-        --------
-
-            >>> timeline = Timeline()
-            >>> timeline += [Segment(0, 1), Segment(1, 2), Segment(2,3)]
-            >>> timeline += [Segment(2, 4), Segment(6, 7)]
-            >>> print timeline.segmentation()
-            [
-               [0 --> 1]
-               [1 --> 2]
-               [2 --> 3]
-               [3 --> 4]
-               [6 --> 7]
-            ]
-
+            (unique) timeline with same support and same set of segment
+            boundaries as original timeline, but with no overlapping segments.
         """
         # COMPLEXITY: O(n)
-        coverage = self.coverage()
+        support = self.support()
 
         # COMPLEXITY: O(n.log n)
         # get all boundaries (sorted)
@@ -611,7 +798,7 @@ class Timeline(object):
         for end in timestamps[1:]:
             # only add segments that are covered by original timeline
             segment = Segment(start=start, end=end)
-            if segment and coverage.overlapping(segment.middle):
+            if segment and support.overlapping(segment.middle):
                 segments.append(segment)
             # next segment...
             start = end
@@ -620,6 +807,13 @@ class Timeline(object):
 
 
     def for_json(self):
+        """Serialization
+
+        See also
+        --------
+        :mod:`pyannote.core.json`
+        """
+
         data = {PYANNOTE_JSON: self.__class__.__name__}
         data[PYANNOTE_JSON_CONTENT] = [s.for_json() for s in self]
 
@@ -630,15 +824,24 @@ class Timeline(object):
 
     @classmethod
     def from_json(cls, data):
+        """Deserialization
+
+        See also
+        --------
+        :mod:`pyannote.core.json`
+        """
+
         uri = data.get(PYANNOTE_URI, None)
         segments = [Segment.from_json(s) for s in data[PYANNOTE_JSON_CONTENT]]
         return cls(segments=segments, uri=uri)
 
     def _repr_png_(self):
+        """IPython notebook support
+
+        See also
+        --------
+        :mod:`pyannote.core.notebook`
+        """
+
         from .notebook import repr_timeline
         return repr_timeline(self)
-
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()

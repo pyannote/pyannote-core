@@ -11,11 +11,42 @@ def annotation():
         uri='TheBigBangTheory.Season01.Episode01',
         modality='speaker')
     annotation[Segment(3, 5), '_'] = 'Penny'
-    annotation[Segment(5.5, 7), '_',] = 'Leonard'
+    annotation[Segment(5.5, 7), '_'] = 'Leonard'
     annotation[Segment(8, 10), '_'] = 'Penny'
     annotation[Segment(8, 10), 'anything'] = 'Sheldon'
 
     return annotation
+
+
+def test_crop(annotation):
+    expected = Annotation(
+        uri='TheBigBangTheory.Season01.Episode01',
+        modality='speaker')
+    expected[Segment(5.5, 7), '_'] = 'Leonard'
+    expected[Segment(8, 9), '_'] = 'Penny'
+    expected[Segment(8, 9), 'anything'] = 'Sheldon'
+    actual = annotation.crop(Segment(5, 9))
+    assert actual == expected, str(actual)
+
+def test_crop_loose(annotation):
+    expected = Annotation(
+        uri='TheBigBangTheory.Season01.Episode01',
+        modality='speaker')
+    expected[Segment(5.5, 7), '_'] = 'Leonard'
+    expected[Segment(8, 10), '_'] = 'Penny'
+    expected[Segment(8, 10), 'anything'] = 'Sheldon'
+    actual = annotation.crop(Segment(5, 9), mode='loose')
+    assert actual == expected, str(actual)
+
+def test_crop_strict(annotation):
+    expected = Annotation(
+        uri='TheBigBangTheory.Season01.Episode01',
+        modality='speaker')
+    expected[Segment(5.5, 7), '_'] = 'Leonard'
+    actual = annotation.crop(Segment(5, 9), mode='strict')
+    assert actual == expected, str(actual)
+
+
 
 def test_copy(annotation):
 
@@ -33,7 +64,7 @@ def test_creation(annotation):
                                              (Segment(8, 10), '_'),
                                              (Segment(8, 10), 'anything')]
 
-    assert list(annotation.itertracks(label=True)) == [(Segment(3, 5), '_', 'Penny'),
+    assert list(annotation.itertracks(yield_label=True)) == [(Segment(3, 5), '_', 'Penny'),
                                                        (Segment(5.5, 7), '_', 'Leonard'),
                                                        (Segment(8, 10), '_', 'Penny'),
                                                        (Segment(8, 10), 'anything', 'Sheldon')]
@@ -58,10 +89,10 @@ def test_tracks(annotation):
     assert not annotation.has_track(Segment(8, 10), '---')
     assert annotation.get_tracks(Segment(8, 10)) == {'_', 'anything'}
 
-    assert list(annotation.retrack().itertracks()) == [(Segment(3, 5), 0),
-                                                       (Segment(5.5, 7), 1),
-                                                       (Segment(8, 10), 2),
-                                                       (Segment(8, 10), 3)]
+    assert list(annotation.rename_tracks().itertracks()) == [(Segment(3, 5), 'A'),
+                                                             (Segment(5.5, 7), 'B'),
+                                                             (Segment(8, 10), 'C'),
+                                                             (Segment(8, 10), 'D')]
 
 
 def test_labels(annotation):
@@ -80,7 +111,7 @@ def test_labels(annotation):
     mapping = {'Penny': 'Kaley Cuoco',
                'Sheldon': 'Jim Parsons',
                'Leonard': 'Johnny Galecki'}
-    assert annotation.translate(mapping) == expected_res
+    assert annotation.rename_labels(mapping) == expected_res
 
 
 def test_analyze(annotation):
@@ -90,3 +121,36 @@ def test_analyze(annotation):
                                   ('Sheldon', 2),
                                   ('Leonard', 1.5)]
     assert annotation.argmax() == 'Penny'
+
+
+def test_rename_labels(annotation):
+    actual = annotation.rename_labels()
+    expected = Annotation(
+            uri='TheBigBangTheory.Season01.Episode01',
+            modality='speaker')
+    expected[Segment(3, 5), '_'] = 'B'
+    expected[Segment(5.5, 7), '_',] = 'A'
+    expected[Segment(8, 10), '_'] = 'B'
+    expected[Segment(8, 10), 'anything'] = 'C'
+    assert actual == expected
+
+def test_relabel_tracks(annotation):
+    actual = annotation.relabel_tracks()
+    expected = Annotation(
+            uri='TheBigBangTheory.Season01.Episode01',
+            modality='speaker')
+    expected[Segment(3, 5), '_'] = 'A'
+    expected[Segment(5.5, 7), '_',] = 'B'
+    expected[Segment(8, 10), '_'] = 'C'
+    expected[Segment(8, 10), 'anything'] = 'D'
+    assert actual == expected
+
+def test_support(annotation):
+    actual = annotation.support(collar=3.5)
+    expected = Annotation(
+            uri='TheBigBangTheory.Season01.Episode01',
+            modality='speaker')
+    expected[Segment(3, 10), 'B'] = 'Penny'
+    expected[Segment(5.5, 7), 'A'] = 'Leonard'
+    expected[Segment(8, 10), 'C'] = 'Sheldon'
+    assert actual == expected
