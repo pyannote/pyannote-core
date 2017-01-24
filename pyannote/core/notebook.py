@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2016 CNRS
+# Copyright (c) 2014-2017 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,12 @@
 
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
+
+"""
+#############
+Visualization
+#############
+"""
 
 from __future__ import unicode_literals
 from __future__ import print_function
@@ -207,7 +213,6 @@ class Notebook(object):
             self.draw_segment(ax, segment, y)
 
         # ax.set_aspect(3. / self.crop.duration)
-
 
     def plot_annotation(self, annotation, ax=None, time=True, legend=True):
 

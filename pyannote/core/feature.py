@@ -26,10 +26,13 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
+
 """
+########
+Features
+########
 
-Features.
-
+See :class:`pyannote.core.SlidingWindowFeature` for the complete reference.
 """
 
 from __future__ import unicode_literals
