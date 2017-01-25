@@ -1188,9 +1188,9 @@ class Annotation(object):
 
     def smooth(self, collar=0.):
         warnings.warn(
-            '"smooth" has been renamed to "coverage".',
+            '"smooth" has been renamed to "support".',
             DeprecationWarning)
-        return self.coverage(collar=collar)
+        return self.support(collar=collar)
 
     def co_iter(self, other):
         """Iterate over pairs of intersecting tracks
