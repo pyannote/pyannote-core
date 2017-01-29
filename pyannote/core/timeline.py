@@ -94,6 +94,7 @@ from banyan import SortedSet
 from .interval_tree import TimelineUpdator
 from .segment import Segment
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from .util import string_generator, int_generator
 
 # ignore Banyan warning
 warnings.filterwarnings(
@@ -805,6 +806,35 @@ class Timeline(object):
 
         return Timeline(segments=segments, uri=self.uri)
 
+    def to_annotation(self, generator='string', modality=None):
+        """Turn timeline into an annotation
+
+        Each segment is labeled by a unique label.
+
+        Parameters
+        ----------
+        generator : 'string', 'int', or iterable, optional
+            If 'string' (default) generate string labels. If 'int', generate
+            integer labels. If iterable, use it to generate labels.
+        modality : str, optional
+
+        Returns
+        -------
+        annotation : Annotation
+            Annotation
+        """
+
+        from .annotation import Annotation
+        annotation = Annotation(uri=self.uri, modality=modality)
+        if generator == 'string':
+            generator = string_generator()
+        elif generator == 'int':
+            generator = int_generator()
+
+        for segment in self:
+            annotation[segment] = next(generator)
+
+        return annotation
 
     def for_json(self):
         """Serialization

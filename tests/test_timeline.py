@@ -1,5 +1,6 @@
 import pytest
 
+from pyannote.core import Annotation
 from pyannote.core import Timeline
 from pyannote.core import Segment
 
@@ -14,6 +15,16 @@ def timeline():
     t.add(Segment(7, 8))
 
     return t
+
+def test_to_annotation(timeline):
+    expected = Annotation(uri='MyAudioFile', modality='MyModality')
+    expected[Segment(6, 8)] = 'D'
+    expected[Segment(0.5, 3)] = 'A'
+    expected[Segment(8.5, 10)] = 'F'
+    expected[Segment(1, 4)] = 'B'
+    expected[Segment(5, 7)] = 'C'
+    expected[Segment(7, 8)] = 'E'
+    assert expected == timeline.to_annotation(modality='MyModality')
 
 def test_iteration(timeline):
 
