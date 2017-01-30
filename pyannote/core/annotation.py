@@ -200,8 +200,11 @@ class Annotation(object):
 
     def _set_uri(self, uri):
         # update uri for all internal timelines
-        for _, timeline in six.iteritems(self._labels):
+        for label in self.labels():
+            timeline = self.label_timeline(label, copy=False)
             timeline.uri = uri
+        timeline = self.get_timeline(copy=False)
+        timeline.uri = uri
         self._uri = uri
 
     uri = property(_get_uri, fset=_set_uri, doc="Resource identifier")
