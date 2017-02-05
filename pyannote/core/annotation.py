@@ -1061,7 +1061,7 @@ class Annotation(object):
             renamed[s, next(generator)] = label
         return renamed
 
-    def rename_labels(self, mapping=None, generator='string', copy=False):
+    def rename_labels(self, mapping=None, generator='string', copy=True):
         """Rename labels
 
         Parameters
