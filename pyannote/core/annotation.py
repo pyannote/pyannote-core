@@ -788,10 +788,23 @@ class Annotation(object):
 
         sub = self.__class__(uri=self.uri, modality=self.modality)
 
-        # TODO speed things up by working directly with annotation internals
-        for segment, track, label in self.itertracks(label=True):
-            if label in labels:
-                sub[segment, track] = label
+        _tracks, _labels = {}, set([])
+        for segment, tracks in self._tracks.items():
+            sub_tracks = {track: label for track, label in tracks.items()
+                                       if label in labels}
+            if sub_tracks:
+                _tracks[segment] = sub_tracks
+                _labels.update(sub_tracks.values())
+
+        sub._tracks = SortedDict(_tracks,
+                                 key_type=(float, float),
+                                 updator=TimelineUpdator)
+
+        sub._labelNeedsUpdate = {label: True for label in _labels}
+        sub._labels = {label: None for label in _labels}
+
+        sub._timelineNeedsUpdate = True
+        sub._timeline = None
 
         return sub
 
@@ -1048,7 +1061,7 @@ class Annotation(object):
             renamed[s, next(generator)] = label
         return renamed
 
-    def rename_labels(self, mapping=None, generator='string'):
+    def rename_labels(self, mapping=None, generator='string', copy=False):
         """Rename labels
 
         Parameters
@@ -1058,6 +1071,9 @@ class Annotation(object):
         generator : 'string', 'int' or iterable, optional
             If 'string' (default) rename label to 'A', 'B', 'C', ... If 'int',
             rename to 0, 1, 2, etc. If iterable, use it to generate labels.
+        copy : bool, optional
+            Return a copy of the annotation. Defaults to updating the
+            annotation in-place.
 
         Returns
         -------
@@ -1082,11 +1098,16 @@ class Annotation(object):
             # generate mapping
             mapping = {label: next(generator) for label in self.labels()}
 
-        renamed = self.empty()
-        for segment, track, label in self.itertracks(label=True):
-            # only transform labels that have an actual translation
-            # in the provided dictionary, keep the others as they are.
-            renamed[segment, track] = mapping.get(label, label)
+        renamed = self.copy() if copy else self
+
+        for old_label, new_label in mapping.items():
+            renamed._labelNeedsUpdate[old_label] = True
+            renamed._labelNeedsUpdate[new_label] = True
+
+        for segment, tracks in self._tracks.items():
+            new_tracks = {track: mapping.get(label, label)
+                          for track, label in tracks.items()}
+            renamed._tracks[segment] = new_tracks
 
         return renamed
 

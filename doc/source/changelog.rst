@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 0.13 (2017-02-05)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- improve: faster Annotation.subset and Annotation.rename_labels
+
 Version 0.12.1 (2017-30-01)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
