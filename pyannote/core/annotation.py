@@ -228,8 +228,8 @@ class Annotation(object):
                     segments=_segments[label], uri=self.uri)
                 self._labelNeedsUpdate[label] = False
             else:
-                self._labels.pop(label)
-                self._labelNeedsUpdate.pop(label)
+                self._labels.pop(label, None)
+                self._labelNeedsUpdate.pop(label, None)
 
     def __len__(self):
         """Number of segments
@@ -1061,7 +1061,7 @@ class Annotation(object):
             renamed[s, next(generator)] = label
         return renamed
 
-    def rename_labels(self, mapping=None, generator='string', copy=False):
+    def rename_labels(self, mapping=None, generator='string', copy=True):
         """Rename labels
 
         Parameters
