@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 0.13.1 (2017-02-20)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix Annotation.rename_labels
+
 Version 0.13 (2017-02-05)
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
