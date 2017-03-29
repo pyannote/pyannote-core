@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 0.13.2 (2017-03-29)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- setup: add dependencies for notebook visualization
+
 Version 0.13.1 (2017-02-20)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
