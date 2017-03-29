@@ -2,6 +2,31 @@
 Changelog
 #########
 
+Version 0.13.2 (2017-03-29)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- setup: add dependencies for notebook visualization
+
+Version 0.13.1 (2017-02-20)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix Annotation.rename_labels
+
+Version 0.13 (2017-02-05)
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- improve: faster Annotation.subset and Annotation.rename_labels
+
+Version 0.12.1 (2017-30-01)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix Annotation.uri setter
+
+Version 0.12 (2017-29-01)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add Timeline.to_annotation()
+
 Version 0.11.1 (2017-25-01)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

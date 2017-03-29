@@ -1,0 +1,1047 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyannote.core.timeline &mdash; pyannote.core 0.11.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
+    <link rel="top" title="pyannote.core 0.11.1 documentation" href="../../../index.html"/>
+        <link rel="up" title="Module code" href="../../index.html"/> 
+
+  
+  <script src="../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> pyannote.core
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.11.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Available data structures</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">Visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../serialization.html">Serialization</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../reference.html">Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../index.html">pyannote.core</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      
+    <li>pyannote.core.timeline</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyannote.core.timeline</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># encoding: utf-8</span>
+
+<span class="c1"># The MIT License (MIT)</span>
+
+<span class="c1"># Copyright (c) 2014-2017 CNRS</span>
+
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+
+<span class="c1"># The above copyright notice and this permission notice shall be included in</span>
+<span class="c1"># all copies or substantial portions of the Software.</span>
+
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+
+<span class="c1"># AUTHORS</span>
+<span class="c1"># Hervé BREDIN - http://herve.niderb.fr</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">########</span>
+<span class="sd">Timeline</span>
+<span class="sd">########</span>
+
+<span class="sd">.. plot:: pyplots/timeline.py</span>
+
+<span class="sd">:class:`pyannote.core.Timeline` instances are ordered sets of non-empty</span>
+<span class="sd">segments:</span>
+
+<span class="sd">  - ordered, because segments are sorted by start time (and end time in case of tie)</span>
+<span class="sd">  - set, because one cannot add twice the same segment</span>
+<span class="sd">  - non-empty, because one cannot add empty segments (*i.e.* start &gt;= end)</span>
+
+<span class="sd">There are two ways to define the timeline depicted above:</span>
+
+<span class="sd">.. ipython::</span>
+
+<span class="sd">  In [25]: from pyannote.core import Timeline, Segment</span>
+
+<span class="sd">  In [26]: timeline = Timeline()</span>
+<span class="sd">     ....: timeline.add(Segment(1, 5))</span>
+<span class="sd">     ....: timeline.add(Segment(6, 8))</span>
+<span class="sd">     ....: timeline.add(Segment(12, 18))</span>
+<span class="sd">     ....: timeline.add(Segment(7, 20))</span>
+<span class="sd">     ....:</span>
+
+<span class="sd">  In [27]: segments = [Segment(1, 5), Segment(6, 8), Segment(12, 18), Segment(7, 20)]</span>
+<span class="sd">     ....: timeline = Timeline(segments=segments, uri=&#39;my_audio_file&#39;)  # faster</span>
+<span class="sd">     ....:</span>
+
+<span class="sd">  In [9]: for segment in timeline:</span>
+<span class="sd">     ...:     print(segment)</span>
+<span class="sd">     ...:</span>
+<span class="sd">  [ 00:00:01.000 --&gt;  00:00:05.000]</span>
+<span class="sd">  [ 00:00:06.000 --&gt;  00:00:08.000]</span>
+<span class="sd">  [ 00:00:07.000 --&gt;  00:00:20.000]</span>
+<span class="sd">  [ 00:00:12.000 --&gt;  00:00:18.000]</span>
+
+
+<span class="sd">.. note::</span>
+
+<span class="sd">  The optional *uri*  keyword argument can be used to remember which document it describes.</span>
+
+<span class="sd">Several convenient methods are available. Here are a few examples:</span>
+
+<span class="sd">.. ipython::</span>
+
+<span class="sd">  In [3]: timeline.extent()    # extent</span>
+<span class="sd">  Out[3]: &lt;Segment(1, 20)&gt;</span>
+
+<span class="sd">  In [5]: timeline.support()  # support</span>
+<span class="sd">  Out[5]: &lt;Timeline(uri=my_audio_file, segments=[&lt;Segment(1, 5)&gt;, &lt;Segment(6, 20)&gt;])&gt;</span>
+
+<span class="sd">  In [6]: timeline.duration()  # support duration</span>
+<span class="sd">  Out[6]: 18</span>
+
+
+<span class="sd">See :class:`pyannote.core.Timeline` for the complete reference.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="k">import</span> <span class="n">PYANNOTE_URI</span><span class="p">,</span> <span class="n">PYANNOTE_SEGMENT</span>
+<span class="kn">from</span> <span class="nn">banyan</span> <span class="k">import</span> <span class="n">SortedSet</span>
+<span class="kn">from</span> <span class="nn">.interval_tree</span> <span class="k">import</span> <span class="n">TimelineUpdator</span>
+<span class="kn">from</span> <span class="nn">.segment</span> <span class="k">import</span> <span class="n">Segment</span>
+<span class="kn">from</span> <span class="nn">.json</span> <span class="k">import</span> <span class="n">PYANNOTE_JSON</span><span class="p">,</span> <span class="n">PYANNOTE_JSON_CONTENT</span>
+
+<span class="c1"># ignore Banyan warning</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+    <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;Key-type optimization&#39;</span><span class="p">,</span>
+    <span class="ne">Warning</span><span class="p">,</span> <span class="s1">&#39;pyannote.core.timeline&#39;</span>
+<span class="p">)</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+    <span class="s1">&#39;ignore&#39;</span><span class="p">,</span> <span class="s1">&#39;Key-type optimization&#39;</span><span class="p">,</span>
+    <span class="ne">Warning</span><span class="p">,</span> <span class="s1">&#39;banyan&#39;</span>
+<span class="p">)</span>
+
+
+<span class="c1"># =====================================================================</span>
+<span class="c1"># Timeline class</span>
+<span class="c1"># =====================================================================</span>
+
+
+<div class="viewcode-block" id="Timeline"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline">[docs]</a><span class="k">class</span> <span class="nc">Timeline</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Ordered set of segments.</span>
+
+<span class="sd">    A timeline can be seen as an ordered set of non-empty segments (Segment).</span>
+<span class="sd">    Segments can overlap -- though adding an already exisiting segment to a</span>
+<span class="sd">    timeline does nothing.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    segments : Segment iterator, optional</span>
+<span class="sd">        initial set of segments</span>
+<span class="sd">    uri : string, optional</span>
+<span class="sd">        name of segmented resource</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    timeline : Timeline</span>
+<span class="sd">        New timeline</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_df</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">PYANNOTE_SEGMENT</span><span class="p">])</span>
+        <span class="n">timeline</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">timeline</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="nb">super</span><span class="p">(</span><span class="n">Timeline</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+
+        <span class="c1"># sorted set of segments (as an augmented red-black tree)</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">segments</span> <span class="k">if</span> <span class="n">s</span><span class="p">]</span> <span class="k">if</span> <span class="n">segments</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">=</span> <span class="n">SortedSet</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span>
+                                   <span class="n">key_type</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+                                   <span class="n">updator</span><span class="o">=</span><span class="n">TimelineUpdator</span><span class="p">)</span>
+
+        <span class="c1"># path to (or any identifier of) segmented resource</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span>
+
+<div class="viewcode-block" id="Timeline.__len__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__len__">[docs]</a>    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of segments</span>
+
+<span class="sd">        &gt;&gt;&gt; len(timeline)  # timeline contains three segments</span>
+<span class="sd">        3</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">length</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bool__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Timeline.__bool__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__bool__">[docs]</a>    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Emptiness</span>
+
+<span class="sd">        &gt;&gt;&gt; if timeline:</span>
+<span class="sd">        ...    # timeline is empty</span>
+<span class="sd">        ... else:</span>
+<span class="sd">        ...    # timeline is not empty</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">length</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="Timeline.__iter__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate over segments (in chronological order)</span>
+
+<span class="sd">        &gt;&gt;&gt; for segment in timeline:</span>
+<span class="sd">        ...     # do something with the segment</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :class:`pyannote.core.Segment` describes how segments are sorted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.__getitem__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__getitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get segment by index (in chronological order)</span>
+
+<span class="sd">        &gt;&gt;&gt; first_segment = timeline[0]</span>
+<span class="sd">        &gt;&gt;&gt; second_segment = timeline[1]</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Negative indexing is not supported.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">kth</span><span class="p">(</span><span class="n">k</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.__eq__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__eq__">[docs]</a>    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Equality</span>
+
+<span class="sd">        Two timelines are equal if and only if their segments are equal.</span>
+
+<span class="sd">        &gt;&gt;&gt; timeline1 = Timeline([Segment(0, 1), Segment(2, 3)])</span>
+<span class="sd">        &gt;&gt;&gt; timeline2 = Timeline([Segment(2, 3), Segment(0, 1)])</span>
+<span class="sd">        &gt;&gt;&gt; timeline3 = Timeline([Segment(2, 3)])</span>
+<span class="sd">        &gt;&gt;&gt; timeline1 == timeline2</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; timeline1 == timeline3</span>
+<span class="sd">        False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_segments</span></div>
+
+<div class="viewcode-block" id="Timeline.__ne__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__ne__">[docs]</a>    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Inequality&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span> <span class="o">!=</span> <span class="n">other</span><span class="o">.</span><span class="n">_segments</span></div>
+
+<div class="viewcode-block" id="Timeline.index"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.index">[docs]</a>    <span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get index of (existing) segment</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        segment : Segment</span>
+<span class="sd">            Segment that is being looked for.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        position : int</span>
+<span class="sd">            Index of `segment` in timeline</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.add"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a segment (in place)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        segment : Segment</span>
+<span class="sd">            Segment that is being added</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : Timeline</span>
+<span class="sd">            Updated timeline.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        If the timeline already contains this segment, it will not be added</span>
+<span class="sd">        again, as a timeline is meant to be a **set** of segments (not a list).</span>
+
+<span class="sd">        If the segment is empty, it will not be added either, as a timeline</span>
+<span class="sd">        only contains non-empty segments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">segment</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Timeline.update"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeline</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add every segments of an existing timeline (in place)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        timeline : Timeline</span>
+<span class="sd">            Timeline whose segments are being added</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self : Timeline</span>
+<span class="sd">            Updated timeline</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Only segments that do not already exist will be added, as a timeline is</span>
+<span class="sd">        meant to be a **set** of segments (not a list).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">timeline</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Timeline.union"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.union">[docs]</a>    <span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeline</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create new timeline made of union of segments</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        timeline : Timeline</span>
+<span class="sd">            Timeline whose segments are being added</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        union : Timeline</span>
+<span class="sd">            New timeline containing the union of both timelines.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        This does the same as timeline.update(...) except it returns a new</span>
+<span class="sd">        timeline, and the original one is not modified.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">timeline</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.co_iter"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.co_iter">[docs]</a>    <span class="k">def</span> <span class="nf">co_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate over pairs of intersecting segments</span>
+
+<span class="sd">        &gt;&gt;&gt; timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])</span>
+<span class="sd">        &gt;&gt;&gt; timeline2 = Timeline([Segment(1, 3), Segment(3, 5)])</span>
+<span class="sd">        &gt;&gt;&gt; for segment1, segment2 in timeline1.co_iter(timeline2):</span>
+<span class="sd">        ...     print(segment1, segment2)</span>
+<span class="sd">        (&lt;Segment(0, 2)&gt;, &lt;Segment(1, 3)&gt;)</span>
+<span class="sd">        (&lt;Segment(1, 2)&gt;, &lt;Segment(1, 3)&gt;)</span>
+<span class="sd">        (&lt;Segment(3, 4)&gt;, &lt;Segment(3, 5)&gt;)</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        other : Timeline</span>
+<span class="sd">            Second timeline</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        iterable : (Segment, Segment) iterable</span>
+<span class="sd">            Yields pairs of intersecting segments in chronological order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">other_segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">_segments</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">segment</span><span class="p">,</span> <span class="n">other_segment</span></div>
+
+<div class="viewcode-block" id="Timeline.crop_iter"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.crop_iter">[docs]</a>    <span class="k">def</span> <span class="nf">crop_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;intersection&#39;</span><span class="p">,</span> <span class="n">returns_mapping</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Like `crop` but returns a segment iterator instead</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :func:`pyannote.core.Timeline.crop`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
+            <span class="n">support</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">[</span><span class="n">support</span><span class="p">],</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">yielded</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_iter</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+                                          <span class="n">returns_mapping</span><span class="o">=</span><span class="n">returns_mapping</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">yielded</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;loose&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">support</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">segment</span>
+
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;strict&#39;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">other_segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">support</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">other_segment</span><span class="p">:</span>
+                        <span class="k">yield</span> <span class="n">segment</span>
+
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;intersection&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">returns_mapping</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">other_segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">support</span><span class="p">):</span>
+                        <span class="n">mapped_to</span> <span class="o">=</span> <span class="n">segment</span> <span class="o">&amp;</span> <span class="n">other_segment</span>
+                        <span class="k">yield</span> <span class="n">segment</span><span class="p">,</span> <span class="n">mapped_to</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">other_segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">support</span><span class="p">):</span>
+                        <span class="k">yield</span> <span class="n">segment</span> <span class="o">&amp;</span> <span class="n">other_segment</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;unsupported mode: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">mode</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.crop"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.crop">[docs]</a>    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;intersection&#39;</span><span class="p">,</span> <span class="n">returns_mapping</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mapping</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Crop timeline to new support</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        support : Segment or Timeline</span>
+<span class="sd">            If `support` is a `Timeline`, its support is used.</span>
+<span class="sd">        mode : {&#39;strict&#39;, &#39;loose&#39;, &#39;intersection&#39;}, optional</span>
+<span class="sd">            Controls how segments that are not fully included in `support` are</span>
+<span class="sd">            handled. &#39;strict&#39; mode only keeps fully included segments. &#39;loose&#39;</span>
+<span class="sd">            mode keeps any intersecting segment. &#39;intersection&#39; mode keeps any</span>
+<span class="sd">            intersecting segment but replace them by their actual intersection.</span>
+<span class="sd">        returns_mapping : bool, optional</span>
+<span class="sd">            In &#39;intersection&#39; mode, return a dictionary whose keys are segments</span>
+<span class="sd">            of the cropped timeline, and values are list of the original</span>
+<span class="sd">            segments that were cropped. Defaults to False.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cropped : Timeline</span>
+<span class="sd">            Cropped timeline</span>
+<span class="sd">        mapping : dict</span>
+<span class="sd">            When &#39;returns_mapping&#39; is True, dictionary whose keys are segments</span>
+<span class="sd">            of &#39;cropped&#39;, and values are lists of corresponding original</span>
+<span class="sd">            segments.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        &gt;&gt;&gt; timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])</span>
+<span class="sd">        &gt;&gt;&gt; timeline.crop(Segment(1, 3))</span>
+<span class="sd">        &lt;Timeline(uri=None, segments=[&lt;Segment(1, 2)&gt;])&gt;</span>
+
+<span class="sd">        &gt;&gt;&gt; timeline.crop(Segment(1, 3), mode=&#39;loose&#39;)</span>
+<span class="sd">        &lt;Timeline(uri=None, segments=[&lt;Segment(0, 2)&gt;, &lt;Segment(1, 2)&gt;])&gt;</span>
+
+<span class="sd">        &gt;&gt;&gt; timeline.crop(Segment(1, 3), mode=&#39;strict&#39;)</span>
+<span class="sd">        &lt;Timeline(uri=None, segments=[&lt;Segment(1, 2)&gt;])&gt;</span>
+
+<span class="sd">        &gt;&gt;&gt; cropped, mapping = timeline.crop(Segment(1, 3), returns_mapping=True)</span>
+<span class="sd">        &gt;&gt;&gt; print(mapping)</span>
+<span class="sd">        {&lt;Segment(1, 2)&gt;: [&lt;Segment(0, 2)&gt;, &lt;Segment(1, 2)&gt;]}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">mapping</span><span class="p">:</span>
+            <span class="n">returns_mapping</span> <span class="o">=</span> <span class="n">mapping</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;mapping&#39; parameter has been renamed to &#39;returns_mapping&#39;.&quot;</span><span class="p">,</span>
+                <span class="ne">DeprecationWarning</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;intersection&#39;</span> <span class="ow">and</span> <span class="n">returns_mapping</span><span class="p">:</span>
+            <span class="n">segments</span><span class="p">,</span> <span class="n">mapping</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">mapped_to</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_iter</span><span class="p">(</span><span class="n">support</span><span class="p">,</span>
+                                                     <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;intersection&#39;</span><span class="p">,</span>
+                                                     <span class="n">returns_mapping</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mapped_to</span><span class="p">)</span>
+                <span class="n">mapping</span><span class="p">[</span><span class="n">mapped_to</span><span class="p">]</span> <span class="o">=</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">mapped_to</span><span class="p">,</span> <span class="nb">list</span><span class="p">())</span> <span class="o">+</span> <span class="p">[</span><span class="n">segment</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">),</span> <span class="n">mapping</span>
+
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop_iter</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.overlapping"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.overlapping">[docs]</a>    <span class="k">def</span> <span class="nf">overlapping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get list of segments overlapping `t`</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        t : float</span>
+<span class="sd">            Timestamp, in seconds.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        segments : list</span>
+<span class="sd">            List of all segments of timeline containing time t</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">overlapping</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.__str__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Human-readable representation</span>
+
+<span class="sd">        &gt;&gt;&gt; timeline = Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])</span>
+<span class="sd">        &gt;&gt;&gt; print(timeline)</span>
+<span class="sd">        [[ 00:00:00.000 --&gt;  00:00:10.000]</span>
+<span class="sd">         [ 00:00:01.000 --&gt;  00:00:13.370]]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span>
+        <span class="n">string</span> <span class="o">=</span> <span class="s2">&quot;[&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">segment</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">):</span>
+            <span class="n">string</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+            <span class="n">string</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> &quot;</span> <span class="k">if</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span> <span class="o">&lt;</span> <span class="n">n</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">string</span> <span class="o">+=</span> <span class="s2">&quot;]&quot;</span>
+        <span class="k">return</span> <span class="n">string</span></div>
+
+<div class="viewcode-block" id="Timeline.__repr__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computer-readable representation</span>
+
+<span class="sd">        &gt;&gt;&gt; Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])</span>
+<span class="sd">        &lt;Timeline(uri=None, segments=[&lt;Segment(0, 10)&gt;, &lt;Segment(1, 13.37)&gt;])&gt;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;&lt;Timeline(uri=</span><span class="si">%s</span><span class="s2">, segments=</span><span class="si">%s</span><span class="s2">)&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span>
+                                                    <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Timeline.__contains__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__contains__">[docs]</a>    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">included</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Inclusion</span>
+
+<span class="sd">        Check whether every segment of `included` does exist in timeline.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        included : Segment or Timeline</span>
+<span class="sd">            Segment or timeline being checked for inclusion</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        contains : bool</span>
+<span class="sd">            True if every segment in `included` exists in timeline,</span>
+<span class="sd">            False otherwise</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; timeline1 = Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])</span>
+<span class="sd">        &gt;&gt;&gt; timeline2 = Timeline(segments=[Segment(0, 10)])</span>
+<span class="sd">        &gt;&gt;&gt; timeline1 in timeline2</span>
+<span class="sd">        False</span>
+<span class="sd">        &gt;&gt;&gt; timeline2 in timeline1</span>
+<span class="sd">        &gt;&gt;&gt; Segment(1, 13.37) in timeline1</span>
+<span class="sd">        True</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">included</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">included</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">included</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="n">included</span><span class="o">.</span><span class="n">_segments</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                <span class="s1">&#39;Checking for inclusion only supports Segment and &#39;</span>
+                <span class="s1">&#39;Timeline instances&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.empty"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.empty">[docs]</a>    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return an empty copy</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty : Timeline</span>
+<span class="sd">            Empty timeline using the same &#39;uri&#39; attribute.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.copy"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment_func</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get a copy of the timeline</span>
+
+<span class="sd">        If `segment_func` is provided, it is applied to each segment first.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        segment_func : callable, optional</span>
+<span class="sd">            Callable that takes a segment as input, and returns a segment.</span>
+<span class="sd">            Defaults to identity function (segment_func(segment) = segment)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        timeline : Timeline</span>
+<span class="sd">            Copy of the timeline</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># if segment_func is not provided</span>
+        <span class="c1"># just add every segment</span>
+        <span class="k">if</span> <span class="n">segment_func</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="c1"># if is provided</span>
+        <span class="c1"># apply it to each segment before adding them</span>
+        <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">[</span><span class="n">segment_func</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="p">],</span>
+                        <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.extent"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.extent">[docs]</a>    <span class="k">def</span> <span class="nf">extent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Extent</span>
+
+<span class="sd">        The extent of a timeline is the segment of minimum duration that</span>
+<span class="sd">        contains every segments of the timeline. It is unique, by definition.</span>
+<span class="sd">        The extent of an empty timeline is an empty segment.</span>
+
+<span class="sd">        A picture is worth a thousand words::</span>
+
+<span class="sd">            timeline</span>
+<span class="sd">            |------|    |------|     |----|</span>
+<span class="sd">              |--|    |-----|     |----------|</span>
+
+<span class="sd">            timeline.extent()</span>
+<span class="sd">            |--------------------------------|</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        extent : Segment</span>
+<span class="sd">            Timeline extent</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; timeline = Timeline(segments=[Segment(0, 1), Segment(9, 10)])</span>
+<span class="sd">        &gt;&gt;&gt; timeline.extent()</span>
+<span class="sd">        &lt;Segment(0, 10)&gt;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">extent</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Timeline.support_iter"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.support_iter">[docs]</a>    <span class="k">def</span> <span class="nf">support_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Like `support` but returns a segment iterator instead</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :func:`pyannote.core.Timeline.support`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The support of an empty timeline is an empty timeline.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Principle:</span>
+        <span class="c1">#   * gather all segments with no gap between them</span>
+        <span class="c1">#   * add one segment per resulting group (their union |)</span>
+        <span class="c1"># Note:</span>
+        <span class="c1">#   Since segments are kept sorted internally,</span>
+        <span class="c1">#   there is no need to perform an exhaustive segment clustering.</span>
+        <span class="c1">#   We just have to consider them in their natural order.</span>
+
+        <span class="c1"># Initialize new support segment</span>
+        <span class="c1"># as very first segment of the timeline</span>
+        <span class="n">new_segment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">kth</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+
+            <span class="c1"># If there is no gap between new support segment and next segment,</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">segment</span> <span class="o">^</span> <span class="n">new_segment</span><span class="p">):</span>
+                <span class="c1"># Extend new support segment using next segment</span>
+                <span class="n">new_segment</span> <span class="o">|=</span> <span class="n">segment</span>
+
+            <span class="c1"># If there actually is a gap,</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">new_segment</span>
+
+                <span class="c1"># Initialize new support segment as next segment</span>
+                <span class="c1"># (right after the gap)</span>
+                <span class="n">new_segment</span> <span class="o">=</span> <span class="n">segment</span>
+
+        <span class="c1"># Add new segment to the timeline support</span>
+        <span class="k">yield</span> <span class="n">new_segment</span></div>
+
+<div class="viewcode-block" id="Timeline.support"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.support">[docs]</a>    <span class="k">def</span> <span class="nf">support</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Timeline support</span>
+
+<span class="sd">        The support of a timeline is the timeline with the minimum number of</span>
+<span class="sd">        segments with exactly the same time span as the original timeline. It</span>
+<span class="sd">        is (by definition) unique and does not contain any overlapping</span>
+<span class="sd">        segments.</span>
+
+<span class="sd">        A picture is worth a thousand words::</span>
+
+<span class="sd">            timeline</span>
+<span class="sd">            |------|    |------|     |----|</span>
+<span class="sd">              |--|    |-----|     |----------|</span>
+
+<span class="sd">            timeline.support()</span>
+<span class="sd">            |------|  |--------|  |----------|</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        support : Timeline</span>
+<span class="sd">            Timeline support</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">support_iter</span><span class="p">()]</span>
+        <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">coverage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s1">&#39;&quot;coverage&quot; has been renamed to &quot;support&quot;.&#39;</span><span class="p">,</span>
+            <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Timeline.duration"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.duration">[docs]</a>    <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Timeline duration</span>
+
+<span class="sd">        The timeline duration is the sum of the durations of the segments</span>
+<span class="sd">        in the timeline support.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        duration : float</span>
+<span class="sd">            Duration of timeline support, in seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># The timeline duration is the sum of the durations</span>
+        <span class="c1"># of the segments in the timeline support.</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">duration</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">support_iter</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Timeline.gaps_iter"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.gaps_iter">[docs]</a>    <span class="k">def</span> <span class="nf">gaps_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">support</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Like `gaps` but returns a segment iterator instead</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :func:`pyannote.core.Timeline.gaps`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">support</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">support</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">extent</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="p">(</span><span class="n">Segment</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unsupported operand type(s) for -&#39;:&quot;</span>
+                            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> and Timeline.&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">support</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+
+        <span class="c1"># segment support</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
+
+            <span class="c1"># `end` is meant to store the end time of former segment</span>
+            <span class="c1"># initialize it with beginning of provided segment `support`</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">support</span><span class="o">.</span><span class="n">start</span>
+
+            <span class="c1"># support on the intersection of timeline and provided segment</span>
+            <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;intersection&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">support</span><span class="p">():</span>
+
+                <span class="c1"># add gap between each pair of consecutive segments</span>
+                <span class="c1"># if there is no gap, segment is empty, therefore not added</span>
+                <span class="k">yield</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+
+                <span class="c1"># keep track of the end of former segment</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">segment</span><span class="o">.</span><span class="n">end</span>
+
+            <span class="c1"># add final gap (if not empty)</span>
+            <span class="k">yield</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">support</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+
+        <span class="c1"># timeline support</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">):</span>
+
+            <span class="c1"># yield gaps for every segment in support of provided timeline</span>
+            <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">support</span><span class="o">.</span><span class="n">support</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">gap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaps_iter</span><span class="p">(</span><span class="n">support</span><span class="o">=</span><span class="n">segment</span><span class="p">):</span>
+                    <span class="k">yield</span> <span class="n">gap</span></div>
+
+<div class="viewcode-block" id="Timeline.gaps"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.gaps">[docs]</a>    <span class="k">def</span> <span class="nf">gaps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">support</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">focus</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Gaps</span>
+
+<span class="sd">        A picture is worth a thousand words::</span>
+
+<span class="sd">            timeline</span>
+<span class="sd">            |------|    |------|     |----|</span>
+<span class="sd">              |--|    |-----|     |----------|</span>
+
+<span class="sd">            timeline.gaps()</span>
+<span class="sd">                   |--|        |--|</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        support : None, Segment or Timeline</span>
+<span class="sd">            Support in which gaps are looked for. Defaults to timeline extent</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        gaps : Timeline</span>
+<span class="sd">            Timeline made of all gaps from original timeline, and delimited</span>
+<span class="sd">            by provided support</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :func:`pyannote.core.Timeline.extent`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">focus</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">support</span> <span class="o">=</span> <span class="n">focus</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;focus&#39; parameter has been renamed to &#39;support&#39;.&quot;</span><span class="p">,</span>
+                <span class="ne">DeprecationWarning</span><span class="p">)</span>
+
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaps_iter</span><span class="p">(</span><span class="n">support</span><span class="o">=</span><span class="n">support</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Timeline.segmentation"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.segmentation">[docs]</a>    <span class="k">def</span> <span class="nf">segmentation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Segmentation</span>
+
+<span class="sd">        Create the unique timeline with same support and same set of segment</span>
+<span class="sd">        boundaries as original timeline, but with no overlapping segments.</span>
+
+<span class="sd">        A picture is worth a thousand words::</span>
+
+<span class="sd">            timeline</span>
+<span class="sd">            |------|    |------|     |----|</span>
+<span class="sd">              |--|    |-----|     |----------|</span>
+
+<span class="sd">            timeline.segmentation()</span>
+<span class="sd">            |-|--|-|  |-|---|--|  |--|----|--|</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        timeline : Timeline</span>
+<span class="sd">            (unique) timeline with same support and same set of segment</span>
+<span class="sd">            boundaries as original timeline, but with no overlapping segments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># COMPLEXITY: O(n)</span>
+        <span class="n">support</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">support</span><span class="p">()</span>
+
+        <span class="c1"># COMPLEXITY: O(n.log n)</span>
+        <span class="c1"># get all boundaries (sorted)</span>
+        <span class="c1"># |------|    |------|     |----|</span>
+        <span class="c1">#   |--|    |-----|     |----------|</span>
+        <span class="c1"># becomes</span>
+        <span class="c1"># | |  | |  | |   |  |  |  |    |  |</span>
+        <span class="n">timestamps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">timestamps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">start</span><span class="p">)</span>
+            <span class="n">timestamps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">end</span><span class="p">)</span>
+        <span class="n">timestamps</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span>
+
+        <span class="c1"># create new partition timeline</span>
+        <span class="c1"># | |  | |  | |   |  |  |  |    |  |</span>
+        <span class="c1"># becomes</span>
+        <span class="c1"># |-|--|-|  |-|---|--|  |--|----|--|</span>
+
+        <span class="c1"># start with an empty copy</span>
+        <span class="n">timeline</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">timestamps</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">timestamps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">timestamps</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="c1"># only add segments that are covered by original timeline</span>
+            <span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">segment</span> <span class="ow">and</span> <span class="n">support</span><span class="o">.</span><span class="n">overlapping</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">middle</span><span class="p">):</span>
+                <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span>
+            <span class="c1"># next segment...</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">end</span>
+
+        <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Timeline.for_json"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.for_json">[docs]</a>    <span class="k">def</span> <span class="nf">for_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Serialization</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :mod:`pyannote.core.json`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">PYANNOTE_JSON</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">}</span>
+        <span class="n">data</span><span class="p">[</span><span class="n">PYANNOTE_JSON_CONTENT</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">for_json</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">PYANNOTE_URI</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span>
+
+        <span class="k">return</span> <span class="n">data</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Timeline.from_json"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.from_json">[docs]</a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Deserialization</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :mod:`pyannote.core.json`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PYANNOTE_URI</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">Segment</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">PYANNOTE_JSON_CONTENT</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_repr_png_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;IPython notebook support</span>
+
+<span class="sd">        See also</span>
+<span class="sd">        --------</span>
+<span class="sd">        :mod:`pyannote.core.notebook`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">.notebook</span> <span class="k">import</span> <span class="n">repr_timeline</span>
+        <span class="k">return</span> <span class="n">repr_timeline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Hervé Bredin.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../',
+            VERSION:'0.11.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

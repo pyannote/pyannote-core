@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.timeline &mdash; pyannote.core 0.11.1 documentation</title>
+  <title>pyannote.core.timeline &mdash; pyannote.core 0.13.1 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,7 +35,7 @@
         <link rel="index" title="Index"
               href="../../../genindex.html"/>
         <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="pyannote.core 0.11.1 documentation" href="../../../index.html"/>
+    <link rel="top" title="pyannote.core 0.13.1 documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
   
@@ -43,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -62,7 +65,7 @@
             
             
               <div class="version">
-                0.11.1
+                0.13.1
               </div>
             
           
@@ -83,7 +86,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Available data structures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../serialization.html">Serialization</a></li>
@@ -103,8 +109,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../../../index.html">pyannote.core</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">pyannote.core</a>
+        
       </nav>
 
 
@@ -117,19 +125,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="../../../index.html">Docs</a> &raquo;</li>
-      
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
           <li><a href="../../index.html">Module code</a> &raquo;</li>
-      
-    <li>pyannote.core.timeline</li>
+        
+      <li>pyannote.core.timeline</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -232,6 +257,7 @@
 <span class="kn">from</span> <span class="nn">.interval_tree</span> <span class="k">import</span> <span class="n">TimelineUpdator</span>
 <span class="kn">from</span> <span class="nn">.segment</span> <span class="k">import</span> <span class="n">Segment</span>
 <span class="kn">from</span> <span class="nn">.json</span> <span class="k">import</span> <span class="n">PYANNOTE_JSON</span><span class="p">,</span> <span class="n">PYANNOTE_JSON_CONTENT</span>
+<span class="kn">from</span> <span class="nn">.util</span> <span class="k">import</span> <span class="n">string_generator</span><span class="p">,</span> <span class="n">int_generator</span>
 
 <span class="c1"># ignore Banyan warning</span>
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
@@ -271,14 +297,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_df</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_df</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">segments</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">PYANNOTE_SEGMENT</span><span class="p">])</span>
-        <span class="n">timeline</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span>
+        <span class="n">timeline</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">timeline</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segments</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="nb">super</span><span class="p">(</span><span class="n">Timeline</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Timeline</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># sorted set of segments (as an augmented red-black tree)</span>
         <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">segments</span> <span class="k">if</span> <span class="n">s</span><span class="p">]</span> <span class="k">if</span> <span class="n">segments</span> <span class="k">else</span> <span class="p">[]</span>
@@ -298,7 +324,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_segments</span><span class="o">.</span><span class="n">length</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bool__</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__bool__</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Timeline.__bool__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__bool__">[docs]</a>    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Emptiness</span>
@@ -816,7 +842,7 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="p">(</span><span class="n">Segment</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unsupported operand type(s) for -&#39;:&quot;</span>
-                            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> and Timeline.&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">support</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+                            <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> and Timeline.&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">support</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 
         <span class="c1"># segment support</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
@@ -943,6 +969,35 @@
 
         <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Timeline.to_annotation"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.to_annotation">[docs]</a>    <span class="k">def</span> <span class="nf">to_annotation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="n">modality</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Turn timeline into an annotation</span>
+
+<span class="sd">        Each segment is labeled by a unique label.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        generator : &#39;string&#39;, &#39;int&#39;, or iterable, optional</span>
+<span class="sd">            If &#39;string&#39; (default) generate string labels. If &#39;int&#39;, generate</span>
+<span class="sd">            integer labels. If iterable, use it to generate labels.</span>
+<span class="sd">        modality : str, optional</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        annotation : Annotation</span>
+<span class="sd">            Annotation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">.annotation</span> <span class="k">import</span> <span class="n">Annotation</span>
+        <span class="n">annotation</span> <span class="o">=</span> <span class="n">Annotation</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="o">=</span><span class="n">modality</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">generator</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="n">string_generator</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">generator</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+            <span class="n">generator</span> <span class="o">=</span> <span class="n">int_generator</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">]</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">annotation</span></div>
 
 <div class="viewcode-block" id="Timeline.for_json"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.for_json">[docs]</a>    <span class="k">def</span> <span class="nf">for_json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Serialization</span>
@@ -952,7 +1007,7 @@
 <span class="sd">        :mod:`pyannote.core.json`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">PYANNOTE_JSON</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">PYANNOTE_JSON</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">}</span>
         <span class="n">data</span><span class="p">[</span><span class="n">PYANNOTE_JSON_CONTENT</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">for_json</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">:</span>
@@ -961,7 +1016,7 @@
         <span class="k">return</span> <span class="n">data</span></div>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Timeline.from_json"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.from_json">[docs]</a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="Timeline.from_json"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.from_json">[docs]</a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialization</span>
 
 <span class="sd">        See also</span>
@@ -971,7 +1026,7 @@
 
         <span class="n">uri</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PYANNOTE_URI</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">Segment</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">PYANNOTE_JSON_CONTENT</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_repr_png_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;IPython notebook support</span>
@@ -986,6 +1041,9 @@
 </pre></div>
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
@@ -994,7 +1052,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Hervé Bredin.
+        &copy; Copyright 2017, CNRS.
 
     </p>
   </div>
@@ -1016,10 +1074,11 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'../../../',
-            VERSION:'0.11.1',
+            VERSION:'0.13.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="../../../_static/jquery.js"></script>

@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Reference &mdash; pyannote.core 0.11.1 documentation</title>
+  <title>Reference &mdash; pyannote.core 0.13.1 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pyannote.core 0.11.1 documentation" href="index.html"/>
+    <link rel="top" title="pyannote.core 0.13.1 documentation" href="index.html"/>
         <link rel="next" title="Changelog" href="changelog.html"/>
         <link rel="prev" title="Serialization" href="serialization.html"/> 
 
@@ -44,6 +46,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -63,7 +66,7 @@
             
             
               <div class="version">
-                0.11.1
+                0.13.1
               </div>
             
           
@@ -84,7 +87,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Available data structures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
@@ -117,8 +123,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">pyannote.core</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pyannote.core</a>
+        
       </nav>
 
 
@@ -127,23 +135,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="index.html">Docs</a> &raquo;</li>
-      
-    <li>Reference</li>
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Reference</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="_sources/reference.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -943,6 +968,32 @@ segments.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="pyannote.core.Timeline.to_annotation">
+<code class="descname">to_annotation</code><span class="sig-paren">(</span><em>generator='string'</em>, <em>modality=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.to_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.to_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turn timeline into an annotation</p>
+<p>Each segment is labeled by a unique label.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>generator</strong> (<em>'string'</em><em>, </em><em>'int'</em><em>, or </em><em>iterable</em><em>, </em><em>optional</em>) &#8211; If &#8216;string&#8217; (default) generate string labels. If &#8216;int&#8217;, generate
+integer labels. If iterable, use it to generate labels.</li>
+<li><strong>modality</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a><em>, </em><em>optional</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>annotation</strong> &#8211; Annotation</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="pyannote.core.Timeline.union">
 <code class="descname">union</code><span class="sig-paren">(</span><em>timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.union" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create new timeline made of union of segments</p>
@@ -1244,7 +1295,7 @@ alphabetical) order.</td>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.crop">
-<code class="descname">crop</code><span class="sig-paren">(</span><em>support</em>, <em>mode=u'intersection'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.crop" title="Permalink to this definition">¶</a></dt>
+<code class="descname">crop</code><span class="sig-paren">(</span><em>support</em>, <em>mode='intersection'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.crop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Crop annotation to new support</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1587,7 +1638,7 @@ exist for the given segment.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.relabel_tracks">
-<code class="descname">relabel_tracks</code><span class="sig-paren">(</span><em>generator=u'string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.relabel_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.relabel_tracks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">relabel_tracks</code><span class="sig-paren">(</span><em>generator='string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.relabel_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.relabel_tracks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Relabel tracks</p>
 <p>Create a new annotation where each track has a unique label.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1607,7 +1658,7 @@ relabel to 0, 1, 2, ... If iterable, use it to generate labels.</td>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.rename_labels">
-<code class="descname">rename_labels</code><span class="sig-paren">(</span><em>mapping=None</em>, <em>generator=u'string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_labels" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rename_labels</code><span class="sig-paren">(</span><em>mapping=None</em>, <em>generator='string'</em>, <em>copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename labels</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1617,6 +1668,8 @@ relabel to 0, 1, 2, ... If iterable, use it to generate labels.</td>
 <li><strong>mapping</strong> (<a class="reference external" href="https://docs.python.org/2/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a><em>, </em><em>optional</em>) &#8211; {old_name: new_name} mapping dictionary.</li>
 <li><strong>generator</strong> (<em>'string'</em><em>, </em><em>'int'</em><em> or </em><em>iterable</em><em>, </em><em>optional</em>) &#8211; If &#8216;string&#8217; (default) rename label to &#8216;A&#8217;, &#8216;B&#8217;, &#8216;C&#8217;, ... If &#8216;int&#8217;,
 rename to 0, 1, 2, etc. If iterable, use it to generate labels.</li>
+<li><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/2/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a><em>, </em><em>optional</em>) &#8211; Return a copy of the annotation. Defaults to updating the
+annotation in-place.</li>
 </ul>
 </td>
 </tr>
@@ -1640,7 +1693,7 @@ rename to 0, 1, 2, etc. If iterable, use it to generate labels.</li>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.rename_tracks">
-<code class="descname">rename_tracks</code><span class="sig-paren">(</span><em>generator=u'string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_tracks" title="Permalink to this definition">¶</a></dt>
+<code class="descname">rename_tracks</code><span class="sig-paren">(</span><em>generator='string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_tracks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename all tracks</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1945,15 +1998,18 @@ annotation in-place.</li>
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="serialization.html" class="btn btn-neutral" title="Serialization" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="serialization.html" class="btn btn-neutral" title="Serialization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1962,7 +2018,7 @@ annotation in-place.</li>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Hervé Bredin.
+        &copy; Copyright 2017, CNRS.
 
     </p>
   </div>
@@ -1984,10 +2040,11 @@ annotation in-place.</li>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.11.1',
+            VERSION:'0.13.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>

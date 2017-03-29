@@ -8,9 +8,11 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core &mdash; pyannote.core 0.11.1 documentation</title>
+  <title>pyannote.core &mdash; pyannote.core 0.13.1 documentation</title>
   
 
+  
+  
   
   
 
@@ -33,7 +35,7 @@
         <link rel="index" title="Index"
               href="genindex.html"/>
         <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="pyannote.core 0.11.1 documentation" href="#"/>
+    <link rel="top" title="pyannote.core 0.13.1 documentation" href="#"/>
         <link rel="next" title="Available data structures" href="structure.html"/> 
 
   
@@ -43,6 +45,7 @@
 
 <body class="wy-body-for-nav" role="document">
 
+   
   <div class="wy-grid-for-nav">
 
     
@@ -62,7 +65,7 @@
             
             
               <div class="version">
-                0.11.1
+                0.13.1
               </div>
             
           
@@ -83,7 +86,10 @@
           
             
             
-                <ul>
+              
+            
+            
+              <ul>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Available data structures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
 <li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
@@ -103,8 +109,10 @@
 
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="#">pyannote.core</a>
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">pyannote.core</a>
+        
       </nav>
 
 
@@ -113,23 +121,40 @@
         <div class="rst-content">
           
 
- 
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <div role="navigation" aria-label="breadcrumbs navigation">
+
   <ul class="wy-breadcrumbs">
-    <li><a href="#">Docs</a> &raquo;</li>
-      
-    <li>pyannote.core</li>
+    
+      <li><a href="#">Docs</a> &raquo;</li>
+        
+      <li>pyannote.core</li>
+    
+    
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
+    
   </ul>
+
+  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
@@ -146,7 +171,10 @@
 <p>It also provides a convenient way to visualize this temporal data in IPython notebooks.</p>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install pyannote.core
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ conda create -n pyannote python=3.5 anaconda
+$ source activate pyannote
+$ conda install gcc
+$ pip install pyannote.core
 </pre></div>
 </div>
 </div>
@@ -176,6 +204,11 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-13-2-2017-03-29">Version 0.13.2 (2017-03-29)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-13-1-2017-02-20">Version 0.13.1 (2017-02-20)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-13-2017-02-05">Version 0.13 (2017-02-05)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-12-1-2017-30-01">Version 0.12.1 (2017-30-01)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-12-2017-29-01">Version 0.12 (2017-29-01)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-11-1-2017-25-01">Version 0.11.1 (2017-25-01)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-11-2017-24-01">Version 0.11 (2017-24-01)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="changelog.html#version-0-10-2017-18-01">Version 0.10 (2017-18-01)</a></li>
@@ -229,12 +262,15 @@
 
 
            </div>
+           <div class="articleComments">
+            
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="structure.html" class="btn btn-neutral float-right" title="Available data structures" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="structure.html" class="btn btn-neutral float-right" title="Available data structures" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>
@@ -244,7 +280,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Hervé Bredin.
+        &copy; Copyright 2017, CNRS.
 
     </p>
   </div>
@@ -266,10 +302,11 @@
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'0.11.1',
+            VERSION:'0.13.1',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
         };
     </script>
       <script type="text/javascript" src="_static/jquery.js"></script>
