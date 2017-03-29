@@ -72,7 +72,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pyannote.core'
-copyright = u'2017, Hervé Bredin'
+copyright = u'2017, CNRS'
 author = u'Hervé Bredin'
 
 # The version info for the project you're documenting, acts as replacement for

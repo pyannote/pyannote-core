@@ -41,7 +41,6 @@ except Exception as e:
     pass
 from matplotlib.cm import get_cmap
 import six.moves
-from unidecode import unidecode
 import tempfile
 import networkx as nx
 import numpy as np
@@ -366,6 +365,8 @@ def _shorten_long_text(text, max_length=30):
 
 
 def _clean_text(text):
+
+    from unidecode import unidecode
 
     only_ascii = six.u(unidecode(text))
 
