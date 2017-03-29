@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2016 CNRS
+# Copyright (c) 2014-2017 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -46,14 +46,13 @@ setup(
         'networkx >= 1.10.0',
         'simplejson >= 3.8.1',
         'six >= 1.10.0',
+        'matplotlib >= 2.0.0',
+        'unidecode >= 0.04.20',
     ],
     extras_require={
         'notebook': [
-            'matplotlib >= 1.5.1',
             'pygraphviz >= 1.3.1',
-            'jupyter >= 1.0.0',
             'pydot2 >= 1.0.33',
-            'unidecode >= 0.4.19'
         ],
     },
     # versioneer
@@ -77,6 +76,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Topic :: Scientific/Engineering"
     ],
 )
