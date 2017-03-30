@@ -90,8 +90,7 @@ See :class:`pyannote.core.Timeline` for the complete reference.
 import warnings
 
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
-from banyan import SortedSet
-from .interval_tree import TimelineUpdator
+from .interval_tree import SortedSet
 from .segment import Segment
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .util import string_generator, int_generator
@@ -145,9 +144,7 @@ class Timeline(object):
 
         # sorted set of segments (as an augmented red-black tree)
         segments = [s for s in segments if s] if segments else []
-        self._segments = SortedSet(items=segments,
-                                   key_type=(float, float),
-                                   updator=TimelineUpdator)
+        self._segments = SortedSet(segments)
 
         # path to (or any identifier of) segmented resource
         self.uri = uri

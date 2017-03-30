@@ -308,3 +308,52 @@ class TimelineUpdator(object):
     def co_iter(self, other):
         for segment, other_segment in _co_iter(self.root, other.root):
             yield segment, other_segment
+
+try:
+    import banyan
+
+    class SortedDict(banyan.SortedDict):
+        def __init__(self, *args, **kwargs):
+            kwargs['key_type'] = (float, float)
+            kwargs['updator'] = TimelineUpdator
+            super(SortedDict, self).__init__(*args, **kwargs)
+
+    class SortedSet(banyan.SortedSet):
+        def __init__(self, *args, **kwargs):
+            kwargs['key_type'] = (float, float)
+            kwargs['updator'] = TimelineUpdator
+            super(SortedSet, self).__init__(*args, **kwargs)
+
+    import warnings
+    # ignore Banyan warning
+    warnings.filterwarnings(
+        'ignore',
+        'Key-type optimization unimplemented with callback metadata.',
+        Warning)
+
+except ImportError:
+    import sortedcontainers
+
+    class SortedDict(sortedcontainers.SortedDict):
+        length = dict.__len__
+
+    class SortedSet(sortedcontainers.SortedSet):
+        length = sortedcontainers.SortedSet.__len__
+        kth = sortedcontainers.SortedSet.__getitem__
+
+        def co_iter(self, other):
+            for alpha in self:
+                for beta in other:
+                    if alpha.intersects(beta):
+                        yield alpha, beta
+
+        def extent(self):
+            if self:
+                start = self[0].start
+                end = max(segment.end for segment in self)
+                return Segment(start=start, end=end)
+            else:
+                return Segment(start=np.inf, end=-np.inf)
+
+        def overlapping(self, t):
+            return [segment for segment in self if segment.overlaps(t)]

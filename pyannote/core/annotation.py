@@ -118,19 +118,12 @@ import numpy as np
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
-from banyan import SortedDict
 from xarray import DataArray
-from .interval_tree import TimelineUpdator
+from .interval_tree import SortedDict
 from .segment import Segment
 from .timeline import Timeline
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .util import string_generator, int_generator
-
-# ignore Banyan warning
-warnings.filterwarnings(
-    'ignore',
-    'Key-type optimization unimplemented with callback metadata.',
-    Warning)
 
 
 class Annotation(object):
@@ -182,8 +175,7 @@ class Annotation(object):
         # sorted dictionary
         # keys: annotated segments
         # values: {track: label} dictionary
-        self._tracks = SortedDict(key_type=(float, float),
-                                  updator=TimelineUpdator)
+        self._tracks = SortedDict()
 
         # dictionary
         # key: label
@@ -418,10 +410,7 @@ class Annotation(object):
                     _tracks[segment] = tracks
                     _labels.update(tracks.values())
 
-                cropped._tracks = SortedDict(
-                    _tracks,
-                    key_type=(float, float),
-                    updator=TimelineUpdator)
+                cropped._tracks = SortedDict(_tracks)
 
                 cropped._labelNeedsUpdate = {label: True for label in _labels}
                 cropped._labels = {label: None for label in _labels}
@@ -446,10 +435,7 @@ class Annotation(object):
                     _tracks[segment] = tracks
                     _labels.update(tracks.values())
 
-                cropped._tracks = SortedDict(
-                    _tracks,
-                    key_type=(float, float),
-                    updator=TimelineUpdator)
+                cropped._tracks = SortedDict(_tracks)
 
                 cropped._labelNeedsUpdate = {label: True for label in _labels}
                 cropped._labels = {label: None for label in _labels}
@@ -530,9 +516,7 @@ class Annotation(object):
             _labels.update(value.values())
             _tracks.append((key, dict(value)))
 
-        copied._tracks = SortedDict(items=_tracks,
-                                    key_type=(float, float),
-                                    updator=TimelineUpdator)
+        copied._tracks = SortedDict(_tracks)
 
         copied._labels = {label: None for label in _labels}
         copied._labelNeedsUpdate = {label: True for label in _labels}
@@ -796,9 +780,7 @@ class Annotation(object):
                 _tracks[segment] = sub_tracks
                 _labels.update(sub_tracks.values())
 
-        sub._tracks = SortedDict(_tracks,
-                                 key_type=(float, float),
-                                 updator=TimelineUpdator)
+        sub._tracks = SortedDict(_tracks)
 
         sub._labelNeedsUpdate = {label: True for label in _labels}
         sub._labels = {label: None for label in _labels}
