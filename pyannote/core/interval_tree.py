@@ -332,28 +332,77 @@ try:
         Warning)
 
 except ImportError:
-    import sortedcontainers
+    import collections as co
+    import sortedcontainers as sc
 
-    class SortedDict(sortedcontainers.SortedDict):
+    class SortedDict(sc.SortedDict):
         length = dict.__len__
 
-    class SortedSet(sortedcontainers.SortedSet):
-        length = sortedcontainers.SortedSet.__len__
-        kth = sortedcontainers.SortedSet.__getitem__
+    class SortedSet(co.MutableSet):
+        "Sorted set intended only for segments."
+        def __init__(self, segments=()):
+            "Initialize sorted set from iterable of segments."
+            set_segments = set(segments)
+            self._set = set_segments
+            self._list = sc.SortedList(set_segments)
+            marks = (mark for segment in set_segments for mark in segment)
+            self._marks = sc.SortedList(marks)
 
-        def co_iter(self, other):
-            for alpha in self:
-                for beta in other:
-                    if alpha.intersects(beta):
-                        yield alpha, beta
+        def __contains__(self, segment):
+            return segment in self._set
+
+        def __iter__(self):
+            return iter(self._list)
+
+        def __len__(self):
+            return len(self._set)
+
+        length = __len__
+
+        def add(self, segment):
+            _set = self._set
+            if segment in _set:
+                return
+            _set.add(segment)
+            self._list.add(segment)
+            _marks = self._marks
+            _marks.add(segment.start)
+            _marks.add(segment.end)
+
+        def discard(self, segment):
+            _set = self._set
+            if segment not in _set:
+                return
+            _set.remove(segment)
+            self._list.remove(segment)
+            _marks = self._marks
+            _marks.remove(segment.start)
+            _marks.remove(segment.end)
 
         def extent(self):
-            if self:
-                start = self[0].start
-                end = max(segment.end for segment in self)
+            if self._set:
+                _marks = self._marks
+                start = _marks[0]
+                end = _marks[-1]
                 return Segment(start=start, end=end)
             else:
                 return Segment(start=np.inf, end=-np.inf)
 
-        def overlapping(self, t):
-            return [segment for segment in self if segment.overlaps(t)]
+        def kth(self, index):
+            return self._list[index]
+
+        def co_iter(self, other):
+            for alpha in self._list:
+                temp = Segment(start=alpha.end, end=alpha.end)
+                iterable = other._list.irange(maximum=temp)
+                for beta in iterable:
+                    if alpha.intersects(beta):
+                        yield alpha, beta
+
+        def overlapping(self, value):
+            segment = Segment(start=value, end=value)
+            iterable = self._list.irange(maximum=segment)
+            result = [segment.overlaps(value) for segment in iterable]
+            return result
+
+        union = co.MutableSet.__or__
