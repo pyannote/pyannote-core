@@ -105,3 +105,4 @@ class SortedSet(co.MutableSet):
         return result
 
     union = co.MutableSet.__or__
+    update = co.MutableSet.__ior__
