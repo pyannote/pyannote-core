@@ -37,7 +37,7 @@ setup(
     namespace_packages=['pyannote'],
     packages=find_packages(),
     install_requires=[
-        'pyannote-banyan >= 0.1.6',
+        'sortedcontainers >= 1.5.7',
         'numpy >= 1.10.4',
         'pandas >= 0.17.1',
         'xarray >= 0.7.0',
