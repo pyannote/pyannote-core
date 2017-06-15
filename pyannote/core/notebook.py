@@ -66,7 +66,7 @@ class Notebook(object):
         colors = [cm(1. * i / 8) for i in range(9)]
 
         self._style_generator = cycle(product(linestyle, linewidth, colors))
-        self._style = {None: (1, 'solid', (0.0, 0.0, 0.0))}
+        self._style = {None: ('solid', 1, (0.0, 0.0, 0.0))}
         del self.crop
         del self.width
 
