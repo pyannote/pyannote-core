@@ -228,8 +228,6 @@ class Notebook(object):
                 cropped.itertracks(label=True), self.get_y(segments)):
             self.draw_segment(ax, segment, y, label=label)
 
-        # ax.set_aspect(3. / self.crop.duration)
-
         if legend:
             # this gets exactly one legend handle and one legend label per label
             # (avoids repeated legends for repeated tracks with same label)
