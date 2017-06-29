@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 0.13.3 (2017-06-29)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix SlidingWindowFeature.iterfeatures()
+
 Version 0.13.2 (2017-03-29)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
