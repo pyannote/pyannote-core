@@ -86,7 +86,7 @@ class SlidingWindowFeature(object):
 
         """
         nSamples = self.data.shape[0]
-        for i in xrange(nSamples):
+        for i in range(nSamples):
             if window:
                 yield self.data[i], self.sliding_window[i]
             else:
