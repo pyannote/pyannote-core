@@ -8,6 +8,6 @@ python:
   - "3.5"
 
 install:
-  - pip install .
+  - travis_wait pip install .
 
-script: py.test 
+script: py.test
