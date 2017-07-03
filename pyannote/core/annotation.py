@@ -119,7 +119,7 @@ import numpy as np
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
 from xarray import DataArray
-from .interval_tree import SortedDict
+from sortedcontainers import SortedDict
 from .segment import Segment
 from .timeline import Timeline
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
@@ -229,7 +229,7 @@ class Annotation(object):
         >>> len(annotation)  # annotation contains three segments
         3
         """
-        return self._tracks.length()
+        return len(self._tracks)
 
     def __nonzero__(self):
         return self.__bool__()
@@ -242,7 +242,7 @@ class Annotation(object):
         ... else:
         ...    # annotation is not empty
         """
-        return self._tracks.length() > 0
+        return len(self._tracks) > 0
 
     def itersegments(self):
         """Iterate over segments (in chronological order)
