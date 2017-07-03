@@ -1,3 +1,31 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+# The MIT License (MIT)
+
+# Copyright (c) 2016-2017 CNRS
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# AUTHORS
+# Hervé BREDIN - http://herve.niderb.fr
+
 import pytest
 
 from pyannote.core import Annotation
@@ -35,9 +63,32 @@ def test_iteration(timeline):
                               Segment(7, 8),
                               Segment(8.5, 10)]
 
+def test_remove(timeline):
+    timeline.remove(Segment(1, 4))
+    timeline.remove(Segment(5, 7))
+    assert list(timeline) == [Segment(0.5, 3),
+                              Segment(6, 8),
+                              Segment(7, 8),
+                              Segment(8.5, 10)]
+
 def test_getter(timeline):
     assert len(timeline) == 6
     assert str(timeline[1]) == "[ 00:00:01.000 -->  00:00:04.000]"
+
+def test_getter_negative(timeline):
+    assert timeline[-2] == Segment(7, 8)
+
+def test_extent(timeline):
+    assert timeline.extent() == Segment(0.5, 10)
+
+def test_remove_and_extent():
+    t = Timeline(uri='MyAudioFile')
+    t.add(Segment(6, 8))
+    t.add(Segment(7, 9))
+    t.add(Segment(6, 9))
+
+    t.remove(Segment(6, 9))
+    assert t.extent() == Segment(6, 9)
 
 def test_extent(timeline):
     assert timeline.extent() == Segment(0.5, 10)
@@ -101,3 +152,18 @@ def test_union():
 
     assert list(first_timeline.co_iter(second_timeline)) == [(Segment(2, 3), Segment(1.5, 4.5)),
                                                              (Segment(4, 5), Segment(1.5, 4.5))]
+def test_union_extent():
+    first_timeline = Timeline([Segment(0, 1),
+                               Segment(2, 3),
+                               Segment(4, 5)])
+    second_timeline = Timeline([Segment(1.5, 6)])
+
+    union_timeline = first_timeline.union(second_timeline)
+    assert union_timeline.extent() == Segment(0, 6)
+
+
+def test_update_extent():
+    timeline = Timeline([Segment(0, 1), Segment(2, 3), Segment(4, 5)])
+    other_timeline = Timeline([Segment(1.5, 6)])
+    timeline.update(other_timeline)
+    assert timeline.extent() == Segment(0, 6)
