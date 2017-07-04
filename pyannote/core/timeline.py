@@ -522,7 +522,7 @@ class Timeline(object):
         --------
         :func:`pyannote.core.Timeline.overlapping`
         """
-        segment = Segment(start=timestamp, end=timestamp)
+        segment = Segment(start=t, end=t)
         iterable = self.segments_list_.irange(maximum=segment)
         for segment in self.segments_list_.irange(maximum=segment):
             if segment.overlaps(t):

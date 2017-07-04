@@ -2,8 +2,8 @@
 Changelog
 #########
 
-Version 1.0 (2017-07-04)
-~~~~~~~~~~~~~~~~~~~~~~~~
+Version 1.0.1 (2017-07-04)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - improve: switch from banyan to sortedcontainers
 - feat: add Timeline.{remove|discard|overlapping_iter} methods
