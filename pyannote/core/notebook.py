@@ -59,14 +59,14 @@ class Notebook(object):
         self.reset()
 
     def reset(self):
-        linewidth = [2, 4]
+        linewidth = [3, 1]
         linestyle = ['solid', 'dashed', 'dotted']
 
         cm = get_cmap('Set1')
         colors = [cm(1. * i / 8) for i in range(9)]
 
-        self._style_generator = cycle(product(linewidth, linestyle, colors))
-        self._style = {None: (1, 'solid', (0.0, 0.0, 0.0))}
+        self._style_generator = cycle(product(linestyle, linewidth, colors))
+        self._style = {None: ('solid', 1, (0.0, 0.0, 0.0))}
         del self.crop
         del self.width
 
@@ -116,16 +116,16 @@ class Notebook(object):
         if not segment:
             return
 
-        linewidth, linestyle, color = self[label]
+        linestyle, linewidth, color = self[label]
 
         # draw segment
         ax.hlines(y, segment.start, segment.end, color,
                  linewidth=linewidth, linestyle=linestyle, label=label)
         if boundaries:
             ax.vlines(segment.start, y + 0.05, y - 0.05,
-                      color, linewidth=linewidth, linestyle=linestyle)
+                      color, linewidth=1, linestyle='solid')
             ax.vlines(segment.end, y + 0.05, y - 0.05,
-                      color, linewidth=linewidth, linestyle=linestyle)
+                      color, linewidth=1, linestyle='solid')
 
         if label is None:
             return
@@ -227,8 +227,6 @@ class Notebook(object):
         for (segment, track, label), y in six.moves.zip(
                 cropped.itertracks(label=True), self.get_y(segments)):
             self.draw_segment(ax, segment, y, label=label)
-
-        # ax.set_aspect(3. / self.crop.duration)
 
         if legend:
             # this gets exactly one legend handle and one legend label per label
