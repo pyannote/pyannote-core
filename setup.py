@@ -41,8 +41,6 @@ setup(
         'numpy >= 1.10.4',
         'pandas >= 0.17.1',
         'xarray >= 0.7.0',
-        'numexpr >= 2.4.6',
-        'bottleneck >= 1.0.0',
         'networkx >= 1.10.0',
         'simplejson >= 3.8.1',
         'six >= 1.10.0',
@@ -74,7 +72,6 @@ setup(
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Topic :: Scientific/Engineering"
