@@ -2,6 +2,16 @@
 Changelog
 #########
 
+Version 1.0 (2017-07-04)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- improve: switch from banyan to sortedcontainers
+- feat: add Timeline.{remove|discard|overlapping_iter} methods
+- BREAKING: Timeline.__init__ now raises ValueError in case of empty segment
+- BREAKING: Timeline.crop now raises ValueError for bad mode
+- BREAKING: rename "mapping" arguments to "returns_mapping" in Timeline.crop
+- test: add more tests
+
 Version 0.13.3 (2017-06-29)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
