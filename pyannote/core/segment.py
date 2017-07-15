@@ -571,7 +571,7 @@ class SlidingWindow(object):
 
         elif isinstance(focus, Timeline):
             return np.unique(np.hstack([
-                self.crop(s, mode=mode, fixed=fixed) for s in focus.coverage()]))
+                self.crop(s, mode=mode, fixed=fixed) for s in focus.support()]))
 
         else:
             raise TypeError('focus must be a Segment or a Timeline.')
