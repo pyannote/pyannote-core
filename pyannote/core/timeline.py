@@ -669,6 +669,7 @@ class Timeline(object):
             end = segments_boundaries_[-1]
             return Segment(start=start, end=end)
         else:
+            import numpy as np
             return Segment(start=np.inf, end=-np.inf)
 
     def support_iter(self):
