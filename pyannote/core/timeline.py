@@ -414,7 +414,13 @@ class Timeline(object):
             raise TypeError("Support must be a Segment or a Timeline.")
 
         if isinstance(support, Segment):
-            support = Timeline(segments=[support], uri=self.uri)
+            # corner case where "support" is empty
+            if support:
+                segments = [support]
+            else:
+                segments = []
+            
+            support = Timeline(segments=segments, uri=self.uri)
             for yielded in self.crop_iter(support, mode=mode,
                                           returns_mapping=returns_mapping):
                 yield yielded
