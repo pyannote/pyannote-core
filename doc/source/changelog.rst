@@ -2,10 +2,11 @@
 Changelog
 #########
 
-Version 1.0.3 (2017-07-18)
+Version 1.0.4 (2017-07-18)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - fix: add missing import
+- fix: fix corner case in Timeline.crop_iter
 
 Version 1.0.2 (2017-07-15)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
