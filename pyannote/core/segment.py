@@ -422,6 +422,9 @@ class SlidingWindow(object):
                 raise ValueError("'end' must be greater than 'start'.")
             self.__end = end
 
+        # current index of iterator
+        self.__i = -1
+
     def __get_start(self):
         return self.__start
     start = property(fget=__get_start)
@@ -684,6 +687,29 @@ class SlidingWindow(object):
 
         return Segment(start=start, end=start + self.__duration)
 
+    def next(self):
+        return self.__next__()
+
+    def __next__(self):
+        """Sliding window iterator
+
+        Usage
+        -----
+        >>> sw = SlidingWindow(end=0.1)
+        >>> print(next(sw))
+        [ 00:00:00.000 -->  00:00:00.030]
+        >>> print(next(sw))
+        [ 00:00:00.010 -->  00:00:00.040]
+        """
+
+        self.__i += 1
+        window = self[self.__i]
+
+        if window:
+            return window
+        else:
+            raise StopIteration
+
     def __iter__(self):
         """Sliding window iterator
 
@@ -692,33 +718,24 @@ class SlidingWindow(object):
         Examples
         --------
 
-            >>> window = SlidingWindow(end=0.1)
-            >>> for segment in window:
-            ...     print segment
-            [0.000 --> 0.030]
-            [0.010 --> 0.040]
-            [0.020 --> 0.050]
-            [0.030 --> 0.060]
-            [0.040 --> 0.070]
-            [0.050 --> 0.080]
-            [0.060 --> 0.090]
-            [0.070 --> 0.100]
-            [0.080 --> 0.100]
-            [0.090 --> 0.100]
-
+        >>> window = SlidingWindow(end=0.1)
+        >>> for segment in window:
+        ...     print(segment)
+        [ 00:00:00.000 -->  00:00:00.030]
+        [ 00:00:00.010 -->  00:00:00.040]
+        [ 00:00:00.020 -->  00:00:00.050]
+        [ 00:00:00.030 -->  00:00:00.060]
+        [ 00:00:00.040 -->  00:00:00.070]
+        [ 00:00:00.050 -->  00:00:00.080]
+        [ 00:00:00.060 -->  00:00:00.090]
+        [ 00:00:00.070 -->  00:00:00.100]
+        [ 00:00:00.080 -->  00:00:00.110]
+        [ 00:00:00.090 -->  00:00:00.120]
         """
 
-        # get window first position
-        i = 0
-        window = self[i]
-
-        # yield window while it's valid
-        while(window):
-            yield window
-
-            # get window next position
-            i += 1
-            window = self[i]
+        # reset iterator index
+        self.__i = -1
+        return self
 
     def __len__(self):
         """Number of positions
