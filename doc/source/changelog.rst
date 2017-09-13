@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 1.0.5 (2017-09-13)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: make an iterator out of SlidingWindow
+
 Version 1.0.4 (2017-07-18)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

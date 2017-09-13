@@ -708,7 +708,7 @@ class SlidingWindow(object):
         if window:
             return window
         else:
-            raise StopIteration
+            raise StopIteration()
 
     def __iter__(self):
         """Sliding window iterator
