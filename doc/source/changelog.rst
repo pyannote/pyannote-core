@@ -2,10 +2,16 @@
 Changelog
 #########
 
+Version 1.1 (2017-09-19)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: make iterators out of SlidingWindowFeature instances
+- improve: make Annotation.__mul__ (much) faster
+
 Version 1.0.5 (2017-09-13)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-- fix: make an iterator out of SlidingWindow
+- fix: make iterators out of SlidingWindow instances
 
 Version 1.0.4 (2017-07-18)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
