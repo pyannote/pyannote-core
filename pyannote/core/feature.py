@@ -59,6 +59,8 @@ class SlidingWindowFeature(object):
         super(SlidingWindowFeature, self).__init__()
         self.sliding_window = sliding_window
         self.data = data
+        self.__i = -1
+
 
     def getNumber(self):
         """Number of feature vectors"""
@@ -74,6 +76,20 @@ class SlidingWindowFeature(object):
     def __getitem__(self, i):
         """Get ith feature vector"""
         return self.data[i]
+
+    def __iter__(self):
+        self.__i = -1
+        return self
+
+    def __next__(self):
+        self.__i += 1
+        try:
+            return self.sliding_window[self.__i], self.data[self.__i]
+        except IndexError as e:
+            raise StopIteration()
+
+    def next(self):
+        return self.__next__()
 
     def iterfeatures(self, window=False):
         """Feature vector iterator
