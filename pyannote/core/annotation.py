@@ -1247,23 +1247,22 @@ class Annotation(object):
                 'computing cooccurrence matrix only works with Annotation '
                 'instances.')
 
-        # initialize matrix with one row per label in `self`,
-        # and one column per label in `other`
+        i_labels = self.labels()
+        j_labels = other.labels()
 
-        i = self.labels()
-        j = other.labels()
-        matrix = DataArray(
-            np.zeros((len(i), len(j))),
-            coords=[('i', i), ('j', j)])
+        I = {label: i for i, label in enumerate(i_labels)}
+        J = {label: j for j, label in enumerate(j_labels)}
+
+        matrix = np.zeros((len(I), len(J)))
 
         # iterate over intersecting tracks and accumulate durations
         for (segment, track), (other_segment, other_track) in self.co_iter(other):
-            label = self[segment, track]
-            other_label = other[other_segment, other_track]
+            i = I[self[segment, track]]
+            j = J[other[other_segment, other_track]]
             duration = (segment & other_segment).duration
-            matrix.loc[label, other_label] += duration
+            matrix[i, j] += duration
 
-        return matrix
+        return DataArray(matrix, coords=[('i', i_labels), ('j', j_labels)])
 
     def for_json(self):
         """Serialization
