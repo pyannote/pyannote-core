@@ -61,6 +61,8 @@ class SlidingWindowFeature(object):
         self.data = data
         self.__i = -1
 
+    def __len__(self):
+        return self.data.shape[0]
 
     def getNumber(self):
         """Number of feature vectors"""
