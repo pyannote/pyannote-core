@@ -41,18 +41,10 @@ setup(
         'numpy >= 1.10.4',
         'pandas >= 0.17.1',
         'xarray >= 0.7.0',
-        'networkx >= 1.10.0',
         'simplejson >= 3.8.1',
         'six >= 1.10.0',
         'matplotlib >= 2.0.0',
-        'unidecode >= 0.04.20',
     ],
-    extras_require={
-        'notebook': [
-            'pygraphviz >= 1.3.1',
-            'pydot2 >= 1.0.33',
-        ],
-    },
     # versioneer
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),

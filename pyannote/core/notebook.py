@@ -41,10 +41,7 @@ except Exception as e:
     pass
 from matplotlib.cm import get_cmap
 import six.moves
-import tempfile
-import networkx as nx
 import numpy as np
-import subprocess
 from itertools import cycle, product, groupby
 from .segment import Segment
 from .timeline import Timeline
@@ -269,7 +266,7 @@ class Notebook(object):
             ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
                       ncol=5, borderaxespad=0., frameon=False)
 
-    def plot_feature(self, feature, ax=None, time=True):
+    def plot_feature(self, feature, ax=None, time=True, ylim=None):
 
         if not self.crop:
             self.crop = feature.getExtent()
@@ -279,9 +276,16 @@ class Notebook(object):
         t = [window[i].middle for i in indices]
 
         data = np.take(feature.data, indices, axis=0, mode='clip')
-        m = np.nanmin(data)
-        M = np.nanmax(data)
-        ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
+        for i, index in enumerate(indices):
+            if index < 0:
+                data[i] = np.NAN
+            if index >= len(feature.data):
+                data[i] = np.NAN
+
+        if ylim is None:
+            m = np.nanmin(data)
+            M = np.nanmax(data)
+            ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
 
         ax = self.setup(ax=ax, yaxis=False, ylim=ylim, time=time)
         ax.plot(t, data)
@@ -352,111 +356,3 @@ def repr_feature(feature):
     plt.close(fig)
     plt.rcParams['figure.figsize'] = figsize
     return data
-
-
-def _shorten_long_text(text, max_length=30):
-    suffix = "..."
-    if len(text) > max_length:
-        return text[:max_length - len(suffix)] + suffix
-    else:
-        return text
-
-
-def _clean_text(text):
-
-    from unidecode import unidecode
-
-    only_ascii = six.u(unidecode(text))
-
-    # remove characters that make resulting SVG invalid
-    mapping = {}
-    mapping[ord(u'&')] = None
-    # mapping[ord(u'"')] = u"'"
-
-    return only_ascii.translate(mapping)
-
-
-def _dottable(transcription):
-    # create new graph with graphviz/dot layout instructions
-    # (e.g. graph orientation, node and edge labels, etc.)
-
-    # create a dumb networkx copy to avoid messing with input transcription
-    dottable = transcription.copy()
-
-    # graphviz/dot will display graph from left to right
-    dottable.graph['graph'] = {'rankdir': 'LR'}
-
-    # set shape, label and tooltip of each node
-    for n in transcription.nodes_iter():
-
-        dottable.node[n] = {
-            'label': str(n), 'tooltip': str(n),
-            'shape': 'circle' if n.drifting else 'box'
-        }
-        # 'URL': 'javascript:console.log("{t}")'.format(t=n.T),
-
-    # set edge label
-
-    label_header = (
-        "<<table border='0' cellborder='0' cellspacing='0' cellpadding='3'>"
-    )
-    label_pattern = (
-        "<tr>"
-        "<td align='left'><b>{name}</b></td>"
-        "<td align='left'>{value}</td>"
-        "</tr>"
-    )
-    label_footer = "</table>>"
-    tooltip_pattern = "[{name}] {value}"
-
-    for source, target, key, data in transcription.edges_iter(
-        keys=True, data=True
-    ):
-        tooltip = ""
-        label = ""
-        if data:
-
-            # initialize label table
-            label = label_header
-
-            for name, value in six.iteritems(data):
-                # remove non-ascii characters
-                name = _clean_text(name)
-                value = _clean_text(str(value))
-                # shorten long value
-                short_value = _shorten_long_text(value)
-                # update label and tooltip
-                label += label_pattern.format(name=name, value=short_value)
-                tooltip += tooltip_pattern.format(name=name, value=value)
-
-            # close label table
-            label += label_footer
-
-        if not tooltip:
-            tooltip = " "
-
-        if not label:
-            label = " "
-
-        dottable[source][target][key] = {
-            'label': label,
-            'labeltooltip': tooltip,
-            'edgetooltip': tooltip,
-            'headtooltip': tooltip,
-            'tailtooltip': tooltip,
-        }
-
-    return dottable
-
-
-def _write_temporary_dot_file(transcription):
-    _, path = tempfile.mkstemp('.dot')
-    nx.write_dot(_dottable(transcription), path)
-    return path
-
-
-def repr_transcription(transcription):
-    """Get `svg` data for `transcription`"""
-    path = _write_temporary_dot_file(transcription)
-    data = subprocess.check_output(["dot", "-T", "svg", path]).decode('ascii')
-    return data[data.find("<svg"):]

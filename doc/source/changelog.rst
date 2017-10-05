@@ -2,6 +2,15 @@
 Changelog
 #########
 
+Version 1.2 (2017-10-05)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - BREAKING: remove all things "Transcription"
+ - feat: add return_data parameter to SlidingWindowFeature.crop (SWF)
+ - feat: add support for len(SWF)
+ - feat: add ylim parameter to plot_feature
+ - fix: fix corner case where notebook.crop is larger than SWF extent
+
 Version 1.1 (2017-09-19)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
