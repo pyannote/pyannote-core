@@ -39,6 +39,7 @@ from __future__ import unicode_literals
 
 import numpy as np
 from .segment import Segment
+from .segment import SlidingWindow
 from .timeline import Timeline
 
 
@@ -110,7 +111,7 @@ class SlidingWindowFeature(object):
             else:
                 yield self.data[i]
 
-    def crop(self, focus, mode='loose', fixed=None):
+    def crop(self, focus, mode='loose', fixed=None, return_data=True):
         """Extract frames as numpy array
 
         Parameters
@@ -126,6 +127,9 @@ class SlidingWindowFeature(object):
             When provided and mode is 'center', override focus duration to make
             sure two `focus` with the same duration always result in the same
             (fixed) number of frames being selected.
+        return_data : bool, optional
+            Set to True (default) to return a numpy array.
+            Set to False to return a SlidingWindowFeature instance.
 
         Returns
         -------
@@ -148,7 +152,17 @@ class SlidingWindowFeature(object):
         # in all other cases, out-of-bounds indices are removed first
         n = self.getNumber()
         indices = indices[np.where((indices > -1) * (indices < n))]
-        return np.take(self.data, indices, axis=0, out=None)
+        data = np.take(self.data, indices, axis=0, out=None)
+
+        if return_data:
+            return data
+
+        sliding_window = SlidingWindow(
+            start=self.sliding_window[indices[0]].start,
+            duration=self.sliding_window.duration,
+            step=self.sliding_window.step)
+        return SlidingWindowFeature(data, sliding_window)
+
 
     def _repr_png_(self):
         from .notebook import repr_feature
