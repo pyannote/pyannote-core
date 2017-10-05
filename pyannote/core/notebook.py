@@ -269,7 +269,7 @@ class Notebook(object):
             ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
                       ncol=5, borderaxespad=0., frameon=False)
 
-    def plot_feature(self, feature, ax=None, time=True):
+    def plot_feature(self, feature, ax=None, time=True, ylim=None):
 
         if not self.crop:
             self.crop = feature.getExtent()
@@ -279,9 +279,10 @@ class Notebook(object):
         t = [window[i].middle for i in indices]
 
         data = np.take(feature.data, indices, axis=0, mode='clip')
-        m = np.nanmin(data)
-        M = np.nanmax(data)
-        ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
+        if ylim is None:
+            m = np.nanmin(data)
+            M = np.nanmax(data)
+            ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
 
         ax = self.setup(ax=ax, yaxis=False, ylim=ylim, time=time)
         ax.plot(t, data)
