@@ -279,6 +279,12 @@ class Notebook(object):
         t = [window[i].middle for i in indices]
 
         data = np.take(feature.data, indices, axis=0, mode='clip')
+        for i, index in enumerate(indices):
+            if index < 0:
+                data[i] = np.NAN
+            if index >= len(feature.data):
+                data[i] = np.NAN
+
         if ylim is None:
             m = np.nanmin(data)
             M = np.nanmax(data)
