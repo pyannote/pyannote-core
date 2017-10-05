@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2017 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,6 @@ from .time import T, TStart, TEnd
 from .segment import Segment, SlidingWindow
 from .timeline import Timeline
 from .annotation import Annotation
-from .transcription import Transcription
 from .scores import Scores
 from .feature import SlidingWindowFeature
 
