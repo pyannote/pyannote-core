@@ -35,7 +35,7 @@ Segment
 
 :class:`pyannote.core.Segment` instances describe temporal fragments (*e.g.* of an audio file). The segment depicted above can be defined like that:
 
-.. ipython::
+.. code-block:: ipython
 
   In [1]: from pyannote.core import Segment
 
@@ -45,7 +45,7 @@ Segment
 
 It is nothing more than 2-tuples augmented with several useful methods and properties:
 
-.. ipython::
+.. code-block:: ipython
 
   In [4]: start, end = segment
 
@@ -395,6 +395,11 @@ class SlidingWindow(object):
     >>> new_segment = sw.toSegment(*sw.toFrameRange(segment))
     >>> abs(segment) - abs(segment & new_segment) < .5 * sw.step
 
+    >>> sw = SlidingWindow(end=0.1)
+    >>> print(next(sw))
+    [ 00:00:00.000 -->  00:00:00.030]
+    >>> print(next(sw))
+    [ 00:00:00.010 -->  00:00:00.040]
     """
 
     def __init__(self, duration=0.030, step=0.010, start=0.000, end=None):
@@ -691,17 +696,6 @@ class SlidingWindow(object):
         return self.__next__()
 
     def __next__(self):
-        """Sliding window iterator
-
-        Usage
-        -----
-        >>> sw = SlidingWindow(end=0.1)
-        >>> print(next(sw))
-        [ 00:00:00.000 -->  00:00:00.030]
-        >>> print(next(sw))
-        [ 00:00:00.010 -->  00:00:00.040]
-        """
-
         self.__i += 1
         window = self[self.__i]
 
