@@ -2,6 +2,12 @@
 Changelog
 #########
 
+Version 1.3 (2017-12-11)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: add HDF5 dataset support inf SlidingWindowFeature
+ - fix: fix documentation
+
 Version 1.2 (2017-10-05)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

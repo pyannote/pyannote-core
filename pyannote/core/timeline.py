@@ -44,7 +44,7 @@ segments:
 
 There are two ways to define the timeline depicted above:
 
-.. ipython::
+.. code-block:: ipython
 
   In [25]: from pyannote.core import Timeline, Segment
 
@@ -74,7 +74,7 @@ There are two ways to define the timeline depicted above:
 
 Several convenient methods are available. Here are a few examples:
 
-.. ipython::
+.. code-block:: ipython
 
   In [3]: timeline.extent()    # extent
   Out[3]: <Segment(1, 20)>
@@ -419,7 +419,7 @@ class Timeline(object):
                 segments = [support]
             else:
                 segments = []
-            
+
             support = Timeline(segments=segments, uri=self.uri)
             for yielded in self.crop_iter(support, mode=mode,
                                           returns_mapping=returns_mapping):

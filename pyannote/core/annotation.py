@@ -47,7 +47,7 @@ tracks with the same support.
 
 To define the annotation depicted above:
 
-.. ipython::
+.. code-block:: ipython
 
     In [1]: from pyannote.core import Annotation, Segment
 
@@ -60,7 +60,7 @@ To define the annotation depicted above:
 
 which is actually a shortcut for
 
-.. ipython::
+.. code-block:: ipython
 
     In [6]: annotation = Annotation()
        ...: annotation[Segment(1, 5), '_'] = 'Carol'
@@ -73,7 +73,7 @@ where all tracks share the same (default) name ``'_'``.
 
 In case two tracks share the same support, use a different track name:
 
-.. ipython::
+.. code-block:: ipython
 
     In [6]: annotation = Annotation(uri='my_video_file', modality='speaker')
        ...: annotation[Segment(1, 5), 1] = 'Carol'  # track name = 1
@@ -90,7 +90,7 @@ The track name does not have to be unique over the whole set of tracks.
 
 Several convenient methods are available. Here are a few examples:
 
-.. ipython::
+.. code-block:: ipython
 
   In [9]: annotation.labels()   # sorted list of labels
   Out[9]: ['Bob', 'Carol']

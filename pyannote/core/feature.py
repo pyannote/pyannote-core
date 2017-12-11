@@ -152,7 +152,13 @@ class SlidingWindowFeature(object):
         # in all other cases, out-of-bounds indices are removed first
         n = self.getNumber()
         indices = indices[np.where((indices > -1) * (indices < n))]
-        data = np.take(self.data, indices, axis=0, out=None)
+
+        if isinstance(self.data, np.ndarray):
+            data = np.take(self.data, indices, axis=0, out=None)
+        else:
+            # in case self.data is a HDF5 dataset
+            # this may lead to better performance
+            data = self.data[indices, :]
 
         if return_data:
             return data
