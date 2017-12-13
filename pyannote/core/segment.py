@@ -495,94 +495,118 @@ class SlidingWindow(object):
         elif mode == 'center':
             return int(np.rint((from_duration / self.step)))
 
-    def crop(self, focus, mode='loose', fixed=None):
+    def crop(self, focus, mode='loose', fixed=None, return_ranges=False):
         """Crop sliding window
 
         Parameters
         ----------
         focus : `Segment` or `Timeline`
-        mode : {'strict', 'loose', 'center', 'fixed'}, optional
-            In 'strict' mode, only indices of segments fully included in focus
-            coverage are returned. In 'loose' mode, indices of any intersecting
-            segment are returned. In 'center' mode, first and last positions are
-            chosen to be the positions whose centers are the closest to the
-            focus start and end times. Defaults to 'loose'.
+        mode : {'strict', 'loose', 'center'}, optional
+            In 'strict' mode, only indices of segments fully included in
+            'focus' support are returned. In 'loose' mode, indices of any
+            intersecting segments are returned. In 'center' mode, first and
+            last positions are chosen to be the positions whose centers are the
+            closest to 'focus' start and end times. Defaults to 'loose'.
         fixed : float, optional
-            When provided and mode is 'center', overrides focus duration. This
-            might be useful to avoid float rounding errors and to make sure the
-            number of positions is deterministic.
+            Overrides `Segment` 'focus' duration and ensures that the number of
+            returned frames is fixed (which might otherwise not be the case
+            because of rounding erros). Has no effect in 'strict' or 'loose'
+            modes.
+        return_ranges : bool, optional
+            Return as list of ranges. Defaults to indices numpy array.
 
         Returns
         -------
-        indices : np.array
+        indices : np.array (or list of ranges)
             Array of unique indices of matching segments
         """
 
         from .timeline import Timeline
 
-        if isinstance(focus, Segment):
+        if not isinstance(focus, (Segment, Timeline)):
+            msg = '"focus" must be a `Segment` or `Timeline` instance.'
+            raise TypeError(msg)
+
+        if isinstance(focus, Timeline):
 
             if fixed is not None:
-                n = self.samples(fixed, mode=mode)
+                msg = "'fixed' is not supported with `Timeline` 'focus'."
+                raise ValueError(msg)
 
-            if mode == 'loose':
+            if return_ranges:
+                ranges = []
 
-                # find smallest integer i such that
-                # self.start + i x self.step + self.duration >= focus.start
-                i_ = (focus.start - self.duration - self.start) / self.step
-                i = int(np.ceil(i_))
+                for i, s in enumerate(focus.support()):
+                    rng = self.crop(s, mode=mode, fixed=fixed,
+                                        return_ranges=True)
 
-                if fixed is None:
-                    # find largest integer j such that
-                    # self.start + j x self.step <= focus.end
-                    j_ = (focus.end - self.start) / self.step
-                    j = int(np.floor(j_))
-                    return np.array(range(i, j + 1), dtype=np.int64)
+                    # if first or disjoint segment, add it
+                    if i == 0 or rng[0][0] > ranges[-1][1]:
+                        ranges += rng
 
-                else:
-                    return np.array(range(i, i + n), dtype=np.int64)
+                    # if overlapping segment, update last range
+                    else:
+                        ranges[-1][1] = rng[0][1]
 
+                return ranges
 
-            elif mode == 'strict':
+            # concatenate all indices
+            indices = np.hstack([
+                self.crop(s, mode=mode, fixed=fixed, return_ranges=False)
+                for s in focus.support()])
 
-                # find smallest integer i such that
-                # self.start + i x self.step >= focus.start
-                i_ = (focus.start - self.start) / self.step
-                i = int(np.ceil(i_))
+            # remove duplicate indices
+            return np.unique(indices)
 
-                if fixed is None:
-                    # find largest integer j such that
-                    # self.start + j x self.step + self.duration <= focus.end
-                    j_ = (focus.end - self.duration - self.start) / self.step
-                    j = int(np.floor(j_))
-                    return np.array(range(i, j + 1), dtype=np.int64)
+        # 'focus' is a `Segment` instance
 
-                else:
-                    return np.array(range(i, i + n), dtype=np.int64)
+        if mode == 'loose':
 
+            # find smallest integer i such that
+            # self.start + i x self.step + self.duration >= focus.start
+            i_ = (focus.start - self.duration - self.start) / self.step
+            i = int(np.ceil(i_))
 
-            elif mode == 'center':
+            # find largest integer j such that
+            # self.start + j x self.step <= focus.end
+            j_ = (focus.end - self.start) / self.step
+            j = int(np.floor(j_))
+            rng = (i, j + 1)
 
-                # find window position whose center is the closest to focus.start
-                i = self.__closest_frame(focus.start)
+        elif mode == 'strict':
 
-                if fixed is None:
-                    # find window position whose center is the closest to focus.end
-                    j = self.__closest_frame(focus.end)
-                    return np.array(range(i, j + 1), dtype=np.int64)
+            # find smallest integer i such that
+            # self.start + i x self.step >= focus.start
+            i_ = (focus.start - self.start) / self.step
+            i = int(np.ceil(i_))
 
-                else:
-                    return np.array(range(i, i + n), dtype=np.int64)
+            # find largest integer j such that
+            # self.start + j x self.step + self.duration <= focus.end
+            j_ = (focus.end - self.duration - self.start) / self.step
+            j = int(np.floor(j_))
+            rng = (i, j + 1)
 
+        elif mode == 'center':
+
+            # find window position whose center is the closest to focus.start
+            i = self.__closest_frame(focus.start)
+
+            if fixed is None:
+                # find window position whose center is the closest to focus.end
+                j = self.__closest_frame(focus.end)
+                rng = (i, j + 1)
             else:
-                raise ValueError('mode must be "loose", "strict", or "center"')
-
-        elif isinstance(focus, Timeline):
-            return np.unique(np.hstack([
-                self.crop(s, mode=mode, fixed=fixed) for s in focus.support()]))
+                n = self.samples(fixed, mode=mode)
+                rng = (i, i + n)
 
         else:
-            raise TypeError('focus must be a Segment or a Timeline.')
+            msg = "'mode' must be one of {'loose', 'strict', 'center'}."
+            raise ValueError(msg)
+
+        if return_ranges:
+            return [list(rng)]
+
+        return np.array(range(*rng), dtype=np.int64)
 
     def segmentToRange(self, segment):
         """Convert segment to 0-indexed frame range
