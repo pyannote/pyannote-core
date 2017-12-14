@@ -112,63 +112,77 @@ class SlidingWindowFeature(object):
                 yield self.data[i]
 
     def crop(self, focus, mode='loose', fixed=None, return_data=True):
-        """Extract frames as numpy array
+        """Extract frames
 
         Parameters
         ----------
         focus : Segment or Timeline
         mode : {'loose', 'strict', 'center', 'fixed'}, optional
-            In 'strict' mode, only frames fully included in focus coverage are
+            In 'strict' mode, only frames fully included in 'focus' support are
             returned. In 'loose' mode, any intersecting frames are returned. In
-            'center' mode, first and last frames are chosen to be the positions
-            whose centers are the closest to the focus start and end times.
+            'center' mode, first and last frames are chosen to be the ones
+            whose centers are the closest to 'focus' start and end times.
             Defaults to 'loose'.
         fixed : float, optional
-            When provided and mode is 'center', override focus duration to make
-            sure two `focus` with the same duration always result in the same
-            (fixed) number of frames being selected.
+            Overrides `Segment` 'focus' duration and ensures that the number of
+            returned frames is fixed (which might otherwise not be the case
+            because of rounding errors). Has no effect in 'strict' or 'loose'
+            modes.
         return_data : bool, optional
-            Set to True (default) to return a numpy array.
-            Set to False to return a SlidingWindowFeature instance.
+            Return a numpy array (default). For `Segment` 'focus', setting it
+            to False will return a `SlidingWindowFeature` instance.
 
         Returns
         -------
-        data : numpy array
-            (nSamples, nFeatures) numpy array
+        data : `numpy.ndarray` or `SlidingWindowFeature`
+            Frame features.
 
         See also
         --------
         SlidingWindow.crop
 
         """
-        indices = self.sliding_window.crop(focus, mode=mode, fixed=fixed)
 
-        # special case when 'fixed' duration cropping is requested
-        # mode='clip' ensure the correct number of samples is returned
-        # even in case of out-of-bounds indices
-        if mode == 'center' and fixed is not None:
-            return np.take(self.data, indices, axis=0, out=None, mode='clip')
+        if fixed is not None and mode is not 'center':
+            msg = "'mode' must be 'center' when 'fixed' is provided."
+            raise ValueError(msg)
 
-        # in all other cases, out-of-bounds indices are removed first
-        n = self.getNumber()
-        indices = indices[np.where((indices > -1) * (indices < n))]
+        ranges = self.sliding_window.crop(focus, mode=mode, fixed=fixed,
+                                          return_ranges=True)
+        n_samples, dimension = self.data.shape
 
-        if isinstance(self.data, np.ndarray):
-            data = np.take(self.data, indices, axis=0, out=None)
-        else:
-            # in case self.data is a HDF5 dataset
-            # this may lead to better performance
-            data = self.data[indices, :]
+        clipped_ranges, repeat_first, repeat_last = [], 0, 0
+        for r in ranges:
+            repeat_first += min(r[1], 0) - min(r[0], 0)
+            repeat_last += max(r[1], n_samples) - max(r[0], n_samples)
+            if r[1] < 0 or r[0] >= n_samples:
+                continue
+            clipped_ranges += [[max(r[0], 0), min(r[1], n_samples)]]
+
+        data = np.vstack(
+            [self.data[r[0]: r[1], :] for r in clipped_ranges])
+
+        # corner case when 'fixed' duration cropping is requested:
+        # correct number of samples even with out-of-bounds indices
+        if fixed is not None:
+            data = np.vstack(
+                [np.tile(self.data[0], (repeat_first, 1)), data,
+                 np.tile(self.data[n_samples - 1], (repeat_last, 1))])
 
         if return_data:
             return data
 
+        if not isinstance(focus, Segment):
+            msg = ('"focus" must be a "Segment" instance when "return_data"'
+                   'is set to False.')
+            raise ValueError(msg)
+
         sliding_window = SlidingWindow(
-            start=self.sliding_window[indices[0]].start,
+            start=self.sliding_window[ranges[0][0]].start,
             duration=self.sliding_window.duration,
             step=self.sliding_window.step)
-        return SlidingWindowFeature(data, sliding_window)
 
+        return SlidingWindowFeature(data, sliding_window)
 
     def _repr_png_(self):
         from .notebook import repr_feature
