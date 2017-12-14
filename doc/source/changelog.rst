@@ -2,10 +2,11 @@
 Changelog
 #########
 
-Version 1.3 (2017-12-11)
-~~~~~~~~~~~~~~~~~~~~~~~~
+Version 1.3.1 (2017-12-14)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
- - feat: add HDF5 dataset support inf SlidingWindowFeature
+ - feat: add "return_ranges" option to SlidingWindow.crop
+ - improve: faster SlidingWindowFeature.crop
  - fix: fix documentation
 
 Version 1.2 (2017-10-05)
