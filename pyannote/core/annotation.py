@@ -935,7 +935,7 @@ class Annotation(object):
 
         return chart
 
-    def argmax(self, support=None, segment=None):
+    def argmax(self, support=None):
         """Get label with longest duration
 
         Parameters
@@ -962,12 +962,6 @@ class Annotation(object):
         No label intersection [22 --> 23]
 
         """
-
-        if segment is not None:
-            warnings.warn(
-                '"segment" parameter has been renamed to "support".',
-                DeprecationWarning)
-            support = segment
 
         cropped = self
         if support is not None:
