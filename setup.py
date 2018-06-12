@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2017 CNRS
+# Copyright (c) 2014-2018 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ setup(
     namespace_packages=['pyannote'],
     packages=find_packages(),
     install_requires=[
-        'sortedcontainers >= 1.5.7',
+        'sortedcontainers >= 2.0.4',
         'numpy >= 1.10.4',
         'pandas >= 0.17.1',
         'xarray >= 0.7.0',

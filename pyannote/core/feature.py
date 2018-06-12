@@ -117,7 +117,7 @@ class SlidingWindowFeature(object):
         Parameters
         ----------
         focus : Segment or Timeline
-        mode : {'loose', 'strict', 'center', 'fixed'}, optional
+        mode : {'loose', 'strict', 'center'}, optional
             In 'strict' mode, only frames fully included in 'focus' support are
             returned. In 'loose' mode, any intersecting frames are returned. In
             'center' mode, first and last frames are chosen to be the ones
@@ -149,7 +149,8 @@ class SlidingWindowFeature(object):
 
         ranges = self.sliding_window.crop(focus, mode=mode, fixed=fixed,
                                           return_ranges=True)
-        n_samples, dimension = self.data.shape
+        n_samples = self.data.shape[0]
+        n_dimensions = len(self.data.shape) - 1
 
         clipped_ranges, repeat_first, repeat_last = [], 0, 0
         for r in ranges:
@@ -165,9 +166,11 @@ class SlidingWindowFeature(object):
         # corner case when 'fixed' duration cropping is requested:
         # correct number of samples even with out-of-bounds indices
         if fixed is not None:
-            data = np.vstack(
-                [np.tile(self.data[0], (repeat_first, 1)), data,
-                 np.tile(self.data[n_samples - 1], (repeat_last, 1))])
+            data = np.vstack([
+                np.tile(self.data[0], (repeat_first, ) + (1,) * n_dimensions),
+                data,
+                np.tile(self.data[n_samples - 1],
+                        (repeat_last,) + (1, ) * n_dimensions)])
 
         if return_data:
             return data
