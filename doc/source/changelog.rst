@@ -2,6 +2,14 @@
 Changelog
 #########
 
+Version 1.3.2 (2018-06-12)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: add support for multi-dimensional SlidingWindowFeatures
+ - setup: switch to sortedcontainers 2.x
+ - fix: update SWF.crop docstring
+ - chore: remove support for "segment" option in Annotation.argmax
+
 Version 1.3.1 (2017-12-14)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
