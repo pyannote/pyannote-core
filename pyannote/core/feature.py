@@ -117,7 +117,7 @@ class SlidingWindowFeature(object):
         Parameters
         ----------
         focus : Segment or Timeline
-        mode : {'loose', 'strict', 'center', 'fixed'}, optional
+        mode : {'loose', 'strict', 'center'}, optional
             In 'strict' mode, only frames fully included in 'focus' support are
             returned. In 'loose' mode, any intersecting frames are returned. In
             'center' mode, first and last frames are chosen to be the ones
