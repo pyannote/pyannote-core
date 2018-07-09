@@ -450,7 +450,7 @@ class SlidingWindow(object):
     duration = property(fget=__get_duration)
     """Sliding window duration in seconds."""
 
-    def __closest_frame(self, t):
+    def closest_frame(self, t):
         """Closest frame to timestamp.
 
         Parameters
@@ -589,11 +589,11 @@ class SlidingWindow(object):
         elif mode == 'center':
 
             # find window position whose center is the closest to focus.start
-            i = self.__closest_frame(focus.start)
+            i = self.closest_frame(focus.start)
 
             if fixed is None:
                 # find window position whose center is the closest to focus.end
-                j = self.__closest_frame(focus.end)
+                j = self.closest_frame(focus.end)
                 rng = (i, j + 1)
             else:
                 n = self.samples(fixed, mode=mode)
@@ -631,7 +631,7 @@ class SlidingWindow(object):
 
         """
         # find closest frame to segment start
-        i0 = self.__closest_frame(segment.start)
+        i0 = self.closest_frame(segment.start)
 
         # number of steps to cover segment duration
         n = int(segment.duration / self.step) + 1
@@ -772,7 +772,7 @@ class SlidingWindow(object):
 
         # start looking for last position
         # based on frame closest to the end
-        i = self.__closest_frame(self.__end)
+        i = self.closest_frame(self.__end)
 
         while(self[i]):
             i += 1

@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 1.4 (2018-07-09)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: expose `SlidingWindow.closest_frame`
+
 Version 1.3.2 (2018-06-12)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
