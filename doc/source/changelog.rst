@@ -2,6 +2,12 @@
 Changelog
 #########
 
+Version 1.4.1 (2018-09-13)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: add unit tests for feature cropping
+ - fix: fix out-of-bounds feature cropping
+
 Version 1.4 (2018-07-09)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
