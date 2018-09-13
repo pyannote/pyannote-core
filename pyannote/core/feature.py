@@ -147,44 +147,63 @@ class SlidingWindowFeature(object):
             msg = "'mode' must be 'center' when 'fixed' is provided."
             raise ValueError(msg)
 
+        if (not return_data) and (not isinstance(focus, Segment)):
+            msg = ('"focus" must be a "Segment" instance when "return_data"'
+                   'is set to False.')
+            raise ValueError(msg)
+
         ranges = self.sliding_window.crop(focus, mode=mode, fixed=fixed,
                                           return_ranges=True)
+
+        # total number of samples in features
         n_samples = self.data.shape[0]
+
+        # 1 for vector features (e.g. MFCC in pyannote.audio)
+        # 2 for matrix features (e.g. grey-level frames in pyannote.video)
+        # 3 for 3rd order tensor (e.g. RBG frames in pyannote.video)
         n_dimensions = len(self.data.shape) - 1
 
+        # clip ranges
         clipped_ranges, repeat_first, repeat_last = [], 0, 0
-        for r in ranges:
-            repeat_first += min(r[1], 0) - min(r[0], 0)
-            repeat_last += max(r[1], n_samples) - max(r[0], n_samples)
-            if r[1] < 0 or r[0] >= n_samples:
+        for start, end in ranges:
+            # count number of requested samples before first sample
+            repeat_first += min(end, 0) - min(start, 0)
+            # count number of requested samples after last sample
+            repeat_last += max(end, n_samples) - max(start, n_samples)
+            # if all requested samples are out of bounds, skip
+            if end < 0 or start >= n_samples:
                 continue
-            clipped_ranges += [[max(r[0], 0), min(r[1], n_samples)]]
+            # keep track of non-empty clipped ranges
+            clipped_ranges += [[max(start, 0), min(end, n_samples)]]
 
-        data = np.vstack(
-            [self.data[r[0]: r[1], :] for r in clipped_ranges])
+        if clipped_ranges:
+            data = np.vstack(
+                [self.data[start: end, :] for start, end in clipped_ranges])
+        else:
+            # if all ranges are out of bounds, just return empty data
+            shape = (0, ) + self.data.shape[1:]
+            data = np.empty(shape)
 
         # corner case when 'fixed' duration cropping is requested:
         # correct number of samples even with out-of-bounds indices
         if fixed is not None:
             data = np.vstack([
+                # repeat first sample as many times as needed
                 np.tile(self.data[0], (repeat_first, ) + (1,) * n_dimensions),
                 data,
+                # repeat last sample as many times as needed
                 np.tile(self.data[n_samples - 1],
                         (repeat_last,) + (1, ) * n_dimensions)])
 
+        # return data
         if return_data:
             return data
 
-        if not isinstance(focus, Segment):
-            msg = ('"focus" must be a "Segment" instance when "return_data"'
-                   'is set to False.')
-            raise ValueError(msg)
-
+        # wrap data in a SlidingWindowFeature and return
         sliding_window = SlidingWindow(
             start=self.sliding_window[ranges[0][0]].start,
             duration=self.sliding_window.duration,
             step=self.sliding_window.step)
-
         return SlidingWindowFeature(data, sliding_window)
 
     def _repr_png_(self):
