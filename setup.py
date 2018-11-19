@@ -39,6 +39,7 @@ setup(
     install_requires=[
         'sortedcontainers >= 2.0.4',
         'numpy >= 1.10.4',
+        'scipy >= 0.10.0',
         'pandas >= 0.17.1',
         'xarray >= 0.7.0',
         'simplejson >= 3.8.1',
