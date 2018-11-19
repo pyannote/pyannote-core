@@ -2,6 +2,17 @@
 Changelog
 #########
 
+Version 2.0 (2018-11-19)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - BREAKING: move pyannote.core.util to pyannote.core.utils.generators
+ - BREAKING: remove support for Python 2
+ - feat: add one_hot_{encoding | decoding} functions
+ - feat: add get_class_by_name utiltiy function
+ - feat: add custom pdist and cdist
+ - feat: add custom hierachical clustering "linkage" function
+ - setup: add scipy dependency
+
 Version 1.4.1 (2018-09-13)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -39,6 +39,7 @@ setup(
     install_requires=[
         'sortedcontainers >= 2.0.4',
         'numpy >= 1.10.4',
+        'scipy >= 0.10.0',
         'pandas >= 0.17.1',
         'xarray >= 0.7.0',
         'simplejson >= 3.8.1',
@@ -61,11 +62,9 @@ setup(
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
         "Natural Language :: English",
-        "Programming Language :: Python :: 2",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering"
     ],
 )
