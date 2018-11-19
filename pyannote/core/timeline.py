@@ -919,10 +919,10 @@ class Timeline(object):
         from .annotation import Annotation
         annotation = Annotation(uri=self.uri, modality=modality)
         if generator == 'string':
-            from .util import string_generator
+            from .utils.generators import string_generator
             generator = string_generator()
         elif generator == 'int':
-            from .util import int_generator
+            from .utils.generators import int_generator
             generator = int_generator()
 
         for segment in self:

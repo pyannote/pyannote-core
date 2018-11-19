@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2016 CNRS
+# Copyright (c) 2014-2018 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,13 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-from __future__ import unicode_literals
-from six.moves import zip
-from itertools import tee
-from itertools import product
+import itertools
 from string import ascii_uppercase
 
 
 def pairwise(iterable):
     "s -> (s0,s1), (s1,s2), (s2, s3), ..."
-    a, b = tee(iterable)
+    a, b = itertools.tee(iterable)
     next(b, None)
     return zip(a, b)
 
@@ -72,7 +69,7 @@ def string_generator(skip=[]):
     while True:
 
         # generate labels with current length
-        for c in product(ascii_uppercase, repeat=r):
+        for c in itertools.product(ascii_uppercase, repeat=r):
             if c in skip:
                 continue
             yield ''.join(c)

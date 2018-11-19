@@ -123,7 +123,7 @@ from sortedcontainers import SortedDict
 from .segment import Segment
 from .timeline import Timeline
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
-from .util import string_generator, int_generator
+from .utils.generators import string_generator, int_generator
 
 
 class Annotation(object):
