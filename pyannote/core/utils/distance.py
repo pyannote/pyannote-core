@@ -31,10 +31,60 @@ import scipy.spatial.distance
 import scipy.cluster.hierarchy
 
 
-def l2_normalize(fX):
-    norm = np.sqrt(np.sum(fX ** 2, axis=1))
+def l2_normalize(X):
+    """L2 normalize vectors
+
+    Parameters
+    ----------
+    X : `np.ndarray`
+        (n_samples, n_dimensions) vectors.
+
+    Returns
+    -------
+    normalized : `np.ndarray`
+        (n_samples, n_dimensions) L2-normalized vectors
+
+    """
+
+    norm = np.sqrt(np.sum(X ** 2, axis=1))
     norm[norm == 0] = 1.
-    return (fX.T / norm).T
+    return (X.T / norm).T
+
+
+def dist_range(metric='euclidean', normalize=False):
+    """Return range of possible distance between two vectors
+
+    Parameters
+    ----------
+    metric : `str`, optional
+        Metric. Defaults to 'euclidean'
+    normalize : `bool`, optional
+        Set to True if vectors are L2-normalized. Defaults to False.
+
+    Returns
+    -------
+    min_dist, max_dist : `float`
+        Range of possible distance.
+    """
+
+    if metric == 'euclidean':
+        if normalize:
+            return (0., 2.)
+        return (0., np.inf)
+
+    if metric == 'sqeuclidean':
+        if normalize:
+            return (0., 4.)
+        return (0., np.inf)
+
+    if metric == 'cosine':
+        return (0., 2.)
+
+    if metric == 'angular':
+        return (0., np.pi)
+
+    msg = f'dist_range does not support {metric} metric.'
+    raise NotImplementedError(msg)
 
 
 def _pdist_func_1D(X, func):
