@@ -2,7 +2,7 @@
 Changelog
 #########
 
-Version 2.0.2 (2018-11-22)
+Version 2.0.3 (2018-11-23)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  - BREAKING: move pyannote.core.util to pyannote.core.utils.generators
