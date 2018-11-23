@@ -76,7 +76,6 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
     n_samples = window.samples(extent.duration, mode=mode)
 
     # defaults to `labels` contained by `annotation`
-    annotation = current_file['annotation']
     labels = annotation.labels() if labels is None else labels
     indices = {label: i for i, label in enumerate(labels)}
 
