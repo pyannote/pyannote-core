@@ -148,3 +148,64 @@ def pool(X, metric='euclidean', pooling_func=None):
         D[k] = np.infty
 
     return Z
+
+
+def fcluster_auto(X, Z, metric='euclidean'):
+    """Forms flat clusters using within-class sum of square elbow criterion
+
+    Parameters
+    ----------
+    X : `np.ndarray`
+        (n_samples, n_dimensions) feature vectors.
+    Z : `np.ndarray`
+        The hierarchical clustering encoded with the matrix returned by the
+        `linkage` function.
+    metric : `str`
+        The distance metric to use. See `pdist` function for a list of valid
+        distance metrics.
+
+    Returns
+    -------
+    T : ndarray
+        An array of length n. T[i] is the flat cluster number to which
+        original observation i belongs.
+
+    Reference
+    ---------
+    H. Delgado, X. Anguerra, C. Fredouille, J. Serrano. "Fast Single- and
+    Cross-Show Speaker Diarization Using Binary Key Speaker Modeling".
+    IEEE Transactions on Audio Speech and Language Processing
+    """
+
+    # within-class sum of squares
+    wcss = []
+    for threshold in Z[:, 2]:
+        y_t = scipy.cluster.hierarchy.fcluster(Z, threshold,
+                                               criterion='distance')
+        D = []
+        for k in np.unique(y_t):
+            Xk = X[y_t == k]
+            Ck = np.mean(Xk, axis=0, keepdims=True)
+            D.append(cdist(Ck, Xk, metric=metric).reshape(-1, ))
+        wcss.append(np.mean(np.hstack(D)**2))
+    wcss = np.array(wcss)
+
+    # elbow criterion
+    n = len(X)
+
+    # after first step, there n-1 clusters (x1)
+    x1, y1 = n - 1, wcss[0]
+    # after last step, there is 1 cluster (x2)
+    x2, y2 = 1, wcss[-1]
+
+    # equation of line passing at both points
+    # ax + by + c = 0
+    a = (y2 - y1) / (x2 - x1)
+    b = 1
+    c = (x2 * y1 - x1 * y2) / (x1 - x2)
+
+    # elbow is at maximum distance to this line
+    distance = np.abs(a * np.arange(1, n) + b * wcss + c) / np.sqrt(a**2 + b**2)
+    threshold = Z[np.argmax(distance), 2]
+
+    return scipy.cluster.hierarchy.fcluster(Z, threshold, criterion='distance')
