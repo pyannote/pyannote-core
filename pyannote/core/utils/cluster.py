@@ -34,7 +34,8 @@ from collections import Counter
 
 def chinese_whispers_clustering(X, t, method='distance',
                                 metric='euclidean',
-                                max_iter=1000):
+                                max_iter=1000,
+                                init=None):
     """Chinese whispers clustering
 
     Parameters
@@ -49,12 +50,15 @@ def chinese_whispers_clustering(X, t, method='distance',
         The distance metric to use. See `pdist` function for a list of valid
         distance metrics. Defaults to 'eucliden'.
     max_iter : `int`
-        Maximum number of iterations.
+        Maximum number of iterations. Defaults to 1000.
+    init : `np.ndarray`
+        (n_samples, ) array. Initial cluster number.
+        Defauts to each item in its own cluster.
 
     Returns
     -------
-    T : ndarray
-        An array of length n_samples. T[i] is the cluster number to which
+    T : `np.ndarray`
+        (n_samples, ) array. T[i] is the cluster number to which
         original observation i belongs.
 
     Reference
@@ -64,6 +68,8 @@ def chinese_whispers_clustering(X, t, method='distance',
     TextGraphs, at HLT-NAACL 2006.
 
     """
+
+    # TODO. add support for 'precomputed' metric
 
     if method == 'distance':
         distance = pdist(X, metric=metric)
@@ -81,8 +87,12 @@ def chinese_whispers_clustering(X, t, method='distance',
         msg = "only 'distance' method is supported for now."
         raise NotImplementedError(msg)
 
-    # initialize one cluster per item
-    clusters = np.arange(len(X))
+    if init is None:
+        # initialize one cluster per item
+        clusters = np.arange(len(X))
+    else:
+        # or use provided initialization
+        clusters = np.array(init).reshape(-1)
 
     # list of indices used to iterate over all items
     indices = np.arange(len(X))
