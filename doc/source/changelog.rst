@@ -2,6 +2,12 @@
 Changelog
 #########
 
+Version 2.1 (2019-01-17)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: add basic implementation of Chinese Whispers clustering
+ - feat: add "utils.hierarchy.fcluster_auto" parameter-free "fcluster"
+
 Version 2.0.3 (2018-11-23)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
