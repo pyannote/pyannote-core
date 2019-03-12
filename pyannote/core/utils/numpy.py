@@ -81,7 +81,14 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
 
     # one-hot encoding
     # NAN = unknown / +1 = active / 0 = inactive
-    y = np.NAN * np.ones((n_samples, len(labels)), dtype=np.int64)
+    try:
+        y = np.ones((n_samples, len(labels)), dtype=np.float64)
+        y = np.multiply(y, np.NAN, out=y)
+    except MemoryError as e:
+        msg = 'Could not create numpy array of {0}x{1} shape for file {2}. '.format(n_samples, len(labels), annotation.uri)
+        print(labels)
+        raise ValueError(msg)
+
     for i, j in window.crop(support, mode=mode, return_ranges=True):
         i = max(0, i)
         j = min(n_samples, j)
@@ -101,7 +108,7 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
             j = min(n_samples, j)
             y[i:j, k] += 1
 
-    y = np.minimum(y, 1)
+    y = np.minimum(y, 1, out=y)
 
     return SlidingWindowFeature(y, window), labels
 
