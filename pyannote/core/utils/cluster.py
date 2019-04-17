@@ -48,7 +48,7 @@ def chinese_whispers_clustering(X, t, method='distance',
         No other method is available yet.
     metric : `str`
         The distance metric to use. See `pdist` function for a list of valid
-        distance metrics. Defaults to 'eucliden'.
+        distance metrics. Defaults to 'euclidean'.
     max_iter : `int`
         Maximum number of iterations. Defaults to 1000.
     init : `np.ndarray`

@@ -2,6 +2,14 @@
 Changelog
 #########
 
+Version 2.2 (2019-04-17)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - improve: speed-up several `Segment` methods
+ - improve: decrease `one_hot_encoding` memory usage
+ - feat: add support for "fixed" option in all cropping modes
+ - setup: switch to scipy 1.1
+
 Version 2.1 (2019-01-17)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
