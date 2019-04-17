@@ -80,8 +80,8 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
     indices = {label: i for i, label in enumerate(labels)}
 
     # one-hot encoding
-    # NAN = unknown / +1 = active / 0 = inactive
-    y = np.NAN * np.ones((n_samples, len(labels)), dtype=np.int64)
+    # -1 = unknown / +1 = active / 0 = inactive
+    y = -np.ones((n_samples, len(labels)), dtype=np.int8)
     for i, j in window.crop(support, mode=mode, return_ranges=True):
         i = max(0, i)
         j = min(n_samples, j)
