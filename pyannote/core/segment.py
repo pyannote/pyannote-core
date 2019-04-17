@@ -487,7 +487,7 @@ class SlidingWindow(object):
 
         """
         if mode == 'strict':
-            return int(np.floor((from_duration - self.duration) / self.step)) - 1
+            return int(np.floor((from_duration - self.duration) / self.step)) + 1
 
         elif mode == 'loose':
             return int(np.floor((from_duration + self.duration) / self.step))
