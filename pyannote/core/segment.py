@@ -510,8 +510,7 @@ class SlidingWindow(object):
         fixed : float, optional
             Overrides `Segment` 'focus' duration and ensures that the number of
             returned frames is fixed (which might otherwise not be the case
-            because of rounding erros). Has no effect in 'strict' or 'loose'
-            modes.
+            because of rounding erros).
         return_ranges : bool, optional
             Return as list of ranges. Defaults to indices numpy array.
 
@@ -538,7 +537,7 @@ class SlidingWindow(object):
 
                 for i, s in enumerate(focus.support()):
                     rng = self.crop(s, mode=mode, fixed=fixed,
-                                        return_ranges=True)
+                                    return_ranges=True)
 
                     # if first or disjoint segment, add it
                     if i == 0 or rng[0][0] > ranges[-1][1]:
@@ -567,11 +566,16 @@ class SlidingWindow(object):
             i_ = (focus.start - self.duration - self.start) / self.step
             i = int(np.ceil(i_))
 
-            # find largest integer j such that
-            # self.start + j x self.step <= focus.end
-            j_ = (focus.end - self.start) / self.step
-            j = int(np.floor(j_))
-            rng = (i, j + 1)
+            if fixed is None:
+                # find largest integer j such that
+                # self.start + j x self.step <= focus.end
+                j_ = (focus.end - self.start) / self.step
+                j = int(np.floor(j_))
+                rng = (i, j + 1)
+
+            else:
+                n = self.samples(fixed, mode='loose')
+                rng = (i, i + n)
 
         elif mode == 'strict':
 
@@ -580,11 +584,17 @@ class SlidingWindow(object):
             i_ = (focus.start - self.start) / self.step
             i = int(np.ceil(i_))
 
-            # find largest integer j such that
-            # self.start + j x self.step + self.duration <= focus.end
-            j_ = (focus.end - self.duration - self.start) / self.step
-            j = int(np.floor(j_))
-            rng = (i, j + 1)
+            if fixed is None:
+
+                # find largest integer j such that
+                # self.start + j x self.step + self.duration <= focus.end
+                j_ = (focus.end - self.duration - self.start) / self.step
+                j = int(np.floor(j_))
+                rng = (i, j + 1)
+
+            else:
+                n = self.samples(fixed, mode='strict')
+                rng = (i, i + n)
 
         elif mode == 'center':
 
@@ -596,7 +606,7 @@ class SlidingWindow(object):
                 j = self.closest_frame(focus.end)
                 rng = (i, j + 1)
             else:
-                n = self.samples(fixed, mode=mode)
+                n = self.samples(fixed, mode='center')
                 rng = (i, i + n)
 
         else:
