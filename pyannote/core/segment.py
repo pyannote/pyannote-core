@@ -113,9 +113,6 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
     def __new__(cls, start=0., end=0.):
         return super(Segment, cls).__new__(cls, start, end)
 
-    def __nonzero__(self):
-        return self.__bool__()
-
     def __bool__(self):
         """Emptiness
 
@@ -129,7 +126,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         A segment is considered empty if its end time is smaller than its
         start time, or its duration is smaller than 1μs.
         """
-        return bool((self.end - self.start) > SEGMENT_PRECISION)
+        return (self.end - self.start) > SEGMENT_PRECISION
 
     def _get_duration(self):
         return self.end - self.start if self else 0.
