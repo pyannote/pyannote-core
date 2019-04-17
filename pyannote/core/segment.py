@@ -212,14 +212,11 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
             True if segments intersect, False otherwise
         """
 
-        if not self or not other:
-            return False
-
-        return (self.start == other.start) or \
-               (self.start < other.start and
+        return (self.start < other.start and
                 other.start < self.end - SEGMENT_PRECISION) or \
                (self.start > other.start and
-                self.start < other.end - SEGMENT_PRECISION)
+                self.start < other.end - SEGMENT_PRECISION) or \
+               (self.start == other.start)
 
     def overlaps(self, t):
         """Check if segment overlaps a given time
