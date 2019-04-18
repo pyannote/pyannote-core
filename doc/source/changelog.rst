@@ -2,8 +2,8 @@
 Changelog
 #########
 
-Version 2.2 (2019-04-17)
-~~~~~~~~~~~~~~~~~~~~~~~~
+Version 2.2.2 (2019-04-18)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  - improve: speed-up several `Segment` methods
  - improve: decrease `one_hot_encoding` memory usage
