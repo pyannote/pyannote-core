@@ -126,8 +126,7 @@ class SlidingWindowFeature(object):
         fixed : float, optional
             Overrides `Segment` 'focus' duration and ensures that the number of
             returned frames is fixed (which might otherwise not be the case
-            because of rounding errors). Has no effect in 'strict' or 'loose'
-            modes.
+            because of rounding errors).
         return_data : bool, optional
             Return a numpy array (default). For `Segment` 'focus', setting it
             to False will return a `SlidingWindowFeature` instance.
@@ -142,10 +141,6 @@ class SlidingWindowFeature(object):
         SlidingWindow.crop
 
         """
-
-        if fixed is not None and mode is not 'center':
-            msg = "'mode' must be 'center' when 'fixed' is provided."
-            raise ValueError(msg)
 
         if (not return_data) and (not isinstance(focus, Segment)):
             msg = ('"focus" must be a "Segment" instance when "return_data"'

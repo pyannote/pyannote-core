@@ -80,15 +80,8 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
     indices = {label: i for i, label in enumerate(labels)}
 
     # one-hot encoding
-    # NAN = unknown / +1 = active / 0 = inactive
-    try:
-        y = np.ones((n_samples, len(labels)), dtype=np.float64)
-        y = np.multiply(y, np.NAN, out=y)
-    except MemoryError as e:
-        msg = 'Could not create numpy array of {0}x{1} shape for file {2}. '.format(n_samples, len(labels), annotation.uri)
-        print(labels)
-        raise ValueError(msg)
-
+    # -1 = unknown / +1 = active / 0 = inactive
+    y = -np.ones((n_samples, len(labels)), dtype=np.int8)
     for i, j in window.crop(support, mode=mode, return_ranges=True):
         i = max(0, i)
         j = min(n_samples, j)
