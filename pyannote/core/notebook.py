@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2017 CNRS
+# Copyright (c) 2014-2019 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -31,9 +31,6 @@
 Visualization
 #############
 """
-
-from __future__ import unicode_literals
-from __future__ import print_function
 
 try:
     from IPython.core.pylabtools import print_figure

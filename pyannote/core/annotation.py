@@ -107,8 +107,6 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
 
-from __future__ import unicode_literals
-
 import itertools
 import numpy as np
 
