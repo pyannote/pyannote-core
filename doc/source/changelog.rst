@@ -2,6 +2,14 @@
 Changelog
 #########
 
+Version 3.0 (2019-06-xx)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - BREAKING: `Annotation.__mul__` now returns `np.ndarray` instance
+ - BREAKING: remove `Annotation` methods (that were deprecated version 1.0)
+ - BREAKING: `Scores.retrack` has been renamed `rename_tracks`
+ - improve: remove `six` and `xarray` dependencies
+
 Version 2.2.2 (2019-04-18)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
