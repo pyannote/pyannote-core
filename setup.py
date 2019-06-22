@@ -40,7 +40,6 @@ setup(
         'numpy >= 1.10.4',
         'scipy >= 1.1',
         'pandas >= 0.17.1',
-        'xarray >= 0.7.0',
         'simplejson >= 3.8.1',
         'matplotlib >= 2.0.0',
     ],
