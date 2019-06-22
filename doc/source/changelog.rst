@@ -9,9 +9,10 @@ Version 3.0 (2019-06-xx)
  - BREAKING: remove `Annotation` methods (that were deprecated version 1.0)
  - BREAKING: `Scores.retrack` has been renamed `rename_tracks`
  - improve: remove `six` and `xarray` dependencies
+ - BREAKING: remove `pyannote.core.time` module
 
 Version 2.2.2 (2019-04-18)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  - improve: speed-up several `Segment` methods
  - improve: decrease `one_hot_encoding` memory usage
