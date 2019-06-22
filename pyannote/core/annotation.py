@@ -111,8 +111,6 @@ from __future__ import unicode_literals
 
 import itertools
 import operator
-import warnings
-
 import numpy as np
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
@@ -208,7 +206,7 @@ class Annotation(object):
 
         # accumulate segments for updated labels
         _segments = {label: [] for label in update}
-        for segment, track, label in self.itertracks(label=True):
+        for segment, track, label in self.itertracks(yield_label=True):
             if label in update:
                 _segments[label].append(segment)
 
@@ -255,7 +253,7 @@ class Annotation(object):
         """
         return iter(self._tracks)
 
-    def itertracks(self, label=False, yield_label=False):
+    def itertracks(self, yield_label=False):
         """Iterate over tracks (in chronological order)
 
         Parameters
@@ -274,13 +272,6 @@ class Annotation(object):
         >>> for segment, track, label in annotation.itertracks(yield_label=True):
         ...     # do something with the track and its label
         """
-
-        if label:
-            warnings.warn(
-                '"label" parameter has been renamed to "yield_label".',
-                DeprecationWarning
-            )
-            yield_label = label
 
         for segment, tracks in self._tracks.items():
             for track, lbl in sorted(tracks.items(),
@@ -575,7 +566,7 @@ class Annotation(object):
         """Human-friendly representation"""
         # TODO: use pandas.DataFrame
         return "\n".join(["%s %s %s" % (s, t, l)
-                          for s, t, l in self.itertracks(label=True)])
+                          for s, t, l in self.itertracks(yield_label=True)])
 
     def __delitem__(self, key):
         """Delete one track
@@ -814,7 +805,7 @@ class Annotation(object):
         result = self.copy() if copy else self
 
         # TODO speed things up by working directly with annotation internals
-        for segment, track, label in annotation.itertracks(label=True):
+        for segment, track, label in annotation.itertracks(yield_label=True):
             result[segment, track] = label
 
         return result
@@ -857,12 +848,6 @@ class Annotation(object):
             return self._labels[label].copy()
 
         return self._labels[label]
-
-    def label_coverage(self, label):
-        warnings.warn(
-            '"label_coverage" has been renamed to "label_support".',
-            DeprecationWarning)
-        return self.label_support(label)
 
     def label_support(self, label):
         """Label support
@@ -973,24 +958,6 @@ class Annotation(object):
         return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
                    key=lambda x: x[1])[0]
 
-    def translate(self, translation):
-        warnings.warn(
-            '"translate" has been replaced by "rename_labels".',
-            DeprecationWarning)
-        return self.rename_labels(mapping=translation)
-
-    def __mod__(self, translation):
-        warnings.warn(
-            'support for "%" operator will be removed.',
-            DeprecationWarning)
-        return self.rename_labels(mapping=translation)
-
-    def retrack(self):
-        warnings.warn(
-            '"retrack" has been renamed to "rename_tracks".',
-            DeprecationWarning)
-        return self.rename_tracks(generator='int')
-
     def rename_tracks(self, generator='string'):
         """Rename all tracks
 
@@ -1033,7 +1000,7 @@ class Annotation(object):
             generator = int_generator()
 
         # TODO speed things up by working directly with annotation internals
-        for s, _, label in self.itertracks(label=True):
+        for s, _, label in self.itertracks(yield_label=True):
             renamed[s, next(generator)] = label
         return renamed
 
@@ -1087,12 +1054,6 @@ class Annotation(object):
 
         return renamed
 
-    def anonymize_labels(self, generator='string'):
-        warnings.warn(
-            "'anonymize_labels' has been replaced by 'rename_labels'",
-            DeprecationWarning)
-        return self.rename_labels(generator=generator)
-
     def relabel_tracks(self, generator='string'):
         """Relabel tracks
 
@@ -1116,16 +1077,10 @@ class Annotation(object):
             generator = int_generator()
 
         relabeled = self.empty()
-        for s, t, _ in self.itertracks(label=True):
+        for s, t, _ in self.itertracks(yield_label=True):
             relabeled[s, t] = next(generator)
 
         return relabeled
-
-    def anonymize_tracks(self, generator='string'):
-        warnings.warn(
-            "'anonymize_tracks' has been replaced by 'relabel_tracks'",
-            DeprecationWarning)
-        return self.relabel_tracks(generator=generator)
 
     def support(self, collar=0.):
         """Annotation support
@@ -1185,12 +1140,6 @@ class Annotation(object):
                 support[segment, next(generator)] = label
 
         return support
-
-    def smooth(self, collar=0.):
-        warnings.warn(
-            '"smooth" has been renamed to "support".',
-            DeprecationWarning)
-        return self.support(collar=collar)
 
     def co_iter(self, other):
         """Iterate over pairs of intersecting tracks
@@ -1270,7 +1219,7 @@ class Annotation(object):
         content = [{PYANNOTE_SEGMENT: s.for_json(),
                     PYANNOTE_TRACK: t,
                     PYANNOTE_LABEL: l}
-                   for s, t, l in self.itertracks(label=True)]
+                   for s, t, l in self.itertracks(yield_label=True)]
         data[PYANNOTE_JSON_CONTENT] = content
 
         if self.uri:

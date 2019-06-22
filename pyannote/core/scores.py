@@ -410,14 +410,13 @@ class Scores(object):
 
         return
 
-    def retrack(self):
-        """
-        """
+    def rename_tracks(self, generator='int'):
+        """Rename tracks"""
 
         self._reindexIfNeeded()
         retracked = self.copy()
 
-        annotation = self.annotation_.retrack()
+        annotation = self.annotation_.rename_tracks(generator=generator)
         retracked.annotation_ = annotation
 
         names = [PYANNOTE_SEGMENT + '_' + field
