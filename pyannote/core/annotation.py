@@ -109,7 +109,6 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 
 from __future__ import unicode_literals
 
-import six
 import itertools
 import operator
 import warnings
@@ -284,9 +283,8 @@ class Annotation(object):
             yield_label = label
 
         for segment, tracks in self._tracks.items():
-            for track, lbl in sorted(
-                six.iteritems(tracks),
-                key=lambda tl: (str(tl[0]), str(tl[1]))):
+            for track, lbl in sorted(tracks.items(),
+                                     key=lambda tl: (str(tl[0]), str(tl[1]))):
                 if yield_label:
                     yield segment, track, lbl
                 else:
@@ -331,14 +329,16 @@ class Annotation(object):
         Two annotations are equal if and only if their tracks and associated
         labels are equal.
         """
-        pairOfTracks = six.moves.zip_longest(self.itertracks(label=True),
-                                             other.itertracks(label=True))
+        pairOfTracks = itertools.zip_longest(
+            self.itertracks(yield_label=True),
+            other.itertracks(yield_label=True))
         return all(t1 == t2 for t1, t2 in pairOfTracks)
 
     def __ne__(self, other):
         """Inequality"""
-        pairOfTracks = six.moves.zip_longest(self.itertracks(label=True),
-                                             other.itertracks(label=True))
+        pairOfTracks = itertools.zip_longest(
+            self.itertracks(yield_label=True),
+            other.itertracks(yield_label=True))
 
         return any(t1 != t2 for t1, t2 in pairOfTracks)
 
@@ -451,7 +451,7 @@ class Annotation(object):
                         self.get_timeline(copy=False).co_iter(support):
 
                     intersection = segment & other_segment
-                    for track, label in six.iteritems(self._tracks[segment]):
+                    for track, label in self._tracks[segment].items():
                         track = cropped.new_track(intersection,
                                                   candidate=track)
                         cropped[intersection, track] = label
@@ -599,7 +599,7 @@ class Annotation(object):
             self._timelineNeedsUpdate = True
 
             # mark every label in tracks as modified
-            for track, label in six.iteritems(tracks):
+            for track, label in tracks.items():
                 self._labelNeedsUpdate[label] = True
 
         # del annotation[segment, track]

@@ -40,7 +40,6 @@ try:
 except Exception as e:
     pass
 from matplotlib.cm import get_cmap
-import six.moves
 import numpy as np
 from itertools import cycle, product, groupby
 from .segment import Segment
@@ -205,7 +204,7 @@ class Notebook(object):
 
         ax = self.setup(ax=ax, time=time)
 
-        for segment, y in six.moves.zip(cropped, self.get_y(cropped)):
+        for segment, y in zip(cropped, self.get_y(cropped)):
             self.draw_segment(ax, segment, y)
 
         # ax.set_aspect(3. / self.crop.duration)
@@ -221,8 +220,9 @@ class Notebook(object):
 
         ax = self.setup(ax=ax, time=time)
 
-        for (segment, track, label), y in six.moves.zip(
-                cropped.itertracks(label=True), self.get_y(segments)):
+        for (segment, track, label), y in zip(
+                cropped.itertracks(yield_label=True),
+                self.get_y(segments)):
             self.draw_segment(ax, segment, y, label=label)
 
         if legend:
