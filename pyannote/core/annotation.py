@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2017 CNRS
+# Copyright (c) 2014-2019 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -114,7 +114,6 @@ import numpy as np
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
-from xarray import DataArray
 from sortedcontainers import SortedDict
 from .segment import Segment
 from .timeline import Timeline
@@ -1171,8 +1170,6 @@ class Annotation(object):
         """Cooccurrence (or confusion) matrix
 
         >>> matrix = annotation * other
-        >>> matrix.loc['A', 'a']   # duration of cooccurrence between labels
-                                   # 'A' from `annotation` and 'a' from `other`
 
         Parameters
         ----------
@@ -1181,7 +1178,9 @@ class Annotation(object):
 
         Returns
         -------
-        cooccurrence : DataArray
+        cooccurrence : (n_self, n_other) np.ndarray
+            Cooccurrence matrix where `n_self` (resp. `n_other`) is the number
+            of labels in `self` (resp. `other`).
         """
 
         if not isinstance(other, Annotation):
@@ -1204,7 +1203,7 @@ class Annotation(object):
             duration = (segment & other_segment).duration
             matrix[i, j] += duration
 
-        return DataArray(matrix, coords=[('i', i_labels), ('j', j_labels)])
+        return matrix
 
     def for_json(self):
         """Serialization
