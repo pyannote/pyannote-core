@@ -110,7 +110,6 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 from __future__ import unicode_literals
 
 import itertools
-import operator
 import numpy as np
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
