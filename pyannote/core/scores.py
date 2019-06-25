@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2019 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,8 +25,6 @@
 
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
-
-from __future__ import unicode_literals
 
 import numpy as np
 from pandas import Index, MultiIndex, DataFrame, pivot_table
@@ -410,14 +408,13 @@ class Scores(object):
 
         return
 
-    def retrack(self):
-        """
-        """
+    def rename_tracks(self, generator='int'):
+        """Rename tracks"""
 
         self._reindexIfNeeded()
         retracked = self.copy()
 
-        annotation = self.annotation_.retrack()
+        annotation = self.annotation_.rename_tracks(generator=generator)
         retracked.annotation_ = annotation
 
         names = [PYANNOTE_SEGMENT + '_' + field

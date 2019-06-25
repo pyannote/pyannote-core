@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2017 CNRS
+# Copyright (c) 2014-2019 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -65,9 +65,6 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
 
 See :class:`pyannote.core.Segment` for the complete reference.
 """
-
-
-from __future__ import unicode_literals
 
 from collections import namedtuple
 import numpy as np
