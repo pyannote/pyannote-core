@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2017 CNRS
+# Copyright (c) 2014-2019 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -66,9 +66,6 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
 See :class:`pyannote.core.Segment` for the complete reference.
 """
 
-
-from __future__ import unicode_literals
-
 from collections import namedtuple
 import numpy as np
 
@@ -111,7 +108,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
     """
 
     def __new__(cls, start=0., end=0.):
-        return super(Segment, cls).__new__(cls, start, end)
+        return super(Segment, cls).__new__(cls, float(start), float(end))
 
     def __bool__(self):
         """Emptiness
@@ -139,17 +136,12 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
     """Segment mid-time (read-only)"""
 
     def __iter__(self):
-        """Unpack segment boundaries as float
-
-        >>> segment = Segment(start=1, end=2)
-        >>> isinstance(segment.start, int)  # segment.start is int
-        True
+        """Unpack segment boundaries
+        >>> segment = Segment(start, end)
         >>> start, end = segment
-        >>> isinstance(start, float)        # start is float
-        True
         """
-        yield float(self.start)
-        yield float(self.end)
+        yield self.start
+        yield self.end
 
     def copy(self):
         """Get a copy of the segment
