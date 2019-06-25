@@ -46,8 +46,6 @@ def test_crop_strict(annotation):
     actual = annotation.crop(Segment(5, 9), mode='strict')
     assert actual == expected, str(actual)
 
-
-
 def test_copy(annotation):
 
     copy = annotation.copy()

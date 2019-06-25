@@ -90,7 +90,7 @@ def test_labels(scores):
 
 def test_retrack(scores):
 
-    assert list(scores.retrack().itertracks()) == [(Segment(0, 2.5), 0),
+    assert list(scores.rename_tracks(generator='int').itertracks()) == [(Segment(0, 2.5), 0),
                                                    (Segment(3, 4), 1),
                                                    (Segment(3, 4), 2)]
 
@@ -151,7 +151,7 @@ def test_subset(scores):
 def test_to_annotation(scores):
 
     annotation = scores.to_annotation()
-    assert list(annotation.itertracks(label=True)) == [(Segment(0, 2.5), 'track', 'C'),
+    assert list(annotation.itertracks(yield_label=True)) == [(Segment(0, 2.5), 'track', 'C'),
                                                        (Segment(3, 4), 'other_track', 'C'),
                                                        (Segment(3, 4), 'track', 'B')]
 

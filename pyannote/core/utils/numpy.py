@@ -101,7 +101,7 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
             j = min(n_samples, j)
             y[i:j, k] += 1
 
-    y = np.minimum(y, 1)
+    y = np.minimum(y, 1, out=y)
 
     return SlidingWindowFeature(y, window), labels
 

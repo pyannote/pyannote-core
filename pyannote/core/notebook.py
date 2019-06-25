@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2017 CNRS
+# Copyright (c) 2014-2019 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -32,15 +32,11 @@ Visualization
 #############
 """
 
-from __future__ import unicode_literals
-from __future__ import print_function
-
 try:
     from IPython.core.pylabtools import print_figure
 except Exception as e:
     pass
 from matplotlib.cm import get_cmap
-import six.moves
 import numpy as np
 from itertools import cycle, product, groupby
 from .segment import Segment
@@ -205,7 +201,7 @@ class Notebook(object):
 
         ax = self.setup(ax=ax, time=time)
 
-        for segment, y in six.moves.zip(cropped, self.get_y(cropped)):
+        for segment, y in zip(cropped, self.get_y(cropped)):
             self.draw_segment(ax, segment, y)
 
         # ax.set_aspect(3. / self.crop.duration)
@@ -221,8 +217,9 @@ class Notebook(object):
 
         ax = self.setup(ax=ax, time=time)
 
-        for (segment, track, label), y in six.moves.zip(
-                cropped.itertracks(label=True), self.get_y(segments)):
+        for (segment, track, label), y in zip(
+                cropped.itertracks(yield_label=True),
+                self.get_y(segments)):
             self.draw_segment(ax, segment, y, label=label)
 
         if legend:

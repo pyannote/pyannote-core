@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2017 CNRS
+# Copyright (c) 2014-2019 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -107,18 +107,11 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
 
-from __future__ import unicode_literals
-
-import six
 import itertools
-import operator
-import warnings
-
 import numpy as np
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
-from xarray import DataArray
 from sortedcontainers import SortedDict
 from .segment import Segment
 from .timeline import Timeline
@@ -209,7 +202,7 @@ class Annotation(object):
 
         # accumulate segments for updated labels
         _segments = {label: [] for label in update}
-        for segment, track, label in self.itertracks(label=True):
+        for segment, track, label in self.itertracks(yield_label=True):
             if label in update:
                 _segments[label].append(segment)
 
@@ -256,7 +249,7 @@ class Annotation(object):
         """
         return iter(self._tracks)
 
-    def itertracks(self, label=False, yield_label=False):
+    def itertracks(self, yield_label=False):
         """Iterate over tracks (in chronological order)
 
         Parameters
@@ -276,17 +269,9 @@ class Annotation(object):
         ...     # do something with the track and its label
         """
 
-        if label:
-            warnings.warn(
-                '"label" parameter has been renamed to "yield_label".',
-                DeprecationWarning
-            )
-            yield_label = label
-
         for segment, tracks in self._tracks.items():
-            for track, lbl in sorted(
-                six.iteritems(tracks),
-                key=lambda tl: (str(tl[0]), str(tl[1]))):
+            for track, lbl in sorted(tracks.items(),
+                                     key=lambda tl: (str(tl[0]), str(tl[1]))):
                 if yield_label:
                     yield segment, track, lbl
                 else:
@@ -331,14 +316,16 @@ class Annotation(object):
         Two annotations are equal if and only if their tracks and associated
         labels are equal.
         """
-        pairOfTracks = six.moves.zip_longest(self.itertracks(label=True),
-                                             other.itertracks(label=True))
+        pairOfTracks = itertools.zip_longest(
+            self.itertracks(yield_label=True),
+            other.itertracks(yield_label=True))
         return all(t1 == t2 for t1, t2 in pairOfTracks)
 
     def __ne__(self, other):
         """Inequality"""
-        pairOfTracks = six.moves.zip_longest(self.itertracks(label=True),
-                                             other.itertracks(label=True))
+        pairOfTracks = itertools.zip_longest(
+            self.itertracks(yield_label=True),
+            other.itertracks(yield_label=True))
 
         return any(t1 != t2 for t1, t2 in pairOfTracks)
 
@@ -451,7 +438,7 @@ class Annotation(object):
                         self.get_timeline(copy=False).co_iter(support):
 
                     intersection = segment & other_segment
-                    for track, label in six.iteritems(self._tracks[segment]):
+                    for track, label in self._tracks[segment].items():
                         track = cropped.new_track(intersection,
                                                   candidate=track)
                         cropped[intersection, track] = label
@@ -575,7 +562,7 @@ class Annotation(object):
         """Human-friendly representation"""
         # TODO: use pandas.DataFrame
         return "\n".join(["%s %s %s" % (s, t, l)
-                          for s, t, l in self.itertracks(label=True)])
+                          for s, t, l in self.itertracks(yield_label=True)])
 
     def __delitem__(self, key):
         """Delete one track
@@ -599,7 +586,7 @@ class Annotation(object):
             self._timelineNeedsUpdate = True
 
             # mark every label in tracks as modified
-            for track, label in six.iteritems(tracks):
+            for track, label in tracks.items():
                 self._labelNeedsUpdate[label] = True
 
         # del annotation[segment, track]
@@ -814,7 +801,7 @@ class Annotation(object):
         result = self.copy() if copy else self
 
         # TODO speed things up by working directly with annotation internals
-        for segment, track, label in annotation.itertracks(label=True):
+        for segment, track, label in annotation.itertracks(yield_label=True):
             result[segment, track] = label
 
         return result
@@ -857,12 +844,6 @@ class Annotation(object):
             return self._labels[label].copy()
 
         return self._labels[label]
-
-    def label_coverage(self, label):
-        warnings.warn(
-            '"label_coverage" has been renamed to "label_support".',
-            DeprecationWarning)
-        return self.label_support(label)
 
     def label_support(self, label):
         """Label support
@@ -973,24 +954,6 @@ class Annotation(object):
         return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
                    key=lambda x: x[1])[0]
 
-    def translate(self, translation):
-        warnings.warn(
-            '"translate" has been replaced by "rename_labels".',
-            DeprecationWarning)
-        return self.rename_labels(mapping=translation)
-
-    def __mod__(self, translation):
-        warnings.warn(
-            'support for "%" operator will be removed.',
-            DeprecationWarning)
-        return self.rename_labels(mapping=translation)
-
-    def retrack(self):
-        warnings.warn(
-            '"retrack" has been renamed to "rename_tracks".',
-            DeprecationWarning)
-        return self.rename_tracks(generator='int')
-
     def rename_tracks(self, generator='string'):
         """Rename all tracks
 
@@ -1033,7 +996,7 @@ class Annotation(object):
             generator = int_generator()
 
         # TODO speed things up by working directly with annotation internals
-        for s, _, label in self.itertracks(label=True):
+        for s, _, label in self.itertracks(yield_label=True):
             renamed[s, next(generator)] = label
         return renamed
 
@@ -1087,12 +1050,6 @@ class Annotation(object):
 
         return renamed
 
-    def anonymize_labels(self, generator='string'):
-        warnings.warn(
-            "'anonymize_labels' has been replaced by 'rename_labels'",
-            DeprecationWarning)
-        return self.rename_labels(generator=generator)
-
     def relabel_tracks(self, generator='string'):
         """Relabel tracks
 
@@ -1116,16 +1073,10 @@ class Annotation(object):
             generator = int_generator()
 
         relabeled = self.empty()
-        for s, t, _ in self.itertracks(label=True):
+        for s, t, _ in self.itertracks(yield_label=True):
             relabeled[s, t] = next(generator)
 
         return relabeled
-
-    def anonymize_tracks(self, generator='string'):
-        warnings.warn(
-            "'anonymize_tracks' has been replaced by 'relabel_tracks'",
-            DeprecationWarning)
-        return self.relabel_tracks(generator=generator)
 
     def support(self, collar=0.):
         """Annotation support
@@ -1186,12 +1137,6 @@ class Annotation(object):
 
         return support
 
-    def smooth(self, collar=0.):
-        warnings.warn(
-            '"smooth" has been renamed to "support".',
-            DeprecationWarning)
-        return self.support(collar=collar)
-
     def co_iter(self, other):
         """Iterate over pairs of intersecting tracks
 
@@ -1223,8 +1168,6 @@ class Annotation(object):
         """Cooccurrence (or confusion) matrix
 
         >>> matrix = annotation * other
-        >>> matrix.loc['A', 'a']   # duration of cooccurrence between labels
-                                   # 'A' from `annotation` and 'a' from `other`
 
         Parameters
         ----------
@@ -1233,7 +1176,9 @@ class Annotation(object):
 
         Returns
         -------
-        cooccurrence : DataArray
+        cooccurrence : (n_self, n_other) np.ndarray
+            Cooccurrence matrix where `n_self` (resp. `n_other`) is the number
+            of labels in `self` (resp. `other`).
         """
 
         if not isinstance(other, Annotation):
@@ -1256,7 +1201,7 @@ class Annotation(object):
             duration = (segment & other_segment).duration
             matrix[i, j] += duration
 
-        return DataArray(matrix, coords=[('i', i_labels), ('j', j_labels)])
+        return matrix
 
     def for_json(self):
         """Serialization
@@ -1270,7 +1215,7 @@ class Annotation(object):
         content = [{PYANNOTE_SEGMENT: s.for_json(),
                     PYANNOTE_TRACK: t,
                     PYANNOTE_LABEL: l}
-                   for s, t, l in self.itertracks(label=True)]
+                   for s, t, l in self.itertracks(yield_label=True)]
         data[PYANNOTE_JSON_CONTENT] = content
 
         if self.uri:
