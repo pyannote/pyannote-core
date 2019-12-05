@@ -57,3 +57,6 @@ doc/.ipynb_checkpoints
 
 # emacs temporary files
 *~
+
+#jupyter notebook
+.ipynb_checkpoints
