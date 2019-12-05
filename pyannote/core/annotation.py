@@ -448,12 +448,12 @@ class Annotation(object):
 
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
-                
+
         elif isinstance(support,Annotation):
             if mode == 'intersection':
                 for segment, other_segment in \
                         self.get_timeline(copy=False).co_iter(support.get_timeline(copy=False)):
-                    label,other_label=annotation.get_labels(segment),support.get_labels(other_segment)
+                    label,other_label=self.get_labels(segment),support.get_labels(other_segment)
                     labels=label & other_label
                     if bool(labels):
                         intersection = segment & other_segment
