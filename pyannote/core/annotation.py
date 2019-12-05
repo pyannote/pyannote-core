@@ -353,8 +353,10 @@ class Annotation(object):
 
         Parameters
         ----------
-        support : Segment or Timeline
+        support : Segment, Timeline or Annotation
             If `support` is a `Timeline`, its support is used.
+            Else, if `support` is an `Annotation` cropping is done only if
+                both annotations share the same labels  
         mode : {'strict', 'loose', 'intersection'}, optional
             Controls how segments that are not fully included in `support` are
             handled. 'strict' mode only keeps fully included segments. 'loose'
@@ -374,16 +376,15 @@ class Annotation(object):
         modified to make sure no track is lost.
 
         """
-
         # TODO speed things up by working directly with annotation internals
+
+        cropped = self.__class__(uri=self.uri, modality=self.modality)
 
         if isinstance(support, Segment):
             support = Timeline(segments=[support], uri=self.uri)
             return self.crop(support, mode=mode)
 
         elif isinstance(support, Timeline):
-
-            cropped = self.__class__(uri=self.uri, modality=self.modality)
 
             if mode == 'loose':
 
@@ -447,7 +448,25 @@ class Annotation(object):
 
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
+                
+        elif isinstance(support,Annotation):
+            if mode == 'intersection':
+                for segment, other_segment in \
+                        self.get_timeline(copy=False).co_iter(support.get_timeline(copy=False)):
+                    label,other_label=annotation.get_labels(segment),support.get_labels(other_segment)
+                    labels=label & other_label
+                    if bool(labels):
+                        intersection = segment & other_segment
+                        for track,label in zip(self._tracks[segment],labels):
+                            track = cropped.new_track(intersection,
+                                                      candidate=track)
+                            cropped[intersection, track] = label
 
+                return cropped
+            else:
+                raise NotImplementedError("unsupported mode: '%s'" % mode)
+        else:
+            raise TypeError(f"got an invalid type for support: {type(support)}")
 
     def get_tracks(self, segment):
         """Query tracks by segment
