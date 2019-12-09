@@ -88,11 +88,14 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
+from typing import Optional, Iterable
 
-from .segment import Segment
+import pandas as pd
 from sortedcontainers import SortedList
+
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from .segment import Segment
 
 
 # =====================================================================
@@ -100,7 +103,7 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 # =====================================================================
 
 
-class Timeline(object):
+class Timeline:
     """
     Ordered set of segments.
 
@@ -122,14 +125,14 @@ class Timeline(object):
     """
 
     @classmethod
-    def from_df(cls, df, uri=None):
+    def from_df(cls, df: pd.DataFrame, uri: Optional[str] = None):
         segments = list(df[PYANNOTE_SEGMENT])
         timeline = cls(segments=segments, uri=uri)
         return timeline
 
-    def __init__(self, segments=None, uri=None):
+    def __init__(self, segments: Optional[Iterable[Segment]] = None, uri=None):
 
-        super(Timeline, self).__init__()
+        super().__init__()
 
         if segments is None:
             segments = ()
@@ -150,7 +153,7 @@ class Timeline(object):
         self.segments_boundaries_ = SortedList(boundaries)
 
         # path to (or any identifier of) segmented resource
-        self.uri = uri
+        self.uri: str = uri
 
     def __len__(self):
         """Number of segments
@@ -173,7 +176,7 @@ class Timeline(object):
         """
         return len(self.segments_set_) > 0
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Segment]:
         """Iterate over segments (in chronological order)
 
         >>> for segment in timeline:
@@ -185,7 +188,7 @@ class Timeline(object):
         """
         return iter(self.segments_list_)
 
-    def __getitem__(self, k):
+    def __getitem__(self, k: int) -> Segment:
         """Get segment by index (in chronological order)
 
         >>> first_segment = timeline[0]
@@ -193,7 +196,7 @@ class Timeline(object):
         """
         return self.segments_list_[k]
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Timeline'):
         """Equality
 
         Two timelines are equal if and only if their segments are equal.
@@ -208,11 +211,11 @@ class Timeline(object):
         """
         return self.segments_set_ == other.segments_set_
 
-    def __ne__(self, other):
+    def __ne__(self, other: 'Timeline'):
         """Inequality"""
         return self.segments_set_ != other.segments_set_
 
-    def index(self, segment):
+    def index(self, segment: Segment) -> int:
         """Get index of (existing) segment
 
         Parameters
@@ -231,7 +234,7 @@ class Timeline(object):
         """
         return self.segments_list_.index(segment)
 
-    def add(self, segment):
+    def add(self, segment: Segment) -> 'Timeline':
         """Add a segment (in place)
 
         Parameters
@@ -267,7 +270,7 @@ class Timeline(object):
 
         return self
 
-    def remove(self, segment):
+    def remove(self, segment: Segment):
         """Remove a segment (in place)
 
         Parameters
@@ -299,7 +302,7 @@ class Timeline(object):
 
         return self
 
-    def discard(self, segment):
+    def discard(self, segment: Segment):
         """Same as `remove`
 
         See also
@@ -308,10 +311,10 @@ class Timeline(object):
         """
         return self.remove(segment)
 
-    def __ior__(self, timeline):
+    def __ior__(self, timeline: 'Timeline'):
         return self.update(timeline)
 
-    def update(self, timeline):
+    def update(self, timeline: Segment):
         """Add every segments of an existing timeline (in place)
 
         Parameters
@@ -344,10 +347,10 @@ class Timeline(object):
 
         return self
 
-    def __or__(self, timeline):
+    def __or__(self, timeline: 'Timeline') -> 'Timeline':
         return self.union(timeline)
 
-    def union(self, timeline):
+    def union(self, timeline: 'Timeline') -> 'Timeline':
         """Create new timeline made of union of segments
 
         Parameters
@@ -368,7 +371,7 @@ class Timeline(object):
         segments = self.segments_set_ | timeline.segments_set_
         return Timeline(segments=segments, uri=self.uri)
 
-    def co_iter(self, other):
+    def co_iter(self, other: 'Timeline'):
         """Iterate over pairs of intersecting segments
 
         >>> timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
@@ -548,7 +551,7 @@ class Timeline(object):
         string = "["
         for i, segment in enumerate(self.segments_list_):
             string += str(segment)
-            string += "\n " if i+1 < n else ""
+            string += "\n " if i + 1 < n else ""
         string += "]"
         return string
 
