@@ -89,6 +89,7 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
 
+from typing import TextIO
 from .segment import Segment
 from sortedcontainers import SortedList
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT

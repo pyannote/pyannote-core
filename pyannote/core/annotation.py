@@ -109,6 +109,7 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 
 import itertools
 import numpy as np
+from typing import TextIO
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
@@ -360,7 +361,7 @@ class Annotation(object):
                 f'<NA> <NA> {label} <NA> <NA>\n'
             )
             file.write(line)
-            
+
     def crop(self, support, mode='intersection'):
         """Crop annotation to new support
 
