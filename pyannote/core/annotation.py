@@ -348,6 +348,19 @@ class Annotation(object):
         """
         return included in self.get_timeline(copy=False)
 
+    def write_rttm(self, file: TextIO):
+        """Write annotation to "rttm" file
+        Parameters
+        ----------
+        file : file object
+        """
+        for segment, _, label in self.itertracks(yield_label=True):
+            line = (
+                f'SPEAKER {self.uri} 1 {segment.start:.3f} {segment.duration:.3f} '
+                f'<NA> <NA> {label} <NA> <NA>\n'
+            )
+            file.write(line)
+            
     def crop(self, support, mode='intersection'):
         """Crop annotation to new support
 
