@@ -930,6 +930,20 @@ class Timeline(object):
 
         return annotation
 
+    def write_uem(self,file: TextIO):
+        """Write timeline to "uem" file
+        Parameters
+        ----------
+        file : file object
+        """
+        for segment in self:
+            line = "{} 1 {} {}\n".format(
+                self.uri,
+                segment.start,
+                segment.end
+                )
+            file.write(line)
+
     def for_json(self):
         """Serialization
 
