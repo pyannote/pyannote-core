@@ -88,7 +88,7 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
-from typing import Optional, Iterable
+from typing import Optional, Iterable, List, Generator, Union, Callable
 
 import pandas as pd
 from sortedcontainers import SortedList
@@ -131,9 +131,6 @@ class Timeline:
         return timeline
 
     def __init__(self, segments: Optional[Iterable[Segment]] = None, uri=None):
-
-        super().__init__()
-
         if segments is None:
             segments = ()
 
@@ -509,7 +506,7 @@ class Timeline:
         return Timeline(segments=self.crop_iter(support, mode=mode),
                         uri=self.uri)
 
-    def overlapping(self, t):
+    def overlapping(self, t: float) -> List[Segment]:
         """Get list of segments overlapping `t`
 
         Parameters
@@ -524,7 +521,7 @@ class Timeline:
         """
         return list(self.overlapping_iter(t))
 
-    def overlapping_iter(self, t):
+    def overlapping_iter(self, t: float) -> Generator[Segment]:
         """Like `overlapping` but returns a segment iterator instead
 
         See also
@@ -532,6 +529,7 @@ class Timeline:
         :func:`pyannote.core.Timeline.overlapping`
         """
         segment = Segment(start=t, end=t)
+        # TODO: maybe this line should be removed?
         iterable = self.segments_list_.irange(maximum=segment)
         for segment in self.segments_list_.irange(maximum=segment):
             if segment.overlaps(t):
@@ -566,7 +564,7 @@ class Timeline:
         return "<Timeline(uri=%s, segments=%s)>" % (self.uri,
                                                     list(self.segments_list_))
 
-    def __contains__(self, included):
+    def __contains__(self, included: Union[Segment, 'Timeline']):
         """Inclusion
 
         Check whether every segment of `included` does exist in timeline.
@@ -598,14 +596,14 @@ class Timeline:
             return included in self.segments_set_
 
         elif isinstance(included, Timeline):
-            return self.segments_set_.issuperset(included._segments)
+            return self.segments_set_.issuperset(included.segments_set_)
 
         else:
             raise TypeError(
                 'Checking for inclusion only supports Segment and '
                 'Timeline instances')
 
-    def empty(self):
+    def empty(self) -> 'Timeline':
         """Return an empty copy
 
         Returns
@@ -616,7 +614,8 @@ class Timeline:
         """
         return Timeline(uri=self.uri)
 
-    def copy(self, segment_func=None):
+    def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
+            -> 'Timeline':
         """Get a copy of the timeline
 
         If `segment_func` is provided, it is applied to each segment first.
@@ -644,7 +643,7 @@ class Timeline:
         return Timeline(segments=[segment_func(s) for s in self.segments_list_],
                         uri=self.uri)
 
-    def extent(self):
+    def extent(self) -> Segment:
         """Extent
 
         The extent of a timeline is the segment of minimum duration that
@@ -681,8 +680,8 @@ class Timeline:
             import numpy as np
             return Segment(start=np.inf, end=-np.inf)
 
-    def support_iter(self):
-        """Like `support` but returns a segment iterator instead
+    def support_iter(self) -> Generator[Segment]:
+        """Like `support` but returns a segment generator instead
 
         See also
         --------
@@ -723,7 +722,7 @@ class Timeline:
         # Add new segment to the timeline support
         yield new_segment
 
-    def support(self):
+    def support(self) -> 'Timeline':
         """Timeline support
 
         The support of a timeline is the timeline with the minimum number of
@@ -763,8 +762,9 @@ class Timeline:
         # of the segments in the timeline support.
         return sum(s.duration for s in self.support_iter())
 
-    def gaps_iter(self, support=None):
-        """Like `gaps` but returns a segment iterator instead
+    def gaps_iter(self, support: Optional[Union[Segment, 'Timeline']] = None) \
+            -> Generator[Segment]:
+        """Like `gaps` but returns a segment generator instead
 
         See also
         --------
@@ -811,7 +811,8 @@ class Timeline:
                 for gap in self.gaps_iter(support=segment):
                     yield gap
 
-    def gaps(self, support=None):
+    def gaps(self, support: Optional[Union[Segment, 'Timeline']] = None) \
+            -> 'Timeline':
         """Gaps
 
         A picture is worth a thousand words::
@@ -842,7 +843,7 @@ class Timeline:
         return Timeline(segments=self.gaps_iter(support=support),
                         uri=self.uri)
 
-    def segmentation(self):
+    def segmentation(self) -> 'Timeline':
         """Segmentation
 
         Create the unique timeline with same support and same set of segment
@@ -901,7 +902,8 @@ class Timeline:
 
         return Timeline(segments=segments, uri=self.uri)
 
-    def to_annotation(self, generator='string', modality=None):
+    def to_annotation(self, generator: Union[str, Iterable['Label']] = 'string',
+                      modality: Optional[str] = None):
         """Turn timeline into an annotation
 
         Each segment is labeled by a unique label.

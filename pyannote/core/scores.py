@@ -35,7 +35,7 @@ from .segment import Segment
 from .timeline import Timeline
 
 
-class Unknown(object):
+class Unknown:
 
     nextID = 0
 
@@ -49,7 +49,6 @@ class Unknown(object):
         return cls.nextID
 
     def __init__(self, format='#{id:d}'):
-        super(Unknown, self).__init__()
         self.ID = Unknown.getNewID()
         self._format = format
 
@@ -78,8 +77,7 @@ class Unknown(object):
         return True
 
 
-
-class Scores(object):
+class Scores:
     """
 
     Parameters

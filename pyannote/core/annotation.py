@@ -108,7 +108,7 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 """
 
 import itertools
-from typing import Optional, Dict, Union, Iterable, Generator, Tuple, List, Set
+from typing import Optional, Dict, Union, Iterable, Generator, Tuple, List, Set, Hashable
 
 import numpy as np
 import pandas as pd
@@ -122,7 +122,7 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .utils.generators import string_generator, int_generator
 
 # TODO : Make sure this is true, it may just be "Hashable"
-Label = Union[str, int]
+Label = Hashable
 
 
 class Annotation:
@@ -165,8 +165,6 @@ class Annotation:
         return annotation
 
     def __init__(self, uri: Optional[str] = None, modality: Optional[str] = None):
-
-        super().__init__()
 
         self._uri: Optional[str] = uri
         self.modality: Optional[str] = modality
@@ -964,7 +962,7 @@ class Annotation:
         return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
                    key=lambda x: x[1])[0]
 
-    def rename_tracks(self, generator: Union[str, Iterable[str]] = 'string'):
+    def rename_tracks(self, generator: Union[str, Iterable[Label]] = 'string'):
         """Rename all tracks
 
         Parameters
