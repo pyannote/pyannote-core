@@ -89,6 +89,7 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
 
+from typing import TextIO
 from .segment import Segment
 from sortedcontainers import SortedList
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
@@ -929,6 +930,25 @@ class Timeline(object):
             annotation[segment] = next(generator)
 
         return annotation
+
+    def write_uem(self,file: TextIO):
+        """Dump timeline to file using UEM format
+
+        Parameters
+        ----------
+        file : file object
+        
+        Usage
+        -----
+        >>> with open('file.uem', 'w') as file:
+        ...    timeline.write_uem(file)
+        """
+
+        uri = self.uri if self.uri else "<NA>"
+        
+        for segment in self:
+            line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
+            file.write(line)
 
     def for_json(self):
         """Serialization
