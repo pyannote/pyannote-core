@@ -932,14 +932,22 @@ class Timeline(object):
         return annotation
 
     def write_uem(self,file: TextIO):
-        """Write timeline to "uem" file
+        """Dump timeline to file using UEM format
+
         Parameters
         ----------
         file : file object
+        
+        Usage
+        -----
+        >>> with open('file.uem', 'w') as file:
+        ...    timeline.write_uem(file)
         """
+
         uri = self.uri if self.uri else "<NA>"
+        
         for segment in self:
-            line = f"{uri} 1 {segment.start} {segment.end}\n"
+            line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
             file.write(line)
 
     def for_json(self):
