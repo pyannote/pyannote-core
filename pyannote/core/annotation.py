@@ -350,12 +350,20 @@ class Annotation(object):
         return included in self.get_timeline(copy=False)
 
     def write_rttm(self, file: TextIO):
-        """Write annotation to "rttm" file
+        """Dump annotation to file using RTTM format
+
         Parameters
         ----------
         file : file object
+
+        Usage
+        -----
+        >>> with open('file.rttm', 'w') as file:
+        ...     annotation.write_rttm(file)
         """
+        
         uri = self.uri if self.uri else "<NA>"
+        
         for segment, _, label in self.itertracks(yield_label=True):            
             line = (
                 f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
