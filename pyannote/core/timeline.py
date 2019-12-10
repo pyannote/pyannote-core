@@ -937,12 +937,9 @@ class Timeline(object):
         ----------
         file : file object
         """
+        uri = self.uri if self.uri else "<NA>"
         for segment in self:
-            line = "{} 1 {} {}\n".format(
-                self.uri,
-                segment.start,
-                segment.end
-                )
+            line = f"{uri} 1 {segment.start} {segment.end}\n"
             file.write(line)
 
     def for_json(self):
