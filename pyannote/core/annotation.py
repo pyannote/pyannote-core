@@ -355,8 +355,8 @@ class Annotation(object):
         ----------
         file : file object
         """
-        for segment, _, label in self.itertracks(yield_label=True):
-            uri = self.uri if self.uri else "<NA>"
+        uri = self.uri if self.uri else "<NA>"
+        for segment, _, label in self.itertracks(yield_label=True):            
             line = (
                 f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
                 f'<NA> <NA> {label} <NA> <NA>\n'
