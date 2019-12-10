@@ -25,6 +25,8 @@
 
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
+from pathlib import Path
+from typing import Union
 
 import simplejson as json
 
@@ -78,12 +80,12 @@ def loads(s):
     return json.loads(s, encoding='utf-8', object_hook=object_hook)
 
 
-def load_from(path):
+def load_from(path: Union[str, Path]):
     """Deserialize
 
     Parameters
     ----------
-    path : string
+    path : string or Path
         Path to file containing serialized `pyannote.core` data structure
 
     Returns

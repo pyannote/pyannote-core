@@ -67,13 +67,18 @@ See :class:`pyannote.core.Segment` for the complete reference.
 """
 
 from collections import namedtuple
+from typing import Union, Optional, Tuple
+
 import numpy as np
+
+from dataclasses import dataclass
 
 # 1 μs (one microsecond)
 SEGMENT_PRECISION = 1e-6
 
 
-class Segment(namedtuple('Segment', ['start', 'end'])):
+@dataclass
+class Segment:
     """
     Time interval
 
@@ -106,9 +111,8 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
       - `segment.start == other_segment.start` and `segment.end < other_segment.end`
 
     """
-
-    def __new__(cls, start=0., end=0.):
-        return super(Segment, cls).__new__(cls, float(start), float(end))
+    start: float = 0.0
+    end: float = 0.0
 
     def __bool__(self):
         """Emptiness
@@ -125,25 +129,26 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         """
         return (self.end - self.start) > SEGMENT_PRECISION
 
-    def _get_duration(self):
+    @property
+    def duration(self):
+        """Segment duration (read-only)"""
         return self.end - self.start if self else 0.
-    duration = property(fget=_get_duration)
-    """Segment duration (read-only)"""
 
-    def _get_middle(self):
+    @property
+    def middle(self):
+        """Segment mid-time (read-only)"""
         return .5 * (self.start + self.end)
-    middle = property(fget=_get_middle)
-    """Segment mid-time (read-only)"""
 
     def __iter__(self):
         """Unpack segment boundaries
         >>> segment = Segment(start, end)
         >>> start, end = segment
         """
+        # todo: is there a reason for not returning a tuple?
         yield self.start
         yield self.end
 
-    def copy(self):
+    def copy(self) -> 'Segment':
         """Get a copy of the segment
 
         Returns
@@ -157,7 +162,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
     # Inclusion (in), intersection (&), union (|) and gap (^) #
     # ------------------------------------------------------- #
 
-    def __contains__(self, other):
+    def __contains__(self, other: 'Segment'):
         """Inclusion
 
         >>> segment = Segment(start=0, end=10)
@@ -190,7 +195,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         end = min(self.end, other.end)
         return Segment(start=start, end=end)
 
-    def intersects(self, other):
+    def intersects(self, other: 'Segment'):
         """Check whether two segments intersect each other
 
         Parameters
@@ -210,7 +215,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
                 self.start < other.end - SEGMENT_PRECISION) or \
                (self.start == other.start)
 
-    def overlaps(self, t):
+    def overlaps(self, t: float):
         """Check if segment overlaps a given time
 
         Parameters
@@ -225,7 +230,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         """
         return self.start <= t and self.end >= t
 
-    def __or__(self, other):
+    def __or__(self, other: 'Segment'):
         """Union
 
         >>> segment = Segment(0, 10)
@@ -255,7 +260,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         end = max(self.end, other.end)
         return Segment(start=start, end=end)
 
-    def __xor__(self, other):
+    def __xor__(self, other: 'Segment'):
         """Gap
 
         >>> segment = Segment(0, 10)
@@ -283,7 +288,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         end = max(self.start, other.start)
         return Segment(start=start, end=end)
 
-    def _str_helper(self, seconds):
+    def _str_helper(self, seconds: float):
         from datetime import timedelta
         negative = seconds < 0
         seconds = abs(seconds)
@@ -312,6 +317,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         return '[]'
 
     def pretty(self):
+        # TODO: where does warning come from?
         warnings.warn(
             '"pretty" has been replaced by "__str__"',
             DeprecationWarning)
@@ -355,7 +361,7 @@ class Segment(namedtuple('Segment', ['start', 'end'])):
         return repr_segment(self)
 
 
-class SlidingWindow(object):
+class SlidingWindow:
     """Sliding window
 
     Parameters
@@ -389,7 +395,6 @@ class SlidingWindow(object):
     """
 
     def __init__(self, duration=0.030, step=0.010, start=0.000, end=None):
-        super(SlidingWindow, self).__init__()
 
         # duration must be a float > 0
         if duration <= 0:
@@ -416,27 +421,27 @@ class SlidingWindow(object):
         # current index of iterator
         self.__i = -1
 
-    def __get_start(self):
+    @property
+    def start(self):
+        """Sliding window start time in seconds."""
         return self.__start
-    start = property(fget=__get_start)
-    """Sliding window start time in seconds."""
 
-    def __get_end(self):
+    @property
+    def end(self):
+        """Sliding window end time in seconds."""
         return self.__end
-    end = property(fget=__get_end)
-    """Sliding window end time in seconds."""
 
-    def __get_step(self):
+    @property
+    def step(self):
+        """Sliding window step in seconds."""
         return self.__step
-    step = property(fget=__get_step)
-    """Sliding window step in seconds."""
 
-    def __get_duration(self):
+    @property
+    def duration(self):
+        """Sliding window duration in seconds."""
         return self.__duration
-    duration = property(fget=__get_duration)
-    """Sliding window duration in seconds."""
 
-    def closest_frame(self, t):
+    def closest_frame(self, t: float) -> int:
         """Closest frame to timestamp.
 
         Parameters
@@ -454,7 +459,7 @@ class SlidingWindow(object):
             (t - self.__start - .5 * self.__duration) / self.__step
         ))
 
-    def samples(self, from_duration, mode='strict'):
+    def samples(self, from_duration: float, mode: str = 'strict') -> int:
         """Number of frames
 
         Parameters
@@ -481,7 +486,10 @@ class SlidingWindow(object):
         elif mode == 'center':
             return int(np.rint((from_duration / self.step)))
 
-    def crop(self, focus, mode='loose', fixed=None, return_ranges=False):
+    def crop(self, focus: Union[Segment, 'Timeline'],
+             mode: str = 'loose',
+             fixed: Optional[float] = None,
+             return_ranges: Optional[bool] = False) -> np.ndarray:
         """Crop sliding window
 
         Parameters
@@ -604,7 +612,8 @@ class SlidingWindow(object):
 
         return np.array(range(*rng), dtype=np.int64)
 
-    def segmentToRange(self, segment):
+    # TODO : this is not PEP8, should be segment_to_range
+    def segmentToRange(self, segment: Segment) -> Tuple[int, int]:
         """Convert segment to 0-indexed frame range
 
         Parameters
@@ -634,7 +643,8 @@ class SlidingWindow(object):
 
         return i0, n
 
-    def rangeToSegment(self, i0, n):
+    # TODO : this is not PEP8, should be range_to_segment
+    def rangeToSegment(self, i0: int, n: int) -> Segment:
         """Convert 0-indexed frame range to segment
 
         Each frame represents a unique segment of duration 'step', centered on
@@ -679,16 +689,17 @@ class SlidingWindow(object):
 
         return Segment(start, end)
 
-    def samplesToDuration(self, nSamples):
+    # TODO : this is not PEP8, should be samples_to_duration
+    def samplesToDuration(self, nSamples: int) -> float:
         """Returns duration of samples"""
         return self.rangeToSegment(0, nSamples).duration
 
-
-    def durationToSamples(self, duration):
+    # TODO : this is not PEP8, should be duration_to_samples
+    def durationToSamples(self, duration: float) -> int:
         """Returns samples in duration"""
         return self.segmentToRange(Segment(0, duration))[1]
 
-    def __getitem__(self, i):
+    def __getitem__(self, i: int) -> Segment:
         """
         Parameters
         ----------
@@ -712,7 +723,7 @@ class SlidingWindow(object):
 
         return Segment(start=start, end=start + self.__duration)
 
-    def next(self):
+    def next(self) -> Segment:
         return self.__next__()
 
     def __next__(self):
@@ -770,19 +781,19 @@ class SlidingWindow(object):
         # based on frame closest to the end
         i = self.closest_frame(self.__end)
 
-        while(self[i]):
+        while (self[i]):
             i += 1
         length = i
 
         return length
 
-    def copy(self):
+    def copy(self) -> 'SlidingWindow':
         """Duplicate sliding window"""
         duration = self.duration
         step = self.step
         start = self.start
         end = self.end
-        sliding_window = SlidingWindow(
+        sliding_window = self.__class__(
             duration=duration, step=step, start=start, end=end
         )
         return sliding_window

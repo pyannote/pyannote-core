@@ -34,6 +34,7 @@ Features
 
 See :class:`pyannote.core.SlidingWindowFeature` for the complete reference.
 """
+from typing import Any, Tuple, Optional, Union
 
 import numpy as np
 from .segment import Segment
@@ -41,8 +42,7 @@ from .segment import SlidingWindow
 from .timeline import Timeline
 
 
-class SlidingWindowFeature(object):
-
+class SlidingWindowFeature:
     """Periodic feature vectors
 
     Parameters
@@ -54,19 +54,20 @@ class SlidingWindowFeature(object):
 
     """
 
-    def __init__(self, data, sliding_window):
-        super(SlidingWindowFeature, self).__init__()
-        self.sliding_window = sliding_window
+    def __init__(self, data: Any, sliding_window: SlidingWindow):
+        self.sliding_window: SlidingWindow = sliding_window
         self.data = data
-        self.__i = -1
+        self.__i: int = -1
 
     def __len__(self):
         return self.data.shape[0]
 
+    # TODO : name is not pep8
     def getNumber(self):
         """Number of feature vectors"""
         return self.data.shape[0]
 
+    # TODO : name is not pep8
     def getDimension(self):
         """Dimension of feature vectors"""
         return self.data.shape[1]
@@ -74,7 +75,7 @@ class SlidingWindowFeature(object):
     def getExtent(self):
         return self.sliding_window.rangeToSegment(0, self.getNumber())
 
-    def __getitem__(self, i):
+    def __getitem__(self, i: int):
         """Get ith feature vector"""
         return self.data[i]
 
@@ -82,7 +83,7 @@ class SlidingWindowFeature(object):
         self.__i = -1
         return self
 
-    def __next__(self):
+    def __next__(self) -> Tuple[Segment, Any]:
         self.__i += 1
         try:
             return self.sliding_window[self.__i], self.data[self.__i]
@@ -92,7 +93,7 @@ class SlidingWindowFeature(object):
     def next(self):
         return self.__next__()
 
-    def iterfeatures(self, window=False):
+    def iterfeatures(self, window: Optional[bool] = False):
         """Feature vector iterator
 
         Parameters
@@ -109,7 +110,12 @@ class SlidingWindowFeature(object):
             else:
                 yield self.data[i]
 
-    def crop(self, focus, mode='loose', fixed=None, return_data=True):
+    def crop(self,
+             focus: Union[Segment, Timeline],
+             mode: str = 'loose',
+             fixed: Optional[float] = None,
+             return_data: bool = True) \
+            -> Union[np.ndarray, 'SlidingWindowFeature']:
         """Extract frames
 
         Parameters
@@ -174,7 +180,7 @@ class SlidingWindowFeature(object):
                 [self.data[start: end, :] for start, end in clipped_ranges])
         else:
             # if all ranges are out of bounds, just return empty data
-            shape = (0, ) + self.data.shape[1:]
+            shape = (0,) + self.data.shape[1:]
             data = np.empty(shape)
 
         # corner case when 'fixed' duration cropping is requested:
@@ -182,11 +188,11 @@ class SlidingWindowFeature(object):
         if fixed is not None:
             data = np.vstack([
                 # repeat first sample as many times as needed
-                np.tile(self.data[0], (repeat_first, ) + (1,) * n_dimensions),
+                np.tile(self.data[0], (repeat_first,) + (1,) * n_dimensions),
                 data,
                 # repeat last sample as many times as needed
                 np.tile(self.data[n_samples - 1],
-                        (repeat_last,) + (1, ) * n_dimensions)])
+                        (repeat_last,) + (1,) * n_dimensions)])
 
         # return data
         if return_data:
@@ -206,4 +212,5 @@ class SlidingWindowFeature(object):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

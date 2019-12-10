@@ -96,6 +96,7 @@ from sortedcontainers import SortedList
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
+from .utils.types import Support, Label
 
 
 # =====================================================================
@@ -521,7 +522,7 @@ class Timeline:
         """
         return list(self.overlapping_iter(t))
 
-    def overlapping_iter(self, t: float) -> Generator[Segment]:
+    def overlapping_iter(self, t: float) -> Generator[Segment, None, None]:
         """Like `overlapping` but returns a segment iterator instead
 
         See also
@@ -680,7 +681,7 @@ class Timeline:
             import numpy as np
             return Segment(start=np.inf, end=-np.inf)
 
-    def support_iter(self) -> Generator[Segment]:
+    def support_iter(self) -> Generator[Segment, None, None]:
         """Like `support` but returns a segment generator instead
 
         See also
@@ -746,7 +747,7 @@ class Timeline:
         """
         return Timeline(segments=self.support_iter(), uri=self.uri)
 
-    def duration(self):
+    def duration(self) -> float:
         """Timeline duration
 
         The timeline duration is the sum of the durations of the segments
@@ -762,8 +763,8 @@ class Timeline:
         # of the segments in the timeline support.
         return sum(s.duration for s in self.support_iter())
 
-    def gaps_iter(self, support: Optional[Union[Segment, 'Timeline']] = None) \
-            -> Generator[Segment]:
+    def gaps_iter(self, support: Optional[Support] = None) \
+            -> Generator[Segment, None, None]:
         """Like `gaps` but returns a segment generator instead
 
         See also
@@ -811,7 +812,7 @@ class Timeline:
                 for gap in self.gaps_iter(support=segment):
                     yield gap
 
-    def gaps(self, support: Optional[Union[Segment, 'Timeline']] = None) \
+    def gaps(self, support: Optional[Support] = None) \
             -> 'Timeline':
         """Gaps
 
@@ -902,7 +903,8 @@ class Timeline:
 
         return Timeline(segments=segments, uri=self.uri)
 
-    def to_annotation(self, generator: Union[str, Iterable['Label']] = 'string',
+    def to_annotation(self,
+                      generator: Union[str, Iterable[Label], None, None] = 'string',
                       modality: Optional[str] = None):
         """Turn timeline into an annotation
 

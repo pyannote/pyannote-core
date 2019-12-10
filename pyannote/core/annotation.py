@@ -120,9 +120,7 @@ from .segment import Segment
 from .timeline import Timeline
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .utils.generators import string_generator, int_generator
-
-# TODO : Make sure this is true, it may just be "Hashable"
-Label = Hashable
+from .utils.types import Label, Key, Support, LabelGenerator
 
 
 class Annotation:
@@ -143,7 +141,10 @@ class Annotation:
     """
 
     @classmethod
-    def from_df(cls, df: pd.DataFrame, uri=None, modality=None):
+    def from_df(cls,
+                df: pd.DataFrame,
+                uri: Optional[str] = None,
+                modality: Optional[str] = None):
 
         df = df[[PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]]
 
@@ -353,8 +354,7 @@ class Annotation:
         """
         return included in self.get_timeline(copy=False)
 
-    def crop(self, support: Union[Segment, Timeline],
-             mode: str = 'intersection'):
+    def crop(self, support: Support, mode: str = 'intersection'):
         """Crop annotation to new support
 
         Parameters
@@ -570,7 +570,7 @@ class Annotation:
         return "\n".join(["%s %s %s" % (s, t, l)
                           for s, t, l in self.itertracks(yield_label=True)])
 
-    def __delitem__(self, key: Union[Segment, Tuple[Segment, str]]):
+    def __delitem__(self, key: Key):
         """Delete one track
 
         >>> del annotation[segment, track]
@@ -622,7 +622,7 @@ class Annotation:
                 'Deletion only works with Segment or (Segment, track) keys.')
 
     # label = annotation[segment, track]
-    def __getitem__(self, key: Union[Segment, Tuple[Segment, str]]):
+    def __getitem__(self, key: Key):
         """Get track label
 
         >>> label = annotation[segment, track]
@@ -640,7 +640,7 @@ class Annotation:
 
     # annotation[segment, track] = label
     def __setitem__(self,
-                    key: Union[Segment, Tuple[Segment, str]],
+                    key: Key,
                     label: Label):
         """Add new or update existing track
 
@@ -814,7 +814,7 @@ class Annotation:
 
         return result
 
-    def label_timeline(self, label: Label, copy: bool=True):
+    def label_timeline(self, label: Label, copy: bool = True):
         """Query segments by label
 
         Parameters
@@ -924,7 +924,7 @@ class Annotation:
 
         return chart
 
-    def argmax(self, support: Optional[Union[Segment, Timeline]] = None):
+    def argmax(self, support: Optional[Support] = None):
         """Get label with longest duration
 
         Parameters
@@ -962,7 +962,7 @@ class Annotation:
         return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
                    key=lambda x: x[1])[0]
 
-    def rename_tracks(self, generator: Union[str, Iterable[Label]] = 'string'):
+    def rename_tracks(self, generator: LabelGenerator = 'string'):
         """Rename all tracks
 
         Parameters
@@ -1010,7 +1010,7 @@ class Annotation:
 
     def rename_labels(self,
                       mapping: Optional[Dict] = None,
-                      generator: Union[str, Generator[str]] = 'string',
+                      generator: LabelGenerator = 'string',
                       copy: bool = True) -> 'Annotation':
         """Rename labels
 
@@ -1061,7 +1061,7 @@ class Annotation:
 
         return renamed
 
-    def relabel_tracks(self, generator: Union[str, Iterable[str]] = 'string')\
+    def relabel_tracks(self, generator: LabelGenerator = 'string') \
             -> 'Annotation':
         """Relabel tracks
 

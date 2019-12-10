@@ -25,6 +25,7 @@
 
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
+from typing import Optional, Callable, Iterable, Hashable, List, Set
 
 import numpy as np
 from pandas import Index, MultiIndex, DataFrame, pivot_table
@@ -33,22 +34,24 @@ from . import PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL, PYANNOTE_SCORE
 from .annotation import Annotation
 from .segment import Segment
 from .timeline import Timeline
+from .utils.types import Key, Label, LabelGenerator, Support
 
 
 class Unknown:
+    # TODO : document this class
 
     nextID = 0
 
     @classmethod
     def reset(cls):
-        cls.nextID = 0
+        cls.nextID: int = 0
 
     @classmethod
-    def getNewID(cls):
+    def getNewID(cls) -> int:
         cls.nextID += 1
         return cls.nextID
 
-    def __init__(self, format='#{id:d}'):
+    def __init__(self, format: str = '#{id:d}'):
         self.ID = Unknown.getNewID()
         self._format = format
 
@@ -105,10 +108,13 @@ class Scores:
         >>> s[Segment(2,3), 's1', 'C'] = 0.3
 
     """
+
     @classmethod
     def from_df(
-        cls, df,
-        uri=None, modality=None, aggfunc=np.mean
+            cls, df: DataFrame,
+            uri: Optional[str] = None,
+            modality: Optional[str] = None,
+            aggfunc: Callable = np.mean
     ):
         """
 
@@ -147,11 +153,13 @@ class Scores:
                    annotation=annotation, labels=labels,
                    values=dataframe.values)
 
-    def __init__(self, uri=None, modality=None,
-                 annotation=None, labels=None,
-                 values=None, dtype=None):
-
-        super(Scores, self).__init__()
+    def __init__(self,
+                 uri: Optional[str] = None,
+                 modality: Optional[str] = None,
+                 annotation: Optional[Annotation] = None,
+                 labels: Iterable[Hashable] = None,
+                 values: Optional[np.ndarray] = None,
+                 dtype=None):  # TODO maybe this should get removed
 
         names = [PYANNOTE_SEGMENT + '_' + field
                  for field in Segment._fields] + [PYANNOTE_TRACK]
@@ -159,7 +167,7 @@ class Scores:
         if annotation:
             annotation = annotation.copy()
             index = Index(
-                [s + (t, ) for s, t in annotation.itertracks()],
+                [s + (t,) for s, t in annotation.itertracks()],
                 name=names)
 
         else:
@@ -181,7 +189,7 @@ class Scores:
         self.modality = modality
         self.uri = uri
 
-    def copy(self):
+    def copy(self) -> 'Scores':
         self._reindexIfNeeded()
         copied = self.__class__(uri=self.uri, modality=self.modality)
         copied.dataframe_ = self.dataframe_.copy()
@@ -192,7 +200,7 @@ class Scores:
     # del scores[segment]
     # del scores[segment, :]
     # del scores[segment, track]
-    def __delitem__(self, key):
+    def __delitem__(self, key: Key):
 
         if isinstance(key, Segment):
             segment = key
@@ -202,7 +210,7 @@ class Scores:
 
         elif isinstance(key, tuple) and len(key) == 2:
             segment, track = key
-            self.dataframe_.drop(tuple(segment) + (track, ),
+            self.dataframe_.drop(tuple(segment) + (track,),
                                  axis=0, inplace=True)
             del self.annotation_[segment, track]
             self.hasChanged_ = True
@@ -217,7 +225,7 @@ class Scores:
             key = (key[0], '_', key[1])
 
         segment, track, label = key
-        return self.dataframe_.at[tuple(segment) + (track, ), label]
+        return self.dataframe_.at[tuple(segment) + (track,), label]
 
     # scores[segment, track, label] = value
     # scores[segment, label] ==== scores[segment, '_', label]
@@ -272,7 +280,7 @@ class Scores:
     def itersegments(self):
         return iter(self)
 
-    def tracks(self, segment):
+    def tracks(self, segment: Segment):
         """Set of tracks for query segment
 
         Parameters
@@ -287,7 +295,7 @@ class Scores:
         """
         return self.annotation_.get_tracks(segment)
 
-    def has_track(self, segment, track):
+    def has_track(self, segment: Segment, track):
         """Check whether a given track exists
 
         Parameters
@@ -358,7 +366,7 @@ class Scores:
                 if not np.isnan(value):
                     yield segment, track, label, value
 
-    def get_track_scores(self, segment, track):
+    def get_track_scores(self, segment: Segment, track):
         """Get all scores for a given track.
 
         Parameters
@@ -372,9 +380,9 @@ class Scores:
         scores : dict
             {label: score} dictionary
         """
-        return dict(self.dataframe_.xs(tuple(segment) + (track, )))
+        return dict(self.dataframe_.xs(tuple(segment) + (track,)))
 
-    def labels(self):
+    def labels(self) -> List[Label]:
         """List of labels
 
         Returns
@@ -397,7 +405,7 @@ class Scores:
                  for field in Segment._fields] + [PYANNOTE_TRACK]
 
         new_index = Index(
-            [s + (t, ) for s, t in self.annotation_.itertracks()],
+            [s + (t,) for s, t in self.annotation_.itertracks()],
             name=names)
 
         self.dataframe_ = self.dataframe_.reindex(new_index)
@@ -406,7 +414,7 @@ class Scores:
 
         return
 
-    def rename_tracks(self, generator='int'):
+    def rename_tracks(self, generator: LabelGenerator = 'int'):
         """Rename tracks"""
 
         self._reindexIfNeeded()
@@ -418,13 +426,13 @@ class Scores:
         names = [PYANNOTE_SEGMENT + '_' + field
                  for field in Segment._fields] + [PYANNOTE_TRACK]
         new_index = Index(
-            [s + (t, ) for s, t in annotation.itertracks()],
+            [s + (t,) for s, t in annotation.itertracks()],
             name=names)
         retracked.dataframe_.index = new_index
 
         return retracked
 
-    def apply(self, func, axis=0):
+    def apply(self, func: Callable, axis=0):
 
         applied = self.copy()
         applied.dataframe_ = self.dataframe_.apply(func, axis=axis)
@@ -432,7 +440,7 @@ class Scores:
 
         return applied
 
-    def rank(self, ascending=False):
+    def rank(self, ascending: bool = False):
         """
 
         Parameters
@@ -452,7 +460,7 @@ class Scores:
         ranked.hasChanged_ = True
         return ranked
 
-    def nbest(self, n, ascending=False):
+    def nbest(self, n: int, ascending: bool = False):
         """
 
         Parameters
@@ -476,7 +484,7 @@ class Scores:
         filtered.hasChanged_ = True
         return filtered
 
-    def subset(self, labels, invert=False):
+    def subset(self, labels: Set[Label], invert: bool = False):
         """Scores subset
 
         Extract scores subset based on labels
@@ -510,7 +518,7 @@ class Scores:
 
         return subset
 
-    def to_annotation(self, threshold=-np.inf, posterior=False):
+    def to_annotation(self, threshold: float = -np.inf, posterior: bool = False):
         """
 
         Parameters
@@ -556,7 +564,7 @@ class Scores:
 
         return annotation
 
-    def map(self, func):
+    def map(self, func: Callable):
         """Apply function to all values"""
 
         mapped = self.copy()
@@ -564,7 +572,7 @@ class Scores:
         mapped.hasChanged_ = True
         return mapped
 
-    def crop(self, focus, mode='strict'):
+    def crop(self, focus: Support, mode: str = 'strict') -> Support:
         """Crop on focus
 
         Parameters
@@ -651,4 +659,5 @@ class Scores:
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
