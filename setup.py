@@ -42,7 +42,7 @@ setup(
         'pandas >= 0.17.1',
         'simplejson >= 3.8.1',
         'matplotlib >= 2.0.0',
-        'dataclasses >= 0.7'
+        "dataclasses >= 0.7; python_version <'3.7'"
     ],
     # versioneer
     version=versioneer.get_version(),
