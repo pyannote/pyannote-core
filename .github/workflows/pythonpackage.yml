@@ -1,4 +1,4 @@
-name: Python package
+name: Install, lint, and test
 
 on:
   pull_request:
