@@ -316,12 +316,6 @@ class Segment:
                                     self._str_helper(self.end))
         return '[]'
 
-    def pretty(self):
-        # TODO: where does warning come from?
-        warnings.warn(
-            '"pretty" has been replaced by "__str__"',
-            DeprecationWarning)
-        return self.__str__()
 
     def __repr__(self):
         """Computer-readable representation

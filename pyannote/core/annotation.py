@@ -108,17 +108,17 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 """
 
 import itertools
-from typing import Optional, Dict, Union, Iterable, Generator, Tuple, List, Set, Hashable
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO
 
 import numpy as np
 import pandas as pd
+from sortedcontainers import SortedDict
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
-from sortedcontainers import SortedDict
+from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .timeline import Timeline
-from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .utils.generators import string_generator, int_generator
 from .utils.types import Label, Key, Support, LabelGenerator
 
@@ -353,6 +353,28 @@ class Annotation:
 
         """
         return included in self.get_timeline(copy=False)
+
+    def write_rttm(self, file: TextIO):
+        """Dump annotation to file using RTTM format
+
+        Parameters
+        ----------
+        file : file object
+
+        Usage
+        -----
+        >>> with open('file.rttm', 'w') as file:
+        ...     annotation.write_rttm(file)
+        """
+
+        uri = self.uri if self.uri else "<NA>"
+
+        for segment, _, label in self.itertracks(yield_label=True):
+            line = (
+                f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
+                f'<NA> <NA> {label} <NA> <NA>\n'
+            )
+            file.write(line)
 
     def crop(self, support: Support, mode: str = 'intersection'):
         """Crop annotation to new support
