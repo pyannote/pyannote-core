@@ -43,6 +43,7 @@ from .segment import Segment
 from .timeline import Timeline
 from .annotation import Annotation
 from .scores import Scores
+from .feature import SlidingWindowFeature
 
 
 class Notebook(object):
@@ -269,15 +270,15 @@ class Notebook(object):
             self.crop = feature.getExtent()
 
         window = feature.sliding_window
-        indices = window.crop(self.crop, mode='loose')
-        t = [window[i].middle for i in indices]
+        n, dimension = feature.data.shape
+        (start, stop), = window.crop(self.crop, mode='loose',
+                                     return_ranges=True)
+        xlim = (window[start].middle, window[stop].middle)
 
-        data = np.take(feature.data, indices, axis=0, mode='clip')
-        for i, index in enumerate(indices):
-            if index < 0:
-                data[i] = np.NAN
-            if index >= len(feature.data):
-                data[i] = np.NAN
+        start = max(0, start)
+        stop = min(stop, n)
+        t = window[0].middle + window.step * np.arange(start, stop)
+        data = feature[start: stop]
 
         if ylim is None:
             m = np.nanmin(data)
@@ -286,6 +287,7 @@ class Notebook(object):
 
         ax = self.setup(ax=ax, yaxis=False, ylim=ylim, time=time)
         ax.plot(t, data)
+        ax.set_xlim(xlim)
 
 notebook = Notebook()
 
