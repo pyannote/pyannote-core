@@ -37,12 +37,13 @@ See :class:`pyannote.core.SlidingWindowFeature` for the complete reference.
 from typing import Any, Tuple, Optional, Union
 
 import numpy as np
+import numbers
 from .segment import Segment
 from .segment import SlidingWindow
 from .timeline import Timeline
 
 
-class SlidingWindowFeature:
+class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     """Periodic feature vectors
 
     Parameters
@@ -208,6 +209,41 @@ class SlidingWindowFeature:
     def _repr_png_(self):
         from .notebook import repr_feature
         return repr_feature(self)
+
+    _HANDLED_TYPES = (np.ndarray, numbers.Number)
+
+    def __array__(self):
+        return self.data
+
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        out = kwargs.get('out', ())
+        for x in inputs + out:
+            # Only support operations with instances of _HANDLED_TYPES.
+            # Use SlidingWindowFeature instead of type(self) for isinstance to
+            # allow subclasses that don't override __array_ufunc__ to
+            # handle SlidingWindowFeature objects.
+            if not isinstance(x, self._HANDLED_TYPES + (SlidingWindowFeature,)):
+                return NotImplemented
+
+        # Defer to the implementation of the ufunc on unwrapped values.
+        inputs = tuple(x.data if isinstance(x, SlidingWindowFeature) else x
+                       for x in inputs)
+        if out:
+            kwargs['out'] = tuple(
+                x.data if isinstance(x, SlidingWindowFeature) else x
+                for x in out)
+        data = getattr(ufunc, method)(*inputs, **kwargs)
+
+        if type(data) is tuple:
+            # multiple return values
+            return tuple(type(self)(x, self.sliding_window) for x in data)
+        elif method == 'at':
+            # no return value
+            return None
+        else:
+            # one return value
+            return type(self)(data, self.sliding_window)
+
 
 
 if __name__ == "__main__":
