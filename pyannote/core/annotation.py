@@ -1034,8 +1034,8 @@ class Annotation(object):
             If 'string' (default) rename label to 'A', 'B', 'C', ... If 'int',
             rename to 0, 1, 2, etc. If iterable, use it to generate labels.
         copy : bool, optional
-            Return a copy of the annotation. Defaults to updating the
-            annotation in-place.
+            Set to True to return a copy of the annotation. Set to False to
+            update the annotation in-place. Defaults to True.
 
         Returns
         -------
