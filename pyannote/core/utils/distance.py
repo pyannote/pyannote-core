@@ -31,7 +31,7 @@ import scipy.spatial.distance
 import scipy.cluster.hierarchy
 
 
-def l2_normalize(X):
+def l2_normalize(X: np.ndarray):
     """L2 normalize vectors
 
     Parameters

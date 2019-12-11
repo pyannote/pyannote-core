@@ -108,7 +108,7 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 """
 
 import itertools
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple
 
 import numpy as np
 import pandas as pd
@@ -120,7 +120,7 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .timeline import Timeline
 from .utils.generators import string_generator, int_generator
-from .utils.types import Label, Key, Support, LabelGenerator
+from .utils.types import Label, Key, Support, LabelGenerator, TrackName
 
 
 class Annotation:
@@ -174,7 +174,7 @@ class Annotation:
         # keys: annotated segments
         # values: {track: label} dictionary
         # TODO : check the type is good for track values
-        self._tracks: Dict[Segment, Dict[str, Label]] = SortedDict()
+        self._tracks: Dict[Segment, Dict[TrackName, Label]] = SortedDict()
 
         # dictionary
         # key: label
@@ -494,7 +494,7 @@ class Annotation:
         """
         return set(self._tracks.get(segment, {}))
 
-    def has_track(self, segment: Segment, track: str) -> bool:
+    def has_track(self, segment: Segment, track: TrackName) -> bool:
         """Check whether a given track exists
 
         Parameters
@@ -540,8 +540,8 @@ class Annotation:
         return copied
 
     def new_track(self, segment: Segment,
-                  candidate: Optional[str] = None,
-                  prefix: Optional[str] = None) -> str:
+                  candidate: Optional[TrackName] = None,
+                  prefix: Optional[str] = None) -> TrackName:
         """Generate a new track name for given segment
 
         Ensures that the returned track name does not already
@@ -644,7 +644,7 @@ class Annotation:
                 'Deletion only works with Segment or (Segment, track) keys.')
 
     # label = annotation[segment, track]
-    def __getitem__(self, key: Key):
+    def __getitem__(self, key: Key) -> TrackName:
         """Get track label
 
         >>> label = annotation[segment, track]
@@ -764,7 +764,8 @@ class Annotation:
 
         return labels
 
-    def subset(self, labels: Iterable[Label], invert: bool = False):
+    def subset(self, labels: Iterable[Label], invert: bool = False) \
+            -> 'Annotation':
         """Filter annotation by labels
 
         Parameters
@@ -836,7 +837,7 @@ class Annotation:
 
         return result
 
-    def label_timeline(self, label: Label, copy: bool = True):
+    def label_timeline(self, label: Label, copy: bool = True) -> Timeline:
         """Query segments by label
 
         Parameters
@@ -875,7 +876,7 @@ class Annotation:
 
         return self._labels[label]
 
-    def label_support(self, label: Label):
+    def label_support(self, label: Label) -> Timeline:
         """Label support
 
         Equivalent to ``Annotation.label_timeline(label).support()``
@@ -922,7 +923,7 @@ class Annotation:
 
         return self.label_timeline(label, copy=False).duration()
 
-    def chart(self, percent: bool = False):
+    def chart(self, percent: bool = False) -> List[Tuple[Label, float]]:
         """Get labels chart (from longest to shortest duration)
 
         Parameters
@@ -946,7 +947,7 @@ class Annotation:
 
         return chart
 
-    def argmax(self, support: Optional[Support] = None):
+    def argmax(self, support: Optional[Support] = None) -> Optional[Label]:
         """Get label with longest duration
 
         Parameters

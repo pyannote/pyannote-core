@@ -26,9 +26,10 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 from pathlib import Path
-from typing import Union
+from typing import Union, TextIO
 
 import simplejson as json
+from .utils.types import Resource
 
 PYANNOTE_JSON = 'pyannote'
 PYANNOTE_JSON_CONTENT = 'content'
@@ -49,7 +50,7 @@ def object_hook(d):
     return d
 
 
-def load(fp):
+def load(fp: TextIO) -> Resource:
     """Deserialize
 
     Parameters
@@ -65,7 +66,7 @@ def load(fp):
     return json.load(fp, encoding='utf-8', object_hook=object_hook)
 
 
-def loads(s):
+def loads(s: str) -> Resource:
     """Deserialize
 
     Parameters
@@ -80,7 +81,7 @@ def loads(s):
     return json.loads(s, encoding='utf-8', object_hook=object_hook)
 
 
-def load_from(path: Union[str, Path]):
+def load_from(path: Union[str, Path]) -> Resource:
     """Deserialize
 
     Parameters
@@ -97,13 +98,13 @@ def load_from(path: Union[str, Path]):
         return load(fp)
 
 
-def dump(resource, fp):
+def dump(resource: Resource, fp: TextIO):
     """Serialize
 
     Parameters
     ----------
     resource : `pyannote.core` data structure
-        Resource to deserialize
+        Resource to serialize
     fp : file
         File in which `resource` serialization is written
     """
@@ -111,7 +112,7 @@ def dump(resource, fp):
     json.dump(resource, fp, encoding='utf-8', for_json=True)
 
 
-def dumps(resource):
+def dumps(resource: Resource) -> str:
     """Serialize to string
 
     Parameters
@@ -126,13 +127,13 @@ def dumps(resource):
     return json.dumps(resource, encoding='utf-8', for_json=True)
 
 
-def dump_to(resource, path):
+def dump_to(resource: Resource, path: Union[str, Path]):
     """Serialize
 
     Parameters
     ----------
     resource : `pyannote.core` data structure
-        Resource to deserialize
+        Resource to serialize
     path : string
         Path to file in which `resource` serialization is written
     """

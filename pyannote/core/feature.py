@@ -55,7 +55,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
 
     """
 
-    def __init__(self, data: Any, sliding_window: SlidingWindow):
+    def __init__(self, data: np.ndarray, sliding_window: SlidingWindow):
         self.sliding_window: SlidingWindow = sliding_window
         self.data = data
         self.__i: int = -1
@@ -104,8 +104,8 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
             Default is to only yield feature vector
 
         """
-        nSamples = self.data.shape[0]
-        for i in range(nSamples):
+        n_samples = self.data.shape[0]
+        for i in range(n_samples):
             if window:
                 yield self.data[i], self.sliding_window[i]
             else:

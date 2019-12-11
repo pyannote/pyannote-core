@@ -25,7 +25,7 @@
 
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
-from typing import Optional, Callable, Iterable, Hashable, List, Set
+from typing import Optional, Callable, Iterable, Hashable, List, Set, Tuple
 
 import numpy as np
 from dataclasses import fields, astuple
@@ -35,7 +35,7 @@ from . import PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL, PYANNOTE_SCORE
 from .annotation import Annotation
 from .segment import Segment
 from .timeline import Timeline
-from .utils.types import Key, Label, LabelGenerator, Support
+from .utils.types import Key, Label, LabelGenerator, Support, TrackName
 
 
 class Unknown:
@@ -313,7 +313,7 @@ class Scores:
         """
         return self.annotation_.has_track(segment, track)
 
-    def get_track_by_name(self, track):
+    def get_track_by_name(self, track: TrackName) -> List[Tuple[Segment]]:
         """Get all tracks with given name
 
         Parameters
@@ -326,17 +326,20 @@ class Scores:
         tracks : list
             List of (segment, track) tuples
         """
+        # WARNING: this doesn't call a valid class
         return self.annotation_.get_track_by_name(track)
 
-    def new_track(self, segment, candidate=None, prefix=None):
+    def new_track(self,
+                  segment: Segment,
+                  candidate: Optional[TrackName]=None,
+                  prefix: Optional[str]=None):
         """Track name generator
 
         Parameters
         ----------
         segment : Segment
-        prefix : str, optional
         candidate : any valid track name
-
+        prefix : str, optional
 
         Returns
         -------
