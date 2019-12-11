@@ -77,7 +77,8 @@ from dataclasses import dataclass
 SEGMENT_PRECISION = 1e-6
 
 
-@dataclass
+# setting 'frozen' to True makes it hashable and immutable
+@dataclass(frozen=True, order=True)
 class Segment:
     """
     Time interval
@@ -315,7 +316,6 @@ class Segment:
             return '[%s --> %s]' % (self._str_helper(self.start),
                                     self._str_helper(self.end))
         return '[]'
-
 
     def __repr__(self):
         """Computer-readable representation

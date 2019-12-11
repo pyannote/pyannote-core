@@ -28,6 +28,7 @@
 from typing import Optional, Callable, Iterable, Hashable, List, Set
 
 import numpy as np
+from dataclasses import fields, astuple
 from pandas import Index, MultiIndex, DataFrame, pivot_table
 
 from . import PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL, PYANNOTE_SCORE
@@ -161,8 +162,8 @@ class Scores:
                  values: Optional[np.ndarray] = None,
                  dtype=None):  # TODO maybe this should get removed
 
-        names = [PYANNOTE_SEGMENT + '_' + field
-                 for field in Segment._fields] + [PYANNOTE_TRACK]
+        names = [PYANNOTE_SEGMENT + '_' + field.name
+                 for field in fields(Segment)] + [PYANNOTE_TRACK]
 
         if annotation:
             annotation = annotation.copy()
@@ -401,11 +402,11 @@ class Scores:
         if not self.hasChanged_:
             return
 
-        names = [PYANNOTE_SEGMENT + '_' + field
-                 for field in Segment._fields] + [PYANNOTE_TRACK]
+        names = [PYANNOTE_SEGMENT + '_' + field.name
+                 for field in fields(Segment)] + [PYANNOTE_TRACK]
 
         new_index = Index(
-            [s + (t,) for s, t in self.annotation_.itertracks()],
+            [astuple(s) + (t,) for s, t in self.annotation_.itertracks()],
             name=names)
 
         self.dataframe_ = self.dataframe_.reindex(new_index)
@@ -423,10 +424,10 @@ class Scores:
         annotation = self.annotation_.rename_tracks(generator=generator)
         retracked.annotation_ = annotation
 
-        names = [PYANNOTE_SEGMENT + '_' + field
-                 for field in Segment._fields] + [PYANNOTE_TRACK]
+        names = [PYANNOTE_SEGMENT + '_' + field.name
+                 for field in fields(Segment)] + [PYANNOTE_TRACK]
         new_index = Index(
-            [s + (t,) for s, t in annotation.itertracks()],
+            [astuple(s) + (t,) for s, t in annotation.itertracks()],
             name=names)
         retracked.dataframe_.index = new_index
 
