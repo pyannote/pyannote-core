@@ -108,7 +108,7 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 """
 
 import itertools
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Generator
 
 import numpy as np
 import pandas as pd
@@ -120,7 +120,7 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .timeline import Timeline
 from .utils.generators import string_generator, int_generator
-from .utils.types import Label, Key, Support, LabelGenerator, TrackName
+from .utils.types import Label, Key, Support, LabelGenerator, TrackName, CropMode
 
 
 class Annotation:
@@ -144,7 +144,7 @@ class Annotation:
     def from_df(cls,
                 df: pd.DataFrame,
                 uri: Optional[str] = None,
-                modality: Optional[str] = None):
+                modality: Optional[str] = None) -> 'Annotation':
 
         df = df[[PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]]
 
@@ -173,7 +173,6 @@ class Annotation:
         # sorted dictionary
         # keys: annotated segments
         # values: {track: label} dictionary
-        # TODO : check the type is good for track values
         self._tracks: Dict[Segment, Dict[TrackName, Label]] = SortedDict()
 
         # dictionary
@@ -255,7 +254,12 @@ class Annotation:
         """
         return iter(self._tracks)
 
-    def itertracks(self, yield_label: bool = False):
+    def itertracks(self, yield_label: bool = False) \
+            -> Generator[Union[
+                             Tuple[Segment, TrackName],
+                             Tuple[Segment, TrackName, Label]
+                         ],
+                         None, None]:
         """Iterate over tracks (in chronological order)
 
         Parameters
@@ -376,7 +380,7 @@ class Annotation:
             )
             file.write(line)
 
-    def crop(self, support: Support, mode: str = 'intersection'):
+    def crop(self, support: Support, mode: CropMode = 'intersection'):
         """Crop annotation to new support
 
         Parameters
@@ -475,7 +479,7 @@ class Annotation:
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
 
-    def get_tracks(self, segment: Segment):
+    def get_tracks(self, segment: Segment) -> Set[TrackName]:
         """Query tracks by segment
 
         Parameters
@@ -492,7 +496,7 @@ class Annotation:
         ----
         This will return an empty set if segment does not exist.
         """
-        return set(self._tracks.get(segment, {}))
+        return set(self._tracks.get(segment, {}).keys())
 
     def has_track(self, segment: Segment, track: TrackName) -> bool:
         """Check whether a given track exists
@@ -644,7 +648,7 @@ class Annotation:
                 'Deletion only works with Segment or (Segment, track) keys.')
 
     # label = annotation[segment, track]
-    def __getitem__(self, key: Key) -> TrackName:
+    def __getitem__(self, key: Key) -> Label:
         """Get track label
 
         >>> label = annotation[segment, track]
@@ -661,9 +665,7 @@ class Annotation:
         return self._tracks[key[0]][key[1]]
 
     # annotation[segment, track] = label
-    def __setitem__(self,
-                    key: Key,
-                    label: Label):
+    def __setitem__(self, key: Key, label: Label):
         """Add new or update existing track
 
         >>> annotation[segment, track] = label
@@ -808,7 +810,8 @@ class Annotation:
 
         return sub
 
-    def update(self, annotation: 'Annotation', copy: bool = False):
+    def update(self, annotation: 'Annotation', copy: bool = False) \
+            -> 'Annotation':
         """Add every track of an existing annotation (in place)
 
         Parameters
@@ -899,7 +902,7 @@ class Annotation:
         """
         return self.label_timeline(label, copy=False).support()
 
-    def label_duration(self, label: Label):
+    def label_duration(self, label: Label) -> float:
         """Label duration
 
         Equivalent to ``Annotation.label_timeline(label).duration()``
@@ -1172,7 +1175,10 @@ class Annotation:
 
         return support
 
-    def co_iter(self, other: 'Annotation'):
+    def co_iter(self, other: 'Annotation') -> \
+            Generator[Tuple[Tuple[Segment, TrackName],
+                            Tuple[Segment, TrackName]],
+                      None, None]:
         """Iterate over pairs of intersecting tracks
 
         Parameters
@@ -1183,7 +1189,7 @@ class Annotation:
         Returns
         -------
         iterable : (Segment, object), (Segment, object) iterable
-            Yields pairs of intersectins tracks, in chronological (then
+            Yields pairs of intersecting tracks, in chronological (then
             alphabetical) order.
 
         See also
