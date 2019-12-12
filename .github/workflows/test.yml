@@ -1,4 +1,4 @@
-name: Install, lint, and test
+name: Test
 
 on:
   pull_request:
