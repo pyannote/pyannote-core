@@ -2,6 +2,16 @@
 Changelog
 #########
 
+Version 3.1 (2019-12-12)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add Annotation.write_rttm and Timeline.write_uem (@PaulLerner)
+- feat: add numpy interface to SlidingWindowFeature (experimental)
+- feat: setup continuous integration
+- improve: speed up SlidingWindowFeature plotting
+- doc: update notebooks to Python 3 (@PaulLerner)
+- BREAKING: remove deprecated Segment.pretty()
+
 Version 3.0 (2019-06-24)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
