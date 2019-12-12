@@ -66,7 +66,7 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
 See :class:`pyannote.core.Segment` for the complete reference.
 """
 import warnings
-from typing import Union, Optional, Tuple, List
+from typing import Union, Optional, Tuple, List, Iterator
 
 import numpy as np
 from dataclasses import dataclass
@@ -140,7 +140,7 @@ class Segment:
         """Segment mid-time (read-only)"""
         return .5 * (self.start + self.end)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[float]:
         """Unpack segment boundaries
         >>> segment = Segment(start, end)
         >>> start, end = segment

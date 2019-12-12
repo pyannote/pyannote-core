@@ -28,7 +28,7 @@
 
 import itertools
 from string import ascii_uppercase
-from typing import Iterable, Union, List, Set, Optional, Generator
+from typing import Iterable, Union, List, Set, Optional, Iterator
 
 
 def pairwise(iterable: Iterable):
@@ -39,7 +39,7 @@ def pairwise(iterable: Iterable):
 
 
 def string_generator(skip: Optional[Union[List, Set]] = None) \
-        -> Generator[str, None, None]:
+        -> Iterator[str]:
     """Label generator
 
     Parameters
@@ -82,7 +82,7 @@ def string_generator(skip: Optional[Union[List, Set]] = None) \
         r = r + 1
 
 
-def int_generator():
+def int_generator() -> Iterator[int]:
     i = 0
     while True:
         yield i

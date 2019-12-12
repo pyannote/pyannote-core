@@ -108,7 +108,7 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 """
 
 import itertools
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Generator
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator
 
 import numpy as np
 import pandas as pd
@@ -255,11 +255,10 @@ class Annotation:
         return iter(self._tracks)
 
     def itertracks(self, yield_label: bool = False) \
-            -> Generator[Union[
+            -> Iterator[Union[
                              Tuple[Segment, TrackName],
                              Tuple[Segment, TrackName, Label]
-                         ],
-                         None, None]:
+                         ]]:
         """Iterate over tracks (in chronological order)
 
         Parameters
@@ -1176,10 +1175,10 @@ class Annotation:
 
         return support
 
-    def co_iter(self, other: 'Annotation') -> \
-            Generator[Tuple[Tuple[Segment, TrackName],
-                            Tuple[Segment, TrackName]],
-                      None, None]:
+    def co_iter(self, other: 'Annotation') \
+            -> Iterator[Tuple[Tuple[Segment, TrackName],
+                              Tuple[Segment, TrackName]]
+            ]:
         """Iterate over pairs of intersecting tracks
 
         Parameters

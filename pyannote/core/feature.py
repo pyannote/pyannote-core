@@ -34,12 +34,11 @@ Features
 
 See :class:`pyannote.core.SlidingWindowFeature` for the complete reference.
 """
+import numbers
 import warnings
-from logging import warning
-from typing import Any, Tuple, Optional, Union, Generator
+from typing import Tuple, Optional, Union, Iterator
 
 import numpy as np
-import numbers
 
 from pyannote.core.utils.types import CropMode
 from .segment import Segment
@@ -110,10 +109,8 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     def next(self):
         return self.__next__()
 
-    def iterfeatures(self, window: Optional[bool] = False) -> \
-            Generator[Union[Tuple[np.ndarray, Segment],
-                            np.ndarray],
-                      None, None]:
+    def iterfeatures(self, window: Optional[bool] = False) \
+            -> Iterator[Union[Tuple[np.ndarray, Segment], np.ndarray]]:
         """Feature vector iterator
 
         Parameters

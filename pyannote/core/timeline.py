@@ -88,7 +88,8 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
-from typing import Optional, Iterable, List, Generator, Union, Callable, TextIO, Tuple
+from typing import (Optional, Iterable, List, Union, Callable,
+                    TextIO, Tuple, TYPE_CHECKING, Iterator)
 
 import pandas as pd
 from sortedcontainers import SortedList
@@ -97,6 +98,12 @@ from . import PYANNOTE_URI, PYANNOTE_SEGMENT
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .utils.types import Support, Label
+
+#  this is a moderately ugly way to import `Annotation` to the namespace
+#  without causing some circular imports :
+#  https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports
+if TYPE_CHECKING:
+    from .annotation import Annotation
 
 
 # =====================================================================
@@ -371,8 +378,7 @@ class Timeline:
         segments = self.segments_set_ | timeline.segments_set_
         return Timeline(segments=segments, uri=self.uri)
 
-    def co_iter(self, other: 'Timeline') \
-            -> Generator[Tuple[Segment, Segment], None, None]:
+    def co_iter(self, other: 'Timeline') -> Iterator[Tuple[Segment, Segment]]:
         """Iterate over pairs of intersecting segments
 
         >>> timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
@@ -525,7 +531,7 @@ class Timeline:
         """
         return list(self.overlapping_iter(t))
 
-    def overlapping_iter(self, t: float) -> Generator[Segment, None, None]:
+    def overlapping_iter(self, t: float) -> Iterator[Segment]:
         """Like `overlapping` but returns a segment iterator instead
 
         See also
@@ -682,7 +688,7 @@ class Timeline:
             import numpy as np
             return Segment(start=np.inf, end=-np.inf)
 
-    def support_iter(self) -> Generator[Segment, None, None]:
+    def support_iter(self) -> Iterator[Segment]:
         """Like `support` but returns a segment generator instead
 
         See also
@@ -764,8 +770,7 @@ class Timeline:
         # of the segments in the timeline support.
         return sum(s.duration for s in self.support_iter())
 
-    def gaps_iter(self, support: Optional[Support] = None) \
-            -> Generator[Segment, None, None]:
+    def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
         """Like `gaps` but returns a segment generator instead
 
         See also
