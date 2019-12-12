@@ -7,5 +7,7 @@ Support = Union['Segment', 'Timeline']
 LabelGenerator = Union[str, Generator[Label, None, None]]
 TrackName = Union[str, int]
 Key = Union['Segment', Tuple['Segment', TrackName]]
-Resource = Union['Segment', 'Timeline', 'Score', 'SlidingWindowFeature']
+Resource = Union['Segment', 'Timeline', 'Score', 'SlidingWindowFeature',
+                 'Annotation']
 CropMode = Literal['intersection', 'loose', 'strict']
+SegmentCropMode = Literal['center', 'loose', 'strict']

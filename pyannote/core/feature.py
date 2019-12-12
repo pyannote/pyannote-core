@@ -34,10 +34,14 @@ Features
 
 See :class:`pyannote.core.SlidingWindowFeature` for the complete reference.
 """
-from typing import Any, Tuple, Optional, Union
+import warnings
+from logging import warning
+from typing import Any, Tuple, Optional, Union, Generator
 
 import numpy as np
 import numbers
+
+from pyannote.core.utils.types import CropMode
 from .segment import Segment
 from .segment import SlidingWindow
 from .timeline import Timeline
@@ -61,22 +65,35 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
         self.__i: int = -1
 
     def __len__(self):
+        """Number of feature vectors"""
         return self.data.shape[0]
 
-    # TODO : name is not pep8
+    @property
+    def extent(self):
+        return self.sliding_window.range_to_segment(0, len(self))
+
+    @property
+    def dimension(self):
+        """Dimension of feature vectors"""
+        return self.data.shape[1]
+
     def getNumber(self):
-        """Number of feature vectors"""
+        warnings.warn("This is deprecated in favor of `__len__`",
+                      DeprecationWarning)
         return self.data.shape[0]
 
     # TODO : name is not pep8
     def getDimension(self):
-        """Dimension of feature vectors"""
-        return self.data.shape[1]
+        warnings.warn("This is deprecated in favor of `dimension` property",
+                      DeprecationWarning)
+        return self.dimension
 
     def getExtent(self):
-        return self.sliding_window.rangeToSegment(0, self.getNumber())
+        warnings.warn("This is deprecated in favor of `extent` property",
+                      DeprecationWarning)
+        return self.extent
 
-    def __getitem__(self, i: int):
+    def __getitem__(self, i: int) -> np.ndarray:
         """Get ith feature vector"""
         return self.data[i]
 
@@ -84,7 +101,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
         self.__i = -1
         return self
 
-    def __next__(self) -> Tuple[Segment, Any]:
+    def __next__(self) -> Tuple[Segment, np.ndarray]:
         self.__i += 1
         try:
             return self.sliding_window[self.__i], self.data[self.__i]
@@ -94,7 +111,10 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     def next(self):
         return self.__next__()
 
-    def iterfeatures(self, window: Optional[bool] = False):
+    def iterfeatures(self, window: Optional[bool] = False) -> \
+            Generator[Union[Tuple[np.ndarray, Segment],
+                            np.ndarray],
+                      None, None]:
         """Feature vector iterator
 
         Parameters
@@ -113,7 +133,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
 
     def crop(self,
              focus: Union[Segment, Timeline],
-             mode: str = 'loose',
+             mode: CropMode = 'loose',
              fixed: Optional[float] = None,
              return_data: bool = True) \
             -> Union[np.ndarray, 'SlidingWindowFeature']:
@@ -212,7 +232,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
 
     _HANDLED_TYPES = (np.ndarray, numbers.Number)
 
-    def __array__(self):
+    def __array__(self) -> np.ndarray:
         return self.data
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):

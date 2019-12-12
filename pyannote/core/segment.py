@@ -65,15 +65,15 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
 
 See :class:`pyannote.core.Segment` for the complete reference.
 """
-
-from collections import namedtuple
-from typing import Union, Optional, Tuple
+import warnings
+from typing import Union, Optional, Tuple, List
 
 import numpy as np
-
 from dataclasses import dataclass
 
 # 1 μs (one microsecond)
+from pyannote.core.utils.types import SegmentCropMode
+
 SEGMENT_PRECISION = 1e-6
 
 
@@ -131,12 +131,12 @@ class Segment:
         return (self.end - self.start) > SEGMENT_PRECISION
 
     @property
-    def duration(self):
+    def duration(self) -> float:
         """Segment duration (read-only)"""
         return self.end - self.start if self else 0.
 
     @property
-    def middle(self):
+    def middle(self) -> float:
         """Segment mid-time (read-only)"""
         return .5 * (self.start + self.end)
 
@@ -196,7 +196,7 @@ class Segment:
         end = min(self.end, other.end)
         return Segment(start=start, end=end)
 
-    def intersects(self, other: 'Segment'):
+    def intersects(self, other: 'Segment') -> bool:
         """Check whether two segments intersect each other
 
         Parameters
@@ -216,7 +216,7 @@ class Segment:
                 self.start < other.end - SEGMENT_PRECISION) or \
                (self.start == other.start)
 
-    def overlaps(self, t: float):
+    def overlaps(self, t: float) -> bool:
         """Check if segment overlaps a given time
 
         Parameters
@@ -231,7 +231,7 @@ class Segment:
         """
         return self.start <= t and self.end >= t
 
-    def __or__(self, other: 'Segment'):
+    def __or__(self, other: 'Segment') -> 'Segment':
         """Union
 
         >>> segment = Segment(0, 10)
@@ -289,7 +289,7 @@ class Segment:
         end = max(self.start, other.start)
         return Segment(start=start, end=end)
 
-    def _str_helper(self, seconds: float):
+    def _str_helper(self, seconds: float) -> str:
         from datetime import timedelta
         negative = seconds < 0
         seconds = abs(seconds)
@@ -398,40 +398,40 @@ class SlidingWindow:
         # step must be a float > 0
         if step <= 0:
             raise ValueError("'step' must be a float > 0.")
-        self.__step = step
+        self.__step: float = step
 
         # start must be a float.
-        self.__start = start
+        self.__start: float = start
 
         # if end is not provided, set it to infinity
         if end is None:
-            self.__end = np.inf
+            self.__end: float = np.inf
         else:
             # end must be greater than start
             if end <= start:
                 raise ValueError("'end' must be greater than 'start'.")
-            self.__end = end
+            self.__end: float = end
 
         # current index of iterator
-        self.__i = -1
+        self.__i: int = -1
 
     @property
-    def start(self):
+    def start(self) -> float:
         """Sliding window start time in seconds."""
         return self.__start
 
     @property
-    def end(self):
+    def end(self) -> float:
         """Sliding window end time in seconds."""
         return self.__end
 
     @property
-    def step(self):
+    def step(self) -> float:
         """Sliding window step in seconds."""
         return self.__step
 
     @property
-    def duration(self):
+    def duration(self) -> float:
         """Sliding window duration in seconds."""
         return self.__duration
 
@@ -453,7 +453,7 @@ class SlidingWindow:
             (t - self.__start - .5 * self.__duration) / self.__step
         ))
 
-    def samples(self, from_duration: float, mode: str = 'strict') -> int:
+    def samples(self, from_duration: float, mode: SegmentCropMode = 'strict') -> int:
         """Number of frames
 
         Parameters
@@ -481,9 +481,10 @@ class SlidingWindow:
             return int(np.rint((from_duration / self.step)))
 
     def crop(self, focus: Union[Segment, 'Timeline'],
-             mode: str = 'loose',
+             mode: SegmentCropMode = 'loose',
              fixed: Optional[float] = None,
-             return_ranges: Optional[bool] = False) -> np.ndarray:
+             return_ranges: Optional[bool] = False) -> \
+            Union[np.ndarray, List[List[int]]]:
         """Crop sliding window
 
         Parameters
@@ -606,8 +607,12 @@ class SlidingWindow:
 
         return np.array(range(*rng), dtype=np.int64)
 
-    # TODO : this is not PEP8, should be segment_to_range
     def segmentToRange(self, segment: Segment) -> Tuple[int, int]:
+        warnings.warn("Deprecated in favor of `segment_to_range`",
+                      DeprecationWarning)
+        return self.segment_to_range(segment)
+
+    def segment_to_range(self, segment: Segment) -> Tuple[int, int]:
         """Convert segment to 0-indexed frame range
 
         Parameters
@@ -625,7 +630,7 @@ class SlidingWindow:
         --------
 
             >>> window = SlidingWindow()
-            >>> print window.segmentToRange(Segment(10, 15))
+            >>> print window.segment_to_range(Segment(10, 15))
             i0, n
 
         """
@@ -637,8 +642,12 @@ class SlidingWindow:
 
         return i0, n
 
-    # TODO : this is not PEP8, should be range_to_segment
     def rangeToSegment(self, i0: int, n: int) -> Segment:
+        warnings.warn("This is deprecated in favor of `range_to_segment`",
+                      DeprecationWarning)
+        return self.range_to_segment(i0, n)
+
+    def range_to_segment(self, i0: int, n: int) -> Segment:
         """Convert 0-indexed frame range to segment
 
         Each frame represents a unique segment of duration 'step', centered on
@@ -662,7 +671,7 @@ class SlidingWindow:
         --------
 
             >>> window = SlidingWindow()
-            >>> print window.rangeToSegment(3, 2)
+            >>> print window.range_to_segment(3, 2)
             [ --> ]
 
         """
@@ -683,15 +692,23 @@ class SlidingWindow:
 
         return Segment(start, end)
 
-    # TODO : this is not PEP8, should be samples_to_duration
     def samplesToDuration(self, nSamples: int) -> float:
-        """Returns duration of samples"""
-        return self.rangeToSegment(0, nSamples).duration
+        warnings.warn("This is deprecated in favor of `samples_to_duration`",
+                      DeprecationWarning)
+        return self.samples_to_duration(nSamples)
 
-    # TODO : this is not PEP8, should be duration_to_samples
+    def samples_to_duration(self, n_samples: int) -> float:
+        """Returns duration of samples"""
+        return self.range_to_segment(0, n_samples).duration
+
     def durationToSamples(self, duration: float) -> int:
+        warnings.warn("This is deprecated in favor of `duration_to_samples`",
+                      DeprecationWarning)
+        return self.duration_to_samples(duration)
+
+    def duration_to_samples(self, duration: float) -> int:
         """Returns samples in duration"""
-        return self.segmentToRange(Segment(0, duration))[1]
+        return self.segment_to_range(Segment(0, duration))[1]
 
     def __getitem__(self, i: int) -> Segment:
         """
@@ -720,7 +737,7 @@ class SlidingWindow:
     def next(self) -> Segment:
         return self.__next__()
 
-    def __next__(self):
+    def __next__(self) -> Segment:
         self.__i += 1
         window = self[self.__i]
 
@@ -756,7 +773,7 @@ class SlidingWindow:
         self.__i = -1
         return self
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Number of positions
 
         Equivalent to len([segment for segment in window])
