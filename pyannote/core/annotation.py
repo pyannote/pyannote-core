@@ -109,6 +109,7 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 
 import itertools
 import numpy as np
+from typing import TextIO
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
@@ -347,6 +348,28 @@ class Annotation(object):
 
         """
         return included in self.get_timeline(copy=False)
+
+    def write_rttm(self, file: TextIO):
+        """Dump annotation to file using RTTM format
+
+        Parameters
+        ----------
+        file : file object
+
+        Usage
+        -----
+        >>> with open('file.rttm', 'w') as file:
+        ...     annotation.write_rttm(file)
+        """
+        
+        uri = self.uri if self.uri else "<NA>"
+        
+        for segment, _, label in self.itertracks(yield_label=True):            
+            line = (
+                f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
+                f'<NA> <NA> {label} <NA> <NA>\n'
+            )
+            file.write(line)
 
     def crop(self, support, mode='intersection'):
         """Crop annotation to new support
@@ -1011,8 +1034,8 @@ class Annotation(object):
             If 'string' (default) rename label to 'A', 'B', 'C', ... If 'int',
             rename to 0, 1, 2, etc. If iterable, use it to generate labels.
         copy : bool, optional
-            Return a copy of the annotation. Defaults to updating the
-            annotation in-place.
+            Set to True to return a copy of the annotation. Set to False to
+            update the annotation in-place. Defaults to True.
 
         Returns
         -------
