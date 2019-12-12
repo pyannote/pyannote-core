@@ -1,0 +1,2 @@
+Sphinx==2.2.2
+ipython==7.10.1
