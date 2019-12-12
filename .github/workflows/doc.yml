@@ -28,9 +28,12 @@ jobs:
         make --directory=doc html
         touch doc/build/html/.nojekyll
     - name: Deploy
-      uses: JamesIves/github-pages-deploy-action@releases/v3
+      uses: 
       env:
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        BASE_BRANCH: master
-        BRANCH: gh-pages
-        FOLDER: doc/build/html
+        PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        PUBLISH_BRANCH: gh-pages
+        PUBLISH_DIR: ./public
+        SCRIPT_MODE: true
+      run: |
+        wget https://raw.githubusercontent.com/peaceiris/actions-gh-pages/v2/entrypoint.sh
+        bash ./entrypoint.sh
