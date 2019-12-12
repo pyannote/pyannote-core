@@ -29,7 +29,7 @@ jobs:
         touch ./doc/build/html/.nojekyll
     - name: Deploy
       env:
-        PERSONAL_TOKEN: ${{ secrets. ACCESS_TOKEN }}
+        PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         PUBLISH_BRANCH: gh-pages
         PUBLISH_DIR: ./doc/build/html
       run: |
