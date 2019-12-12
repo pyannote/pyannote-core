@@ -28,7 +28,6 @@ jobs:
         make --directory=doc html
         touch doc/build/html/.nojekyll
     - name: Deploy
-      uses: 
       env:
         PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         PUBLISH_BRANCH: gh-pages
