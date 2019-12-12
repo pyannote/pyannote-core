@@ -2,8 +2,8 @@
 Changelog
 #########
 
-Version 3.1.9 (2019-12-12)
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Version 3.1.10 (2019-12-12)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - feat: add Annotation.write_rttm and Timeline.write_uem (@PaulLerner)
 - feat: add numpy interface to SlidingWindowFeature (experimental)
