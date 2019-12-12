@@ -2,7 +2,7 @@
 Changelog
 #########
 
-Version 3.1.5 (2019-12-12)
+Version 3.1.6 (2019-12-12)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - feat: add Annotation.write_rttm and Timeline.write_uem (@PaulLerner)
