@@ -82,7 +82,6 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
                       DeprecationWarning)
         return self.data.shape[0]
 
-    # TODO : name is not pep8
     def getDimension(self):
         warnings.warn("This is deprecated in favor of `dimension` property",
                       DeprecationWarning)

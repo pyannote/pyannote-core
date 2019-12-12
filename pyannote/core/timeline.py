@@ -88,7 +88,7 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
-from typing import Optional, Iterable, List, Generator, Union, Callable, TextIO
+from typing import Optional, Iterable, List, Generator, Union, Callable, TextIO, Tuple
 
 import pandas as pd
 from sortedcontainers import SortedList
@@ -126,12 +126,14 @@ class Timeline:
     """
 
     @classmethod
-    def from_df(cls, df: pd.DataFrame, uri: Optional[str] = None):
+    def from_df(cls, df: pd.DataFrame, uri: Optional[str] = None) -> 'Timeline':
         segments = list(df[PYANNOTE_SEGMENT])
         timeline = cls(segments=segments, uri=uri)
         return timeline
 
-    def __init__(self, segments: Optional[Iterable[Segment]] = None, uri=None):
+    def __init__(self,
+                 segments: Optional[Iterable[Segment]] = None,
+                 uri: str = None):
         if segments is None:
             segments = ()
 
@@ -268,7 +270,7 @@ class Timeline:
 
         return self
 
-    def remove(self, segment: Segment):
+    def remove(self, segment: Segment) -> 'Timeline':
         """Remove a segment (in place)
 
         Parameters
@@ -300,7 +302,7 @@ class Timeline:
 
         return self
 
-    def discard(self, segment: Segment):
+    def discard(self, segment: Segment) -> 'Timeline':
         """Same as `remove`
 
         See also
@@ -309,10 +311,10 @@ class Timeline:
         """
         return self.remove(segment)
 
-    def __ior__(self, timeline: 'Timeline'):
+    def __ior__(self, timeline: 'Timeline') -> 'Timeline':
         return self.update(timeline)
 
-    def update(self, timeline: Segment):
+    def update(self, timeline: Segment) -> 'Timeline':
         """Add every segments of an existing timeline (in place)
 
         Parameters
@@ -369,7 +371,8 @@ class Timeline:
         segments = self.segments_set_ | timeline.segments_set_
         return Timeline(segments=segments, uri=self.uri)
 
-    def co_iter(self, other: 'Timeline'):
+    def co_iter(self, other: 'Timeline') \
+            -> Generator[Tuple[Segment, Segment], None, None]:
         """Iterate over pairs of intersecting segments
 
         >>> timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
@@ -530,8 +533,6 @@ class Timeline:
         :func:`pyannote.core.Timeline.overlapping`
         """
         segment = Segment(start=t, end=t)
-        # TODO: maybe this line should be removed?
-        iterable = self.segments_list_.irange(maximum=segment)
         for segment in self.segments_list_.irange(maximum=segment):
             if segment.overlaps(t):
                 yield segment
@@ -905,7 +906,8 @@ class Timeline:
 
     def to_annotation(self,
                       generator: Union[str, Iterable[Label], None, None] = 'string',
-                      modality: Optional[str] = None):
+                      modality: Optional[str] = None) \
+            -> 'Annotation':
         """Turn timeline into an annotation
 
         Each segment is labeled by a unique label.
@@ -937,7 +939,7 @@ class Timeline:
 
         return annotation
 
-    def write_uem(self,file: TextIO):
+    def write_uem(self, file: TextIO):
         """Dump timeline to file using UEM format
 
         Parameters
@@ -951,7 +953,7 @@ class Timeline:
         """
 
         uri = self.uri if self.uri else "<NA>"
-        
+
         for segment in self:
             line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
             file.write(line)

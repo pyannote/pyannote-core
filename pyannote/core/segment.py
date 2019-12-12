@@ -145,7 +145,6 @@ class Segment:
         >>> segment = Segment(start, end)
         >>> start, end = segment
         """
-        # todo: is there a reason for not returning a tuple?
         yield self.start
         yield self.end
 
@@ -261,7 +260,7 @@ class Segment:
         end = max(self.end, other.end)
         return Segment(start=start, end=end)
 
-    def __xor__(self, other: 'Segment'):
+    def __xor__(self, other: 'Segment') -> 'Segment':
         """Gap
 
         >>> segment = Segment(0, 10)
@@ -746,7 +745,7 @@ class SlidingWindow:
         else:
             raise StopIteration()
 
-    def __iter__(self):
+    def __iter__(self) -> 'SlidingWindow':
         """Sliding window iterator
 
         Use expression 'for segment in sliding_window'

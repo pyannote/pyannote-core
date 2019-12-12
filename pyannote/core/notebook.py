@@ -31,7 +31,9 @@
 Visualization
 #############
 """
-from typing import Iterable, Union
+from typing import Iterable, Union, Dict, Optional
+
+from .utils.types import Label, LabelStyle, Resource
 
 try:
     from IPython.core.pylabtools import print_figure
@@ -60,7 +62,9 @@ class Notebook:
         colors = [cm(1. * i / 8) for i in range(9)]
 
         self._style_generator = cycle(product(linestyle, linewidth, colors))
-        self._style = {None: ('solid', 1, (0.0, 0.0, 0.0))}
+        self._style: Dict[Optional[Label], LabelStyle] = {
+            None: ('solid', 1, (0.0, 0.0, 0.0))
+        }
         del self.crop
         del self.width
 
@@ -90,7 +94,7 @@ class Notebook:
     def width(self):
         self._width = 20
 
-    def __getitem__(self, label: str):
+    def __getitem__(self, label: Label) -> LabelStyle:
         if label not in self._style:
             self._style[label] = next(self._style_generator)
         return self._style[label]
@@ -173,7 +177,7 @@ class Notebook:
 
         return y
 
-    def __call__(self, resource: Union[Segment, Timeline, Annotation, Scores],
+    def __call__(self, resource: Resource,
                  time: bool = True,
                  legend: bool = True):
 
@@ -188,6 +192,10 @@ class Notebook:
 
         elif isinstance(resource, Scores):
             self.plot_scores(resource, time=time, legend=legend)
+
+        elif isinstance(resource, SlidingWindowFeature):
+            # TODO : check this
+            self.plot_feature(resource, time=time)
 
     def plot_segment(self, segment, ax=None, time=True):
 

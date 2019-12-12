@@ -11,3 +11,4 @@ Resource = Union['Segment', 'Timeline', 'Score', 'SlidingWindowFeature',
                  'Annotation']
 CropMode = Literal['intersection', 'loose', 'strict']
 SegmentCropMode = Literal['center', 'loose', 'strict']
+LabelStyle = Tuple[str, int, Tuple[float, float, float]]

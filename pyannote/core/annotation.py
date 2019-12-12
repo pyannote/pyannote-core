@@ -988,7 +988,8 @@ class Annotation:
         return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
                    key=lambda x: x[1])[0]
 
-    def rename_tracks(self, generator: LabelGenerator = 'string'):
+    def rename_tracks(self, generator: LabelGenerator = 'string') \
+            -> 'Annotation':
         """Rename all tracks
 
         Parameters
