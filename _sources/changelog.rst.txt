@@ -2,8 +2,109 @@
 Changelog
 #########
 
-Version 1.0 (2017-07-04)
+Version 3.1.10 (2019-12-12)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add Annotation.write_rttm and Timeline.write_uem (@PaulLerner)
+- feat: add numpy interface to SlidingWindowFeature (experimental)
+- feat: setup continuous integration
+- improve: speed up SlidingWindowFeature plotting
+- doc: update notebooks to Python 3 (@PaulLerner)
+- BREAKING: remove deprecated Segment.pretty()
+
+Version 3.0 (2019-06-24)
 ~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - BREAKING: `Annotation.__mul__` now returns `np.ndarray` instance
+ - BREAKING: remove `Annotation` methods (that were deprecated version 1.0)
+ - BREAKING: `Scores.retrack` has been renamed `rename_tracks`
+ - improve: remove `six` and `xarray` dependencies
+ - BREAKING: remove `pyannote.core.time` module
+
+Version 2.2.2 (2019-04-18)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - improve: speed-up several `Segment` methods
+ - improve: decrease `one_hot_encoding` memory usage
+ - feat: add support for "fixed" option in all cropping modes
+ - setup: switch to scipy 1.1
+
+Version 2.1 (2019-01-17)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: add basic implementation of Chinese Whispers clustering
+ - feat: add "utils.hierarchy.fcluster_auto" parameter-free "fcluster"
+
+Version 2.0.3 (2018-11-23)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - BREAKING: move pyannote.core.util to pyannote.core.utils.generators
+ - BREAKING: remove support for Python 2
+ - feat: add one_hot_{encoding | decoding} functions
+ - feat: add get_class_by_name utiltiy function
+ - feat: add custom pdist and cdist
+ - feat: add custom hierachical clustering "linkage" function
+ - setup: add scipy dependency
+
+Version 1.4.1 (2018-09-13)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: add unit tests for feature cropping
+ - fix: fix out-of-bounds feature cropping
+
+Version 1.4 (2018-07-09)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: expose `SlidingWindow.closest_frame`
+
+Version 1.3.2 (2018-06-12)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: add support for multi-dimensional SlidingWindowFeatures
+ - setup: switch to sortedcontainers 2.x
+ - fix: update SWF.crop docstring
+ - chore: remove support for "segment" option in Annotation.argmax
+
+Version 1.3.1 (2017-12-14)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - feat: add "return_ranges" option to SlidingWindow.crop
+ - improve: faster SlidingWindowFeature.crop
+ - fix: fix documentation
+
+Version 1.2 (2017-10-05)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+ - BREAKING: remove all things "Transcription"
+ - feat: add return_data parameter to SlidingWindowFeature.crop (SWF)
+ - feat: add support for len(SWF)
+ - feat: add ylim parameter to plot_feature
+ - fix: fix corner case where notebook.crop is larger than SWF extent
+
+Version 1.1 (2017-09-19)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: make iterators out of SlidingWindowFeature instances
+- improve: make Annotation.__mul__ (much) faster
+
+Version 1.0.5 (2017-09-13)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: make iterators out of SlidingWindow instances
+
+Version 1.0.4 (2017-07-18)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: add missing import
+- fix: fix corner case in Timeline.crop_iter
+
+Version 1.0.2 (2017-07-15)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: use Timeline.support() instead of .coverage()
+
+Version 1.0.1 (2017-07-04)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - improve: switch from banyan to sortedcontainers
 - feat: add Timeline.{remove|discard|overlapping_iter} methods

@@ -37,22 +37,19 @@ Annotation
 ..    :members:
 ..    :special-members:
 
-.. Features
-.. ========
-..
-.. SlidingWindow
-.. -------------
-..
-.. .. autoclass:: pyannote.core.SlidingWindow
-..    :members:
-..    :special-members:
-..
-.. SlidingWindowFeature
-.. --------------------
-..
-.. .. autoclass:: pyannote.core.SlidingWindowFeature
-..    :members:
-..    :special-members:
+SlidingWindow
+=============
+
+.. autoclass:: pyannote.core.SlidingWindow
+   :members:
+   :special-members:
+
+SlidingWindowFeature
+====================
+
+.. autoclass:: pyannote.core.SlidingWindowFeature
+   :members:
+   :special-members:
 
 *************
 Serialization

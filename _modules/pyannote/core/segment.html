@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.segment &mdash; pyannote.core 1.0 documentation</title>
+  <title>pyannote.core.segment &mdash; pyannote.core 3.1.10 documentation</title>
   
 
   
@@ -17,41 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="pyannote.core 1.0 documentation" href="../../../index.html"/>
-        <link rel="up" title="Module code" href="../../index.html"/> 
-
-  
-  <script src="../../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -65,7 +58,7 @@
             
             
               <div class="version">
-                1.0
+                3.1.10
               </div>
             
           
@@ -108,7 +101,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">pyannote.core</a>
@@ -116,9 +109,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -148,8 +142,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-        
       </li>
     
   </ul>
@@ -166,7 +158,7 @@
 
 <span class="c1"># The MIT License (MIT)</span>
 
-<span class="c1"># Copyright (c) 2014-2017 CNRS</span>
+<span class="c1"># Copyright (c) 2014-2019 CNRS</span>
 
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
 <span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
@@ -198,7 +190,7 @@
 
 <span class="sd">:class:`pyannote.core.Segment` instances describe temporal fragments (*e.g.* of an audio file). The segment depicted above can be defined like that:</span>
 
-<span class="sd">.. ipython::</span>
+<span class="sd">.. code-block:: ipython</span>
 
 <span class="sd">  In [1]: from pyannote.core import Segment</span>
 
@@ -208,7 +200,7 @@
 
 <span class="sd">It is nothing more than 2-tuples augmented with several useful methods and properties:</span>
 
-<span class="sd">.. ipython::</span>
+<span class="sd">.. code-block:: ipython</span>
 
 <span class="sd">  In [4]: start, end = segment</span>
 
@@ -229,14 +221,11 @@
 <span class="sd">See :class:`pyannote.core.Segment` for the complete reference.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
-
-<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># 1 μs (one microsecond)</span>
-<span class="n">SEGMENT_PRECISION</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
+<span class="n">SEGMENT_PRECISION</span> <span class="o">=</span> <span class="mf">1e-6</span>
 
 
 <div class="viewcode-block" id="Segment"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment">[docs]</a><span class="k">class</span> <span class="nc">Segment</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Segment&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">])):</span>
@@ -273,13 +262,10 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Segment</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+<div class="viewcode-block" id="Segment.__new__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__new__">[docs]</a>    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">Segment</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">start</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">end</span><span class="p">))</span></div>
 
-    <span class="k">def</span> <span class="nf">__nonzero__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bool__</span><span class="p">()</span>
-
-<div class="viewcode-block" id="Segment.__bool__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__bool__">[docs]</a>    <span class="k">def</span> <span class="nf">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Segment.__bool__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__bool__">[docs]</a>    <span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Emptiness</span>
 
 <span class="sd">        &gt;&gt;&gt; if segment:</span>
@@ -292,7 +278,7 @@
 <span class="sd">        A segment is considered empty if its end time is smaller than its</span>
 <span class="sd">        start time, or its duration is smaller than 1μs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">bool</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SEGMENT_PRECISION</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SEGMENT_PRECISION</span></div>
 
     <span class="k">def</span> <span class="nf">_get_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="k">if</span> <span class="bp">self</span> <span class="k">else</span> <span class="mf">0.</span>
@@ -304,18 +290,13 @@
     <span class="n">middle</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="n">_get_middle</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Segment mid-time (read-only)&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="Segment.__iter__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__iter__">[docs]</a>    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Unpack segment boundaries as float</span>
-
-<span class="sd">        &gt;&gt;&gt; segment = Segment(start=1, end=2)</span>
-<span class="sd">        &gt;&gt;&gt; isinstance(segment.start, int)  # segment.start is int</span>
-<span class="sd">        True</span>
+<div class="viewcode-block" id="Segment.__iter__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Unpack segment boundaries</span>
+<span class="sd">        &gt;&gt;&gt; segment = Segment(start, end)</span>
 <span class="sd">        &gt;&gt;&gt; start, end = segment</span>
-<span class="sd">        &gt;&gt;&gt; isinstance(start, float)        # start is float</span>
-<span class="sd">        True</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">yield</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
-        <span class="k">yield</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span></div>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
+        <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span></div>
 
 <div class="viewcode-block" id="Segment.copy"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get a copy of the segment</span>
@@ -331,7 +312,7 @@
     <span class="c1"># Inclusion (in), intersection (&amp;), union (|) and gap (^) #</span>
     <span class="c1"># ------------------------------------------------------- #</span>
 
-<div class="viewcode-block" id="Segment.__contains__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__contains__">[docs]</a>    <span class="k">def</span> <span class="nf">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="Segment.__contains__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__contains__">[docs]</a>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Inclusion</span>
 
 <span class="sd">        &gt;&gt;&gt; segment = Segment(start=0, end=10)</span>
@@ -342,7 +323,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">&gt;=</span> <span class="n">other</span><span class="o">.</span><span class="n">end</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Segment.__and__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__and__">[docs]</a>    <span class="k">def</span> <span class="nf">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="Segment.__and__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__and__">[docs]</a>    <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Intersection</span>
 
 <span class="sd">        &gt;&gt;&gt; segment = Segment(0, 10)</span>
@@ -378,14 +359,11 @@
 <span class="sd">            True if segments intersect, False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">other</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">False</span>
-
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="ow">or</span> \
-               <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span> <span class="ow">and</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span> <span class="ow">and</span>
                 <span class="n">other</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="n">SEGMENT_PRECISION</span><span class="p">)</span> <span class="ow">or</span> \
                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&gt;</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="n">SEGMENT_PRECISION</span><span class="p">)</span></div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;</span> <span class="n">other</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="n">SEGMENT_PRECISION</span><span class="p">)</span> <span class="ow">or</span> \
+               <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">start</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Segment.overlaps"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.overlaps">[docs]</a>    <span class="k">def</span> <span class="nf">overlaps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Check if segment overlaps a given time</span>
@@ -402,7 +380,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">&lt;=</span> <span class="n">t</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">&gt;=</span> <span class="n">t</span></div>
 
-<div class="viewcode-block" id="Segment.__or__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__or__">[docs]</a>    <span class="k">def</span> <span class="nf">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="Segment.__or__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__or__">[docs]</a>    <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Union</span>
 
 <span class="sd">        &gt;&gt;&gt; segment = Segment(0, 10)</span>
@@ -432,7 +410,7 @@
         <span class="n">end</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">,</span> <span class="n">other</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Segment.__xor__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__xor__">[docs]</a>    <span class="k">def</span> <span class="nf">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<div class="viewcode-block" id="Segment.__xor__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__xor__">[docs]</a>    <span class="k">def</span> <span class="fm">__xor__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Gap</span>
 
 <span class="sd">        &gt;&gt;&gt; segment = Segment(0, 10)</span>
@@ -461,7 +439,7 @@
         <span class="k">return</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_str_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seconds</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">timedelta</span>
+        <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span>
         <span class="n">negative</span> <span class="o">=</span> <span class="n">seconds</span> <span class="o">&lt;</span> <span class="mi">0</span>
         <span class="n">seconds</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">seconds</span><span class="p">)</span>
         <span class="n">td</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">seconds</span><span class="p">)</span>
@@ -473,7 +451,7 @@
             <span class="s1">&#39;-&#39;</span> <span class="k">if</span> <span class="n">negative</span> <span class="k">else</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">hours</span><span class="p">,</span> <span class="n">minutes</span><span class="p">,</span>
             <span class="n">seconds</span><span class="p">,</span> <span class="n">microseconds</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Segment.__str__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Segment.__str__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Human-readable representation</span>
 
 <span class="sd">        &gt;&gt;&gt; print(Segment(1337, 1337 + 0.42))</span>
@@ -488,13 +466,7 @@
                                     <span class="bp">self</span><span class="o">.</span><span class="n">_str_helper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">))</span>
         <span class="k">return</span> <span class="s1">&#39;[]&#39;</span></div>
 
-    <span class="k">def</span> <span class="nf">pretty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s1">&#39;&quot;pretty&quot; has been replaced by &quot;__str__&quot;&#39;</span><span class="p">,</span>
-            <span class="ne">DeprecationWarning</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span>
-
-<div class="viewcode-block" id="Segment.__repr__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Segment.__repr__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__repr__">[docs]</a>    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Computer-readable representation</span>
 
 <span class="sd">        &gt;&gt;&gt; Segment(1337, 1337 + 0.42)</span>
@@ -511,15 +483,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;start&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">}</span></div>
 
-    <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="Segment.from_json"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.from_json">[docs]</a>    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="Segment.from_json"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.from_json">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Deserialization</span>
 
 <span class="sd">        See also</span>
 <span class="sd">        --------</span>
 <span class="sd">        :mod:`pyannote.core.json`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="n">end</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">],</span> <span class="n">end</span><span class="o">=</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">])</span></div>
 
     <span class="k">def</span> <span class="nf">_repr_png_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;IPython notebook support</span>
@@ -528,11 +500,11 @@
 <span class="sd">        --------</span>
 <span class="sd">        :mod:`pyannote.core.notebook`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">.notebook</span> <span class="k">import</span> <span class="n">repr_segment</span>
+        <span class="kn">from</span> <span class="nn">.notebook</span> <span class="kn">import</span> <span class="n">repr_segment</span>
         <span class="k">return</span> <span class="n">repr_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
-<span class="k">class</span> <span class="nc">SlidingWindow</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow">[docs]</a><span class="k">class</span> <span class="nc">SlidingWindow</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Sliding window</span>
 
 <span class="sd">    Parameters</span>
@@ -558,10 +530,15 @@
 <span class="sd">    &gt;&gt;&gt; new_segment = sw.toSegment(*sw.toFrameRange(segment))</span>
 <span class="sd">    &gt;&gt;&gt; abs(segment) - abs(segment &amp; new_segment) &lt; .5 * sw.step</span>
 
+<span class="sd">    &gt;&gt;&gt; sw = SlidingWindow(end=0.1)</span>
+<span class="sd">    &gt;&gt;&gt; print(next(sw))</span>
+<span class="sd">    [ 00:00:00.000 --&gt;  00:00:00.030]</span>
+<span class="sd">    &gt;&gt;&gt; print(next(sw))</span>
+<span class="sd">    [ 00:00:00.010 --&gt;  00:00:00.040]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">0.030</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.010</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mf">0.000</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SlidingWindow</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+<div class="viewcode-block" id="SlidingWindow.__init__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="mf">0.030</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.010</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mf">0.000</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SlidingWindow</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
         <span class="c1"># duration must be a float &gt; 0</span>
         <span class="k">if</span> <span class="n">duration</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -585,6 +562,9 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;end&#39; must be greater than &#39;start&#39;.&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__end</span> <span class="o">=</span> <span class="n">end</span>
 
+        <span class="c1"># current index of iterator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span></div>
+
     <span class="k">def</span> <span class="nf">__get_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span>
     <span class="n">start</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="n">__get_start</span><span class="p">)</span>
@@ -605,7 +585,7 @@
     <span class="n">duration</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="n">__get_duration</span><span class="p">)</span>
     <span class="sd">&quot;&quot;&quot;Sliding window duration in seconds.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__closest_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow.closest_frame"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.closest_frame">[docs]</a>    <span class="k">def</span> <span class="nf">closest_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Closest frame to timestamp.</span>
 
 <span class="sd">        Parameters</span>
@@ -621,9 +601,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
             <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__duration</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span>
-        <span class="p">))</span>
+        <span class="p">))</span></div>
 
-    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_duration</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow.samples"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.samples">[docs]</a>    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_duration</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Number of frames</span>
 
 <span class="sd">        Parameters</span>
@@ -642,104 +622,138 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;strict&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">from_duration</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">))</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">from_duration</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span>
 
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;loose&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">((</span><span class="n">from_duration</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">))</span>
 
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">((</span><span class="n">from_duration</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">((</span><span class="n">from_duration</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">)))</span></div>
 
-    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">focus</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;loose&#39;</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow.crop"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.crop">[docs]</a>    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">focus</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;loose&#39;</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_ranges</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Crop sliding window</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        focus : `Segment` or `Timeline`</span>
-<span class="sd">        mode : {&#39;strict&#39;, &#39;loose&#39;, &#39;center&#39;, &#39;fixed&#39;}, optional</span>
-<span class="sd">            In &#39;strict&#39; mode, only indices of segments fully included in focus</span>
-<span class="sd">            coverage are returned. In &#39;loose&#39; mode, indices of any intersecting</span>
-<span class="sd">            segment are returned. In &#39;center&#39; mode, first and last positions are</span>
-<span class="sd">            chosen to be the positions whose centers are the closest to the</span>
-<span class="sd">            focus start and end times. Defaults to &#39;loose&#39;.</span>
+<span class="sd">        mode : {&#39;strict&#39;, &#39;loose&#39;, &#39;center&#39;}, optional</span>
+<span class="sd">            In &#39;strict&#39; mode, only indices of segments fully included in</span>
+<span class="sd">            &#39;focus&#39; support are returned. In &#39;loose&#39; mode, indices of any</span>
+<span class="sd">            intersecting segments are returned. In &#39;center&#39; mode, first and</span>
+<span class="sd">            last positions are chosen to be the positions whose centers are the</span>
+<span class="sd">            closest to &#39;focus&#39; start and end times. Defaults to &#39;loose&#39;.</span>
 <span class="sd">        fixed : float, optional</span>
-<span class="sd">            When provided and mode is &#39;center&#39;, overrides focus duration. This</span>
-<span class="sd">            might be useful to avoid float rounding errors and to make sure the</span>
-<span class="sd">            number of positions is deterministic.</span>
+<span class="sd">            Overrides `Segment` &#39;focus&#39; duration and ensures that the number of</span>
+<span class="sd">            returned frames is fixed (which might otherwise not be the case</span>
+<span class="sd">            because of rounding erros).</span>
+<span class="sd">        return_ranges : bool, optional</span>
+<span class="sd">            Return as list of ranges. Defaults to indices numpy array.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        indices : np.array</span>
+<span class="sd">        indices : np.array (or list of ranges)</span>
 <span class="sd">            Array of unique indices of matching segments</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">.timeline</span> <span class="k">import</span> <span class="n">Timeline</span>
+        <span class="kn">from</span> <span class="nn">.timeline</span> <span class="kn">import</span> <span class="n">Timeline</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">focus</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">focus</span><span class="p">,</span> <span class="p">(</span><span class="n">Segment</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">)):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&quot;focus&quot; must be a `Segment` or `Timeline` instance.&#39;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">focus</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">):</span>
 
             <span class="k">if</span> <span class="n">fixed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">(</span><span class="n">fixed</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&#39;fixed&#39; is not supported with `Timeline` &#39;focus&#39;.&quot;</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;loose&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">return_ranges</span><span class="p">:</span>
+                <span class="n">ranges</span> <span class="o">=</span> <span class="p">[]</span>
 
-                <span class="c1"># find smallest integer i such that</span>
-                <span class="c1"># self.start + i x self.step + self.duration &gt;= focus.start</span>
-                <span class="n">i_</span> <span class="o">=</span> <span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
-                <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">i_</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">support</span><span class="p">()):</span>
+                    <span class="n">rng</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="n">fixed</span><span class="p">,</span>
+                                    <span class="n">return_ranges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">fixed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="c1"># find largest integer j such that</span>
-                    <span class="c1"># self.start + j x self.step &lt;= focus.end</span>
-                    <span class="n">j_</span> <span class="o">=</span> <span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
-                    <span class="n">j</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">j_</span><span class="p">))</span>
-                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                    <span class="c1"># if first or disjoint segment, add it</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">rng</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ranges</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">ranges</span> <span class="o">+=</span> <span class="n">rng</span>
 
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                    <span class="c1"># if overlapping segment, update last range</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ranges</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">rng</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
 
+                <span class="k">return</span> <span class="n">ranges</span>
 
-            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;strict&#39;</span><span class="p">:</span>
+            <span class="c1"># concatenate all indices</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="n">fixed</span><span class="p">,</span> <span class="n">return_ranges</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">focus</span><span class="o">.</span><span class="n">support</span><span class="p">()])</span>
 
-                <span class="c1"># find smallest integer i such that</span>
-                <span class="c1"># self.start + i x self.step &gt;= focus.start</span>
-                <span class="n">i_</span> <span class="o">=</span> <span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
-                <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">i_</span><span class="p">))</span>
+            <span class="c1"># remove duplicate indices</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">fixed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="c1"># find largest integer j such that</span>
-                    <span class="c1"># self.start + j x self.step + self.duration &lt;= focus.end</span>
-                    <span class="n">j_</span> <span class="o">=</span> <span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
-                    <span class="n">j</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">j_</span><span class="p">))</span>
-                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="c1"># &#39;focus&#39; is a `Segment` instance</span>
 
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;loose&#39;</span><span class="p">:</span>
 
+            <span class="c1"># find smallest integer i such that</span>
+            <span class="c1"># self.start + i x self.step + self.duration &gt;= focus.start</span>
+            <span class="n">i_</span> <span class="o">=</span> <span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">i_</span><span class="p">))</span>
 
-            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
-
-                <span class="c1"># find window position whose center is the closest to focus.start</span>
-                <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__closest_frame</span><span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">fixed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="c1"># find window position whose center is the closest to focus.end</span>
-                    <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__closest_frame</span><span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
-                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">fixed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># find largest integer j such that</span>
+                <span class="c1"># self.start + j x self.step &lt;= focus.end</span>
+                <span class="n">j_</span> <span class="o">=</span> <span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">j_</span><span class="p">))</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mode must be &quot;loose&quot;, &quot;strict&quot;, or &quot;center&quot;&#39;</span><span class="p">)</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">(</span><span class="n">fixed</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;loose&#39;</span><span class="p">)</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
 
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">focus</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="n">fixed</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">focus</span><span class="o">.</span><span class="n">coverage</span><span class="p">()]))</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;strict&#39;</span><span class="p">:</span>
+
+            <span class="c1"># find smallest integer i such that</span>
+            <span class="c1"># self.start + i x self.step &gt;= focus.start</span>
+            <span class="n">i_</span> <span class="o">=</span> <span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">start</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">i_</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">fixed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+                <span class="c1"># find largest integer j such that</span>
+                <span class="c1"># self.start + j x self.step + self.duration &lt;= focus.end</span>
+                <span class="n">j_</span> <span class="o">=</span> <span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">j_</span><span class="p">))</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">(</span><span class="n">fixed</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">)</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;center&#39;</span><span class="p">:</span>
+
+            <span class="c1"># find window position whose center is the closest to focus.start</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">closest_frame</span><span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">fixed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># find window position whose center is the closest to focus.end</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">closest_frame</span><span class="p">(</span><span class="n">focus</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">samples</span><span class="p">(</span><span class="n">fixed</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;focus must be a Segment or a Timeline.&#39;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&#39;mode&#39; must be one of {&#39;loose&#39;, &#39;strict&#39;, &#39;center&#39;}.&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">segmentToRange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">return_ranges</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">rng</span><span class="p">)]</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">*</span><span class="n">rng</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SlidingWindow.segmentToRange"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.segmentToRange">[docs]</a>    <span class="k">def</span> <span class="nf">segmentToRange</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert segment to 0-indexed frame range</span>
 
 <span class="sd">        Parameters</span>
@@ -762,14 +776,14 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># find closest frame to segment start</span>
-        <span class="n">i0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__closest_frame</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+        <span class="n">i0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">closest_frame</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
 
         <span class="c1"># number of steps to cover segment duration</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">segment</span><span class="o">.</span><span class="n">duration</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
 
-        <span class="k">return</span> <span class="n">i0</span><span class="p">,</span> <span class="n">n</span>
+        <span class="k">return</span> <span class="n">i0</span><span class="p">,</span> <span class="n">n</span></div>
 
-    <span class="k">def</span> <span class="nf">rangeToSegment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow.rangeToSegment"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.rangeToSegment">[docs]</a>    <span class="k">def</span> <span class="nf">rangeToSegment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i0</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Convert 0-indexed frame range to segment</span>
 
 <span class="sd">        Each frame represents a unique segment of duration &#39;step&#39;, centered on</span>
@@ -812,18 +826,18 @@
         <span class="k">if</span> <span class="n">i0</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span>
 
-        <span class="k">return</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">samplesToDuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nSamples</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow.samplesToDuration"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.samplesToDuration">[docs]</a>    <span class="k">def</span> <span class="nf">samplesToDuration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nSamples</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns duration of samples&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rangeToSegment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nSamples</span><span class="p">)</span><span class="o">.</span><span class="n">duration</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rangeToSegment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nSamples</span><span class="p">)</span><span class="o">.</span><span class="n">duration</span></div>
 
 
-    <span class="k">def</span> <span class="nf">durationToSamples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow.durationToSamples"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.durationToSamples">[docs]</a>    <span class="k">def</span> <span class="nf">durationToSamples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">duration</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns samples in duration&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">segmentToRange</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">duration</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">segmentToRange</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">duration</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span></div>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow.__getitem__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -845,9 +859,21 @@
         <span class="k">if</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__end</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">return</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__duration</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__duration</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">window</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__i</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">window</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">window</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SlidingWindow.__iter__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sliding window iterator</span>
 
 <span class="sd">        Use expression &#39;for segment in sliding_window&#39;</span>
@@ -855,35 +881,26 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 
-<span class="sd">            &gt;&gt;&gt; window = SlidingWindow(end=0.1)</span>
-<span class="sd">            &gt;&gt;&gt; for segment in window:</span>
-<span class="sd">            ...     print segment</span>
-<span class="sd">            [0.000 --&gt; 0.030]</span>
-<span class="sd">            [0.010 --&gt; 0.040]</span>
-<span class="sd">            [0.020 --&gt; 0.050]</span>
-<span class="sd">            [0.030 --&gt; 0.060]</span>
-<span class="sd">            [0.040 --&gt; 0.070]</span>
-<span class="sd">            [0.050 --&gt; 0.080]</span>
-<span class="sd">            [0.060 --&gt; 0.090]</span>
-<span class="sd">            [0.070 --&gt; 0.100]</span>
-<span class="sd">            [0.080 --&gt; 0.100]</span>
-<span class="sd">            [0.090 --&gt; 0.100]</span>
-
+<span class="sd">        &gt;&gt;&gt; window = SlidingWindow(end=0.1)</span>
+<span class="sd">        &gt;&gt;&gt; for segment in window:</span>
+<span class="sd">        ...     print(segment)</span>
+<span class="sd">        [ 00:00:00.000 --&gt;  00:00:00.030]</span>
+<span class="sd">        [ 00:00:00.010 --&gt;  00:00:00.040]</span>
+<span class="sd">        [ 00:00:00.020 --&gt;  00:00:00.050]</span>
+<span class="sd">        [ 00:00:00.030 --&gt;  00:00:00.060]</span>
+<span class="sd">        [ 00:00:00.040 --&gt;  00:00:00.070]</span>
+<span class="sd">        [ 00:00:00.050 --&gt;  00:00:00.080]</span>
+<span class="sd">        [ 00:00:00.060 --&gt;  00:00:00.090]</span>
+<span class="sd">        [ 00:00:00.070 --&gt;  00:00:00.100]</span>
+<span class="sd">        [ 00:00:00.080 --&gt;  00:00:00.110]</span>
+<span class="sd">        [ 00:00:00.090 --&gt;  00:00:00.120]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="c1"># get window first position</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">window</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># reset iterator index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
 
-        <span class="c1"># yield window while it&#39;s valid</span>
-        <span class="k">while</span><span class="p">(</span><span class="n">window</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="n">window</span>
-
-            <span class="c1"># get window next position</span>
-            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">window</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow.__len__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Number of positions</span>
 
 <span class="sd">        Equivalent to len([segment for segment in window])</span>
@@ -900,15 +917,15 @@
 
         <span class="c1"># start looking for last position</span>
         <span class="c1"># based on frame closest to the end</span>
-        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__closest_frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__end</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">closest_frame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__end</span><span class="p">)</span>
 
         <span class="k">while</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]):</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="n">length</span> <span class="o">=</span> <span class="n">i</span>
 
-        <span class="k">return</span> <span class="n">length</span>
+        <span class="k">return</span> <span class="n">length</span></div>
 
-    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SlidingWindow.copy"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Duplicate sliding window&quot;&quot;&quot;</span>
         <span class="n">duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span>
         <span class="n">step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span>
@@ -917,13 +934,11 @@
         <span class="n">sliding_window</span> <span class="o">=</span> <span class="n">SlidingWindow</span><span class="p">(</span>
             <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">sliding_window</span>
+        <span class="k">return</span> <span class="n">sliding_window</span></div></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -932,11 +947,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, CNRS.
+        &copy; Copyright 2017, CNRS
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -949,37 +964,15 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'1.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

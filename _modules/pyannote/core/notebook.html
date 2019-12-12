@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.notebook &mdash; pyannote.core 1.0 documentation</title>
+  <title>pyannote.core.notebook &mdash; pyannote.core 3.1.10 documentation</title>
   
 
   
@@ -17,41 +17,34 @@
   
 
   
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
-  
-  
-    <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="../../../genindex.html"/>
-        <link rel="search" title="Search" href="../../../search.html"/>
-    <link rel="top" title="pyannote.core 1.0 documentation" href="../../../index.html"/>
-        <link rel="up" title="Module code" href="../../index.html"/> 
-
-  
-  <script src="../../../_static/js/modernizr.min.js"></script>
-
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -65,7 +58,7 @@
             
             
               <div class="version">
-                1.0
+                3.1.10
               </div>
             
           
@@ -108,7 +101,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../../../index.html">pyannote.core</a>
@@ -116,9 +109,10 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
 
 
@@ -148,8 +142,6 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
-        
       </li>
     
   </ul>
@@ -166,7 +158,7 @@
 
 <span class="c1"># The MIT License (MIT)</span>
 
-<span class="c1"># Copyright (c) 2014-2017 CNRS</span>
+<span class="c1"># Copyright (c) 2014-2019 CNRS</span>
 
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
 <span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
@@ -195,30 +187,24 @@
 <span class="sd">#############</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">unicode_literals</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
-
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">IPython.core.pylabtools</span> <span class="k">import</span> <span class="n">print_figure</span>
+    <span class="kn">from</span> <span class="nn">IPython.core.pylabtools</span> <span class="kn">import</span> <span class="n">print_figure</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="k">pass</span>
-<span class="kn">from</span> <span class="nn">matplotlib.cm</span> <span class="k">import</span> <span class="n">get_cmap</span>
-<span class="kn">import</span> <span class="nn">six.moves</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">from</span> <span class="nn">matplotlib.cm</span> <span class="kn">import</span> <span class="n">get_cmap</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">from</span> <span class="nn">itertools</span> <span class="k">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">groupby</span>
-<span class="kn">from</span> <span class="nn">.segment</span> <span class="k">import</span> <span class="n">Segment</span>
-<span class="kn">from</span> <span class="nn">.timeline</span> <span class="k">import</span> <span class="n">Timeline</span>
-<span class="kn">from</span> <span class="nn">.annotation</span> <span class="k">import</span> <span class="n">Annotation</span>
-<span class="kn">from</span> <span class="nn">.scores</span> <span class="k">import</span> <span class="n">Scores</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">groupby</span>
+<span class="kn">from</span> <span class="nn">.segment</span> <span class="kn">import</span> <span class="n">Segment</span>
+<span class="kn">from</span> <span class="nn">.timeline</span> <span class="kn">import</span> <span class="n">Timeline</span>
+<span class="kn">from</span> <span class="nn">.annotation</span> <span class="kn">import</span> <span class="n">Annotation</span>
+<span class="kn">from</span> <span class="nn">.scores</span> <span class="kn">import</span> <span class="n">Scores</span>
+<span class="kn">from</span> <span class="nn">.feature</span> <span class="kn">import</span> <span class="n">SlidingWindowFeature</span>
 
 
 <span class="k">class</span> <span class="nc">Notebook</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">Notebook</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">()</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Notebook</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -255,7 +241,7 @@
         <span class="k">return</span> <span class="nb">locals</span><span class="p">()</span>
     <span class="n">width</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="o">**</span><span class="n">width</span><span class="p">())</span>
 
-    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_style</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_style</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_style_generator</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_style</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
@@ -339,7 +325,7 @@
         <span class="k">return</span> <span class="n">y</span>
 
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resource</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">plot_segment</span><span class="p">(</span><span class="n">resource</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span>
@@ -371,7 +357,7 @@
 
         <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span><span class="n">cropped</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">cropped</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cropped</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">cropped</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">draw_segment</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 
         <span class="c1"># ax.set_aspect(3. / self.crop.duration)</span>
@@ -387,8 +373,9 @@
 
         <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span><span class="p">),</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">moves</span><span class="o">.</span><span class="n">zip</span><span class="p">(</span>
-                <span class="n">cropped</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">segments</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span><span class="p">),</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">cropped</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">segments</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">draw_segment</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">segment</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">legend</span><span class="p">:</span>
@@ -432,22 +419,30 @@
             <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">bbox_to_anchor</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
                       <span class="n">ncol</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">borderaxespad</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">frameon</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">plot_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">plot_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">feature</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">crop</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">getExtent</span><span class="p">()</span>
 
         <span class="n">window</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">sliding_window</span>
-        <span class="n">indices</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;loose&#39;</span><span class="p">)</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="p">[</span><span class="n">window</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">middle</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">dimension</span> <span class="o">=</span> <span class="n">feature</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>
+        <span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">),</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;loose&#39;</span><span class="p">,</span>
+                                     <span class="n">return_ranges</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">xlim</span> <span class="o">=</span> <span class="p">(</span><span class="n">window</span><span class="p">[</span><span class="n">start</span><span class="p">]</span><span class="o">.</span><span class="n">middle</span><span class="p">,</span> <span class="n">window</span><span class="p">[</span><span class="n">stop</span><span class="p">]</span><span class="o">.</span><span class="n">middle</span><span class="p">)</span>
 
-        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">take</span><span class="p">(</span><span class="n">feature</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;clip&#39;</span><span class="p">)</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-        <span class="n">ylim</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span> <span class="o">-</span> <span class="n">m</span><span class="p">),</span> <span class="n">M</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span> <span class="o">-</span> <span class="n">m</span><span class="p">))</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span>
+        <span class="n">stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">stop</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">window</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">middle</span> <span class="o">+</span> <span class="n">window</span><span class="o">.</span><span class="n">step</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="n">start</span><span class="p">:</span> <span class="n">stop</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">ylim</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">M</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">ylim</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span> <span class="o">-</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span> <span class="o">-</span> <span class="n">m</span><span class="p">),</span> <span class="n">M</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span><span class="n">M</span> <span class="o">-</span> <span class="n">m</span><span class="p">))</span>
 
         <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">yaxis</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ylim</span><span class="o">=</span><span class="n">ylim</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="n">time</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">xlim</span><span class="p">)</span>
 
 <span class="n">notebook</span> <span class="o">=</span> <span class="n">Notebook</span><span class="p">()</span>
 
@@ -515,120 +510,10 @@
     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.figsize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">figsize</span>
     <span class="k">return</span> <span class="n">data</span></div>
-
-
-<span class="k">def</span> <span class="nf">_shorten_long_text</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">):</span>
-    <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;...&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_length</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">text</span><span class="p">[:</span><span class="n">max_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">suffix</span><span class="p">)]</span> <span class="o">+</span> <span class="n">suffix</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">text</span>
-
-
-<span class="k">def</span> <span class="nf">_clean_text</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
-
-    <span class="kn">from</span> <span class="nn">unidecode</span> <span class="k">import</span> <span class="n">unidecode</span>
-
-    <span class="n">only_ascii</span> <span class="o">=</span> <span class="n">six</span><span class="o">.</span><span class="n">u</span><span class="p">(</span><span class="n">unidecode</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
-
-    <span class="c1"># remove characters that make resulting SVG invalid</span>
-    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">mapping</span><span class="p">[</span><span class="nb">ord</span><span class="p">(</span><span class="s1">u&#39;&amp;&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="c1"># mapping[ord(u&#39;&quot;&#39;)] = u&quot;&#39;&quot;</span>
-
-    <span class="k">return</span> <span class="n">only_ascii</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">mapping</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_dottable</span><span class="p">(</span><span class="n">transcription</span><span class="p">):</span>
-    <span class="c1"># create new graph with graphviz/dot layout instructions</span>
-    <span class="c1"># (e.g. graph orientation, node and edge labels, etc.)</span>
-
-    <span class="c1"># create a dumb networkx copy to avoid messing with input transcription</span>
-    <span class="n">dottable</span> <span class="o">=</span> <span class="n">transcription</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-    <span class="c1"># graphviz/dot will display graph from left to right</span>
-    <span class="n">dottable</span><span class="o">.</span><span class="n">graph</span><span class="p">[</span><span class="s1">&#39;graph&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rankdir&#39;</span><span class="p">:</span> <span class="s1">&#39;LR&#39;</span><span class="p">}</span>
-
-    <span class="c1"># set shape, label and tooltip of each node</span>
-    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">transcription</span><span class="o">.</span><span class="n">nodes_iter</span><span class="p">():</span>
-
-        <span class="n">dottable</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="s1">&#39;tooltip&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">),</span>
-            <span class="s1">&#39;shape&#39;</span><span class="p">:</span> <span class="s1">&#39;circle&#39;</span> <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">drifting</span> <span class="k">else</span> <span class="s1">&#39;box&#39;</span>
-        <span class="p">}</span>
-        <span class="c1"># &#39;URL&#39;: &#39;javascript:console.log(&quot;{t}&quot;)&#39;.format(t=n.T),</span>
-
-    <span class="c1"># set edge label</span>
-
-    <span class="n">label_header</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;&lt;&lt;table border=&#39;0&#39; cellborder=&#39;0&#39; cellspacing=&#39;0&#39; cellpadding=&#39;3&#39;&gt;&quot;</span>
-    <span class="p">)</span>
-    <span class="n">label_pattern</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s2">&quot;&lt;tr&gt;&quot;</span>
-        <span class="s2">&quot;&lt;td align=&#39;left&#39;&gt;&lt;b&gt;</span><span class="si">{name}</span><span class="s2">&lt;/b&gt;&lt;/td&gt;&quot;</span>
-        <span class="s2">&quot;&lt;td align=&#39;left&#39;&gt;</span><span class="si">{value}</span><span class="s2">&lt;/td&gt;&quot;</span>
-        <span class="s2">&quot;&lt;/tr&gt;&quot;</span>
-    <span class="p">)</span>
-    <span class="n">label_footer</span> <span class="o">=</span> <span class="s2">&quot;&lt;/table&gt;&gt;&quot;</span>
-    <span class="n">tooltip_pattern</span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="si">{name}</span><span class="s2">] </span><span class="si">{value}</span><span class="s2">&quot;</span>
-
-    <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">transcription</span><span class="o">.</span><span class="n">edges_iter</span><span class="p">(</span>
-        <span class="n">keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">):</span>
-        <span class="n">tooltip</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
-
-            <span class="c1"># initialize label table</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="n">label_header</span>
-
-            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-                <span class="c1"># remove non-ascii characters</span>
-                <span class="n">name</span> <span class="o">=</span> <span class="n">_clean_text</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">_clean_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
-                <span class="c1"># shorten long value</span>
-                <span class="n">short_value</span> <span class="o">=</span> <span class="n">_shorten_long_text</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-                <span class="c1"># update label and tooltip</span>
-                <span class="n">label</span> <span class="o">+=</span> <span class="n">label_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">short_value</span><span class="p">)</span>
-                <span class="n">tooltip</span> <span class="o">+=</span> <span class="n">tooltip_pattern</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span>
-
-            <span class="c1"># close label table</span>
-            <span class="n">label</span> <span class="o">+=</span> <span class="n">label_footer</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">tooltip</span><span class="p">:</span>
-            <span class="n">tooltip</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">label</span><span class="p">:</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span>
-
-        <span class="n">dottable</span><span class="p">[</span><span class="n">source</span><span class="p">][</span><span class="n">target</span><span class="p">][</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span>
-            <span class="s1">&#39;labeltooltip&#39;</span><span class="p">:</span> <span class="n">tooltip</span><span class="p">,</span>
-            <span class="s1">&#39;edgetooltip&#39;</span><span class="p">:</span> <span class="n">tooltip</span><span class="p">,</span>
-            <span class="s1">&#39;headtooltip&#39;</span><span class="p">:</span> <span class="n">tooltip</span><span class="p">,</span>
-            <span class="s1">&#39;tailtooltip&#39;</span><span class="p">:</span> <span class="n">tooltip</span><span class="p">,</span>
-        <span class="p">}</span>
-
-    <span class="k">return</span> <span class="n">dottable</span>
-
-
-<span class="k">def</span> <span class="nf">_write_temporary_dot_file</span><span class="p">(</span><span class="n">transcription</span><span class="p">):</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkstemp</span><span class="p">(</span><span class="s1">&#39;.dot&#39;</span><span class="p">)</span>
-    <span class="n">nx</span><span class="o">.</span><span class="n">write_dot</span><span class="p">(</span><span class="n">_dottable</span><span class="p">(</span><span class="n">transcription</span><span class="p">),</span> <span class="n">path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">path</span>
-
-
-<div class="viewcode-block" id="repr_transcription"><a class="viewcode-back" href="../../../reference.html#pyannote.core.notebook.repr_transcription">[docs]</a><span class="k">def</span> <span class="nf">repr_transcription</span><span class="p">(</span><span class="n">transcription</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Get `svg` data for `transcription`&quot;&quot;&quot;</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">_write_temporary_dot_file</span><span class="p">(</span><span class="n">transcription</span><span class="p">)</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span> <span class="s2">&quot;-T&quot;</span><span class="p">,</span> <span class="s2">&quot;svg&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;&lt;svg&quot;</span><span class="p">):]</span></div>
 </pre></div>
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
   
@@ -637,11 +522,11 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, CNRS.
+        &copy; Copyright 2017, CNRS
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
 
@@ -654,37 +539,15 @@
   
 
 
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'../../../',
-            VERSION:'1.0',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="../../../_static/jquery.js"></script>
-      <script type="text/javascript" src="../../../_static/underscore.js"></script>
-      <script type="text/javascript" src="../../../_static/doctools.js"></script>
-      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

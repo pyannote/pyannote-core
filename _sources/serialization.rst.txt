@@ -6,7 +6,7 @@ Serialization
 :mod:`pyannote.core.json` provides convenient functions to (de)serialize
 `pyannote.core` data structure instances to (from) JSON.
 
-.. ipython::
+.. code-block:: ipython
 
   In [14]: from pyannote.core import Segment, Timeline, Annotation
 
