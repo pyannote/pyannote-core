@@ -89,7 +89,7 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
 from typing import (Optional, Iterable, List, Union, Callable,
-                    TextIO, Tuple, TYPE_CHECKING, Iterator)
+                    TextIO, Tuple, TYPE_CHECKING, Iterator, Dict)
 
 import pandas as pd
 from sortedcontainers import SortedList
@@ -466,7 +466,8 @@ class Timeline:
     def crop(self,
              support: Support,
              mode: CropMode = 'intersection',
-             returns_mapping: bool = False) -> 'Timeline':
+             returns_mapping: bool = False) \
+            -> Union['Timeline', Tuple['Timeline', Dict[Segment, Segment]]]:
         """Crop timeline to new support
 
         Parameters
