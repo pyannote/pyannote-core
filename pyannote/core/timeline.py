@@ -412,7 +412,7 @@ class Timeline:
                   support: Support,
                   mode: CropMode = 'intersection',
                   returns_mapping: bool = False) \
-            -> Iterator[Union[Segment, Segment], Segment]:
+            -> Iterator[Union[Tuple[Segment, Segment], Segment]]:
         """Like `crop` but returns a segment iterator instead
 
         See also
