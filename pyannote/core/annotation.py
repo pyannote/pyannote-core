@@ -108,19 +108,22 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 """
 
 import itertools
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator
+
 import numpy as np
-from typing import TextIO
+import pandas as pd
+from sortedcontainers import SortedDict
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
-from sortedcontainers import SortedDict
+from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .timeline import Timeline
-from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .utils.generators import string_generator, int_generator
+from .utils.types import Label, Key, Support, LabelGenerator, TrackName, CropMode
 
 
-class Annotation(object):
+class Annotation:
     """Annotation
 
     Parameters
@@ -138,7 +141,10 @@ class Annotation(object):
     """
 
     @classmethod
-    def from_df(cls, df, uri=None, modality=None):
+    def from_df(cls,
+                df: pd.DataFrame,
+                uri: Optional[str] = None,
+                modality: Optional[str] = None) -> 'Annotation':
 
         df = df[[PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]]
 
@@ -159,32 +165,32 @@ class Annotation(object):
 
         return annotation
 
-    def __init__(self, uri=None, modality=None):
+    def __init__(self, uri: Optional[str] = None, modality: Optional[str] = None):
 
-        super(Annotation, self).__init__()
-
-        self._uri = uri
-        self.modality = modality
+        self._uri: Optional[str] = uri
+        self.modality: Optional[str] = modality
 
         # sorted dictionary
         # keys: annotated segments
         # values: {track: label} dictionary
-        self._tracks = SortedDict()
+        self._tracks: Dict[Segment, Dict[TrackName, Label]] = SortedDict()
 
         # dictionary
         # key: label
         # value: timeline
-        self._labels = {}
-        self._labelNeedsUpdate = {}
+        self._labels: Dict[Label, Timeline] = {}
+        self._labelNeedsUpdate: [Label, bool] = {}
 
         # timeline meant to store all annotated segments
-        self._timeline = None
-        self._timelineNeedsUpdate = True
+        self._timeline: Timeline = None
+        self._timelineNeedsUpdate: bool = True
 
-    def _get_uri(self):
+    @property
+    def uri(self):
         return self._uri
 
-    def _set_uri(self, uri):
+    @uri.setter
+    def uri(self, uri: str):
         # update uri for all internal timelines
         for label in self.labels():
             timeline = self.label_timeline(label, copy=False)
@@ -192,8 +198,6 @@ class Annotation(object):
         timeline = self.get_timeline(copy=False)
         timeline.uri = uri
         self._uri = uri
-
-    uri = property(_get_uri, fset=_set_uri, doc="Resource identifier")
 
     def _updateLabels(self):
 
@@ -250,7 +254,11 @@ class Annotation(object):
         """
         return iter(self._tracks)
 
-    def itertracks(self, yield_label=False):
+    def itertracks(self, yield_label: bool = False) \
+            -> Iterator[Union[
+                             Tuple[Segment, TrackName],
+                             Tuple[Segment, TrackName, Label]
+                         ]]:
         """Iterate over tracks (in chronological order)
 
         Parameters
@@ -282,7 +290,7 @@ class Annotation(object):
         self._timeline = Timeline(segments=self._tracks, uri=self.uri)
         self._timelineNeedsUpdate = False
 
-    def get_timeline(self, copy=True):
+    def get_timeline(self, copy: bool = True) -> Timeline:
         """Get timeline made of all annotated segments
 
         Parameters
@@ -309,7 +317,7 @@ class Annotation(object):
             return self._timeline.copy()
         return self._timeline
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Annotation'):
         """Equality
 
         >>> annotation == other
@@ -322,7 +330,7 @@ class Annotation(object):
             other.itertracks(yield_label=True))
         return all(t1 == t2 for t1, t2 in pairOfTracks)
 
-    def __ne__(self, other):
+    def __ne__(self, other: 'Annotation'):
         """Inequality"""
         pairOfTracks = itertools.zip_longest(
             self.itertracks(yield_label=True),
@@ -330,7 +338,7 @@ class Annotation(object):
 
         return any(t1 != t2 for t1, t2 in pairOfTracks)
 
-    def __contains__(self, included):
+    def __contains__(self, included: Union[Segment, Timeline]):
         """Inclusion
 
         Check whether every segment of `included` does exist in annotation.
@@ -361,17 +369,17 @@ class Annotation(object):
         >>> with open('file.rttm', 'w') as file:
         ...     annotation.write_rttm(file)
         """
-        
+
         uri = self.uri if self.uri else "<NA>"
-        
-        for segment, _, label in self.itertracks(yield_label=True):            
+
+        for segment, _, label in self.itertracks(yield_label=True):
             line = (
                 f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
                 f'<NA> <NA> {label} <NA> <NA>\n'
             )
             file.write(line)
 
-    def crop(self, support, mode='intersection'):
+    def crop(self, support: Support, mode: CropMode = 'intersection'):
         """Crop annotation to new support
 
         Parameters
@@ -414,8 +422,7 @@ class Annotation(object):
                 _labels = set([])
 
                 for segment, _ in \
-                    self.get_timeline(copy=False).co_iter(support):
-
+                        self.get_timeline(copy=False).co_iter(support):
                     tracks = dict(self._tracks[segment])
                     _tracks[segment] = tracks
                     _labels.update(tracks.values())
@@ -471,8 +478,7 @@ class Annotation(object):
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
 
-
-    def get_tracks(self, segment):
+    def get_tracks(self, segment: Segment) -> Set[TrackName]:
         """Query tracks by segment
 
         Parameters
@@ -489,9 +495,9 @@ class Annotation(object):
         ----
         This will return an empty set if segment does not exist.
         """
-        return set(self._tracks.get(segment, {}))
+        return set(self._tracks.get(segment, {}).keys())
 
-    def has_track(self, segment, track):
+    def has_track(self, segment: Segment, track: TrackName) -> bool:
         """Check whether a given track exists
 
         Parameters
@@ -508,7 +514,7 @@ class Annotation(object):
         """
         return track in self._tracks.get(segment, {})
 
-    def copy(self):
+    def copy(self) -> 'Annotation':
         """Get a copy of the annotation
 
         Returns
@@ -536,7 +542,9 @@ class Annotation(object):
 
         return copied
 
-    def new_track(self, segment, candidate=None, prefix=None):
+    def new_track(self, segment: Segment,
+                  candidate: Optional[TrackName] = None,
+                  prefix: Optional[str] = None) -> TrackName:
         """Generate a new track name for given segment
 
         Ensures that the returned track name does not already
@@ -587,7 +595,7 @@ class Annotation(object):
         return "\n".join(["%s %s %s" % (s, t, l)
                           for s, t, l in self.itertracks(yield_label=True)])
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: Key):
         """Delete one track
 
         >>> del annotation[segment, track]
@@ -639,7 +647,7 @@ class Annotation(object):
                 'Deletion only works with Segment or (Segment, track) keys.')
 
     # label = annotation[segment, track]
-    def __getitem__(self, key):
+    def __getitem__(self, key: Key) -> Label:
         """Get track label
 
         >>> label = annotation[segment, track]
@@ -656,7 +664,7 @@ class Annotation(object):
         return self._tracks[key[0]][key[1]]
 
     # annotation[segment, track] = label
-    def __setitem__(self, key, label):
+    def __setitem__(self, key: Key, label: Label):
         """Add new or update existing track
 
         >>> annotation[segment, track] = label
@@ -698,7 +706,7 @@ class Annotation(object):
         self._tracks[segment][track] = label
         self._labelNeedsUpdate[label] = True
 
-    def empty(self):
+    def empty(self) -> 'Annotation':
         """Return an empty copy
 
         Returns
@@ -709,7 +717,7 @@ class Annotation(object):
         """
         return self.__class__(uri=self.uri, modality=self.modality)
 
-    def labels(self):
+    def labels(self) -> List[Label]:
         """Get sorted list of labels
 
         Returns
@@ -721,7 +729,7 @@ class Annotation(object):
             self._updateLabels()
         return sorted(self._labels, key=str)
 
-    def get_labels(self, segment, unique=True):
+    def get_labels(self, segment: Segment, unique: bool = True) -> Set[Label]:
         """Query labels by segment
 
         Parameters
@@ -757,7 +765,8 @@ class Annotation(object):
 
         return labels
 
-    def subset(self, labels, invert=False):
+    def subset(self, labels: Iterable[Label], invert: bool = False) \
+            -> 'Annotation':
         """Filter annotation by labels
 
         Parameters
@@ -785,7 +794,7 @@ class Annotation(object):
         _tracks, _labels = {}, set([])
         for segment, tracks in self._tracks.items():
             sub_tracks = {track: label for track, label in tracks.items()
-                                       if label in labels}
+                          if label in labels}
             if sub_tracks:
                 _tracks[segment] = sub_tracks
                 _labels.update(sub_tracks.values())
@@ -800,7 +809,8 @@ class Annotation(object):
 
         return sub
 
-    def update(self, annotation, copy=False):
+    def update(self, annotation: 'Annotation', copy: bool = False) \
+            -> 'Annotation':
         """Add every track of an existing annotation (in place)
 
         Parameters
@@ -829,7 +839,7 @@ class Annotation(object):
 
         return result
 
-    def label_timeline(self, label, copy=True):
+    def label_timeline(self, label: Label, copy: bool = True) -> Timeline:
         """Query segments by label
 
         Parameters
@@ -868,7 +878,7 @@ class Annotation(object):
 
         return self._labels[label]
 
-    def label_support(self, label):
+    def label_support(self, label: Label) -> Timeline:
         """Label support
 
         Equivalent to ``Annotation.label_timeline(label).support()``
@@ -891,7 +901,7 @@ class Annotation(object):
         """
         return self.label_timeline(label, copy=False).support()
 
-    def label_duration(self, label):
+    def label_duration(self, label: Label) -> float:
         """Label duration
 
         Equivalent to ``Annotation.label_timeline(label).duration()``
@@ -915,7 +925,7 @@ class Annotation(object):
 
         return self.label_timeline(label, copy=False).duration()
 
-    def chart(self, percent=False):
+    def chart(self, percent: bool = False) -> List[Tuple[Label, float]]:
         """Get labels chart (from longest to shortest duration)
 
         Parameters
@@ -939,7 +949,7 @@ class Annotation(object):
 
         return chart
 
-    def argmax(self, support=None):
+    def argmax(self, support: Optional[Support] = None) -> Optional[Label]:
         """Get label with longest duration
 
         Parameters
@@ -977,7 +987,8 @@ class Annotation(object):
         return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
                    key=lambda x: x[1])[0]
 
-    def rename_tracks(self, generator='string'):
+    def rename_tracks(self, generator: LabelGenerator = 'string') \
+            -> 'Annotation':
         """Rename all tracks
 
         Parameters
@@ -1023,7 +1034,10 @@ class Annotation(object):
             renamed[s, next(generator)] = label
         return renamed
 
-    def rename_labels(self, mapping=None, generator='string', copy=True):
+    def rename_labels(self,
+                      mapping: Optional[Dict] = None,
+                      generator: LabelGenerator = 'string',
+                      copy: bool = True) -> 'Annotation':
         """Rename labels
 
         Parameters
@@ -1073,7 +1087,8 @@ class Annotation(object):
 
         return renamed
 
-    def relabel_tracks(self, generator='string'):
+    def relabel_tracks(self, generator: LabelGenerator = 'string') \
+            -> 'Annotation':
         """Relabel tracks
 
         Create a new annotation where each track has a unique label.
@@ -1101,7 +1116,7 @@ class Annotation(object):
 
         return relabeled
 
-    def support(self, collar=0.):
+    def support(self, collar: float = 0.) -> 'Annotation':
         """Annotation support
 
         The support of an annotation is an annotation where contiguous tracks
@@ -1160,7 +1175,10 @@ class Annotation(object):
 
         return support
 
-    def co_iter(self, other):
+    def co_iter(self, other: 'Annotation') \
+            -> Iterator[Tuple[Tuple[Segment, TrackName],
+                              Tuple[Segment, TrackName]]
+            ]:
         """Iterate over pairs of intersecting tracks
 
         Parameters
@@ -1171,7 +1189,7 @@ class Annotation(object):
         Returns
         -------
         iterable : (Segment, object), (Segment, object) iterable
-            Yields pairs of intersectins tracks, in chronological (then
+            Yields pairs of intersecting tracks, in chronological (then
             alphabetical) order.
 
         See also
@@ -1187,7 +1205,7 @@ class Annotation(object):
             for t, T in itertools.product(tracks, other_tracks):
                 yield (s, t), (S, T)
 
-    def __mul__(self, other):
+    def __mul__(self, other: 'Annotation') -> np.ndarray:
         """Cooccurrence (or confusion) matrix
 
         >>> matrix = annotation * other
@@ -1226,7 +1244,7 @@ class Annotation(object):
 
         return matrix
 
-    def for_json(self):
+    def for_json(self) -> Dict:
         """Serialization
 
         See also
@@ -1250,7 +1268,7 @@ class Annotation(object):
         return data
 
     @classmethod
-    def from_json(cls, data):
+    def from_json(cls, data: Dict) -> 'Annotation':
         """Deserialization
 
         See also
