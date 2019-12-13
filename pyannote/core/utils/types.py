@@ -11,5 +11,5 @@ Key = Union['Segment', Tuple['Segment', TrackName]]
 Resource = Union['Segment', 'Timeline', 'Score', 'SlidingWindowFeature',
                  'Annotation']
 CropMode = Literal['intersection', 'loose', 'strict']
-SegmentCropMode = Literal['center', 'loose', 'strict']
+Alignment = Literal['center', 'loose', 'strict']
 LabelStyle = Tuple[str, int, Tuple[float, float, float]]

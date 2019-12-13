@@ -194,7 +194,6 @@ class Notebook:
             self.plot_scores(resource, time=time, legend=legend)
 
         elif isinstance(resource, SlidingWindowFeature):
-            # TODO : check this
             self.plot_feature(resource, time=time)
 
     def plot_segment(self, segment, ax=None, time=True):

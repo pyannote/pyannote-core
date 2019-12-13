@@ -72,7 +72,7 @@ import numpy as np
 from dataclasses import dataclass
 
 # 1 μs (one microsecond)
-from pyannote.core.utils.types import SegmentCropMode
+from pyannote.core.utils.types import Alignment
 
 SEGMENT_PRECISION = 1e-6
 
@@ -452,7 +452,7 @@ class SlidingWindow:
             (t - self.__start - .5 * self.__duration) / self.__step
         ))
 
-    def samples(self, from_duration: float, mode: SegmentCropMode = 'strict') -> int:
+    def samples(self, from_duration: float, mode: Alignment = 'strict') -> int:
         """Number of frames
 
         Parameters
@@ -480,7 +480,7 @@ class SlidingWindow:
             return int(np.rint((from_duration / self.step)))
 
     def crop(self, focus: Union[Segment, 'Timeline'],
-             mode: SegmentCropMode = 'loose',
+             mode: Alignment = 'loose',
              fixed: Optional[float] = None,
              return_ranges: Optional[bool] = False) -> \
             Union[np.ndarray, List[List[int]]]:
