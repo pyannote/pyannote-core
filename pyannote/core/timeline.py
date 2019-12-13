@@ -97,7 +97,7 @@ from sortedcontainers import SortedList
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
-from .utils.types import Support, Label
+from .utils.types import Support, Label, CropMode
 
 #  this is a moderately ugly way to import `Annotation` to the namespace
 #  without causing some circular imports :
@@ -408,7 +408,11 @@ class Timeline:
                 if segment.intersects(other_segment):
                     yield segment, other_segment
 
-    def crop_iter(self, support, mode='intersection', returns_mapping=False):
+    def crop_iter(self,
+                  support: Support,
+                  mode: CropMode = 'intersection',
+                  returns_mapping: bool = False) \
+            -> Iterator[Union[Segment, Segment], Segment]:
         """Like `crop` but returns a segment iterator instead
 
         See also
@@ -459,7 +463,10 @@ class Timeline:
             else:
                 yield mapped_to
 
-    def crop(self, support, mode='intersection', returns_mapping=False):
+    def crop(self,
+             support: Support,
+             mode: CropMode = 'intersection',
+             returns_mapping: bool = False) -> 'Timeline':
         """Crop timeline to new support
 
         Parameters
