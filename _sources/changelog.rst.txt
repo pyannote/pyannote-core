@@ -2,6 +2,12 @@
 Changelog
 #########
 
+Version 3.2 (2019-12-13)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add type hints (@hadware)
+- chore: Python3-ize code base (@hadware)
+
 Version 3.1.10 (2019-12-12)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; pyannote.core 3.1.10 documentation</title>
+  <title>Index &mdash; pyannote.core 3.2 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                3.1.10
+                3.2
               </div>
             
           
@@ -242,6 +242,8 @@
       <ul>
         <li><a href="reference.html#pyannote.core.SlidingWindow.__len__">(pyannote.core.SlidingWindow method)</a>
 </li>
+        <li><a href="reference.html#pyannote.core.SlidingWindowFeature.__len__">(pyannote.core.SlidingWindowFeature method)</a>
+</li>
         <li><a href="reference.html#pyannote.core.Timeline.__len__">(pyannote.core.Timeline method)</a>
 </li>
       </ul></li>
@@ -253,8 +255,6 @@
         <li><a href="reference.html#pyannote.core.Timeline.__ne__">(pyannote.core.Timeline method)</a>
 </li>
       </ul></li>
-      <li><a href="reference.html#pyannote.core.Segment.__new__">__new__() (pyannote.core.Segment static method)</a>
-</li>
       <li><a href="reference.html#pyannote.core.Segment.__or__">__or__() (pyannote.core.Segment method)</a>
 </li>
       <li><a href="reference.html#pyannote.core.Segment.__repr__">__repr__() (pyannote.core.Segment method)</a>
@@ -276,6 +276,8 @@
       <li><a href="reference.html#pyannote.core.Annotation.__weakref__">__weakref__ (pyannote.core.Annotation attribute)</a>
 
       <ul>
+        <li><a href="reference.html#pyannote.core.Segment.__weakref__">(pyannote.core.Segment attribute)</a>
+</li>
         <li><a href="reference.html#pyannote.core.SlidingWindow.__weakref__">(pyannote.core.SlidingWindow attribute)</a>
 </li>
         <li><a href="reference.html#pyannote.core.Timeline.__weakref__">(pyannote.core.Timeline attribute)</a>
@@ -343,16 +345,18 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference.html#pyannote.core.SlidingWindowFeature.dimension">dimension() (pyannote.core.SlidingWindowFeature property)</a>
+</li>
       <li><a href="reference.html#pyannote.core.Timeline.discard">discard() (pyannote.core.Timeline method)</a>
 </li>
       <li><a href="reference.html#pyannote.core.json.dump">dump() (in module pyannote.core.json)</a>
 </li>
       <li><a href="reference.html#pyannote.core.json.dump_to">dump_to() (in module pyannote.core.json)</a>
 </li>
-      <li><a href="reference.html#pyannote.core.json.dumps">dumps() (in module pyannote.core.json)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference.html#pyannote.core.json.dumps">dumps() (in module pyannote.core.json)</a>
+</li>
       <li><a href="reference.html#pyannote.core.Segment.duration">duration() (pyannote.core.Segment property)</a>
 
       <ul>
@@ -361,7 +365,7 @@
         <li><a href="reference.html#pyannote.core.Timeline.duration">(pyannote.core.Timeline method)</a>
 </li>
       </ul></li>
-      <li><a href="reference.html#pyannote.core.SlidingWindow.durationToSamples">durationToSamples() (pyannote.core.SlidingWindow method)</a>
+      <li><a href="reference.html#pyannote.core.SlidingWindow.duration_to_samples">duration_to_samples() (pyannote.core.SlidingWindow method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -415,17 +419,13 @@
 </li>
       <li><a href="reference.html#pyannote.core.Timeline.gaps_iter">gaps_iter() (pyannote.core.Timeline method)</a>
 </li>
-      <li><a href="reference.html#pyannote.core.Annotation.get_labels">get_labels() (pyannote.core.Annotation method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference.html#pyannote.core.Annotation.get_labels">get_labels() (pyannote.core.Annotation method)</a>
+</li>
       <li><a href="reference.html#pyannote.core.Annotation.get_timeline">get_timeline() (pyannote.core.Annotation method)</a>
 </li>
       <li><a href="reference.html#pyannote.core.Annotation.get_tracks">get_tracks() (pyannote.core.Annotation method)</a>
-</li>
-      <li><a href="reference.html#pyannote.core.SlidingWindowFeature.getDimension">getDimension() (pyannote.core.SlidingWindowFeature method)</a>
-</li>
-      <li><a href="reference.html#pyannote.core.SlidingWindowFeature.getNumber">getNumber() (pyannote.core.SlidingWindowFeature method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -533,7 +533,7 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference.html#pyannote.core.SlidingWindow.rangeToSegment">rangeToSegment() (pyannote.core.SlidingWindow method)</a>
+      <li><a href="reference.html#pyannote.core.SlidingWindow.range_to_segment">range_to_segment() (pyannote.core.SlidingWindow method)</a>
 </li>
       <li><a href="reference.html#pyannote.core.Annotation.relabel_tracks">relabel_tracks() (pyannote.core.Annotation method)</a>
 </li>
@@ -563,13 +563,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#pyannote.core.SlidingWindow.samples">samples() (pyannote.core.SlidingWindow method)</a>
 </li>
-      <li><a href="reference.html#pyannote.core.SlidingWindow.samplesToDuration">samplesToDuration() (pyannote.core.SlidingWindow method)</a>
+      <li><a href="reference.html#pyannote.core.SlidingWindow.samples_to_duration">samples_to_duration() (pyannote.core.SlidingWindow method)</a>
 </li>
       <li><a href="reference.html#pyannote.core.Segment">Segment (class in pyannote.core)</a>
 </li>
-      <li><a href="reference.html#pyannote.core.Timeline.segmentation">segmentation() (pyannote.core.Timeline method)</a>
+      <li><a href="reference.html#pyannote.core.SlidingWindow.segment_to_range">segment_to_range() (pyannote.core.SlidingWindow method)</a>
 </li>
-      <li><a href="reference.html#pyannote.core.SlidingWindow.segmentToRange">segmentToRange() (pyannote.core.SlidingWindow method)</a>
+      <li><a href="reference.html#pyannote.core.Timeline.segmentation">segmentation() (pyannote.core.Timeline method)</a>
 </li>
       <li><a href="reference.html#pyannote.core.SlidingWindow">SlidingWindow (class in pyannote.core)</a>
 </li>
@@ -611,16 +611,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#pyannote.core.Timeline.union">union() (pyannote.core.Timeline method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference.html#pyannote.core.Annotation.update">update() (pyannote.core.Annotation method)</a>
 
       <ul>
         <li><a href="reference.html#pyannote.core.Timeline.update">(pyannote.core.Timeline method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference.html#pyannote.core.Annotation.uri">uri() (pyannote.core.Annotation property)</a>
-</li>
   </ul></td>
 </tr></table>
 

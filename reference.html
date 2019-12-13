@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Reference &mdash; pyannote.core 3.1.10 documentation</title>
+  <title>Reference &mdash; pyannote.core 3.2 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                3.1.10
+                3.2
               </div>
             
           
@@ -181,7 +181,7 @@
 <h3>Segment<a class="headerlink" href="#segment" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.Segment">
-<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">Segment</code><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">Segment</code><span class="sig-paren">(</span><em class="sig-param">start: float = 0.0</em>, <em class="sig-param">end: float = 0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Time interval</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -256,7 +256,7 @@ start time, or its duration is smaller than 1μs.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Segment.__contains__">
-<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__contains__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.segment.Segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__contains__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inclusion</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span> <span class="ow">in</span> <span class="n">segment</span><span class="p">:</span>
@@ -269,21 +269,15 @@ start time, or its duration is smaller than 1μs.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Segment.__iter__">
-<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__iter__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterator[float]<a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Unpack segment boundaries
 &gt;&gt;&gt; segment = Segment(start, end)
 &gt;&gt;&gt; start, end = segment</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyannote.core.Segment.__new__">
-<em class="property">static </em><code class="sig-name descname">__new__</code><span class="sig-paren">(</span><em class="sig-param">cls</em>, <em class="sig-param">start=0.0</em>, <em class="sig-param">end=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__new__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__new__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create new instance of Segment(start, end)</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="pyannote.core.Segment.__or__">
-<code class="sig-name descname">__or__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__or__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__or__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__or__</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.Segment<a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__or__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__or__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Union</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other_segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
@@ -327,9 +321,15 @@ start time, or its duration is smaller than 1μs.</p>
 </div>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="pyannote.core.Segment.__weakref__">
+<code class="sig-name descname">__weakref__</code><a class="headerlink" href="#pyannote.core.Segment.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="pyannote.core.Segment.__xor__">
-<code class="sig-name descname">__xor__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__xor__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__xor__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__xor__</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.Segment<a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__xor__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__xor__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gap</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">other_segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
@@ -351,7 +351,7 @@ start time, or its duration is smaller than 1μs.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Segment.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.Segment<a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a copy of the segment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -391,7 +391,7 @@ start time, or its duration is smaller than 1μs.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Segment.intersects">
-<code class="sig-name descname">intersects</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.intersects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.intersects" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">intersects</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.intersects"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.intersects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether two segments intersect each other</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -414,7 +414,7 @@ start time, or its duration is smaller than 1μs.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Segment.overlaps">
-<code class="sig-name descname">overlaps</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.overlaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.overlaps" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">overlaps</code><span class="sig-paren">(</span><em class="sig-param">t: float</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.overlaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.overlaps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check if segment overlaps a given time</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -436,7 +436,7 @@ start time, or its duration is smaller than 1μs.</p>
 <h3>Timeline<a class="headerlink" href="#timeline" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.Timeline">
-<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">Timeline</code><span class="sig-paren">(</span><em class="sig-param">segments=None</em>, <em class="sig-param">uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">Timeline</code><span class="sig-paren">(</span><em class="sig-param">segments: Optional[Iterable[pyannote.core.segment.Segment]] = None</em>, <em class="sig-param">uri: str = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Ordered set of segments.</p>
 <p>A timeline can be seen as an ordered set of non-empty segments (Segment).
 Segments can overlap – though adding an already exisiting segment to a
@@ -469,7 +469,7 @@ timeline does nothing.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.__contains__">
-<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param">included</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__contains__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param">included: Union[pyannote.core.segment.Segment, Timeline]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__contains__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inclusion</p>
 <p>Check whether every segment of <cite>included</cite> does exist in timeline.</p>
 <dl class="field-list simple">
@@ -498,7 +498,7 @@ False otherwise</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.__eq__">
-<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__eq__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.timeline.Timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__eq__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Equality</p>
 <p>Two timelines are equal if and only if their segments are equal.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline1</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)])</span>
@@ -514,7 +514,7 @@ False otherwise</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">k</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">k: int</em><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.Segment<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get segment by index (in chronological order)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">first_segment</span> <span class="o">=</span> <span class="n">timeline</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">penultimate_segment</span> <span class="o">=</span> <span class="n">timeline</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
@@ -524,13 +524,13 @@ False otherwise</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">segments=None</em>, <em class="sig-param">uri=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">segments: Optional[Iterable[pyannote.core.segment.Segment]] = None</em>, <em class="sig-param">uri: str = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.__iter__">
-<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__iter__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterable[pyannote.core.segment.Segment]<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate over segments (in chronological order)</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">timeline</span><span class="p">:</span>
 <span class="gp">... </span>    <span class="c1"># do something with the segment</span>
@@ -554,7 +554,7 @@ False otherwise</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.__ne__">
-<code class="sig-name descname">__ne__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__ne__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__ne__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__ne__</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.timeline.Timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.__ne__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.__ne__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inequality</p>
 </dd></dl>
 
@@ -588,7 +588,7 @@ False otherwise</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.add">
-<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.add" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.add"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.add" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a segment (in place)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -612,7 +612,7 @@ only contains non-empty segments.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.co_iter">
-<code class="sig-name descname">co_iter</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.co_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.co_iter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">co_iter</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.timeline.Timeline</em><span class="sig-paren">)</span> &#x2192; Iterator[Tuple[pyannote.core.segment.Segment, pyannote.core.segment.Segment]]<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.co_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.co_iter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate over pairs of intersecting segments</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline1</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">timeline2</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
@@ -638,7 +638,7 @@ only contains non-empty segments.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param">segment_func=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><em class="sig-param">segment_func: Optional[Callable[[pyannote.core.segment.Segment], pyannote.core.segment.Segment]] = None</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a copy of the timeline</p>
 <p>If <cite>segment_func</cite> is provided, it is applied to each segment first.</p>
 <dl class="field-list simple">
@@ -657,7 +657,7 @@ Defaults to identity function (segment_func(segment) = segment)</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.crop">
-<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">support</em>, <em class="sig-param">mode='intersection'</em>, <em class="sig-param">returns_mapping=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.crop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">support: Union[Segment, Timeline], mode: typing_extensions.Literal['intersection', 'loose', 'strict'][intersection, loose, strict] = 'intersection', returns_mapping: bool = False</em><span class="sig-paren">)</span> &#x2192; Union[pyannote.core.timeline.Timeline, Tuple[pyannote.core.timeline.Timeline, Dict[pyannote.core.segment.Segment, pyannote.core.segment.Segment]]]<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.crop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Crop timeline to new support</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -705,7 +705,7 @@ segments.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.crop_iter">
-<code class="sig-name descname">crop_iter</code><span class="sig-paren">(</span><em class="sig-param">support</em>, <em class="sig-param">mode='intersection'</em>, <em class="sig-param">returns_mapping=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.crop_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.crop_iter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">crop_iter</code><span class="sig-paren">(</span><em class="sig-param">support: Union[Segment, Timeline], mode: typing_extensions.Literal['intersection', 'loose', 'strict'][intersection, loose, strict] = 'intersection', returns_mapping: bool = False</em><span class="sig-paren">)</span> &#x2192; Iterator[Union[Tuple[pyannote.core.segment.Segment, pyannote.core.segment.Segment], pyannote.core.segment.Segment]]<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.crop_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.crop_iter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Like <cite>crop</cite> but returns a segment iterator instead</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -715,7 +715,7 @@ segments.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.discard">
-<code class="sig-name descname">discard</code><span class="sig-paren">(</span><em class="sig-param">segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.discard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.discard" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">discard</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.discard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.discard" title="Permalink to this definition">¶</a></dt>
 <dd><p>Same as <cite>remove</cite></p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -725,7 +725,7 @@ segments.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.duration">
-<code class="sig-name descname">duration</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.duration" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">duration</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.duration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Timeline duration</p>
 <p>The timeline duration is the sum of the durations of the segments
 in the timeline support.</p>
@@ -741,7 +741,7 @@ in the timeline support.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.empty">
-<code class="sig-name descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.empty" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.empty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an empty copy</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -755,7 +755,7 @@ in the timeline support.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.extent">
-<code class="sig-name descname">extent</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.extent" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">extent</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.Segment<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.extent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.extent" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extent</p>
 <p>The extent of a timeline is the segment of minimum duration that
 contains every segments of the timeline. It is unique, by definition.
@@ -807,7 +807,7 @@ The extent of an empty timeline is an empty segment.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.gaps">
-<code class="sig-name descname">gaps</code><span class="sig-paren">(</span><em class="sig-param">support=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.gaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.gaps" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">gaps</code><span class="sig-paren">(</span><em class="sig-param">support: Union[Segment</em>, <em class="sig-param">Timeline</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.gaps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.gaps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gaps</p>
 <p>A picture is worth a thousand words:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">timeline</span>
@@ -838,8 +838,8 @@ by provided support</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.gaps_iter">
-<code class="sig-name descname">gaps_iter</code><span class="sig-paren">(</span><em class="sig-param">support=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.gaps_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.gaps_iter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Like <cite>gaps</cite> but returns a segment iterator instead</p>
+<code class="sig-name descname">gaps_iter</code><span class="sig-paren">(</span><em class="sig-param">support: Union[Segment</em>, <em class="sig-param">Timeline</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> &#x2192; Iterator[pyannote.core.segment.Segment]<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.gaps_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.gaps_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <cite>gaps</cite> but returns a segment generator instead</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#pyannote.core.Timeline.gaps" title="pyannote.core.Timeline.gaps"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyannote.core.Timeline.gaps()</span></code></a></p>
@@ -848,7 +848,7 @@ by provided support</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.index">
-<code class="sig-name descname">index</code><span class="sig-paren">(</span><em class="sig-param">segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.index" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">index</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get index of (existing) segment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -868,7 +868,7 @@ by provided support</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.overlapping">
-<code class="sig-name descname">overlapping</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.overlapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.overlapping" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">overlapping</code><span class="sig-paren">(</span><em class="sig-param">t: float</em><span class="sig-paren">)</span> &#x2192; List[pyannote.core.segment.Segment]<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.overlapping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.overlapping" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get list of segments overlapping <cite>t</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -885,7 +885,7 @@ by provided support</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.overlapping_iter">
-<code class="sig-name descname">overlapping_iter</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.overlapping_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.overlapping_iter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">overlapping_iter</code><span class="sig-paren">(</span><em class="sig-param">t: float</em><span class="sig-paren">)</span> &#x2192; Iterator[pyannote.core.segment.Segment]<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.overlapping_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.overlapping_iter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Like <cite>overlapping</cite> but returns a segment iterator instead</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -895,7 +895,7 @@ by provided support</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.remove">
-<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param">segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.remove" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.remove"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.remove" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove a segment (in place)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -916,7 +916,7 @@ by provided support</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.segmentation">
-<code class="sig-name descname">segmentation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.segmentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.segmentation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">segmentation</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.segmentation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.segmentation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Segmentation</p>
 <p>Create the unique timeline with same support and same set of segment
 boundaries as original timeline, but with no overlapping segments.</p>
@@ -942,7 +942,7 @@ boundaries as original timeline, but with no overlapping segments.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.support">
-<code class="sig-name descname">support</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.support" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">support</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.support" title="Permalink to this definition">¶</a></dt>
 <dd><p>Timeline support</p>
 <p>The support of a timeline is the timeline with the minimum number of
 segments with exactly the same time span as the original timeline. It
@@ -969,8 +969,8 @@ segments.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.support_iter">
-<code class="sig-name descname">support_iter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.support_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.support_iter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Like <cite>support</cite> but returns a segment iterator instead</p>
+<code class="sig-name descname">support_iter</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterator[pyannote.core.segment.Segment]<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.support_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.support_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Like <cite>support</cite> but returns a segment generator instead</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <p><a class="reference internal" href="#pyannote.core.Timeline.support" title="pyannote.core.Timeline.support"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyannote.core.Timeline.support()</span></code></a></p>
@@ -979,7 +979,7 @@ segments.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.to_annotation">
-<code class="sig-name descname">to_annotation</code><span class="sig-paren">(</span><em class="sig-param">generator='string'</em>, <em class="sig-param">modality=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.to_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.to_annotation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">to_annotation</code><span class="sig-paren">(</span><em class="sig-param">generator: Union[str, Iterable[Hashable], None] = 'string', modality: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; Annotation<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.to_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.to_annotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Turn timeline into an annotation</p>
 <p>Each segment is labeled by a unique label.</p>
 <dl class="field-list simple">
@@ -1001,7 +1001,7 @@ integer labels. If iterable, use it to generate labels.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.union">
-<code class="sig-name descname">union</code><span class="sig-paren">(</span><em class="sig-param">timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.union" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">union</code><span class="sig-paren">(</span><em class="sig-param">timeline: pyannote.core.timeline.Timeline</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.union" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create new timeline made of union of segments</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1023,7 +1023,7 @@ timeline, and the original one is not modified.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Timeline.update">
-<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">timeline: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add every segments of an existing timeline (in place)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1067,7 +1067,7 @@ meant to be a <strong>set</strong> of segments (not a list).</p>
 <h3>Annotation<a class="headerlink" href="#annotation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.Annotation">
-<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">Annotation</code><span class="sig-paren">(</span><em class="sig-param">uri=None</em>, <em class="sig-param">modality=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">Annotation</code><span class="sig-paren">(</span><em class="sig-param">uri: Optional[str] = None</em>, <em class="sig-param">modality: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -1096,7 +1096,7 @@ meant to be a <strong>set</strong> of segments (not a list).</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.__contains__">
-<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param">included</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__contains__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param">included: Union[pyannote.core.segment.Segment, pyannote.core.timeline.Timeline]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__contains__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inclusion</p>
 <p>Check whether every segment of <cite>included</cite> does exist in annotation.</p>
 <dl class="field-list simple">
@@ -1115,7 +1115,7 @@ False otherwise</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.__delitem__">
-<code class="sig-name descname">__delitem__</code><span class="sig-paren">(</span><em class="sig-param">key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__delitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__delitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__delitem__</code><span class="sig-paren">(</span><em class="sig-param">key: Union[Segment, Tuple[Segment, Union[str, int]]]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__delitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__delitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Delete one track</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">]</span>
 </pre></div>
@@ -1128,7 +1128,7 @@ False otherwise</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.__eq__">
-<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__eq__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__eq__</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.annotation.Annotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__eq__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Equality</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span> <span class="o">==</span> <span class="n">other</span>
 </pre></div>
@@ -1139,7 +1139,7 @@ labels are equal.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">key: Union[Segment, Tuple[Segment, Union[str, int]]]</em><span class="sig-paren">)</span> &#x2192; Hashable<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get track label</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">label</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">]</span>
 </pre></div>
@@ -1152,7 +1152,7 @@ labels are equal.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">uri=None</em>, <em class="sig-param">modality=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">uri: Optional[str] = None</em>, <em class="sig-param">modality: Optional[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -1168,7 +1168,7 @@ labels are equal.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.__mul__">
-<code class="sig-name descname">__mul__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__mul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__mul__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__mul__</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.annotation.Annotation</em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__mul__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__mul__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Cooccurrence (or confusion) matrix</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">matrix</span> <span class="o">=</span> <span class="n">annotation</span> <span class="o">*</span> <span class="n">other</span>
 </pre></div>
@@ -1189,13 +1189,13 @@ of labels in <cite>self</cite> (resp. <cite>other</cite>).</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.__ne__">
-<code class="sig-name descname">__ne__</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__ne__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__ne__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__ne__</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.annotation.Annotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__ne__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__ne__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Inequality</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.__setitem__">
-<code class="sig-name descname">__setitem__</code><span class="sig-paren">(</span><em class="sig-param">key</em>, <em class="sig-param">label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__setitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__setitem__</code><span class="sig-paren">(</span><em class="sig-param">key: Union[Segment, Tuple[Segment, Union[str, int]]], label: Hashable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.__setitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add new or update existing track</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
 </pre></div>
@@ -1226,7 +1226,7 @@ If (segment, track) already exists, it is updated.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.argmax">
-<code class="sig-name descname">argmax</code><span class="sig-paren">(</span><em class="sig-param">support=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.argmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.argmax" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">argmax</code><span class="sig-paren">(</span><em class="sig-param">support: Union[Segment</em>, <em class="sig-param">Timeline</em>, <em class="sig-param">None] = None</em><span class="sig-paren">)</span> &#x2192; Optional[Hashable]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.argmax"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.argmax" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get label with longest duration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1256,7 +1256,7 @@ Defaults to whole extent.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.chart">
-<code class="sig-name descname">chart</code><span class="sig-paren">(</span><em class="sig-param">percent=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.chart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.chart" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">chart</code><span class="sig-paren">(</span><em class="sig-param">percent: bool = False</em><span class="sig-paren">)</span> &#x2192; List[Tuple[Hashable, float]]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.chart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.chart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get labels chart (from longest to shortest duration)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1274,14 +1274,14 @@ Defaults to returning list of (label, duration) tuples.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.co_iter">
-<code class="sig-name descname">co_iter</code><span class="sig-paren">(</span><em class="sig-param">other</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.co_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.co_iter" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">co_iter</code><span class="sig-paren">(</span><em class="sig-param">other: pyannote.core.annotation.Annotation</em><span class="sig-paren">)</span> &#x2192; Iterator[Tuple[Tuple[pyannote.core.segment.Segment, Union[str, int]], Tuple[pyannote.core.segment.Segment, Union[str, int]]]]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.co_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.co_iter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate over pairs of intersecting tracks</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>other</strong> (<a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation"><em>Annotation</em></a>) – Second annotation</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>iterable</strong> – Yields pairs of intersectins tracks, in chronological (then
+<dd class="field-even"><p><strong>iterable</strong> – Yields pairs of intersecting tracks, in chronological (then
 alphabetical) order.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
@@ -1296,7 +1296,7 @@ alphabetical) order.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a copy of the annotation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1310,7 +1310,7 @@ alphabetical) order.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.crop">
-<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">support</em>, <em class="sig-param">mode='intersection'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.crop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">support: Union[Segment, Timeline], mode: typing_extensions.Literal['intersection', 'loose', 'strict'][intersection, loose, strict] = 'intersection'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.crop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Crop annotation to new support</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1340,7 +1340,7 @@ modified to make sure no track is lost.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.empty">
-<code class="sig-name descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.empty" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.empty" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an empty copy</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1354,7 +1354,7 @@ modified to make sure no track is lost.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.for_json">
-<code class="sig-name descname">for_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.for_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.for_json" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">for_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Dict<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.for_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.for_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialization</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1364,7 +1364,7 @@ modified to make sure no track is lost.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.from_json">
-<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param">data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.from_json" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param">data: Dict</em><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.from_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deserialization</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
@@ -1374,7 +1374,7 @@ modified to make sure no track is lost.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.get_labels">
-<code class="sig-name descname">get_labels</code><span class="sig-paren">(</span><em class="sig-param">segment</em>, <em class="sig-param">unique=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_labels" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_labels</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em>, <em class="sig-param">unique: bool = True</em><span class="sig-paren">)</span> &#x2192; Set[Hashable]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query labels by segment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1406,7 +1406,7 @@ Defaults to returning the set of labels.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.get_timeline">
-<code class="sig-name descname">get_timeline</code><span class="sig-paren">(</span><em class="sig-param">copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_timeline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_timeline</code><span class="sig-paren">(</span><em class="sig-param">copy: bool = True</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_timeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get timeline made of all annotated segments</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1430,7 +1430,7 @@ instance.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.get_tracks">
-<code class="sig-name descname">get_tracks</code><span class="sig-paren">(</span><em class="sig-param">segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_tracks" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_tracks</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; Set[Union[str, int]]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_tracks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query tracks by segment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1451,7 +1451,7 @@ instance.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.has_track">
-<code class="sig-name descname">has_track</code><span class="sig-paren">(</span><em class="sig-param">segment</em>, <em class="sig-param">track</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.has_track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.has_track" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">has_track</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment, track: Union[str, int]</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.has_track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.has_track" title="Permalink to this definition">¶</a></dt>
 <dd><p>Check whether a given track exists</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1485,7 +1485,7 @@ instance.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.itertracks">
-<code class="sig-name descname">itertracks</code><span class="sig-paren">(</span><em class="sig-param">yield_label=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.itertracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.itertracks" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">itertracks</code><span class="sig-paren">(</span><em class="sig-param">yield_label: bool = False</em><span class="sig-paren">)</span> &#x2192; Iterator[Union[Tuple[pyannote.core.segment.Segment, Union[str, int]], Tuple[pyannote.core.segment.Segment, Union[str, int], Hashable]]]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.itertracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.itertracks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate over tracks (in chronological order)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1507,7 +1507,7 @@ annotation[segment, track] == label. Defaults to yielding
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.label_duration">
-<code class="sig-name descname">label_duration</code><span class="sig-paren">(</span><em class="sig-param">label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.label_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.label_duration" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">label_duration</code><span class="sig-paren">(</span><em class="sig-param">label: Hashable</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.label_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.label_duration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Label duration</p>
 <p>Equivalent to <code class="docutils literal notranslate"><span class="pre">Annotation.label_timeline(label).duration()</span></code></p>
 <dl class="field-list simple">
@@ -1530,7 +1530,7 @@ annotation[segment, track] == label. Defaults to yielding
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.label_support">
-<code class="sig-name descname">label_support</code><span class="sig-paren">(</span><em class="sig-param">label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.label_support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.label_support" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">label_support</code><span class="sig-paren">(</span><em class="sig-param">label: Hashable</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.label_support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.label_support" title="Permalink to this definition">¶</a></dt>
 <dd><p>Label support</p>
 <p>Equivalent to <code class="docutils literal notranslate"><span class="pre">Annotation.label_timeline(label).support()</span></code></p>
 <dl class="field-list simple">
@@ -1553,7 +1553,7 @@ annotation[segment, track] == label. Defaults to yielding
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.label_timeline">
-<code class="sig-name descname">label_timeline</code><span class="sig-paren">(</span><em class="sig-param">label</em>, <em class="sig-param">copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.label_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.label_timeline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">label_timeline</code><span class="sig-paren">(</span><em class="sig-param">label: Hashable</em>, <em class="sig-param">copy: bool = True</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.label_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.label_timeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query segments by label</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1585,7 +1585,7 @@ instance.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.labels">
-<code class="sig-name descname">labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.labels" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List[Hashable]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get sorted list of labels</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -1599,7 +1599,7 @@ instance.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.new_track">
-<code class="sig-name descname">new_track</code><span class="sig-paren">(</span><em class="sig-param">segment</em>, <em class="sig-param">candidate=None</em>, <em class="sig-param">prefix=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.new_track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.new_track" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">new_track</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em>, <em class="sig-param">candidate: Union[str</em>, <em class="sig-param">int</em>, <em class="sig-param">None] = None</em>, <em class="sig-param">prefix: Optional[str] = None</em><span class="sig-paren">)</span> &#x2192; Union[str, int]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.new_track"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.new_track" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a new track name for given segment</p>
 <p>Ensures that the returned track name does not already
 exist for the given segment.</p>
@@ -1622,7 +1622,7 @@ exist for the given segment.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.relabel_tracks">
-<code class="sig-name descname">relabel_tracks</code><span class="sig-paren">(</span><em class="sig-param">generator='string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.relabel_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.relabel_tracks" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">relabel_tracks</code><span class="sig-paren">(</span><em class="sig-param">generator: Union[typing_extensions.Literal['int', 'string'][int, string], Iterator[Hashable]] = 'string'</em><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.relabel_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.relabel_tracks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Relabel tracks</p>
 <p>Create a new annotation where each track has a unique label.</p>
 <dl class="field-list simple">
@@ -1641,7 +1641,7 @@ relabel to 0, 1, 2, … If iterable, use it to generate labels.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.rename_labels">
-<code class="sig-name descname">rename_labels</code><span class="sig-paren">(</span><em class="sig-param">mapping=None</em>, <em class="sig-param">generator='string'</em>, <em class="sig-param">copy=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_labels" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rename_labels</code><span class="sig-paren">(</span><em class="sig-param">mapping: Optional[Dict] = None, generator: Union[typing_extensions.Literal['int', 'string'][int, string], Iterator[Hashable]] = 'string', copy: bool = True</em><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename labels</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1672,7 +1672,7 @@ update the annotation in-place. Defaults to True.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.rename_tracks">
-<code class="sig-name descname">rename_tracks</code><span class="sig-paren">(</span><em class="sig-param">generator='string'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_tracks" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">rename_tracks</code><span class="sig-paren">(</span><em class="sig-param">generator: Union[typing_extensions.Literal['int', 'string'][int, string], Iterator[Hashable]] = 'string'</em><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.rename_tracks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.rename_tracks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rename all tracks</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1709,7 +1709,7 @@ If iterable, use it to generate track names.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.subset">
-<code class="sig-name descname">subset</code><span class="sig-paren">(</span><em class="sig-param">labels</em>, <em class="sig-param">invert=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.subset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.subset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">subset</code><span class="sig-paren">(</span><em class="sig-param">labels: Iterable[Hashable], invert: bool = False</em><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.subset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.subset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Filter annotation by labels</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1729,7 +1729,7 @@ If iterable, use it to generate track names.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.support">
-<code class="sig-name descname">support</code><span class="sig-paren">(</span><em class="sig-param">collar=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.support" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">support</code><span class="sig-paren">(</span><em class="sig-param">collar: float = 0.0</em><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.support"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.support" title="Permalink to this definition">¶</a></dt>
 <dd><p>Annotation support</p>
 <p>The support of an annotation is an annotation where contiguous tracks
 with same label are merged into one unique covering track.</p>
@@ -1767,7 +1767,7 @@ Defaults to 0.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.update">
-<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">annotation</em>, <em class="sig-param">copy=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param">annotation: pyannote.core.annotation.Annotation</em>, <em class="sig-param">copy: bool = False</em><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add every track of an existing annotation (in place)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1788,12 +1788,6 @@ annotation in-place.</p></li>
 <p class="admonition-title">Note</p>
 <p>Existing tracks are updated with the new label.</p>
 </div>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyannote.core.Annotation.uri">
-<em class="property">property </em><code class="sig-name descname">uri</code><a class="headerlink" href="#pyannote.core.Annotation.uri" title="Permalink to this definition">¶</a></dt>
-<dd><p>Resource identifier</p>
 </dd></dl>
 
 <dl class="method">
@@ -1853,7 +1847,7 @@ annotation in-place.</p></li>
 </div>
 <dl class="method">
 <dt id="pyannote.core.SlidingWindow.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">i: int</em><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.Segment<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of sliding window position</p>
@@ -1875,7 +1869,7 @@ annotation in-place.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.SlidingWindow.__iter__">
-<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.__iter__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.SlidingWindow<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sliding window iterator</p>
 <p>Use expression ‘for segment in sliding_window’</p>
 <p class="rubric">Examples</p>
@@ -1898,7 +1892,7 @@ annotation in-place.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.SlidingWindow.__len__">
-<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.__len__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.__len__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of positions</p>
 <p>Equivalent to len([segment for segment in window])</p>
 <dl class="field-list simple">
@@ -1920,7 +1914,7 @@ annotation in-place.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.SlidingWindow.closest_frame">
-<code class="sig-name descname">closest_frame</code><span class="sig-paren">(</span><em class="sig-param">t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.closest_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.closest_frame" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">closest_frame</code><span class="sig-paren">(</span><em class="sig-param">t: float</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.closest_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.closest_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Closest frame to timestamp.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1937,13 +1931,13 @@ annotation in-place.</p></li>
 
 <dl class="method">
 <dt id="pyannote.core.SlidingWindow.copy">
-<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.copy" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">copy</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.SlidingWindow<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.copy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.copy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Duplicate sliding window</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyannote.core.SlidingWindow.crop">
-<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">focus</em>, <em class="sig-param">mode='loose'</em>, <em class="sig-param">fixed=None</em>, <em class="sig-param">return_ranges=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.crop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">focus: Union[pyannote.core.segment.Segment, Timeline], mode: typing_extensions.Literal['center', 'loose', 'strict'][center, loose, strict] = 'loose', fixed: Optional[float] = None, return_ranges: Optional[bool] = False</em><span class="sig-paren">)</span> &#x2192; Union[numpy.ndarray, List[List[int]]]<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.crop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Crop sliding window</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1976,8 +1970,8 @@ because of rounding erros).</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyannote.core.SlidingWindow.durationToSamples">
-<code class="sig-name descname">durationToSamples</code><span class="sig-paren">(</span><em class="sig-param">duration</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.durationToSamples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.durationToSamples" title="Permalink to this definition">¶</a></dt>
+<dt id="pyannote.core.SlidingWindow.duration_to_samples">
+<code class="sig-name descname">duration_to_samples</code><span class="sig-paren">(</span><em class="sig-param">duration: float</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.duration_to_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.duration_to_samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns samples in duration</p>
 </dd></dl>
 
@@ -1988,8 +1982,8 @@ because of rounding erros).</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyannote.core.SlidingWindow.rangeToSegment">
-<code class="sig-name descname">rangeToSegment</code><span class="sig-paren">(</span><em class="sig-param">i0</em>, <em class="sig-param">n</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.rangeToSegment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.rangeToSegment" title="Permalink to this definition">¶</a></dt>
+<dt id="pyannote.core.SlidingWindow.range_to_segment">
+<code class="sig-name descname">range_to_segment</code><span class="sig-paren">(</span><em class="sig-param">i0: int</em>, <em class="sig-param">n: int</em><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.Segment<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.range_to_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.range_to_segment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert 0-indexed frame range to segment</p>
 <p>Each frame represents a unique segment of duration ‘step’, centered on
 the middle of the frame.</p>
@@ -2011,7 +2005,7 @@ sliding window start time.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">window</span> <span class="o">=</span> <span class="n">SlidingWindow</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">window</span><span class="o">.</span><span class="n">rangeToSegment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">window</span><span class="o">.</span><span class="n">range_to_segment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="go">[ --&gt; ]</span>
 </pre></div>
 </div>
@@ -2019,7 +2013,7 @@ sliding window start time.</p>
 
 <dl class="method">
 <dt id="pyannote.core.SlidingWindow.samples">
-<code class="sig-name descname">samples</code><span class="sig-paren">(</span><em class="sig-param">from_duration</em>, <em class="sig-param">mode='strict'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.samples" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">samples</code><span class="sig-paren">(</span><em class="sig-param">from_duration: float</em>, <em class="sig-param">mode: typing_extensions.Literal['center'</em>, <em class="sig-param">'loose'</em>, <em class="sig-param">'strict'][center</em>, <em class="sig-param">loose</em>, <em class="sig-param">strict] = 'strict'</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.samples" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of frames</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2039,14 +2033,14 @@ is centered on the end time of a segment with duration
 </dd></dl>
 
 <dl class="method">
-<dt id="pyannote.core.SlidingWindow.samplesToDuration">
-<code class="sig-name descname">samplesToDuration</code><span class="sig-paren">(</span><em class="sig-param">nSamples</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.samplesToDuration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.samplesToDuration" title="Permalink to this definition">¶</a></dt>
+<dt id="pyannote.core.SlidingWindow.samples_to_duration">
+<code class="sig-name descname">samples_to_duration</code><span class="sig-paren">(</span><em class="sig-param">n_samples: int</em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.samples_to_duration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.samples_to_duration" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns duration of samples</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyannote.core.SlidingWindow.segmentToRange">
-<code class="sig-name descname">segmentToRange</code><span class="sig-paren">(</span><em class="sig-param">segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.segmentToRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.segmentToRange" title="Permalink to this definition">¶</a></dt>
+<dt id="pyannote.core.SlidingWindow.segment_to_range">
+<code class="sig-name descname">segment_to_range</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; Tuple[int, int]<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.segment_to_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.segment_to_range" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert segment to 0-indexed frame range</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2062,7 +2056,7 @@ is centered on the end time of a segment with duration
 </dl>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">window</span> <span class="o">=</span> <span class="n">SlidingWindow</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">window</span><span class="o">.</span><span class="n">segmentToRange</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span> <span class="n">window</span><span class="o">.</span><span class="n">segment_to_range</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
 <span class="go">i0, n</span>
 </pre></div>
 </div>
@@ -2087,7 +2081,7 @@ is centered on the end time of a segment with duration
 <h3>SlidingWindowFeature<a class="headerlink" href="#slidingwindowfeature" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.SlidingWindowFeature">
-<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">SlidingWindowFeature</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">sliding_window</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">SlidingWindowFeature</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.ndarray</em>, <em class="sig-param">sliding_window: pyannote.core.segment.SlidingWindow</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Periodic feature vectors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2099,19 +2093,25 @@ is centered on the end time of a segment with duration
 </dl>
 <dl class="method">
 <dt id="pyannote.core.SlidingWindowFeature.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.__getitem__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">i: int</em><span class="sig-paren">)</span> &#x2192; numpy.ndarray<a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get ith feature vector</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyannote.core.SlidingWindowFeature.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">sliding_window</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.ndarray</em>, <em class="sig-param">sliding_window: pyannote.core.segment.SlidingWindow</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="pyannote.core.SlidingWindowFeature.__len__">
+<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.__len__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Number of feature vectors</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="pyannote.core.SlidingWindowFeature.crop">
-<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">focus</em>, <em class="sig-param">mode='loose'</em>, <em class="sig-param">fixed=None</em>, <em class="sig-param">return_data=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.crop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">focus: Union[pyannote.core.segment.Segment, pyannote.core.timeline.Timeline], mode: typing_extensions.Literal['intersection', 'loose', 'strict'][intersection, loose, strict] = 'loose', fixed: Optional[float] = None, return_data: bool = True</em><span class="sig-paren">)</span> &#x2192; Union[numpy.ndarray, pyannote.core.feature.SlidingWindowFeature]<a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.crop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract frames</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2143,20 +2143,14 @@ to False will return a <cite>SlidingWindowFeature</cite> instance.</p></li>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyannote.core.SlidingWindowFeature.getDimension">
-<code class="sig-name descname">getDimension</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.getDimension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.getDimension" title="Permalink to this definition">¶</a></dt>
+<dt id="pyannote.core.SlidingWindowFeature.dimension">
+<em class="property">property </em><code class="sig-name descname">dimension</code><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.dimension" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dimension of feature vectors</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pyannote.core.SlidingWindowFeature.getNumber">
-<code class="sig-name descname">getNumber</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.getNumber"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.getNumber" title="Permalink to this definition">¶</a></dt>
-<dd><p>Number of feature vectors</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="pyannote.core.SlidingWindowFeature.iterfeatures">
-<code class="sig-name descname">iterfeatures</code><span class="sig-paren">(</span><em class="sig-param">window=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.iterfeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.iterfeatures" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">iterfeatures</code><span class="sig-paren">(</span><em class="sig-param">window: Optional[bool] = False</em><span class="sig-paren">)</span> &#x2192; Iterator[Union[Tuple[numpy.ndarray, pyannote.core.segment.Segment], numpy.ndarray]]<a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.iterfeatures"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.iterfeatures" title="Permalink to this definition">¶</a></dt>
 <dd><p>Feature vector iterator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2174,12 +2168,12 @@ Default is to only yield feature vector</p>
 <span id="serialization"></span><h2>Serialization<a class="headerlink" href="#module-pyannote.core.json" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="pyannote.core.json.dump">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param">resource</em>, <em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param">resource: Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation], fp: TextIO</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>resource</strong> (<cite>pyannote.core</cite> data structure) – Resource to deserialize</p></li>
+<li><p><strong>resource</strong> (<cite>pyannote.core</cite> data structure) – Resource to serialize</p></li>
 <li><p><strong>fp</strong> (<em>file</em>) – File in which <cite>resource</cite> serialization is written</p></li>
 </ul>
 </dd>
@@ -2188,12 +2182,12 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.dump_to">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dump_to</code><span class="sig-paren">(</span><em class="sig-param">resource</em>, <em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump_to" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dump_to</code><span class="sig-paren">(</span><em class="sig-param">resource: Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation], path: Union[str, pathlib.Path]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>resource</strong> (<cite>pyannote.core</cite> data structure) – Resource to deserialize</p></li>
+<li><p><strong>resource</strong> (<cite>pyannote.core</cite> data structure) – Resource to serialize</p></li>
 <li><p><strong>path</strong> (<em>string</em>) – Path to file in which <cite>resource</cite> serialization is written</p></li>
 </ul>
 </dd>
@@ -2202,7 +2196,7 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.dumps">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dumps</code><span class="sig-paren">(</span><em class="sig-param">resource</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dumps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dumps" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dumps</code><span class="sig-paren">(</span><em class="sig-param">resource: Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation]</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/pyannote/core/json.html#dumps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dumps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize to string</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2219,7 +2213,7 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.load">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">fp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">fp: TextIO</em><span class="sig-paren">)</span> &#x2192; Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation]<a class="reference internal" href="_modules/pyannote/core/json.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deserialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2236,11 +2230,11 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.load_from">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">load_from</code><span class="sig-paren">(</span><em class="sig-param">path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#load_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load_from" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">load_from</code><span class="sig-paren">(</span><em class="sig-param">path: Union[str, pathlib.Path]</em><span class="sig-paren">)</span> &#x2192; Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation]<a class="reference internal" href="_modules/pyannote/core/json.html#load_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load_from" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deserialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>path</strong> (<em>string</em>) – Path to file containing serialized <cite>pyannote.core</cite> data structure</p>
+<dd class="field-odd"><p><strong>path</strong> (<em>string</em><em> or </em><em>Path</em>) – Path to file containing serialized <cite>pyannote.core</cite> data structure</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>deserialized</strong></p>
@@ -2253,7 +2247,7 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.loads">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param">s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.loads" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param">s: str</em><span class="sig-paren">)</span> &#x2192; Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation]<a class="reference internal" href="_modules/pyannote/core/json.html#loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.loads" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deserialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2285,31 +2279,31 @@ Default is to only yield feature vector</p>
 <h3>Visualization<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <dl class="function">
 <dt id="pyannote.core.notebook.repr_annotation">
-<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_annotation</code><span class="sig-paren">(</span><em class="sig-param">annotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_annotation" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_annotation</code><span class="sig-paren">(</span><em class="sig-param">annotation: pyannote.core.annotation.Annotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_annotation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get <cite>png</cite> data for <cite>annotation</cite></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyannote.core.notebook.repr_feature">
-<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_feature</code><span class="sig-paren">(</span><em class="sig-param">feature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_feature" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_feature</code><span class="sig-paren">(</span><em class="sig-param">feature: pyannote.core.feature.SlidingWindowFeature</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_feature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_feature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get <cite>png</cite> data for <cite>feature</cite></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyannote.core.notebook.repr_scores">
-<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_scores</code><span class="sig-paren">(</span><em class="sig-param">scores</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_scores" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_scores</code><span class="sig-paren">(</span><em class="sig-param">scores: pyannote.core.scores.Scores</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_scores"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_scores" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get <cite>png</cite> data for <cite>scores</cite></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyannote.core.notebook.repr_segment">
-<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_segment</code><span class="sig-paren">(</span><em class="sig-param">segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_segment" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_segment</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_segment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_segment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get <cite>png</cite> data for <cite>segment</cite></p>
 </dd></dl>
 
 <dl class="function">
 <dt id="pyannote.core.notebook.repr_timeline">
-<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_timeline</code><span class="sig-paren">(</span><em class="sig-param">timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_timeline" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_timeline</code><span class="sig-paren">(</span><em class="sig-param">timeline: pyannote.core.timeline.Timeline</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_timeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get <cite>png</cite> data for <cite>timeline</cite></p>
 </dd></dl>
 
