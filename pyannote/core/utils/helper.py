@@ -31,7 +31,7 @@ from importlib import import_module
 
 
 def get_class_by_name(class_name: str,
-                      default_module_name: Optional[str] = None) -> type :
+                      default_module_name: Optional[str] = None) -> type:
     """Load class by its name
 
     Parameters
