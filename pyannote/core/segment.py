@@ -65,17 +65,16 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
 
 See :class:`pyannote.core.Segment` for the complete reference.
 """
+
 import warnings
 from typing import Union, Optional, Tuple, List, Iterator
+from .utils.types import Alignment
 
 import numpy as np
 from dataclasses import dataclass
 
 # 1 μs (one microsecond)
-from pyannote.core.utils.types import Alignment
-
 SEGMENT_PRECISION = 1e-6
-
 
 # setting 'frozen' to True makes it hashable and immutable
 @dataclass(frozen=True, order=True)
