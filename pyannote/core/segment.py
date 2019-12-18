@@ -65,6 +65,7 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
 
 See :class:`pyannote.core.Segment` for the complete reference.
 """
+
 import warnings
 from typing import Union, Optional, Tuple, List, Iterator
 

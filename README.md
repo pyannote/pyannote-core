@@ -1,9 +1,31 @@
-pyannote.core
-=============
+# pyannote.core
 
-| Branch  | Build status                                                                                                                     |
-|---------|----------------------------------------------------------------------------------------------------------------------------------|
-| master  | [![Build Status](https://travis-ci.org/pyannote/pyannote-core.svg?branch=master)](https://travis-ci.org/pyannote/pyannote-core)  |
-| develop | [![Build Status](https://travis-ci.org/pyannote/pyannote-core.svg?branch=develop)](https://travis-ci.org/pyannote/pyannote-core) |
+> advanced data structures for handling and visualizing temporal segments with attached labels.
 
-[Notebooks](http://nbviewer.ipython.org/github/pyannote/pyannote-core/blob/master/notebook/index.ipynb)
+## Installation
+
+```bash
+$ pip install pyannote.core
+```
+
+## Documentation
+
+The documentation is available at [http://pyannote.github.io/pyannote-core](http://pyannote.github.io/pyannote-core).
+
+Sample notebooks are available [here](https://nbviewer.jupyter.org/github/pyannote/pyannote-core/blob/develop/notebook/index.ipynb).
+
+## Citation
+
+If you use `pyannote.core` in your research, please use the following citation:
+
+```bibtex
+@inproceedings{pyannote.metrics,
+ author = {Herv\'e Bredin},
+ title = {{pyannote.metrics: a toolkit for reproducible evaluation, diagnostic, and error analysis of speaker diarization systems}},
+ booktitle = {{Interspeech 2017, 18th Annual Conference of the International Speech Communication Association}},
+ year = {2017},
+ month = {August},
+ address = {Stockholm, Sweden},
+ url = {http://pyannote.github.io/pyannote-metrics},
+}
+```
