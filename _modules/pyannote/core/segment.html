@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.segment &mdash; pyannote.core 3.2 documentation</title>
+  <title>pyannote.core.segment &mdash; pyannote.core 3.2+7.g2c07940 documentation</title>
   
 
   
@@ -282,7 +282,7 @@
 <span class="sd">        A segment is considered empty if its end time is smaller than its</span>
 <span class="sd">        start time, or its duration is smaller than 1μs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SEGMENT_PRECISION</span></div>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SEGMENT_PRECISION</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
