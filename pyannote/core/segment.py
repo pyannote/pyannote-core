@@ -127,7 +127,7 @@ class Segment:
         A segment is considered empty if its end time is smaller than its
         start time, or its duration is smaller than 1μs.
         """
-        return (self.end - self.start) > SEGMENT_PRECISION
+        return bool((self.end - self.start) > SEGMENT_PRECISION)
 
     @property
     def duration(self) -> float:
