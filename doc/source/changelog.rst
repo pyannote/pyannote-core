@@ -2,6 +2,13 @@
 Changelog
 #########
 
+Version 3.3 (2020-01-08)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- BREAKING: remove pyannote.core.Scores
+- fix: fix legend corner case with empty Annotation instances
+- fix: fix {Timeline|Annotation}.crop with overlapping segments in support
+
 Version 3.2.2 (2020-01-06)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -45,7 +45,6 @@ from itertools import cycle, product, groupby
 from .segment import Segment
 from .timeline import Timeline
 from .annotation import Annotation
-from .scores import Scores
 from .feature import SlidingWindowFeature
 
 
@@ -190,9 +189,6 @@ class Notebook:
         elif isinstance(resource, Annotation):
             self.plot_annotation(resource, time=time, legend=legend)
 
-        elif isinstance(resource, Scores):
-            self.plot_scores(resource, time=time, legend=legend)
-
         elif isinstance(resource, SlidingWindowFeature):
             self.plot_feature(resource, time=time)
 
@@ -235,40 +231,14 @@ class Notebook:
             self.draw_segment(ax, segment, y, label=label)
 
         if legend:
+            H, L = ax.get_legend_handles_labels()
+
+            # corner case when no segment is visible
+            if not H:
+                return
+
             # this gets exactly one legend handle and one legend label per label
             # (avoids repeated legends for repeated tracks with same label)
-            H, L = ax.get_legend_handles_labels()
-            HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
-                         key=lambda h_l: h_l[1])
-            H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
-            ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
-                      ncol=5, borderaxespad=0., frameon=False)
-
-    def plot_scores(self, scores: Scores, ax=None, time=True, legend=True):
-
-        if not self.crop:
-            self.crop = scores.to_annotation().get_timeline(copy=False).extent()
-
-        cropped = scores.crop(notebook.crop, mode='loose')
-        labels = cropped.labels()
-
-        data = scores.dataframe_.values
-        m = np.nanmin(data)
-        M = np.nanmax(data)
-        ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
-
-        ax = self.setup(ax=ax, yaxis=True, ylim=ylim, time=time)
-
-        for segment, track, label, value in cropped.itervalues():
-            y = value
-            self.draw_segment(ax, segment, y, label=label, boundaries=False)
-
-        # ax.set_aspect(6. / ((ylim[1] - ylim[0]) * self.crop.duration))
-
-        if legend:
-            # this gets exactly one legend handle and one legend label per label
-            # (avoids repeated legends for repeated tracks with same label)
-            H, L = ax.get_legend_handles_labels()
             HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
                          key=lambda h_l: h_l[1])
             H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
@@ -338,19 +308,6 @@ def repr_annotation(annotation: Annotation):
     plt.rcParams['figure.figsize'] = (notebook.width, 2)
     fig, ax = plt.subplots()
     notebook.plot_annotation(annotation, ax=ax)
-    data = print_figure(fig, 'png')
-    plt.close(fig)
-    plt.rcParams['figure.figsize'] = figsize
-    return data
-
-
-def repr_scores(scores: Scores):
-    """Get `png` data for `scores`"""
-    import matplotlib.pyplot as plt
-    figsize = plt.rcParams['figure.figsize']
-    plt.rcParams['figure.figsize'] = (notebook.width, 2)
-    fig, ax = plt.subplots()
-    notebook.plot_scores(scores, ax=ax)
     data = print_figure(fig, 'png')
     plt.close(fig)
     plt.rcParams['figure.figsize'] = figsize

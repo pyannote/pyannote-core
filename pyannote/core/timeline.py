@@ -440,6 +440,9 @@ class Timeline:
                 yield yielded
             return
 
+        # if 'support' is a `Timeline`, we use its support
+        support = support.support()
+
         # loose mode
         if mode == 'loose':
             for segment, _ in self.co_iter(support):
