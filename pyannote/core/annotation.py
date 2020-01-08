@@ -414,6 +414,8 @@ class Annotation:
 
         elif isinstance(support, Timeline):
 
+            # if 'support' is a `Timeline`, we use its support
+            support = support.support()
             cropped = self.__class__(uri=self.uri, modality=self.modality)
 
             if mode == 'loose':
