@@ -231,9 +231,14 @@ class Notebook:
             self.draw_segment(ax, segment, y, label=label)
 
         if legend:
+            H, L = ax.get_legend_handles_labels()
+
+            # corner case when no segment is visible
+            if not H:
+                return
+
             # this gets exactly one legend handle and one legend label per label
             # (avoids repeated legends for repeated tracks with same label)
-            H, L = ax.get_legend_handles_labels()
             HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
                          key=lambda h_l: h_l[1])
             H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
