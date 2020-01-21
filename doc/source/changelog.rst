@@ -2,6 +2,12 @@
 Changelog
 #########
 
+Version 3.4 (2020-01-21)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add SlidingWindow.__call__ to slide over a specific support
+- feat: add pyannote.core.utils.random
+
 Version 3.3 (2020-01-08)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
