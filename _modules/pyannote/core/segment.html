@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.segment &mdash; pyannote.core 3.3 documentation</title>
+  <title>pyannote.core.segment &mdash; pyannote.core 3.4 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                3.3
+                3.4
               </div>
             
           
@@ -222,7 +222,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterator</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Iterable</span>
 <span class="kn">from</span> <span class="nn">.utils.types</span> <span class="kn">import</span> <span class="n">Alignment</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -960,7 +960,58 @@
         <span class="n">sliding_window</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span>
             <span class="n">duration</span><span class="o">=</span><span class="n">duration</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="n">sliding_window</span></div></div>
+        <span class="k">return</span> <span class="n">sliding_window</span></div>
+
+<div class="viewcode-block" id="SlidingWindow.__call__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">support</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Segment</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Slide window over support</span>
+
+<span class="sd">        Parameter</span>
+<span class="sd">        ---------</span>
+<span class="sd">        support : Segment or Timeline</span>
+<span class="sd">            Support on which to slide the window.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        chunk : Segment</span>
+
+<span class="sd">        Example</span>
+<span class="sd">        -------</span>
+<span class="sd">        &gt;&gt;&gt; window = SlidingWindow(duration=2., step=1.)</span>
+<span class="sd">        &gt;&gt;&gt; for chunk in window(Segment(3, 7)):</span>
+<span class="sd">        ...     print(tuple(chunk))</span>
+<span class="sd">        (3, 5)</span>
+<span class="sd">        (4, 6)</span>
+<span class="sd">        (5, 7)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span> <span class="nn">pyannote.core</span> <span class="kn">import</span> <span class="n">Timeline</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">):</span>
+            <span class="n">segments</span> <span class="o">=</span> <span class="n">support</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
+            <span class="n">segments</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="p">[</span><span class="n">support</span><span class="p">])</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s1">&#39;&quot;support&quot; must be either a Segment or a Timeline &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;instance (is {type(support)})&#39;</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">segments</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">segment</span><span class="o">.</span><span class="n">duration</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">window</span> <span class="o">=</span> <span class="n">SlidingWindow</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
+                                   <span class="n">step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">,</span>
+                                   <span class="n">start</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+                                   <span class="n">end</span><span class="o">=</span><span class="n">segment</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">window</span><span class="p">:</span>
+                <span class="c1"># ugly hack to account for floating point imprecision</span>
+                <span class="k">if</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">segment</span><span class="p">:</span>
+                    <span class="k">yield</span> <span class="n">s</span></div></div>
 </pre></div>
 
            </div>

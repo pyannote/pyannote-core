@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Reference &mdash; pyannote.core 3.3 documentation</title>
+  <title>Reference &mdash; pyannote.core 3.4 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                3.3
+                3.4
               </div>
             
           
@@ -1846,6 +1846,30 @@ annotation in-place.</p></li>
 </pre></div>
 </div>
 <dl class="method">
+<dt id="pyannote.core.SlidingWindow.__call__">
+<code class="sig-name descname">__call__</code><span class="sig-paren">(</span><em class="sig-param">support: Union[pyannote.core.segment.Segment, Timeline]</em><span class="sig-paren">)</span> &#x2192; Iterable[pyannote.core.segment.Segment]<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.__call__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Slide window over support</p>
+<dl class="simple">
+<dt>support<span class="classifier">Segment or Timeline</span></dt><dd><p>Support on which to slide the window.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Yields</dt>
+<dd class="field-odd"><p><strong>chunk</strong> (<em>Segment</em>)</p>
+</dd>
+</dl>
+<p class="rubric">Example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">window</span> <span class="o">=</span> <span class="n">SlidingWindow</span><span class="p">(</span><span class="n">duration</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">1.</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">window</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">)):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">chunk</span><span class="p">))</span>
+<span class="go">(3, 5)</span>
+<span class="go">(4, 6)</span>
+<span class="go">(5, 7)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="pyannote.core.SlidingWindow.__getitem__">
 <code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">i: int</em><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.Segment<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
@@ -2168,7 +2192,7 @@ Default is to only yield feature vector</p>
 <span id="serialization"></span><h2>Serialization<a class="headerlink" href="#module-pyannote.core.json" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="pyannote.core.json.dump">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param">resource: Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation], fp: TextIO</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dump</code><span class="sig-paren">(</span><em class="sig-param">resource: Union[Segment, Timeline, SlidingWindowFeature, Annotation], fp: TextIO</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2182,7 +2206,7 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.dump_to">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dump_to</code><span class="sig-paren">(</span><em class="sig-param">resource: Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation], path: Union[str, pathlib.Path]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump_to" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dump_to</code><span class="sig-paren">(</span><em class="sig-param">resource: Union[Segment, Timeline, SlidingWindowFeature, Annotation], path: Union[str, pathlib.Path]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/json.html#dump_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dump_to" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2196,7 +2220,7 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.dumps">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dumps</code><span class="sig-paren">(</span><em class="sig-param">resource: Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation]</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/pyannote/core/json.html#dumps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dumps" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">dumps</code><span class="sig-paren">(</span><em class="sig-param">resource: Union[Segment, Timeline, SlidingWindowFeature, Annotation]</em><span class="sig-paren">)</span> &#x2192; str<a class="reference internal" href="_modules/pyannote/core/json.html#dumps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.dumps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialize to string</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2213,7 +2237,7 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.load">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">fp: TextIO</em><span class="sig-paren">)</span> &#x2192; Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation]<a class="reference internal" href="_modules/pyannote/core/json.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">load</code><span class="sig-paren">(</span><em class="sig-param">fp: TextIO</em><span class="sig-paren">)</span> &#x2192; Union[Segment, Timeline, SlidingWindowFeature, Annotation]<a class="reference internal" href="_modules/pyannote/core/json.html#load"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deserialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2230,7 +2254,7 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.load_from">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">load_from</code><span class="sig-paren">(</span><em class="sig-param">path: Union[str, pathlib.Path]</em><span class="sig-paren">)</span> &#x2192; Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation]<a class="reference internal" href="_modules/pyannote/core/json.html#load_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load_from" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">load_from</code><span class="sig-paren">(</span><em class="sig-param">path: Union[str, pathlib.Path]</em><span class="sig-paren">)</span> &#x2192; Union[Segment, Timeline, SlidingWindowFeature, Annotation]<a class="reference internal" href="_modules/pyannote/core/json.html#load_from"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.load_from" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deserialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2247,7 +2271,7 @@ Default is to only yield feature vector</p>
 
 <dl class="function">
 <dt id="pyannote.core.json.loads">
-<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param">s: str</em><span class="sig-paren">)</span> &#x2192; Union[Segment, Timeline, Score, SlidingWindowFeature, Annotation]<a class="reference internal" href="_modules/pyannote/core/json.html#loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.loads" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">pyannote.core.json.</code><code class="sig-name descname">loads</code><span class="sig-paren">(</span><em class="sig-param">s: str</em><span class="sig-paren">)</span> &#x2192; Union[Segment, Timeline, SlidingWindowFeature, Annotation]<a class="reference internal" href="_modules/pyannote/core/json.html#loads"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.json.loads" title="Permalink to this definition">¶</a></dt>
 <dd><p>Deserialize</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
