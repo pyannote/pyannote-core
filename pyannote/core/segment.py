@@ -67,7 +67,7 @@ See :class:`pyannote.core.Segment` for the complete reference.
 """
 
 import warnings
-from typing import Union, Optional, Tuple, List, Iterator
+from typing import Union, Optional, Tuple, List, Iterator, Iterable
 from .utils.types import Alignment
 
 import numpy as np
@@ -806,3 +806,54 @@ class SlidingWindow:
             duration=duration, step=step, start=start, end=end
         )
         return sliding_window
+
+    def __call__(self, support: Union[Segment, 'Timeline']) -> Iterable[Segment]:
+        """Slide window over support
+
+        Parameter
+        ---------
+        support : Segment or Timeline
+            Support on which to slide the window.
+
+        Yields
+        ------
+        chunk : Segment
+
+        Example
+        -------
+        >>> window = SlidingWindow(duration=2., step=1.)
+        >>> for chunk in window(Segment(3, 7)):
+        ...     print(tuple(chunk))
+        (3, 5)
+        (4, 6)
+        (5, 7)
+        """
+
+        from pyannote.core import Timeline
+        if isinstance(support, Timeline):
+            segments = support
+
+        elif isinstance(support, Segment):
+            segments = Timeline(segments=[support])
+
+        else:
+            msg = (
+                f'"support" must be either a Segment or a Timeline '
+                f'instance (is {type(support)})'
+            )
+            raise TypeError(msg)
+
+        for segment in segments:
+
+            if segment.duration < self.duration:
+                continue
+
+            window = SlidingWindow(duration=self.duration,
+                                   step=self.step,
+                                   start=segment.start,
+                                   end=segment.end)
+
+            for s in window:
+                # ugly hack to account for floating point imprecision
+                if s in segment:
+                    yield s
