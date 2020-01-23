@@ -807,13 +807,17 @@ class SlidingWindow:
         )
         return sliding_window
 
-    def __call__(self, support: Union[Segment, 'Timeline']) -> Iterable[Segment]:
+    def __call__(self,
+                 support: Union[Segment, 'Timeline'],
+                 align_last: bool = False) -> Iterable[Segment]:
         """Slide window over support
 
         Parameter
         ---------
         support : Segment or Timeline
             Support on which to slide the window.
+        align_last : bool, optional
+            Yield a final segment so that it aligns exactly with end of support.
 
         Yields
         ------
@@ -822,11 +826,17 @@ class SlidingWindow:
         Example
         -------
         >>> window = SlidingWindow(duration=2., step=1.)
-        >>> for chunk in window(Segment(3, 7)):
+        >>> for chunk in window(Segment(3, 7.5)):
         ...     print(tuple(chunk))
-        (3, 5)
-        (4, 6)
-        (5, 7)
+        (3.0, 5.0)
+        (4.0, 6.0)
+        (5.0, 7.0)
+        >>> for chunk in window(Segment(3, 7.5), align_last=True):
+        ...     print(tuple(chunk))
+        (3.0, 5.0)
+        (4.0, 6.0)
+        (5.0, 7.0)
+        (5.5, 7.5)
         """
 
         from pyannote.core import Timeline
@@ -857,3 +867,8 @@ class SlidingWindow:
                 # ugly hack to account for floating point imprecision
                 if s in segment:
                     yield s
+                    last = s
+
+            if align_last and last.end < segment.end:
+                yield Segment(start=segment.end - self.duration,
+                              end=segment.end)

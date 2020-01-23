@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 3.5 (2020-01-23)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: feat: add align_last option to SlidingWindow.__call__
+
 Version 3.4 (2020-01-21)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
