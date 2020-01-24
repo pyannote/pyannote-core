@@ -699,7 +699,7 @@ class Timeline:
             import numpy as np
             return Segment(start=np.inf, end=-np.inf)
 
-    def support_iter(self) -> Iterator[Segment]:
+    def support_iter(self, collar: float = 0.) -> Iterator[Segment]:
         """Like `support` but returns a segment generator instead
 
         See also
@@ -725,12 +725,15 @@ class Timeline:
 
         for segment in self:
 
-            # If there is no gap between new support segment and next segment,
-            if not (segment ^ new_segment):
+            # If there is no gap between new support segment and next segment
+            # OR there is a gap with duration < collar seconds,
+            possible_gap = segment ^ new_segment
+            if not possible_gap or possible_gap.duration < collar:
                 # Extend new support segment using next segment
                 new_segment |= segment
 
-            # If there actually is a gap,
+            # If there actually is a gap and the gap duration >= collar
+            # seconds,
             else:
                 yield new_segment
 
@@ -741,7 +744,7 @@ class Timeline:
         # Add new segment to the timeline support
         yield new_segment
 
-    def support(self) -> 'Timeline':
+    def support(self, collar: float = 0.) -> 'Timeline':
         """Timeline support
 
         The support of a timeline is the timeline with the minimum number of
@@ -751,19 +754,32 @@ class Timeline:
 
         A picture is worth a thousand words::
 
+            collar
+            |---|
+
             timeline
-            |------|    |------|     |----|
-              |--|    |-----|     |----------|
+            |------|    |------|      |----|
+              |--|    |-----|      |----------|
 
             timeline.support()
-            |------|  |--------|  |----------|
+            |------|  |--------|   |----------|
+
+            timeline.support(collar)
+            |------------------|   |----------|
+
+        Parameters
+        ----------
+        collar : float, optional
+            Merge separated by less than `collar` seconds. This is why there
+            are only two segments in the final timeline in the above figure.
+            Defaults to 0.
 
         Returns
         -------
         support : Timeline
             Timeline support
         """
-        return Timeline(segments=self.support_iter(), uri=self.uri)
+        return Timeline(segments=self.support_iter(collar), uri=self.uri)
 
     def duration(self) -> float:
         """Timeline duration
@@ -961,7 +977,7 @@ class Timeline:
         Parameters
         ----------
         file : file object
-        
+
         Usage
         -----
         >>> with open('file.uem', 'w') as file:

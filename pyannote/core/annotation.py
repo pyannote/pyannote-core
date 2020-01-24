@@ -1165,11 +1165,7 @@ class Annotation:
             timeline = self.label_timeline(label, copy=True)
 
             # fill the gaps shorter than collar
-            if collar > 0.:
-                gaps = timeline.gaps()
-                for gap in gaps:
-                    if gap.duration < collar:
-                        timeline.add(gap)
+            timeline = timeline.support(collar)
 
             # reconstruct annotation with merged tracks
             for segment in timeline.support():
