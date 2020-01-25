@@ -106,7 +106,7 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
-
+from collections import defaultdict
 import itertools
 from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator
 
@@ -147,23 +147,8 @@ class Annotation:
                 modality: Optional[str] = None) -> 'Annotation':
 
         df = df[[PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]]
-
-        annotation = cls(uri=uri, modality=modality)
-
-        for row in df.itertuples():
-            if row[1] in annotation._tracks:
-                annotation._tracks[row[1]][row[2]] = row[3]
-            else:
-                annotation._tracks[row[1]] = {row[2]: row[3]}
-
-        annotation._labels = {label: None for label in df['label'].unique()}
-        annotation._labelNeedsUpdate = {
-            label: True for label in annotation._labels}
-
-        annotation._timeline = None
-        annotation._timelineNeedsUpdate = True
-
-        return annotation
+        return Annotation.from_records(
+            df.itertuples(index=False), uri, modality)
 
     def __init__(self, uri: Optional[str] = None, modality: Optional[str] = None):
 
@@ -1273,15 +1258,49 @@ class Annotation:
         --------
         :mod:`pyannote.core.json`
         """
-
         uri = data.get(PYANNOTE_URI, None)
         modality = data.get(PYANNOTE_MODALITY, None)
+        records = []
+        for record_dict in data[PYANNOTE_JSON_CONTENT]:
+            segment = Segment.from_json(record_dict[PYANNOTE_SEGMENT])
+            track = record_dict[PYANNOTE_TRACK]
+            label = record_dict[PYANNOTE_LABEL]
+            records.append((segment, track, label))
+        return Annotation.from_records(records, uri, modality)
+
+    @classmethod
+    def from_records(cls, records: Iterator[Tuple[Segment, TrackName, Label]],
+                     uri: Optional[str] = None,
+                     modality: Optional[str] = None) -> 'Annotation':
+        """Annotation
+
+        Parameters
+        ----------
+        records : iterator of tuples
+            (segment, track, label) tuples
+        uri : string, optional
+            name of annotated resource (e.g. audio or video file)
+        modality : string, optional
+            name of annotated modality
+
+        Returns
+        -------
+        annotation : Annotation
+            New annotation
+
+        """
         annotation = cls(uri=uri, modality=modality)
-        for one in data[PYANNOTE_JSON_CONTENT]:
-            segment = Segment.from_json(one[PYANNOTE_SEGMENT])
-            track = one[PYANNOTE_TRACK]
-            label = one[PYANNOTE_LABEL]
-            annotation[segment, track] = label
+        tracks = defaultdict(dict)
+        labels = set()
+        for segment, track, label in records:
+            tracks[segment][track] = label
+            labels.add(label)
+        annotation._tracks = SortedDict(tracks)
+        annotation._labels = {label: None for label in labels}
+        annotation._labelNeedsUpdate = {
+            label: True for label in annotation._labels}
+        annotation._timeline = None
+        annotation._timelineNeedsUpdate = True
 
         return annotation
 
