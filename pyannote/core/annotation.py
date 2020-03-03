@@ -356,8 +356,13 @@ class Annotation:
         """
 
         uri = self.uri if self.uri else "<NA>"
-
+        if ' ' in uri:
+            msg = f"{uri} : There shouldn't be spaces in file uris."
+            raise ValueError(msg)
         for segment, _, label in self.itertracks(yield_label=True):
+            if ' ' in label:
+                msg = f"{uri} : There shouldn't be spaces in labels. Got {label}."
+                raise ValueError(msg)
             line = (
                 f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
                 f'<NA> <NA> {label} <NA> <NA>\n'
