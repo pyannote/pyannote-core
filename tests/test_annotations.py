@@ -1,8 +1,10 @@
+import pandas as pd
 import pytest
 
 from pyannote.core import Annotation
 from pyannote.core import Segment
 from pyannote.core import Timeline
+from pyannote.core import PYANNOTE_LABEL, PYANNOTE_SEGMENT, PYANNOTE_TRACK
 
 
 @pytest.fixture
@@ -151,4 +153,32 @@ def test_support(annotation):
     expected[Segment(3, 10), 'B'] = 'Penny'
     expected[Segment(5.5, 7), 'A'] = 'Leonard'
     expected[Segment(8, 10), 'C'] = 'Sheldon'
+    assert actual == expected
+
+def test_from_records(annotation):
+    # Check that we can reconstruct an annotation from the
+    # output of itertracks.
+    records = annotation.itertracks(yield_label=True)
+    actual = Annotation.from_records(records)
+    expected = annotation
+    assert actual == expected
+
+
+def test_from_df(annotation):
+    # Check that we can reconstruct an annotation from a Pandas
+    # dataframe containing its tracks.
+    column_names = [PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]
+    df = pd.DataFrame.from_records(
+        annotation.itertracks(True), columns=column_names)
+    actual = Annotation.from_df(df)
+    expected = annotation
+    assert actual == expected
+
+
+def test_from_json(annotation):
+    # Check that we can reconstruct an annotation from the dict
+    # returned by for_json.
+    data = annotation.for_json()
+    actual = Annotation.from_json(data)
+    expected = annotation
     assert actual == expected

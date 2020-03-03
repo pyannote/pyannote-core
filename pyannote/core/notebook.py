@@ -31,6 +31,9 @@
 Visualization
 #############
 """
+from typing import Iterable, Union, Dict, Optional
+
+from .utils.types import Label, LabelStyle, Resource
 
 try:
     from IPython.core.pylabtools import print_figure
@@ -42,13 +45,12 @@ from itertools import cycle, product, groupby
 from .segment import Segment
 from .timeline import Timeline
 from .annotation import Annotation
-from .scores import Scores
+from .feature import SlidingWindowFeature
 
 
-class Notebook(object):
+class Notebook:
 
     def __init__(self):
-        super(Notebook, self).__init__()
         self.reset()
 
     def reset(self):
@@ -59,33 +61,39 @@ class Notebook(object):
         colors = [cm(1. * i / 8) for i in range(9)]
 
         self._style_generator = cycle(product(linestyle, linewidth, colors))
-        self._style = {None: ('solid', 1, (0.0, 0.0, 0.0))}
+        self._style: Dict[Optional[Label], LabelStyle] = {
+            None: ('solid', 1, (0.0, 0.0, 0.0))
+        }
         del self.crop
         del self.width
 
-    def crop():
-        doc = "The crop property."
-        def fget(self):
-            return self._crop
-        def fset(self, segment):
-            self._crop = segment
-        def fdel(self):
-            self._crop = None
-        return locals()
-    crop = property(**crop())
+    @property
+    def crop(self):
+        """The crop property."""
+        return self._crop
 
-    def width():
-        doc = "The width property."
-        def fget(self):
-            return self._width
-        def fset(self, value):
-            self._width = value
-        def fdel(self):
-            self._width = 20
-        return locals()
-    width = property(**width())
+    @crop.setter
+    def crop(self, segment: Segment):
+        self._crop = segment
 
-    def __getitem__(self, label):
+    @crop.deleter
+    def crop(self):
+        self._crop = None
+
+    @property
+    def width(self):
+        """The width property"""
+        return self._width
+
+    @width.setter
+    def width(self, value: int):
+        self._width = value
+
+    @width.deleter
+    def width(self):
+        self._width = 20
+
+    def __getitem__(self, label: Label) -> LabelStyle:
         if label not in self._style:
             self._style[label] = next(self._style_generator)
         return self._style[label]
@@ -103,7 +111,7 @@ class Notebook(object):
         ax.axes.get_yaxis().set_visible(yaxis)
         return ax
 
-    def draw_segment(self, ax, segment, y, label=None, boundaries=True):
+    def draw_segment(self, ax, segment: Segment, y, label=None, boundaries=True):
 
         # do nothing if segment is empty
         if not segment:
@@ -113,7 +121,7 @@ class Notebook(object):
 
         # draw segment
         ax.hlines(y, segment.start, segment.end, color,
-                 linewidth=linewidth, linestyle=linestyle, label=label)
+                  linewidth=linewidth, linestyle=linestyle, label=label)
         if boundaries:
             ax.vlines(segment.start, y + 0.05, y - 0.05,
                       color, linewidth=1, linestyle='solid')
@@ -123,13 +131,13 @@ class Notebook(object):
         if label is None:
             return
 
-    def get_y(self, segments):
+    def get_y(self, segments: Iterable[Segment]) -> np.ndarray:
         """
 
         Parameters
         ----------
-        segments : iterator
-            `Segment` iterator (sorted)
+        segments : Iterable
+            `Segment` iterable (sorted)
 
         Returns
         -------
@@ -168,8 +176,9 @@ class Notebook(object):
 
         return y
 
-
-    def __call__(self, resource, time=True, legend=True):
+    def __call__(self, resource: Resource,
+                 time: bool = True,
+                 legend: bool = True):
 
         if isinstance(resource, Segment):
             self.plot_segment(resource, time=time)
@@ -180,9 +189,8 @@ class Notebook(object):
         elif isinstance(resource, Annotation):
             self.plot_annotation(resource, time=time, legend=legend)
 
-        elif isinstance(resource, Scores):
-            self.plot_scores(resource, time=time, legend=legend)
-
+        elif isinstance(resource, SlidingWindowFeature):
+            self.plot_feature(resource, time=time)
 
     def plot_segment(self, segment, ax=None, time=True):
 
@@ -192,7 +200,7 @@ class Notebook(object):
         ax = self.setup(ax=ax, time=time)
         self.draw_segment(ax, segment, 0.5)
 
-    def plot_timeline(self, timeline, ax=None, time=True):
+    def plot_timeline(self, timeline: Timeline, ax=None, time=True):
 
         if not self.crop and timeline:
             self.crop = timeline.extent()
@@ -206,7 +214,7 @@ class Notebook(object):
 
         # ax.set_aspect(3. / self.crop.duration)
 
-    def plot_annotation(self, annotation, ax=None, time=True, legend=True):
+    def plot_annotation(self, annotation: Annotation, ax=None, time=True, legend=True):
 
         if not self.crop:
             self.crop = annotation.get_timeline(copy=False).extent()
@@ -223,61 +231,36 @@ class Notebook(object):
             self.draw_segment(ax, segment, y, label=label)
 
         if legend:
+            H, L = ax.get_legend_handles_labels()
+
+            # corner case when no segment is visible
+            if not H:
+                return
+
             # this gets exactly one legend handle and one legend label per label
             # (avoids repeated legends for repeated tracks with same label)
-            H, L = ax.get_legend_handles_labels()
             HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
                          key=lambda h_l: h_l[1])
             H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
             ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
                       ncol=5, borderaxespad=0., frameon=False)
 
-    def plot_scores(self, scores, ax=None, time=True, legend=True):
-
-        if not self.crop:
-            self.crop = scores.to_annotation().get_timeline(copy=False).extent()
-
-        cropped = scores.crop(notebook.crop, mode='loose')
-        labels = cropped.labels()
-
-        data = scores.dataframe_.values
-        m = np.nanmin(data)
-        M = np.nanmax(data)
-        ylim = (m - 0.1 * (M - m), M + 0.1 * (M - m))
-
-        ax = self.setup(ax=ax, yaxis=True, ylim=ylim, time=time)
-
-        for segment, track, label, value in cropped.itervalues():
-            y = value
-            self.draw_segment(ax, segment, y, label=label, boundaries=False)
-
-        # ax.set_aspect(6. / ((ylim[1] - ylim[0]) * self.crop.duration))
-
-        if legend:
-            # this gets exactly one legend handle and one legend label per label
-            # (avoids repeated legends for repeated tracks with same label)
-            H, L = ax.get_legend_handles_labels()
-            HL = groupby(sorted(zip(H, L), key=lambda h_l: h_l[1]),
-                         key=lambda h_l: h_l[1])
-            H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
-            ax.legend(H, L, bbox_to_anchor=(0, 1), loc=3,
-                      ncol=5, borderaxespad=0., frameon=False)
-
-    def plot_feature(self, feature, ax=None, time=True, ylim=None):
+    def plot_feature(self, feature: SlidingWindowFeature,
+                     ax=None, time=True, ylim=None):
 
         if not self.crop:
             self.crop = feature.getExtent()
 
         window = feature.sliding_window
-        indices = window.crop(self.crop, mode='loose')
-        t = [window[i].middle for i in indices]
+        n, dimension = feature.data.shape
+        (start, stop), = window.crop(self.crop, mode='loose',
+                                     return_ranges=True)
+        xlim = (window[start].middle, window[stop].middle)
 
-        data = np.take(feature.data, indices, axis=0, mode='clip')
-        for i, index in enumerate(indices):
-            if index < 0:
-                data[i] = np.NAN
-            if index >= len(feature.data):
-                data[i] = np.NAN
+        start = max(0, start)
+        stop = min(stop, n)
+        t = window[0].middle + window.step * np.arange(start, stop)
+        data = feature[start: stop]
 
         if ylim is None:
             m = np.nanmin(data)
@@ -286,11 +269,13 @@ class Notebook(object):
 
         ax = self.setup(ax=ax, yaxis=False, ylim=ylim, time=time)
         ax.plot(t, data)
+        ax.set_xlim(xlim)
+
 
 notebook = Notebook()
 
 
-def repr_segment(segment):
+def repr_segment(segment: Segment):
     """Get `png` data for `segment`"""
     import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']
@@ -303,7 +288,7 @@ def repr_segment(segment):
     return data
 
 
-def repr_timeline(timeline):
+def repr_timeline(timeline: Timeline):
     """Get `png` data for `timeline`"""
     import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']
@@ -316,7 +301,7 @@ def repr_timeline(timeline):
     return data
 
 
-def repr_annotation(annotation):
+def repr_annotation(annotation: Annotation):
     """Get `png` data for `annotation`"""
     import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']
@@ -329,20 +314,7 @@ def repr_annotation(annotation):
     return data
 
 
-def repr_scores(scores):
-    """Get `png` data for `scores`"""
-    import matplotlib.pyplot as plt
-    figsize = plt.rcParams['figure.figsize']
-    plt.rcParams['figure.figsize'] = (notebook.width, 2)
-    fig, ax = plt.subplots()
-    notebook.plot_scores(scores, ax=ax)
-    data = print_figure(fig, 'png')
-    plt.close(fig)
-    plt.rcParams['figure.figsize'] = figsize
-    return data
-
-
-def repr_feature(feature):
+def repr_feature(feature: SlidingWindowFeature):
     """Get `png` data for `feature`"""
     import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']

@@ -88,11 +88,22 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
+from typing import (Optional, Iterable, List, Union, Callable,
+                    TextIO, Tuple, TYPE_CHECKING, Iterator, Dict)
 
-from .segment import Segment
+import pandas as pd
 from sortedcontainers import SortedList
+
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from .segment import Segment
+from .utils.types import Support, Label, CropMode
+
+#  this is a moderately ugly way to import `Annotation` to the namespace
+#  without causing some circular imports :
+#  https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports
+if TYPE_CHECKING:
+    from .annotation import Annotation
 
 
 # =====================================================================
@@ -100,7 +111,7 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 # =====================================================================
 
 
-class Timeline(object):
+class Timeline:
     """
     Ordered set of segments.
 
@@ -122,15 +133,14 @@ class Timeline(object):
     """
 
     @classmethod
-    def from_df(cls, df, uri=None):
+    def from_df(cls, df: pd.DataFrame, uri: Optional[str] = None) -> 'Timeline':
         segments = list(df[PYANNOTE_SEGMENT])
         timeline = cls(segments=segments, uri=uri)
         return timeline
 
-    def __init__(self, segments=None, uri=None):
-
-        super(Timeline, self).__init__()
-
+    def __init__(self,
+                 segments: Optional[Iterable[Segment]] = None,
+                 uri: str = None):
         if segments is None:
             segments = ()
 
@@ -150,7 +160,7 @@ class Timeline(object):
         self.segments_boundaries_ = SortedList(boundaries)
 
         # path to (or any identifier of) segmented resource
-        self.uri = uri
+        self.uri: str = uri
 
     def __len__(self):
         """Number of segments
@@ -173,7 +183,7 @@ class Timeline(object):
         """
         return len(self.segments_set_) > 0
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Segment]:
         """Iterate over segments (in chronological order)
 
         >>> for segment in timeline:
@@ -185,7 +195,7 @@ class Timeline(object):
         """
         return iter(self.segments_list_)
 
-    def __getitem__(self, k):
+    def __getitem__(self, k: int) -> Segment:
         """Get segment by index (in chronological order)
 
         >>> first_segment = timeline[0]
@@ -193,7 +203,7 @@ class Timeline(object):
         """
         return self.segments_list_[k]
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'Timeline'):
         """Equality
 
         Two timelines are equal if and only if their segments are equal.
@@ -208,11 +218,11 @@ class Timeline(object):
         """
         return self.segments_set_ == other.segments_set_
 
-    def __ne__(self, other):
+    def __ne__(self, other: 'Timeline'):
         """Inequality"""
         return self.segments_set_ != other.segments_set_
 
-    def index(self, segment):
+    def index(self, segment: Segment) -> int:
         """Get index of (existing) segment
 
         Parameters
@@ -231,7 +241,7 @@ class Timeline(object):
         """
         return self.segments_list_.index(segment)
 
-    def add(self, segment):
+    def add(self, segment: Segment) -> 'Timeline':
         """Add a segment (in place)
 
         Parameters
@@ -267,7 +277,7 @@ class Timeline(object):
 
         return self
 
-    def remove(self, segment):
+    def remove(self, segment: Segment) -> 'Timeline':
         """Remove a segment (in place)
 
         Parameters
@@ -299,7 +309,7 @@ class Timeline(object):
 
         return self
 
-    def discard(self, segment):
+    def discard(self, segment: Segment) -> 'Timeline':
         """Same as `remove`
 
         See also
@@ -308,10 +318,10 @@ class Timeline(object):
         """
         return self.remove(segment)
 
-    def __ior__(self, timeline):
+    def __ior__(self, timeline: 'Timeline') -> 'Timeline':
         return self.update(timeline)
 
-    def update(self, timeline):
+    def update(self, timeline: Segment) -> 'Timeline':
         """Add every segments of an existing timeline (in place)
 
         Parameters
@@ -344,10 +354,10 @@ class Timeline(object):
 
         return self
 
-    def __or__(self, timeline):
+    def __or__(self, timeline: 'Timeline') -> 'Timeline':
         return self.union(timeline)
 
-    def union(self, timeline):
+    def union(self, timeline: 'Timeline') -> 'Timeline':
         """Create new timeline made of union of segments
 
         Parameters
@@ -368,7 +378,7 @@ class Timeline(object):
         segments = self.segments_set_ | timeline.segments_set_
         return Timeline(segments=segments, uri=self.uri)
 
-    def co_iter(self, other):
+    def co_iter(self, other: 'Timeline') -> Iterator[Tuple[Segment, Segment]]:
         """Iterate over pairs of intersecting segments
 
         >>> timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
@@ -398,7 +408,11 @@ class Timeline(object):
                 if segment.intersects(other_segment):
                     yield segment, other_segment
 
-    def crop_iter(self, support, mode='intersection', returns_mapping=False):
+    def crop_iter(self,
+                  support: Support,
+                  mode: CropMode = 'intersection',
+                  returns_mapping: bool = False) \
+            -> Iterator[Union[Tuple[Segment, Segment], Segment]]:
         """Like `crop` but returns a segment iterator instead
 
         See also
@@ -426,6 +440,9 @@ class Timeline(object):
                 yield yielded
             return
 
+        # if 'support' is a `Timeline`, we use its support
+        support = support.support()
+
         # loose mode
         if mode == 'loose':
             for segment, _ in self.co_iter(support):
@@ -449,7 +466,11 @@ class Timeline(object):
             else:
                 yield mapped_to
 
-    def crop(self, support, mode='intersection', returns_mapping=False):
+    def crop(self,
+             support: Support,
+             mode: CropMode = 'intersection',
+             returns_mapping: bool = False) \
+            -> Union['Timeline', Tuple['Timeline', Dict[Segment, Segment]]]:
         """Crop timeline to new support
 
         Parameters
@@ -506,7 +527,7 @@ class Timeline(object):
         return Timeline(segments=self.crop_iter(support, mode=mode),
                         uri=self.uri)
 
-    def overlapping(self, t):
+    def overlapping(self, t: float) -> List[Segment]:
         """Get list of segments overlapping `t`
 
         Parameters
@@ -521,7 +542,7 @@ class Timeline(object):
         """
         return list(self.overlapping_iter(t))
 
-    def overlapping_iter(self, t):
+    def overlapping_iter(self, t: float) -> Iterator[Segment]:
         """Like `overlapping` but returns a segment iterator instead
 
         See also
@@ -529,7 +550,6 @@ class Timeline(object):
         :func:`pyannote.core.Timeline.overlapping`
         """
         segment = Segment(start=t, end=t)
-        iterable = self.segments_list_.irange(maximum=segment)
         for segment in self.segments_list_.irange(maximum=segment):
             if segment.overlaps(t):
                 yield segment
@@ -548,7 +568,7 @@ class Timeline(object):
         string = "["
         for i, segment in enumerate(self.segments_list_):
             string += str(segment)
-            string += "\n " if i+1 < n else ""
+            string += "\n " if i + 1 < n else ""
         string += "]"
         return string
 
@@ -563,7 +583,7 @@ class Timeline(object):
         return "<Timeline(uri=%s, segments=%s)>" % (self.uri,
                                                     list(self.segments_list_))
 
-    def __contains__(self, included):
+    def __contains__(self, included: Union[Segment, 'Timeline']):
         """Inclusion
 
         Check whether every segment of `included` does exist in timeline.
@@ -595,14 +615,14 @@ class Timeline(object):
             return included in self.segments_set_
 
         elif isinstance(included, Timeline):
-            return self.segments_set_.issuperset(included._segments)
+            return self.segments_set_.issuperset(included.segments_set_)
 
         else:
             raise TypeError(
                 'Checking for inclusion only supports Segment and '
                 'Timeline instances')
 
-    def empty(self):
+    def empty(self) -> 'Timeline':
         """Return an empty copy
 
         Returns
@@ -613,7 +633,8 @@ class Timeline(object):
         """
         return Timeline(uri=self.uri)
 
-    def copy(self, segment_func=None):
+    def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
+            -> 'Timeline':
         """Get a copy of the timeline
 
         If `segment_func` is provided, it is applied to each segment first.
@@ -641,7 +662,7 @@ class Timeline(object):
         return Timeline(segments=[segment_func(s) for s in self.segments_list_],
                         uri=self.uri)
 
-    def extent(self):
+    def extent(self) -> Segment:
         """Extent
 
         The extent of a timeline is the segment of minimum duration that
@@ -678,8 +699,8 @@ class Timeline(object):
             import numpy as np
             return Segment(start=np.inf, end=-np.inf)
 
-    def support_iter(self):
-        """Like `support` but returns a segment iterator instead
+    def support_iter(self, collar: float = 0.) -> Iterator[Segment]:
+        """Like `support` but returns a segment generator instead
 
         See also
         --------
@@ -704,12 +725,15 @@ class Timeline(object):
 
         for segment in self:
 
-            # If there is no gap between new support segment and next segment,
-            if not (segment ^ new_segment):
+            # If there is no gap between new support segment and next segment
+            # OR there is a gap with duration < collar seconds,
+            possible_gap = segment ^ new_segment
+            if not possible_gap or possible_gap.duration < collar:
                 # Extend new support segment using next segment
                 new_segment |= segment
 
-            # If there actually is a gap,
+            # If there actually is a gap and the gap duration >= collar
+            # seconds,
             else:
                 yield new_segment
 
@@ -720,7 +744,7 @@ class Timeline(object):
         # Add new segment to the timeline support
         yield new_segment
 
-    def support(self):
+    def support(self, collar: float = 0.) -> 'Timeline':
         """Timeline support
 
         The support of a timeline is the timeline with the minimum number of
@@ -730,21 +754,34 @@ class Timeline(object):
 
         A picture is worth a thousand words::
 
+            collar
+            |---|
+
             timeline
-            |------|    |------|     |----|
-              |--|    |-----|     |----------|
+            |------|    |------|      |----|
+              |--|    |-----|      |----------|
 
             timeline.support()
-            |------|  |--------|  |----------|
+            |------|  |--------|   |----------|
+
+            timeline.support(collar)
+            |------------------|   |----------|
+
+        Parameters
+        ----------
+        collar : float, optional
+            Merge separated by less than `collar` seconds. This is why there
+            are only two segments in the final timeline in the above figure.
+            Defaults to 0.
 
         Returns
         -------
         support : Timeline
             Timeline support
         """
-        return Timeline(segments=self.support_iter(), uri=self.uri)
+        return Timeline(segments=self.support_iter(collar), uri=self.uri)
 
-    def duration(self):
+    def duration(self) -> float:
         """Timeline duration
 
         The timeline duration is the sum of the durations of the segments
@@ -760,8 +797,8 @@ class Timeline(object):
         # of the segments in the timeline support.
         return sum(s.duration for s in self.support_iter())
 
-    def gaps_iter(self, support=None):
-        """Like `gaps` but returns a segment iterator instead
+    def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
+        """Like `gaps` but returns a segment generator instead
 
         See also
         --------
@@ -808,7 +845,8 @@ class Timeline(object):
                 for gap in self.gaps_iter(support=segment):
                     yield gap
 
-    def gaps(self, support=None):
+    def gaps(self, support: Optional[Support] = None) \
+            -> 'Timeline':
         """Gaps
 
         A picture is worth a thousand words::
@@ -839,7 +877,7 @@ class Timeline(object):
         return Timeline(segments=self.gaps_iter(support=support),
                         uri=self.uri)
 
-    def segmentation(self):
+    def segmentation(self) -> 'Timeline':
         """Segmentation
 
         Create the unique timeline with same support and same set of segment
@@ -898,7 +936,10 @@ class Timeline(object):
 
         return Timeline(segments=segments, uri=self.uri)
 
-    def to_annotation(self, generator='string', modality=None):
+    def to_annotation(self,
+                      generator: Union[str, Iterable[Label], None, None] = 'string',
+                      modality: Optional[str] = None) \
+            -> 'Annotation':
         """Turn timeline into an annotation
 
         Each segment is labeled by a unique label.
@@ -929,6 +970,27 @@ class Timeline(object):
             annotation[segment] = next(generator)
 
         return annotation
+
+    def write_uem(self, file: TextIO):
+        """Dump timeline to file using UEM format
+
+        Parameters
+        ----------
+        file : file object
+
+        Usage
+        -----
+        >>> with open('file.uem', 'w') as file:
+        ...    timeline.write_uem(file)
+        """
+
+        uri = self.uri if self.uri else "<NA>"
+        if ' ' in uri:
+            msg = f"{uri} : There shouldn't be spaces in file uris."
+            raise ValueError(msg)
+        for segment in self:
+            line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
+            file.write(line)
 
     def for_json(self):
         """Serialization

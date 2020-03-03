@@ -28,16 +28,18 @@
 
 import itertools
 from string import ascii_uppercase
+from typing import Iterable, Union, List, Set, Optional, Iterator
 
 
-def pairwise(iterable):
-    "s -> (s0,s1), (s1,s2), (s2, s3), ..."
+def pairwise(iterable: Iterable):
+    """s -> (s0,s1), (s1,s2), (s2, s3), ..."""
     a, b = itertools.tee(iterable)
     next(b, None)
     return zip(a, b)
 
 
-def string_generator(skip=[]):
+def string_generator(skip: Optional[Union[List, Set]] = None) \
+        -> Iterator[str]:
     """Label generator
 
     Parameters
@@ -61,6 +63,8 @@ def string_generator(skip=[]):
     next(t) -> 'AAA'  # then 3-letters labels
     ...               # (you get the idea)
     """
+    if skip is None:
+        skip = list()
 
     # label length
     r = 1
@@ -77,7 +81,8 @@ def string_generator(skip=[]):
         # increment label length when all possibilities are exhausted
         r = r + 1
 
-def int_generator():
+
+def int_generator() -> Iterator[int]:
     i = 0
     while True:
         yield i
