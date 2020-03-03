@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2019 CNRS
+# Copyright (c) 2014-2020 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
-
+# Paul LERNER
 
 """
 ##########
@@ -358,12 +358,12 @@ class Annotation:
         uri = self.uri if self.uri else "<NA>"
         if isinstance(uri, Text) and ' ' in uri:
             msg = (f'Space-separated RTTM file format does not allow file URIs '
-                  f'containing spaces (got: "{uri}").')
+                   f'containing spaces (got: "{uri}").')
             raise ValueError(msg)
         for segment, _, label in self.itertracks(yield_label=True):
             if isinstance(label, Text) and ' ' in label:
                 msg = (f'Space-separated RTTM file format does not allow labels '
-                      f'containing spaces (got: "{label}").')
+                       f'containing spaces (got: "{label}").')
                 raise ValueError(msg)
             line = (
                 f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
