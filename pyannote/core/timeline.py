@@ -28,7 +28,6 @@
 # Grant JENKS - http://www.grantjenks.com/
 # Paul LERNER
 
-
 """
 ########
 Timeline
@@ -634,6 +633,34 @@ class Timeline:
         """
         return Timeline(uri=self.uri)
 
+    def covers(self, other : 'Timeline') -> bool:
+        """Check whether other timeline is fully covered by the timeline
+        
+        Parameter
+        ---------
+        other : Timeline
+            Second timeline
+
+        Returns
+        -------
+        covers : bool
+            True if timeline covers "other" timeline entirely. False if at least
+            one segment of "other" is not fully covered by timeline
+        """
+        
+        # compute gaps within "other" extent 
+        # this is where we should look for possible faulty segments 
+        gaps = self.gaps(support=other.extent())
+        
+        # if at least one gap intersects with a segment from "other", 
+        # "self" does not cover "other" entirely --> return False
+        for _ in gaps.co_iter(other):
+            return False
+
+        # if no gap intersects with a segment from "other", 
+        # "self" covers "other" entirely --> return True
+        return True
+ 
     def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
             -> 'Timeline':
         """Get a copy of the timeline
