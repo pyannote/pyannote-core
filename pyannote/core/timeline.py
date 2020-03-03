@@ -633,6 +633,19 @@ class Timeline:
         """
         return Timeline(uri=self.uri)
 
+    def covers(self, other : 'Timeline') -> bool:
+        """Check whether a timeline covers another,
+        i.e. whether the other if fully included in the timeline
+        """
+        covers = True
+        gap_gen = self.gaps(support=other.extent()).co_iter(other)
+        try:
+            next(gap_gen)
+        except StopIteration:
+            return True
+        else:
+            return False
+
     def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
             -> 'Timeline':
         """Get a copy of the timeline
