@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.annotation &mdash; pyannote.core 3.5 documentation</title>
+  <title>pyannote.core.annotation &mdash; pyannote.core 3.6 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                3.5
+                3.6
               </div>
             
           
@@ -158,7 +158,7 @@
 
 <span class="c1"># The MIT License (MIT)</span>
 
-<span class="c1"># Copyright (c) 2014-2019 CNRS</span>
+<span class="c1"># Copyright (c) 2014-2020 CNRS</span>
 
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
 <span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
@@ -180,7 +180,7 @@
 
 <span class="c1"># AUTHORS</span>
 <span class="c1"># Hervé BREDIN - http://herve.niderb.fr</span>
-
+<span class="c1"># Paul LERNER</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">##########</span>
@@ -261,9 +261,9 @@
 
 <span class="sd">See :class:`pyannote.core.Annotation` for the complete reference.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TextIO</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterator</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TextIO</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Text</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -302,23 +302,8 @@
                 <span class="n">modality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">PYANNOTE_SEGMENT</span><span class="p">,</span> <span class="n">PYANNOTE_TRACK</span><span class="p">,</span> <span class="n">PYANNOTE_LABEL</span><span class="p">]]</span>
-
-        <span class="n">annotation</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="o">=</span><span class="n">modality</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">annotation</span><span class="o">.</span><span class="n">_tracks</span><span class="p">:</span>
-                <span class="n">annotation</span><span class="o">.</span><span class="n">_tracks</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">annotation</span><span class="o">.</span><span class="n">_tracks</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">]}</span>
-
-        <span class="n">annotation</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()}</span>
-        <span class="n">annotation</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">label</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">annotation</span><span class="o">.</span><span class="n">_labels</span><span class="p">}</span>
-
-        <span class="n">annotation</span><span class="o">.</span><span class="n">_timeline</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">annotation</span><span class="o">.</span><span class="n">_timelineNeedsUpdate</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="k">return</span> <span class="n">annotation</span>
+        <span class="k">return</span> <span class="n">Annotation</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Annotation.__init__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">modality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
@@ -526,8 +511,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="k">else</span> <span class="s2">&quot;&lt;NA&gt;&quot;</span>
-
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">uri</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Space-separated RTTM file format does not allow file URIs &#39;</span>
+                   <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{uri}</span><span class="s1">&quot;).&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Space-separated RTTM file format does not allow labels &#39;</span>
+                       <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{label}</span><span class="s1">&quot;).&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="n">line</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="sa">f</span><span class="s1">&#39;SPEAKER </span><span class="si">{uri}</span><span class="s1"> 1 </span><span class="si">{segment.start:.3f}</span><span class="s1"> </span><span class="si">{segment.duration:.3f}</span><span class="s1"> &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;&lt;NA&gt; &lt;NA&gt; </span><span class="si">{label}</span><span class="s1"> &lt;NA&gt; &lt;NA&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -1320,11 +1312,7 @@
             <span class="n">timeline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_timeline</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="c1"># fill the gaps shorter than collar</span>
-            <span class="k">if</span> <span class="n">collar</span> <span class="o">&gt;</span> <span class="mf">0.</span><span class="p">:</span>
-                <span class="n">gaps</span> <span class="o">=</span> <span class="n">timeline</span><span class="o">.</span><span class="n">gaps</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">gap</span> <span class="ow">in</span> <span class="n">gaps</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">gap</span><span class="o">.</span><span class="n">duration</span> <span class="o">&lt;</span> <span class="n">collar</span><span class="p">:</span>
-                        <span class="n">timeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">gap</span><span class="p">)</span>
+            <span class="n">timeline</span> <span class="o">=</span> <span class="n">timeline</span><span class="o">.</span><span class="n">support</span><span class="p">(</span><span class="n">collar</span><span class="p">)</span>
 
             <span class="c1"># reconstruct annotation with merged tracks</span>
             <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">timeline</span><span class="o">.</span><span class="n">support</span><span class="p">():</span>
@@ -1432,15 +1420,49 @@
 <span class="sd">        --------</span>
 <span class="sd">        :mod:`pyannote.core.json`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="n">uri</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PYANNOTE_URI</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">modality</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">PYANNOTE_MODALITY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">record_dict</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">PYANNOTE_JSON_CONTENT</span><span class="p">]:</span>
+            <span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">record_dict</span><span class="p">[</span><span class="n">PYANNOTE_SEGMENT</span><span class="p">])</span>
+            <span class="n">track</span> <span class="o">=</span> <span class="n">record_dict</span><span class="p">[</span><span class="n">PYANNOTE_TRACK</span><span class="p">]</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">record_dict</span><span class="p">[</span><span class="n">PYANNOTE_LABEL</span><span class="p">]</span>
+            <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">Annotation</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Annotation.from_records"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.from_records">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_records</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">records</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">,</span> <span class="n">Label</span><span class="p">]],</span>
+                     <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                     <span class="n">modality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Annotation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        records : iterator of tuples</span>
+<span class="sd">            (segment, track, label) tuples</span>
+<span class="sd">        uri : string, optional</span>
+<span class="sd">            name of annotated resource (e.g. audio or video file)</span>
+<span class="sd">        modality : string, optional</span>
+<span class="sd">            name of annotated modality</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        annotation : Annotation</span>
+<span class="sd">            New annotation</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">annotation</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="o">=</span><span class="n">modality</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">one</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">PYANNOTE_JSON_CONTENT</span><span class="p">]:</span>
-            <span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">one</span><span class="p">[</span><span class="n">PYANNOTE_SEGMENT</span><span class="p">])</span>
-            <span class="n">track</span> <span class="o">=</span> <span class="n">one</span><span class="p">[</span><span class="n">PYANNOTE_TRACK</span><span class="p">]</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="n">one</span><span class="p">[</span><span class="n">PYANNOTE_LABEL</span><span class="p">]</span>
-            <span class="n">annotation</span><span class="p">[</span><span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+        <span class="n">tracks</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">records</span><span class="p">:</span>
+            <span class="n">tracks</span><span class="p">[</span><span class="n">segment</span><span class="p">][</span><span class="n">track</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
+            <span class="n">labels</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+        <span class="n">annotation</span><span class="o">.</span><span class="n">_tracks</span> <span class="o">=</span> <span class="n">SortedDict</span><span class="p">(</span><span class="n">tracks</span><span class="p">)</span>
+        <span class="n">annotation</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">}</span>
+        <span class="n">annotation</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">label</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">annotation</span><span class="o">.</span><span class="n">_labels</span><span class="p">}</span>
+        <span class="n">annotation</span><span class="o">.</span><span class="n">_timeline</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">annotation</span><span class="o">.</span><span class="n">_timelineNeedsUpdate</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">return</span> <span class="n">annotation</span></div>
 

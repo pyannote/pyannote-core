@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.timeline &mdash; pyannote.core 3.5 documentation</title>
+  <title>pyannote.core.timeline &mdash; pyannote.core 3.6 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                3.5
+                3.6
               </div>
             
           
@@ -158,7 +158,7 @@
 
 <span class="c1"># The MIT License (MIT)</span>
 
-<span class="c1"># Copyright (c) 2014-2017 CNRS</span>
+<span class="c1"># Copyright (c) 2014-2020 CNRS</span>
 
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
 <span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
@@ -181,7 +181,7 @@
 <span class="c1"># AUTHORS</span>
 <span class="c1"># Hervé BREDIN - http://herve.niderb.fr</span>
 <span class="c1"># Grant JENKS - http://www.grantjenks.com/</span>
-
+<span class="c1"># Paul LERNER</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">########</span>
@@ -244,7 +244,7 @@
 <span class="sd">See :class:`pyannote.core.Timeline` for the complete reference.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Optional</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span>
-                    <span class="n">TextIO</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Dict</span><span class="p">)</span>
+                    <span class="n">TextIO</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sortedcontainers</span> <span class="kn">import</span> <span class="n">SortedList</span>
@@ -788,6 +788,34 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Timeline.covers"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.covers">[docs]</a>    <span class="k">def</span> <span class="nf">covers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">:</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Check whether other timeline is fully covered by the timeline</span>
+<span class="sd">        </span>
+<span class="sd">        Parameter</span>
+<span class="sd">        ---------</span>
+<span class="sd">        other : Timeline</span>
+<span class="sd">            Second timeline</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        covers : bool</span>
+<span class="sd">            True if timeline covers &quot;other&quot; timeline entirely. False if at least</span>
+<span class="sd">            one segment of &quot;other&quot; is not fully covered by timeline</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1"># compute gaps within &quot;other&quot; extent </span>
+        <span class="c1"># this is where we should look for possible faulty segments </span>
+        <span class="n">gaps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaps</span><span class="p">(</span><span class="n">support</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">extent</span><span class="p">())</span>
+        
+        <span class="c1"># if at least one gap intersects with a segment from &quot;other&quot;, </span>
+        <span class="c1"># &quot;self&quot; does not cover &quot;other&quot; entirely --&gt; return False</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">gaps</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># if no gap intersects with a segment from &quot;other&quot;, </span>
+        <span class="c1"># &quot;self&quot; covers &quot;other&quot; entirely --&gt; return True</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+ 
 <div class="viewcode-block" id="Timeline.copy"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Segment</span><span class="p">],</span> <span class="n">Segment</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
             <span class="o">-&gt;</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get a copy of the timeline</span>
@@ -854,7 +882,7 @@
             <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
             <span class="k">return</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">end</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Timeline.support_iter"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.support_iter">[docs]</a>    <span class="k">def</span> <span class="nf">support_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Segment</span><span class="p">]:</span>
+<div class="viewcode-block" id="Timeline.support_iter"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.support_iter">[docs]</a>    <span class="k">def</span> <span class="nf">support_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collar</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Segment</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Like `support` but returns a segment generator instead</span>
 
 <span class="sd">        See also</span>
@@ -880,12 +908,15 @@
 
         <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
 
-            <span class="c1"># If there is no gap between new support segment and next segment,</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">segment</span> <span class="o">^</span> <span class="n">new_segment</span><span class="p">):</span>
+            <span class="c1"># If there is no gap between new support segment and next segment</span>
+            <span class="c1"># OR there is a gap with duration &lt; collar seconds,</span>
+            <span class="n">possible_gap</span> <span class="o">=</span> <span class="n">segment</span> <span class="o">^</span> <span class="n">new_segment</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">possible_gap</span> <span class="ow">or</span> <span class="n">possible_gap</span><span class="o">.</span><span class="n">duration</span> <span class="o">&lt;</span> <span class="n">collar</span><span class="p">:</span>
                 <span class="c1"># Extend new support segment using next segment</span>
                 <span class="n">new_segment</span> <span class="o">|=</span> <span class="n">segment</span>
 
-            <span class="c1"># If there actually is a gap,</span>
+            <span class="c1"># If there actually is a gap and the gap duration &gt;= collar</span>
+            <span class="c1"># seconds,</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">new_segment</span>
 
@@ -896,7 +927,7 @@
         <span class="c1"># Add new segment to the timeline support</span>
         <span class="k">yield</span> <span class="n">new_segment</span></div>
 
-<div class="viewcode-block" id="Timeline.support"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.support">[docs]</a>    <span class="k">def</span> <span class="nf">support</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Timeline.support"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.support">[docs]</a>    <span class="k">def</span> <span class="nf">support</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collar</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Timeline support</span>
 
 <span class="sd">        The support of a timeline is the timeline with the minimum number of</span>
@@ -906,19 +937,32 @@
 
 <span class="sd">        A picture is worth a thousand words::</span>
 
+<span class="sd">            collar</span>
+<span class="sd">            |---|</span>
+
 <span class="sd">            timeline</span>
-<span class="sd">            |------|    |------|     |----|</span>
-<span class="sd">              |--|    |-----|     |----------|</span>
+<span class="sd">            |------|    |------|      |----|</span>
+<span class="sd">              |--|    |-----|      |----------|</span>
 
 <span class="sd">            timeline.support()</span>
-<span class="sd">            |------|  |--------|  |----------|</span>
+<span class="sd">            |------|  |--------|   |----------|</span>
+
+<span class="sd">            timeline.support(collar)</span>
+<span class="sd">            |------------------|   |----------|</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        collar : float, optional</span>
+<span class="sd">            Merge separated by less than `collar` seconds. This is why there</span>
+<span class="sd">            are only two segments in the final timeline in the above figure.</span>
+<span class="sd">            Defaults to 0.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        support : Timeline</span>
 <span class="sd">            Timeline support</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">support_iter</span><span class="p">(),</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">support_iter</span><span class="p">(</span><span class="n">collar</span><span class="p">),</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Timeline.duration"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.duration">[docs]</a>    <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Timeline duration</span>
@@ -1116,7 +1160,7 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        file : file object</span>
-<span class="sd">        </span>
+
 <span class="sd">        Usage</span>
 <span class="sd">        -----</span>
 <span class="sd">        &gt;&gt;&gt; with open(&#39;file.uem&#39;, &#39;w&#39;) as file:</span>
@@ -1124,7 +1168,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="k">else</span> <span class="s2">&quot;&lt;NA&gt;&quot;</span>
-
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">uri</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Space-separated UEM file format does not allow file URIs &#39;</span>
+                   <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{uri}</span><span class="s1">&quot;).&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{uri}</span><span class="s2"> 1 </span><span class="si">{segment.start:.3f}</span><span class="s2"> </span><span class="si">{segment.end:.3f}</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
