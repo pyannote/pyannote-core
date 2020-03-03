@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2019 CNRS
+# Copyright (c) 2014-2020 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@
 
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
-
+# Paul LERNER
 
 """
 ##########
@@ -106,9 +106,9 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
-
+from collections import defaultdict
 import itertools
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text
 
 import numpy as np
 import pandas as pd
@@ -147,23 +147,8 @@ class Annotation:
                 modality: Optional[str] = None) -> 'Annotation':
 
         df = df[[PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL]]
-
-        annotation = cls(uri=uri, modality=modality)
-
-        for row in df.itertuples():
-            if row[1] in annotation._tracks:
-                annotation._tracks[row[1]][row[2]] = row[3]
-            else:
-                annotation._tracks[row[1]] = {row[2]: row[3]}
-
-        annotation._labels = {label: None for label in df['label'].unique()}
-        annotation._labelNeedsUpdate = {
-            label: True for label in annotation._labels}
-
-        annotation._timeline = None
-        annotation._timelineNeedsUpdate = True
-
-        return annotation
+        return Annotation.from_records(
+            df.itertuples(index=False), uri, modality)
 
     def __init__(self, uri: Optional[str] = None, modality: Optional[str] = None):
 
@@ -371,8 +356,15 @@ class Annotation:
         """
 
         uri = self.uri if self.uri else "<NA>"
-
+        if isinstance(uri, Text) and ' ' in uri:
+            msg = (f'Space-separated RTTM file format does not allow file URIs '
+                   f'containing spaces (got: "{uri}").')
+            raise ValueError(msg)
         for segment, _, label in self.itertracks(yield_label=True):
+            if isinstance(label, Text) and ' ' in label:
+                msg = (f'Space-separated RTTM file format does not allow labels '
+                       f'containing spaces (got: "{label}").')
+                raise ValueError(msg)
             line = (
                 f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
                 f'<NA> <NA> {label} <NA> <NA>\n'
@@ -1165,11 +1157,7 @@ class Annotation:
             timeline = self.label_timeline(label, copy=True)
 
             # fill the gaps shorter than collar
-            if collar > 0.:
-                gaps = timeline.gaps()
-                for gap in gaps:
-                    if gap.duration < collar:
-                        timeline.add(gap)
+            timeline = timeline.support(collar)
 
             # reconstruct annotation with merged tracks
             for segment in timeline.support():
@@ -1277,15 +1265,49 @@ class Annotation:
         --------
         :mod:`pyannote.core.json`
         """
-
         uri = data.get(PYANNOTE_URI, None)
         modality = data.get(PYANNOTE_MODALITY, None)
+        records = []
+        for record_dict in data[PYANNOTE_JSON_CONTENT]:
+            segment = Segment.from_json(record_dict[PYANNOTE_SEGMENT])
+            track = record_dict[PYANNOTE_TRACK]
+            label = record_dict[PYANNOTE_LABEL]
+            records.append((segment, track, label))
+        return Annotation.from_records(records, uri, modality)
+
+    @classmethod
+    def from_records(cls, records: Iterator[Tuple[Segment, TrackName, Label]],
+                     uri: Optional[str] = None,
+                     modality: Optional[str] = None) -> 'Annotation':
+        """Annotation
+
+        Parameters
+        ----------
+        records : iterator of tuples
+            (segment, track, label) tuples
+        uri : string, optional
+            name of annotated resource (e.g. audio or video file)
+        modality : string, optional
+            name of annotated modality
+
+        Returns
+        -------
+        annotation : Annotation
+            New annotation
+
+        """
         annotation = cls(uri=uri, modality=modality)
-        for one in data[PYANNOTE_JSON_CONTENT]:
-            segment = Segment.from_json(one[PYANNOTE_SEGMENT])
-            track = one[PYANNOTE_TRACK]
-            label = one[PYANNOTE_LABEL]
-            annotation[segment, track] = label
+        tracks = defaultdict(dict)
+        labels = set()
+        for segment, track, label in records:
+            tracks[segment][track] = label
+            labels.add(label)
+        annotation._tracks = SortedDict(tracks)
+        annotation._labels = {label: None for label in labels}
+        annotation._labelNeedsUpdate = {
+            label: True for label in annotation._labels}
+        annotation._timeline = None
+        annotation._timelineNeedsUpdate = True
 
         return annotation
 
