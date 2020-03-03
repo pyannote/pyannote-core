@@ -89,7 +89,7 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
 from typing import (Optional, Iterable, List, Union, Callable,
-                    TextIO, Tuple, TYPE_CHECKING, Iterator, Dict)
+                    TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
 
 import pandas as pd
 from sortedcontainers import SortedList
@@ -985,9 +985,11 @@ class Timeline:
         """
 
         uri = self.uri if self.uri else "<NA>"
-        if ' ' in uri:
-            msg = f"{uri} : There shouldn't be spaces in file uris."
-            raise ValueError(msg)
+        if isinstance(uri, Text):
+            if ' ' in uri:
+                msg = (f'Space-separated UEM file format does not allow file URIs '
+                      f'containing spaces (got: "{uri}").')
+                raise ValueError(msg)
         for segment in self:
             line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
             file.write(line)

@@ -108,7 +108,7 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 """
 from collections import defaultdict
 import itertools
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text
 
 import numpy as np
 import pandas as pd
@@ -356,13 +356,17 @@ class Annotation:
         """
 
         uri = self.uri if self.uri else "<NA>"
-        if ' ' in uri:
-            msg = f"{uri} : There shouldn't be spaces in file uris."
-            raise ValueError(msg)
-        for segment, _, label in self.itertracks(yield_label=True):
-            if ' ' in label:
-                msg = f"{uri} : There shouldn't be spaces in labels. Got {label}."
+        if isinstance(uri, Text):
+            if ' ' in uri:
+                msg = (f'Space-separated RTTM file format does not allow file URIs '
+                      f'containing spaces (got: "{uri}").')
                 raise ValueError(msg)
+        for segment, _, label in self.itertracks(yield_label=True):
+            if isinstance(label, Text):
+                if ' ' in label:
+                    msg = (f'Space-separated RTTM file format does not allow labels '
+                          f'containing spaces (got: "{label}").')
+                    raise ValueError(msg)
             line = (
                 f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
                 f'<NA> <NA> {label} <NA> <NA>\n'
