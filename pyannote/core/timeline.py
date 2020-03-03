@@ -985,11 +985,10 @@ class Timeline:
         """
 
         uri = self.uri if self.uri else "<NA>"
-        if isinstance(uri, Text):
-            if ' ' in uri:
-                msg = (f'Space-separated UEM file format does not allow file URIs '
-                      f'containing spaces (got: "{uri}").')
-                raise ValueError(msg)
+        if isinstance(uri, Text) and ' ' in uri:
+            msg = (f'Space-separated UEM file format does not allow file URIs '
+                  f'containing spaces (got: "{uri}").')
+            raise ValueError(msg)
         for segment in self:
             line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
             file.write(line)

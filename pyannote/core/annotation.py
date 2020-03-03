@@ -356,17 +356,15 @@ class Annotation:
         """
 
         uri = self.uri if self.uri else "<NA>"
-        if isinstance(uri, Text):
-            if ' ' in uri:
-                msg = (f'Space-separated RTTM file format does not allow file URIs '
-                      f'containing spaces (got: "{uri}").')
-                raise ValueError(msg)
+        if isinstance(uri, Text) and ' ' in uri:
+            msg = (f'Space-separated RTTM file format does not allow file URIs '
+                  f'containing spaces (got: "{uri}").')
+            raise ValueError(msg)
         for segment, _, label in self.itertracks(yield_label=True):
-            if isinstance(label, Text):
-                if ' ' in label:
-                    msg = (f'Space-separated RTTM file format does not allow labels '
-                          f'containing spaces (got: "{label}").')
-                    raise ValueError(msg)
+            if isinstance(label, Text) and ' ' in label:
+                msg = (f'Space-separated RTTM file format does not allow labels '
+                      f'containing spaces (got: "{label}").')
+                raise ValueError(msg)
             line = (
                 f'SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} '
                 f'<NA> <NA> {label} <NA> <NA>\n'
