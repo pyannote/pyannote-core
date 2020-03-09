@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2017 CNRS
+# Copyright (c) 2014-2020 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 # Grant JENKS - http://www.grantjenks.com/
-
+# Paul LERNER
 
 """
 ########
@@ -89,7 +89,7 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
 from typing import (Optional, Iterable, List, Union, Callable,
-                    TextIO, Tuple, TYPE_CHECKING, Iterator, Dict)
+                    TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
 
 import pandas as pd
 from sortedcontainers import SortedList
@@ -634,17 +634,32 @@ class Timeline:
         return Timeline(uri=self.uri)
 
     def covers(self, other : 'Timeline') -> bool:
-        """Check whether a timeline covers another,
-        i.e. whether the other if fully included in the timeline
+        """Check whether other timeline is fully covered by the timeline
+
+        Parameter
+        ---------
+        other : Timeline
+            Second timeline
+
+        Returns
+        -------
+        covers : bool
+            True if timeline covers "other" timeline entirely. False if at least
+            one segment of "other" is not fully covered by timeline
         """
-        covers = True
-        gap_gen = self.gaps(support=other.extent()).co_iter(other)
-        try:
-            next(gap_gen)
-        except StopIteration:
-            return True
-        else:
+
+        # compute gaps within "other" extent
+        # this is where we should look for possible faulty segments
+        gaps = self.gaps(support=other.extent())
+
+        # if at least one gap intersects with a segment from "other",
+        # "self" does not cover "other" entirely --> return False
+        for _ in gaps.co_iter(other):
             return False
+
+        # if no gap intersects with a segment from "other",
+        # "self" covers "other" entirely --> return True
+        return True
 
     def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
             -> 'Timeline':
@@ -998,8 +1013,9 @@ class Timeline:
         """
 
         uri = self.uri if self.uri else "<NA>"
-        if ' ' in uri:
-            msg = f"{uri} : There shouldn't be spaces in file uris."
+        if isinstance(uri, Text) and ' ' in uri:
+            msg = (f'Space-separated UEM file format does not allow file URIs '
+                   f'containing spaces (got: "{uri}").')
             raise ValueError(msg)
         for segment in self:
             line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
