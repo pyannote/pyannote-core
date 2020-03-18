@@ -42,7 +42,6 @@ PYANNOTE_IDENTITY = 'identity'
 from .segment import Segment, SlidingWindow
 from .timeline import Timeline
 from .annotation import Annotation
-from .scores import Scores
 from .feature import SlidingWindowFeature
 
 try:

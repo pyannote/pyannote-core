@@ -2,6 +2,53 @@
 Changelog
 #########
 
+Version 3.6 (2020-03-03)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add collar argument to Timeline.support (@nryant)
+- feat: add new method Timeline.covers (@PaulLerner)
+- fix: check for spaces before writing with RTTM or UEM format (@PaulLerner)
+- improve: speed up Annotation.{from_df | from_json} (@nryant)
+
+Version 3.5 (2020-01-23)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add align_last option to SlidingWindow.__call__
+
+Version 3.4 (2020-01-21)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add SlidingWindow.__call__ to slide over a specific support
+- feat: add pyannote.core.utils.random
+
+Version 3.3 (2020-01-08)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- BREAKING: remove pyannote.core.Scores
+- fix: fix legend corner case with empty Annotation instances
+- fix: fix {Timeline|Annotation}.crop with overlapping segments in support
+
+Version 3.2.2 (2020-01-06)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix Segment.__bool__ return type
+
+Version 3.2 (2019-12-13)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add type hints (@hadware)
+- chore: Python3-ize code base (@hadware)
+
+Version 3.1.10 (2019-12-12)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add Annotation.write_rttm and Timeline.write_uem (@PaulLerner)
+- feat: add numpy interface to SlidingWindowFeature (experimental)
+- feat: setup continuous integration
+- improve: speed up SlidingWindowFeature plotting
+- doc: update notebooks to Python 3 (@PaulLerner)
+- BREAKING: remove deprecated Segment.pretty()
+
 Version 3.0 (2019-06-24)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

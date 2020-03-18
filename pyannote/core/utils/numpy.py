@@ -50,7 +50,7 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
     -------
     y : `pyannote.core.SlidingWindowFeature`
         (N, K) array where y[t, k] > 0 when labels[k] is active at timestep t.
-        y[t, k] = NAN means we have no idea.
+        y[t, k] = -1 means we have no idea.
     labels : list
         List of labels.
 
@@ -111,7 +111,7 @@ def one_hot_decoding(y, window, labels=None):
 
     Parameters
     ----------
-    y : (N, K) or (N, ) numpy.ndarray
+    y : (N, K) or (N, ) `numpy.ndarray`
         When y has shape (N, K), y[t, k] > 0 means kth label is active at
         timestep t. When y has shape (N, ), y[t] = 0 means no label is active
         at timestep t, y[t] = k means (k-1)th label is active.
@@ -123,7 +123,7 @@ def one_hot_decoding(y, window, labels=None):
 
     Returns
     -------
-    annotation : pyannote.core.Annotation
+    annotation : `pyannote.core.Annotation`
 
     See also
     --------
@@ -138,22 +138,27 @@ def one_hot_decoding(y, window, labels=None):
                    f"or have an attribute called 'sliding_window'.")
             raise TypeError(msg)
 
+    # if y has shape (N, ), convert it to (N, K) shape
     if len(y.shape) < 2:
         N, = y.shape
+
+        # estimate the number of classes
         if labels is not None:
             K = len(labels)
         else:
             K = np.max(y)
 
+        # convert to (N, K) shape
+        # y[t, k] = 1 means kth class is active
         y_ = np.zeros((N, K), dtype=np.int64)
         for t, k in enumerate(y):
-            if k == 0:
-                continue
-            y_[t, k - 1] = 1
+            if k > 0:
+                y_[t, k - 1] = 1
         y = y_
 
     N, K = y.shape
 
+    # generate label names when not provided
     if labels is None:
         labels = string_generator()
         labels = [next(labels) for _ in range(K)]
