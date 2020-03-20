@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Reference &mdash; pyannote.core 3.6 documentation</title>
+  <title>Reference &mdash; pyannote.core 3.7 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                3.6
+                3.7
               </div>
             
           
@@ -2190,6 +2190,23 @@ is centered on the end time of a segment with duration
 <dt id="pyannote.core.SlidingWindowFeature.__len__">
 <code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.__len__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Number of feature vectors</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.SlidingWindowFeature.align">
+<code class="sig-name descname">align</code><span class="sig-paren">(</span><em class="sig-param">to: pyannote.core.feature.SlidingWindowFeature</em><span class="sig-paren">)</span> &#x2192; pyannote.core.feature.SlidingWindowFeature<a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.align"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.align" title="Permalink to this definition">¶</a></dt>
+<dd><p>Align features by linear temporal interpolation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>to</strong> (<a class="reference internal" href="#pyannote.core.SlidingWindowFeature" title="pyannote.core.SlidingWindowFeature"><em>SlidingWindowFeature</em></a>) – Features to align with.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>aligned</strong> – Aligned features</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyannote.core.SlidingWindowFeature" title="pyannote.core.SlidingWindowFeature">SlidingWindowFeature</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">

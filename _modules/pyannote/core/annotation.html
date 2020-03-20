@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.annotation &mdash; pyannote.core 3.6 documentation</title>
+  <title>pyannote.core.annotation &mdash; pyannote.core 3.7 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                3.6
+                3.7
               </div>
             
           
@@ -513,16 +513,16 @@
         <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="k">else</span> <span class="s2">&quot;&lt;NA&gt;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">uri</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Space-separated RTTM file format does not allow file URIs &#39;</span>
-                   <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{uri}</span><span class="s1">&quot;).&#39;</span><span class="p">)</span>
+                   <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s1">&quot;).&#39;</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Space-separated RTTM file format does not allow labels &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{label}</span><span class="s1">&quot;).&#39;</span><span class="p">)</span>
+                       <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">&quot;).&#39;</span><span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="n">line</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;SPEAKER </span><span class="si">{uri}</span><span class="s1"> 1 </span><span class="si">{segment.start:.3f}</span><span class="s1"> </span><span class="si">{segment.duration:.3f}</span><span class="s1"> &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;&lt;NA&gt; &lt;NA&gt; </span><span class="si">{label}</span><span class="s1"> &lt;NA&gt; &lt;NA&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;SPEAKER </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s1"> 1 </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">start</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">duration</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;&lt;NA&gt; &lt;NA&gt; </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1"> &lt;NA&gt; &lt;NA&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
             <span class="p">)</span>
             <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
 

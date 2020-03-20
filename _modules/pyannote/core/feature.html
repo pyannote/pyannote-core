@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.feature &mdash; pyannote.core 3.6 documentation</title>
+  <title>pyannote.core.feature &mdash; pyannote.core 3.7 documentation</title>
   
 
   
@@ -58,7 +58,7 @@
             
             
               <div class="version">
-                3.6
+                3.7
               </div>
             
           
@@ -413,8 +413,37 @@
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># one return value</span>
-            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="p">)</span>
 
+<div class="viewcode-block" id="SlidingWindowFeature.align"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.align">[docs]</a>    <span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="s1">&#39;SlidingWindowFeature&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;SlidingWindowFeature&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Align features by linear temporal interpolation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        to : SlidingWindowFeature</span>
+<span class="sd">            Features to align with.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        aligned : SlidingWindowFeature</span>
+<span class="sd">            Aligned features</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">old_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">start</span>
+        <span class="n">old_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">step</span>
+        <span class="n">old_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">duration</span>
+        <span class="n">old_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">old_t</span> <span class="o">=</span> <span class="n">old_start</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">old_duration</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">old_samples</span><span class="p">)</span> <span class="o">*</span> <span class="n">old_step</span>
+
+        <span class="n">new_start</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">start</span>
+        <span class="n">new_step</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">step</span>
+        <span class="n">new_duration</span> <span class="o">=</span> <span class="n">to</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">duration</span>
+        <span class="n">new_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">to</span><span class="p">)</span>
+        <span class="n">new_t</span> <span class="o">=</span> <span class="n">new_start</span> <span class="o">+</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">new_duration</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">new_samples</span><span class="p">)</span> <span class="o">*</span> <span class="n">new_step</span>
+
+        <span class="n">new_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">new_t</span><span class="p">,</span> <span class="n">old_t</span><span class="p">,</span> <span class="n">old_data</span><span class="p">)[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+                             <span class="k">for</span> <span class="n">old_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">T</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">SlidingWindowFeature</span><span class="p">(</span><span class="n">new_data</span><span class="p">,</span> <span class="n">to</span><span class="o">.</span><span class="n">sliding_window</span><span class="p">)</span></div></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
