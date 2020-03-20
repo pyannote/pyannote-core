@@ -260,7 +260,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
             # one return value
             return type(self)(data, self.sliding_window)
 
-    def align(self, to: SlidingWindowFeature) -> SlidingWindowFeature:
+    def align(self, to: 'SlidingWindowFeature') -> 'SlidingWindowFeature':
         """Align features by linear temporal interpolation
 
         Parameters

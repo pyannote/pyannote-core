@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 3.7 (2020-03-30)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add new method SlidingWindowFeature.align
+
 Version 3.6 (2020-03-03)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
