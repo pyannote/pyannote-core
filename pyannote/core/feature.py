@@ -260,6 +260,35 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
             # one return value
             return type(self)(data, self.sliding_window)
 
+    def align(self, to: 'SlidingWindowFeature') -> 'SlidingWindowFeature':
+        """Align features by linear temporal interpolation
+
+        Parameters
+        ----------
+        to : SlidingWindowFeature
+            Features to align with.
+
+        Returns
+        -------
+        aligned : SlidingWindowFeature
+            Aligned features
+        """
+
+        old_start = self.sliding_window.start
+        old_step = self.sliding_window.step
+        old_duration = self.sliding_window.duration
+        old_samples = len(self)
+        old_t = old_start + 0.5 * old_duration + np.arange(old_samples) * old_step
+
+        new_start = to.sliding_window.start
+        new_step = to.sliding_window.step
+        new_duration = to.sliding_window.duration
+        new_samples = len(to)
+        new_t = new_start + 0.5 * new_duration + np.arange(new_samples) * new_step
+
+        new_data = np.hstack([np.interp(new_t, old_t, old_data)[:, np.newaxis]
+                             for old_data in self.data.T])
+        return SlidingWindowFeature(new_data, to.sliding_window)
 
 
 if __name__ == "__main__":
