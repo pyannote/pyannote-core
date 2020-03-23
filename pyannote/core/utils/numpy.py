@@ -83,8 +83,8 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
     # -1 = unknown / +1 = active / 0 = inactive
     y = -np.ones((n_samples, len(labels)), dtype=np.int8)
     for i, j in window.crop(support, mode=mode, return_ranges=True):
-        i = max(0, i)
-        j = min(n_samples, j)
+        i = max(0, min(n_samples, i))
+        j = max(0, min(n_samples, j))
         y[i:j, :] = 0
 
     for label in annotation.labels():
@@ -97,8 +97,8 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
 
         for i, j in window.crop(annotation.label_timeline(label),
                                 mode=mode, return_ranges=True):
-            i = max(0, i)
-            j = min(n_samples, j)
+            i = max(0, min(n_samples, i))
+            j = max(0, min(n_samples, j))
             y[i:j, k] += 1
 
     y = np.minimum(y, 1, out=y)
