@@ -2,7 +2,12 @@
 Changelog
 #########
 
-Version 3.7 (2020-03-30)
+Version 3.7.1 (2020-03-23)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix corner case in pyannote.core.utils.numpy.one_hot_encoding
+
+Version 3.7 (2020-03-21)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 - feat: add new method SlidingWindowFeature.align
