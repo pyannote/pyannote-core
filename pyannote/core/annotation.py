@@ -895,7 +895,7 @@ class Annotation:
         """
         return self.label_timeline(label, copy=False).support()
 
-    def label_duration(self, label: Label) -> float:
+    def label_duration(self, label: Label, min_duration: float = 0.0) -> float:
         """Label duration
 
         Equivalent to ``Annotation.label_timeline(label).duration()``
@@ -904,7 +904,9 @@ class Annotation:
         ----------
         label : object
             Query
-
+        min_duration: float, optional
+            Doesn't take into account segments with a duration inferior to `min_duration`
+            Defaults to take into account every segment (i.e. 0.0)
         Returns
         -------
         duration : float
@@ -917,9 +919,9 @@ class Annotation:
 
         """
 
-        return self.label_timeline(label, copy=False).duration()
+        return self.label_timeline(label, copy=False).duration(min_duration)
 
-    def chart(self, percent: bool = False) -> List[Tuple[Label, float]]:
+    def chart(self, percent: bool = False, min_duration: float = 0.0) -> List[Tuple[Label, float]]:
         """Get labels chart (from longest to shortest duration)
 
         Parameters
@@ -927,14 +929,16 @@ class Annotation:
         percent : bool, optional
             Return list of (label, percentage) tuples.
             Defaults to returning list of (label, duration) tuples.
-
+        min_duration: float, optional
+            Doesn't take into account segments with a duration inferior to `min_duration`
+            Defaults to take into account every segment (i.e. 0.0)
         Returns
         -------
         chart : list
             List of (label, duration), sorted by duration in decreasing order.
         """
 
-        chart = sorted(((L, self.label_duration(L)) for L in self.labels()),
+        chart = sorted(((L, self.label_duration(L, min_duration)) for L in self.labels()),
                        key=lambda x: x[1], reverse=True)
 
         if percent:

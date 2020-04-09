@@ -809,11 +809,17 @@ class Timeline:
         """
         return Timeline(segments=self.support_iter(collar), uri=self.uri)
 
-    def duration(self) -> float:
+    def duration(self, min_duration: float = 0.0) -> float:
         """Timeline duration
 
         The timeline duration is the sum of the durations of the segments
         in the timeline support.
+
+        Parameters
+        ----------
+        min_duration: float, optional
+            Doesn't take into account segments with a duration inferior to `min_duration`
+            Defaults to take into account every segment (i.e. 0.0)
 
         Returns
         -------
@@ -823,7 +829,7 @@ class Timeline:
 
         # The timeline duration is the sum of the durations
         # of the segments in the timeline support.
-        return sum(s.duration for s in self.support_iter())
+        return sum(s.duration for s in self.support_iter() if s.duration > min_duration)
 
     def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
         """Like `gaps` but returns a segment generator instead
