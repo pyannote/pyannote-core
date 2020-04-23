@@ -2,6 +2,12 @@
 Changelog
 #########
 
+Version 4.0.a0 (2020-04-23)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- BREAKING: make one_hot_encoding return SlidingWindowFeature with labels
+- feat: add "labels" optional attribute to SlidingWindowFeature
+
 Version 3.7.1 (2020-03-23)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
