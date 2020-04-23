@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Reference &mdash; pyannote.core 3.7.1 documentation</title>
+  <title>Reference &mdash; pyannote.core 4.0.a0 documentation</title>
   
 
   
@@ -60,7 +60,7 @@
             
             
               <div class="version">
-                3.7.1
+                4.0.a0
               </div>
             
           
@@ -2164,13 +2164,14 @@ is centered on the end time of a segment with duration
 <h3>SlidingWindowFeature<a class="headerlink" href="#slidingwindowfeature" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.SlidingWindowFeature">
-<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">SlidingWindowFeature</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.ndarray</em>, <em class="sig-param">sliding_window: pyannote.core.segment.SlidingWindow</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">pyannote.core.</code><code class="sig-name descname">SlidingWindowFeature</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.ndarray</em>, <em class="sig-param">sliding_window: pyannote.core.segment.SlidingWindow</em>, <em class="sig-param">labels: List[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature" title="Permalink to this definition">¶</a></dt>
 <dd><p>Periodic feature vectors</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>(</em><em>nSamples</em><em>, </em><em>nFeatures</em><em>) </em><em>numpy array</em>) – </p></li>
+<li><p><strong>data</strong> (<em>(</em><em>n_frames</em><em>, </em><em>n_features</em><em>) </em><em>numpy array</em>) – </p></li>
 <li><p><strong>sliding_window</strong> (<a class="reference internal" href="#pyannote.core.SlidingWindow" title="pyannote.core.SlidingWindow"><em>SlidingWindow</em></a>) – </p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – Textual description of each dimension.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2182,7 +2183,7 @@ is centered on the end time of a segment with duration
 
 <dl class="method">
 <dt id="pyannote.core.SlidingWindowFeature.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.ndarray</em>, <em class="sig-param">sliding_window: pyannote.core.segment.SlidingWindow</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">data: numpy.ndarray</em>, <em class="sig-param">sliding_window: pyannote.core.segment.SlidingWindow</em>, <em class="sig-param">labels: List[str] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
