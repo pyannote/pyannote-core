@@ -33,6 +33,7 @@ Hierarchical clustering (:mod:`pyannote.core.utils.hierarchy`)
 
 """
 
+from typing import Text, Callable, List, Tuple
 import numpy as np
 import scipy.cluster.hierarchy
 from .distance import to_condensed
@@ -63,11 +64,52 @@ def linkage(X, method='single', metric='euclidean'):
     return scipy.cluster.hierarchy.linkage(distance, method=method,
                                            metric=metric)
 
-def pool(X, metric='euclidean', pooling_func=None):
-    """'pool' linkage"""
+
+def pool(
+    X: np.ndarray,
+    metric: Text = "euclidean",
+    pooling_func: Callable = None,
+    cannot_link: List[Tuple[int, int]] = None,
+    must_link: List[Tuple[int, int]] = None,
+):
+    """'pool' linkage
+
+    Parameters
+    ----------
+    X : np.ndarray
+        (n_samples, dimension) obversations.
+    metric : {"euclidean", "cosine", "angular"}, optional
+        Distance metric. Defaults to "euclidean"
+    pooling_func: callable
+
+    cannot_link : list of pairs
+        Pairs of indices of observations that cannot be linked. For instance,
+        [(1, 2), (5, 6)] means that first and second observations cannot end up
+        in the same cluster, as well as 5th and 6th obversations.
+    """
 
     if pooling_func is None:
-        def pooling_func(C_u, C_v, X_u, X_v):
+
+        def pooling_func(
+            C_u: np.ndarray, C_v: np.ndarray, X_u: np.ndarray, X_v: np.ndarray
+        ) -> np.ndarray:
+            """
+            Parameters
+            ----------
+            C_u : (dimension, ) np.ndarray
+                Centroid of u^th cluster.
+            C_v : (dimension, ) np.ndarray
+                Centroid of v^th cluster.
+            X_u : (n_samples_u, dimension) np.ndarray
+                Elements of u^th cluster.
+            X_v : (n_samples_v, dimension) np.ndarray
+                Elements of v^th cluster.
+
+            Returns
+            -------
+            C : (dimension, ) np.ndarray
+                Centroid of newly formed cluster.
+            """
             S_u = len(X_u)
             S_v = len(X_v)
             return (C_u * S_u + C_v * S_v) / (S_u + S_v)
@@ -98,22 +140,36 @@ def pool(X, metric='euclidean', pooling_func=None):
     # condensed pdist matrix for the `2n-1` clusters (including the `n`
     # original observations) that will exist at some point during the process.
     D = np.infty * np.ones((2 * n - 1) * (2 * n - 2) // 2)
-    D[to_condensed(2 * n - 1, *to_squared(n, np.arange(n * (n - 1) // 2)))] = \
-        pdist(X, metric=metric)
+    D[to_condensed(2 * n - 1, *to_squared(n, np.arange(n * (n - 1) // 2)))] = pdist(
+        X, metric=metric
+    )
 
+    # take "cannot link" constraints into account by artifically setting the
+    # distance between corresponding observations to infinity.
+    if cannot_link is not None:
+        u, v = zip(*cannot_link)
+        D[to_condensed(2 * n - 1, u, v)] = np.infty
+
+    cannot_merge = False
     for i in range(n - 1):
 
         # find two most similar clusters
         k = np.argmin(D)
-        u, v = to_squared(2 * n - 1, k)
+
+        # if no merge is allowed, choose an arbitrary (u, v) pair
+        if cannot_merge or D[k] == np.infty:
+            cannot_merge = True
+            u, v, *_ = np.where(S > 0)[0]
+        else:
+            u, v = to_squared(2 * n - 1, k)
 
         # keep track of ...
         # ... which clusters are merged at this iteration
         Z[i, 0] = v if S[v] > S[u] else v
         Z[i, 1] = u if Z[i, 0] == v else v
 
-        # ... their distance
-        Z[i, 2] = D[k]
+        # ... their distance (infty if cannot merge)
+        Z[i, 2] = np.infty if cannot_merge else D[k]
 
         # ... the size of the newly formed cluster
         Z[i, 3] = S[u] + S[v]
@@ -130,20 +186,35 @@ def pool(X, metric='euclidean', pooling_func=None):
         K[K == u] = n + i
         K[K == v] = n + i
 
-        # distance to merged clusters u and v can no longer be computed
-        D[to_condensed(2 * n - 1, u, np.arange(u))] = np.infty
-        D[to_condensed(2 * n - 1, u, np.arange(u + 1, n + i + 1))] = np.infty
-        D[to_condensed(2 * n - 1, v, np.arange(v))] = np.infty
-        D[to_condensed(2 * n - 1, v, np.arange(v + 1, n + i + 1))] = np.infty
-
         # compute distance to newly formed cluster
-        empty = S[:n + i] == 0
+        # (only for clusters that still exists, i.e. those that are not empty)
+        empty = S[: n + i] == 0
         k = to_condensed(2 * n - 1, n + i, np.arange(n + i)[~empty])
-        D[k] = cdist(C[np.newaxis, n + i, :],
-                     C[:n + i, :][~empty, :],
-                     metric=metric)
+        D[k] = cdist(C[np.newaxis, n + i, :], C[: n + i, :][~empty, :], metric=metric)
 
-        # is this really needed?
+        # condensed indices of all (u, _) and (v, _) pairs
+        _u = to_condensed(2 * n - 1, u, np.arange(u))
+        u_ = to_condensed(2 * n - 1, u, np.arange(u + 1, n + i))
+        _v = to_condensed(2 * n - 1, v, np.arange(v))
+        v_ = to_condensed(2 * n - 1, v, np.arange(v + 1, n + i))
+
+        # propagate "cannot link" constraints to newly formed cluster
+        if cannot_link:
+            x, _ = to_squared(2 * n - 1, _u[D[_u] == np.infty])
+            D[to_condensed(2 * n - 1, n + i, x)] = np.infty
+            _, x = to_squared(2 * n - 1, u_[D[u_] == np.infty])
+            D[to_condensed(2 * n - 1, n + i, x)] = np.infty
+            x, _ = to_squared(2 * n - 1, _v[D[_v] == np.infty])
+            D[to_condensed(2 * n - 1, n + i, x)] = np.infty
+            _, x = to_squared(2 * n - 1, v_[D[v_] == np.infty])
+            D[to_condensed(2 * n - 1, n + i, x)] = np.infty
+
+        # distance to merged clusters u and v no longer exist
+        D[_u] = np.infty
+        D[u_] = np.infty
+        D[_v] = np.infty
+        D[v_] = np.infty
+
         k = to_condensed(2 * n - 1, n + i, np.arange(n + i)[empty])
         D[k] = np.infty
 
