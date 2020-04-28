@@ -144,70 +144,87 @@ def pool(
         X, metric=metric
     )
 
-    # take "cannot link" constraints into account by artifically setting the
-    # distance between corresponding observations to infinity.
-    if cannot_link is not None:
-        u, v = zip(*cannot_link)
-        D[to_condensed(2 * n - 1, u, v)] = np.infty
+    def merge(u, v, iteration, constraint=False):
+        """Merge two clusters
 
-    cannot_merge = False
-    for i in range(n - 1):
+        Parameters
+        ----------
+        u, v : int
+            Indices of clusters to merge.
+        iteration : int
+            Current clustering iteration.
+        constraint : bool
+            Set to True to indicate that this merge is coming from a 'must_link'
+            constraint. This will artificially set Z[iteration, 2] to 0.0.
 
-        # find two most similar clusters
-        k = np.argmin(D)
+        Returns
+        -------
+        uv : int
+            Indices of resulting cluster.
 
-        # if no merge is allowed, choose an arbitrary (u, v) pair
-        if cannot_merge or D[k] == np.infty:
-            cannot_merge = True
-            u, v, *_ = np.where(S > 0)[0]
-        else:
-            u, v = to_squared(2 * n - 1, k)
+        Raises
+        ------
+        "ValueError" in case of conflict between "must_link" and "cannot_link"
+        constraints.
+
+        """
+
+        k = to_condensed(2 * n - 1, u, v)
+
+        if constraint and D[k] == np.infty:
+            w = u if u < n else v
+            msg = f"Found a conflict between 'must_link' and 'cannot_link' constraints for observation {w}."
+            raise ValueError(msg)
 
         # keep track of ...
         # ... which clusters are merged at this iteration
-        Z[i, 0] = v if S[v] > S[u] else v
-        Z[i, 1] = u if Z[i, 0] == v else v
+        Z[iteration, 0] = v if S[v] > S[u] else v
+        Z[iteration, 1] = u if Z[iteration, 0] == v else v
 
-        # ... their distance (infty if cannot merge)
-        Z[i, 2] = np.infty if cannot_merge else D[k]
+        # ... their distance
+        Z[iteration, 2] = 0.0 if constraint else D[k]
 
         # ... the size of the newly formed cluster
-        Z[i, 3] = S[u] + S[v]
-        S[n + i] = S[u] + S[v]
+        Z[iteration, 3] = S[u] + S[v]
+        S[n + iteration] = S[u] + S[v]
 
         # merged clusters are now empty...
         S[u] = 0
         S[v] = 0
 
         # compute centroid of newly formed cluster
-        C[n + i] = pooling_func(C[u], C[v], X[K == u], X[K == v])
+        C[n + iteration] = pooling_func(C[u], C[v], X[K == u], X[K == v])
 
         # move observations of merged clusters into the newly formed cluster
-        K[K == u] = n + i
-        K[K == v] = n + i
+        K[K == u] = n + iteration
+        K[K == v] = n + iteration
 
         # compute distance to newly formed cluster
         # (only for clusters that still exists, i.e. those that are not empty)
-        empty = S[: n + i] == 0
-        k = to_condensed(2 * n - 1, n + i, np.arange(n + i)[~empty])
-        D[k] = cdist(C[np.newaxis, n + i, :], C[: n + i, :][~empty, :], metric=metric)
+        empty = S[: n + iteration] == 0
+        k = to_condensed(2 * n - 1, n + iteration, np.arange(n + iteration)[~empty])
+        D[k] = cdist(
+            C[np.newaxis, n + iteration, :],
+            C[: n + iteration, :][~empty, :],
+            metric=metric,
+        )
 
         # condensed indices of all (u, _) and (v, _) pairs
         _u = to_condensed(2 * n - 1, u, np.arange(u))
-        u_ = to_condensed(2 * n - 1, u, np.arange(u + 1, n + i))
+        u_ = to_condensed(2 * n - 1, u, np.arange(u + 1, n + iteration))
         _v = to_condensed(2 * n - 1, v, np.arange(v))
-        v_ = to_condensed(2 * n - 1, v, np.arange(v + 1, n + i))
+        v_ = to_condensed(2 * n - 1, v, np.arange(v + 1, n + iteration))
 
         # propagate "cannot link" constraints to newly formed cluster
         if cannot_link:
             x, _ = to_squared(2 * n - 1, _u[D[_u] == np.infty])
-            D[to_condensed(2 * n - 1, n + i, x)] = np.infty
+            D[to_condensed(2 * n - 1, n + iteration, x)] = np.infty
             _, x = to_squared(2 * n - 1, u_[D[u_] == np.infty])
-            D[to_condensed(2 * n - 1, n + i, x)] = np.infty
+            D[to_condensed(2 * n - 1, n + iteration, x)] = np.infty
             x, _ = to_squared(2 * n - 1, _v[D[_v] == np.infty])
-            D[to_condensed(2 * n - 1, n + i, x)] = np.infty
+            D[to_condensed(2 * n - 1, n + iteration, x)] = np.infty
             _, x = to_squared(2 * n - 1, v_[D[v_] == np.infty])
-            D[to_condensed(2 * n - 1, n + i, x)] = np.infty
+            D[to_condensed(2 * n - 1, n + iteration, x)] = np.infty
 
         # distance to merged clusters u and v no longer exist
         D[_u] = np.infty
@@ -215,8 +232,55 @@ def pool(
         D[_v] = np.infty
         D[v_] = np.infty
 
-        k = to_condensed(2 * n - 1, n + i, np.arange(n + i)[empty])
+        k = to_condensed(2 * n - 1, n + iteration, np.arange(n + iteration)[empty])
         D[k] = np.infty
+
+        return n + iteration
+
+    iteration = 0
+
+    # take "cannot link" constraints into account by artifically setting the
+    # distance between corresponding observations to infinity.
+    if cannot_link is not None:
+        u, v = zip(*cannot_link)
+        D[to_condensed(2 * n - 1, u, v)] = np.infty
+
+    # take "must link" constraints into account by merging corresponding
+    # observations regardless of their actual similarity. this might lead to
+    # weird clustering results when merged observations are very dissimilar.
+
+    if must_link is not None:
+        # find connected components in "must link" graph
+        graph = np.zeros((n, n), dtype=np.int8)
+        for u, v in must_link:
+            graph[u, v] = 1
+        _, K_init = connected_components(
+            csr_matrix(graph), directed=False, return_labels=True
+        )
+
+        # merge observations within each connected components
+        for k, count in Counter(K_init).items():
+            if count < 2:
+                continue
+            u, *others = np.where(K_init == k)[0]
+            for v in others:
+                u = merge(u, v, iteration, constraint=True)
+                iteration += 1
+
+    # iterate until one cluster remains
+    for iteration in range(iteration, n - 1):
+
+        # find two most similar clusters
+        k = np.argmin(D)
+
+        # when cannot_link constraints prevents any further merging,
+        # choose an arbitrary (u, v) pair among remaining clusters
+        if D[k] == np.infty:
+            u, v, *_ = np.where(S > 0)[0]
+        else:
+            u, v = to_squared(2 * n - 1, k)
+
+        _ = merge(u, v, iteration)
 
     return Z
 
