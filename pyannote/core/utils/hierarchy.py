@@ -43,12 +43,20 @@ from .distance import pdist
 from .distance import cdist
 
 
-def linkage(X, method='single', metric='euclidean'):
+def linkage(X, method='single', metric='euclidean',
+            cannot_link: List[Tuple[int, int]] = None,
+            must_link: List[Tuple[int, int]] = None):
     """Same as scipy.cluster.hierarchy.linkage with more metrics and methods
+    `cannot_link` and `must_link` are only supported with 'pool' method
     """
 
     if method == 'pool':
-        return pool(X, metric=metric, pooling_func=None)
+        return pool(X, metric=metric, pooling_func=None,
+                    cannot_link=cannot_link, must_link=must_link)
+    elif cannot_link or must_link:
+        msg =(f'cannot_link and must_link are only supported with "pool" method, '
+              f'got {method} instead.')
+        raise ValueError(msg)
 
     # corner case when using non-euclidean distances with methods
     # designed for the euclidean distance
