@@ -43,12 +43,13 @@ from .distance import pdist
 from .distance import cdist
 
 
-def linkage(X, method='single', metric='euclidean'):
+
+def linkage(X, method="single", metric="euclidean", **kwargs):
     """Same as scipy.cluster.hierarchy.linkage with more metrics and methods
     """
 
-    if method == 'pool':
-        return pool(X, metric=metric, pooling_func=None)
+    if method == "pool":
+        return pool(X, metric=metric, **kwargs)
 
     # corner case when using non-euclidean distances with methods
     # designed for the euclidean distance
@@ -61,8 +62,9 @@ def linkage(X, method='single', metric='euclidean'):
         metric = 'euclidean'
 
     distance = pdist(X, metric=metric)
-    return scipy.cluster.hierarchy.linkage(distance, method=method,
-                                           metric=metric)
+    return scipy.cluster.hierarchy.linkage(
+        distance, method=method, metric=metric, **kwargs
+    )
 
 
 def pool(
