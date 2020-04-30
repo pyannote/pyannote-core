@@ -34,6 +34,7 @@ Hierarchical clustering (:mod:`pyannote.core.utils.hierarchy`)
 """
 
 from typing import Text, Callable, List, Tuple
+from collections import Counter
 import numpy as np
 import scipy.cluster.hierarchy
 from .distance import to_condensed
@@ -42,6 +43,8 @@ from .distance import l2_normalize
 from .distance import pdist
 from .distance import cdist
 
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import connected_components
 
 
 def linkage(X, method="single", metric="euclidean", **kwargs):
