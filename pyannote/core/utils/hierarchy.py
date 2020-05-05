@@ -33,8 +33,9 @@ Hierarchical clustering (:mod:`pyannote.core.utils.hierarchy`)
 
 """
 
-from typing import Text, Callable, List, Tuple
+from typing import Text, Callable, List, Tuple, Union
 from collections import Counter
+from inspect import signature
 import numpy as np
 import scipy.cluster.hierarchy
 from .distance import to_condensed
@@ -43,6 +44,7 @@ from .distance import l2_normalize
 from .distance import pdist
 from .distance import cdist
 
+from scipy.spatial.distance import squareform
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
 
@@ -70,10 +72,67 @@ def linkage(X, method="single", metric="euclidean", **kwargs):
     )
 
 
+def _average_pooling_func(
+    u: int, v: int, S: np.ndarray = None, C: np.ndarray = None, **kwargs,
+) -> np.ndarray:
+    """Compute average of newly merged cluster
+
+    Parameters
+    ----------
+    u : int
+        Cluster index.
+    v : int
+        Cluster index.
+    C : (2 x n_observations - 1, dimension) np.ndarray
+        Cluster average.
+    S : (2 x n_observations - 1, ) np.ndarray
+        Cluster size.
+
+    Returns
+    -------
+    Cuv : (dimension, ) np.ndarray
+        Average of newly formed cluster.
+    """
+    return (C[u] * S[u] + C[v] * S[v]) / (S[u] + S[v])
+
+
+def _centroid_pooling_func(
+    u: int,
+    v: int,
+    X: np.ndarray = None,
+    d: np.ndarray = None,
+    K: np.ndarray = None,
+    **kwargs,
+) -> np.ndarray:
+    """Compute centroid of newly merged cluster
+
+    Parameters
+    ----------
+    u : int
+        Cluster index.
+    v : int
+        Cluster index.
+    X : (n_observations, dimension) np.ndarray
+        Observations.
+    d : (n_observations, n_obversations) np.ndarray
+        Distance between observations.
+    K : (n_observations, ) np.ndarray, optional
+        Cluster assignment.
+
+    Returns
+    -------
+    Cuv : (dimension, ) np.ndarray
+        Centroid of newly formed cluster.
+    """
+    u_or_v = np.where(np.isin(K, [u, v]))[0]
+    i = np.argmin(np.mean(d[u_or_v][:, u_or_v], axis=0))
+    return X[u_or_v[i]]
+
+
 def pool(
     X: np.ndarray,
     metric: Text = "euclidean",
-    pooling_func: Callable = None,
+    pooling_func: Union[Text, Callable] = "average",
     cannot_link: List[Tuple[int, int]] = None,
     must_link: List[Tuple[int, int]] = None,
 ):
@@ -85,7 +144,8 @@ def pool(
         (n_samples, dimension) obversations.
     metric : {"euclidean", "cosine", "angular"}, optional
         Distance metric. Defaults to "euclidean"
-    pooling_func: callable
+    pooling_func: callable, optional
+        Defaults to "average".
 
     cannot_link : list of pairs
         Pairs of indices of observations that cannot be linked. For instance,
@@ -93,34 +153,24 @@ def pool(
         in the same cluster, as well as 5th and 6th obversations.
     """
 
-    if pooling_func is None:
+    if pooling_func == "average":
+        pooling_func = _average_pooling_func
 
-        def pooling_func(
-            C_u: np.ndarray, C_v: np.ndarray, X_u: np.ndarray, X_v: np.ndarray
-        ) -> np.ndarray:
-            """
-            Parameters
-            ----------
-            C_u : (dimension, ) np.ndarray
-                Centroid of u^th cluster.
-            C_v : (dimension, ) np.ndarray
-                Centroid of v^th cluster.
-            X_u : (n_samples_u, dimension) np.ndarray
-                Elements of u^th cluster.
-            X_v : (n_samples_v, dimension) np.ndarray
-                Elements of v^th cluster.
+    elif pooling_func == "centroid":
+        pooling_func = _centroid_pooling_func
 
-            Returns
-            -------
-            C : (dimension, ) np.ndarray
-                Centroid of newly formed cluster.
-            """
-            S_u = len(X_u)
-            S_v = len(X_v)
-            return (C_u * S_u + C_v * S_v) / (S_u + S_v)
+    elif isinstance(pooling_func, Text):
+        msg = (
+            f"{pooling_func} pooling is not supported. Choose between "
+            f"'average' and 'centroid', or provide your own function."
+        )
+        raise ValueError(msg)
 
     # obtain number of original observations
     n, dimension = X.shape
+
+    # compute similarity matrix
+    d = pdist(X, metric=metric)
 
     # K[j] contains the index of the cluster to which
     # the jth observation is currently assigned
@@ -145,9 +195,10 @@ def pool(
     # condensed pdist matrix for the `2n-1` clusters (including the `n`
     # original observations) that will exist at some point during the process.
     D = np.infty * np.ones((2 * n - 1) * (2 * n - 2) // 2)
-    D[to_condensed(2 * n - 1, *to_squared(n, np.arange(n * (n - 1) // 2)))] = pdist(
-        X, metric=metric
-    )
+    D[to_condensed(2 * n - 1, *to_squared(n, np.arange(n * (n - 1) // 2)))] = d
+
+    if "d" in signature(pooling_func).parameters:
+        d = squareform(d)
 
     def merge(u, v, iteration, constraint=False):
         """Merge two clusters
@@ -193,12 +244,12 @@ def pool(
         Z[iteration, 3] = S[u] + S[v]
         S[n + iteration] = S[u] + S[v]
 
+        # compute "representation" of newly formed cluster
+        C[n + iteration] = pooling_func(u, v, X=X, d=d, K=K, S=S, C=C)
+
         # merged clusters are now empty...
         S[u] = 0
         S[v] = 0
-
-        # compute centroid of newly formed cluster
-        C[n + iteration] = pooling_func(C[u], C[v], X[K == u], X[K == v])
 
         # move observations of merged clusters into the newly formed cluster
         K[K == u] = n + iteration
@@ -287,6 +338,7 @@ def pool(
 
         _ = merge(u, v, iteration)
 
+    # return dendrogram
     return Z
 
 
