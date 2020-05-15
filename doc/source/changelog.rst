@@ -2,9 +2,10 @@
 Changelog
 #########
 
-Version 4.0.a0 (2020-04-23)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Version 4.0 (2020-05-15)
+~~~~~~~~~~~~~~~~~~~~~~~~
 
+- feat: add support for cannot/must link constraints in "pool" clustering
 - BREAKING: make one_hot_encoding return SlidingWindowFeature with labels
 - feat: add "labels" optional attribute to SlidingWindowFeature
 
