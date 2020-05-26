@@ -129,6 +129,35 @@ def _centroid_pooling_func(
     return X[u_or_v[i]]
 
 
+def propagate_constraints(
+    cannot_link: List[Tuple[int, int]], must_link: List[Tuple[int, int]]
+):
+
+    # expand list of "cannot link" constraints thanks to the following rule
+    # (u != v) & (v == w) ==> u != w
+
+    cannot_link = set(tuple(sorted(uv)) for uv in cannot_link)
+    while True:
+        new_cannot_link = list()
+        for x, y in must_link:
+            for u, v in cannot_link:
+                ij = tuple(sorted({u, v}.symmetric_difference({x, y})))
+                if not ij:
+                    msg = (
+                        f"Found a conflict between 'must_link' and "
+                        f"'cannot_link' constraints for pair ({u}, {v})."
+                    )
+                    raise ValueError(msg)
+                if len(ij) == 2 and ij not in cannot_link:
+                    new_cannot_link.append(ij)
+        if new_cannot_link:
+            cannot_link.update(new_cannot_link)
+        else:
+            break
+
+    return list(cannot_link)
+
+
 def pool(
     X: np.ndarray,
     metric: Text = "euclidean",
@@ -316,29 +345,9 @@ def pool(
     iteration = 0
 
     if cannot_link:
-        if must_link_method in ["propagate", "both"] and must_link:
 
-            # expand list of "cannot link" constraints thant to the following rule
-            # (u != v) & (v == w) ==> u != w
-
-            cannot_link = set(tuple(sorted(uv)) for uv in cannot_link)
-            while True:
-                new_cannot_link = list()
-                for x, y in must_link:
-                    for u, v in cannot_link:
-                        ij = tuple(sorted({u, v}.symmetric_difference({x, y})))
-                        if not ij:
-                            msg = (
-                                f"Found a conflict between 'must_link' and "
-                                f"'cannot_link' constraints for pair ({u}, {v})."
-                            )
-                            raise ValueError(msg)
-                        if len(ij) == 2 and ij not in cannot_link:
-                            new_cannot_link.append(ij)
-                if new_cannot_link:
-                    cannot_link.update(new_cannot_link)
-                else:
-                    break
+        if must_link_method in ["propagate", "both"]:
+            cannot_link = propagate_constraints(cannot_link, must_link)
 
         # take "cannot link" constraints into account by artifically setting the
         # distance between corresponding observations to infinity.
