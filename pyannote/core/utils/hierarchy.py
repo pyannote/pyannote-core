@@ -135,6 +135,7 @@ def pool(
     pooling_func: Union[Text, Callable] = "average",
     cannot_link: List[Tuple[int, int]] = None,
     must_link: List[Tuple[int, int]] = None,
+    must_link_method: Text = "both",
 ):
     """'pool' linkage
 
@@ -146,11 +147,24 @@ def pool(
         Distance metric. Defaults to "euclidean"
     pooling_func: callable, optional
         Defaults to "average".
-
-    cannot_link : list of pairs
+    cannot_link : list of pairs, optional
         Pairs of indices of observations that cannot be linked. For instance,
         [(1, 2), (5, 6)] means that first and second observations cannot end up
         in the same cluster, as well as 5th and 6th obversations.
+    must_link : list of pairs, optional
+        Pairs of indices of observations that must be linked. For instance,
+        [(1, 2), (5, 6)] means that first and second observations must end up
+        in the same cluster, as well as 5th and 6th obversations.
+    must_link_method : {"merge", "propagate", "both"}, optional
+        Method used for taking "must link" constraints into account.
+        * use "merge" to initialize clusters by merging "must link" observations
+          before any other regular clustering iterations.
+        * use "propagate" to infer additional "cannot link" constraints by
+          applying the following propagation rule:
+                if u and v cannot be linked and v and w must be linked,
+                then u and w cannot be linked.
+        * use "both" to apply both methods.
+        Defaults to "both".
     """
 
     if pooling_func == "average":
@@ -165,6 +179,12 @@ def pool(
             f"'average' and 'centroid', or provide your own function."
         )
         raise ValueError(msg)
+
+    if cannot_link is None:
+        cannot_link = []
+
+    if must_link is None:
+        must_link = []
 
     # obtain number of original observations
     n, dimension = X.shape
@@ -295,17 +315,40 @@ def pool(
 
     iteration = 0
 
-    # take "cannot link" constraints into account by artifically setting the
-    # distance between corresponding observations to infinity.
-    if cannot_link is not None:
+    if cannot_link:
+        if must_link_method in ["propagate", "both"] and must_link:
+
+            # expand list of "cannot link" constraints thant to the following rule
+            # (u != v) & (v == w) ==> u != w
+
+            cannot_link = set(tuple(sorted(uv)) for uv in cannot_link)
+            while True:
+                new_cannot_link = list()
+                for x, y in must_link:
+                    for u, v in cannot_link:
+                        ij = tuple(sorted({u, v}.symmetric_difference({x, y})))
+                        if not ij:
+                            msg = (
+                                f"Found a conflict between 'must_link' and "
+                                f"'cannot_link' constraints for pair ({u}, {v})."
+                            )
+                            raise ValueError(msg)
+                        if len(ij) == 2 and ij not in cannot_link:
+                            new_cannot_link.append(ij)
+                if new_cannot_link:
+                    cannot_link.update(new_cannot_link)
+                else:
+                    break
+
+        # take "cannot link" constraints into account by artifically setting the
+        # distance between corresponding observations to infinity.
         u, v = zip(*cannot_link)
         D[to_condensed(2 * n - 1, u, v)] = np.infty
 
     # take "must link" constraints into account by merging corresponding
     # observations regardless of their actual similarity. this might lead to
     # weird clustering results when merged observations are very dissimilar.
-
-    if must_link is not None:
+    if must_link_method in ["merge", "both"] and must_link:
         # find connected components in "must link" graph
         graph = np.zeros((n, n), dtype=np.int8)
         for u, v in must_link:
@@ -342,7 +385,7 @@ def pool(
     return Z
 
 
-def fcluster_auto(X, Z, metric='euclidean'):
+def fcluster_auto(X, Z, metric="euclidean"):
     """Forms flat clusters using within-class sum of square elbow criterion
 
     Parameters
@@ -372,14 +415,14 @@ def fcluster_auto(X, Z, metric='euclidean'):
     # within-class sum of squares
     wcss = []
     for threshold in Z[:, 2]:
-        y_t = scipy.cluster.hierarchy.fcluster(Z, threshold,
-                                               criterion='distance')
+        y_t = scipy.cluster.hierarchy.fcluster(Z, threshold, criterion="distance")
         D = []
         for k in np.unique(y_t):
             Xk = X[y_t == k]
             Ck = np.mean(Xk, axis=0, keepdims=True)
             D.append(cdist(Ck, Xk, metric=metric).reshape(-1, ))
-        wcss.append(np.mean(np.hstack(D)**2))
+            D.append(cdist(Ck, Xk, metric=metric).reshape(-1,))
+        wcss.append(np.mean(np.hstack(D) ** 2))
     wcss = np.array(wcss)
 
     # elbow criterion
@@ -397,7 +440,6 @@ def fcluster_auto(X, Z, metric='euclidean'):
     c = (x2 * y1 - x1 * y2) / (x1 - x2)
 
     # elbow is at maximum distance to this line
-    distance = np.abs(a * np.arange(1, n) + b * wcss + c) / np.sqrt(a**2 + b**2)
     threshold = Z[np.argmax(distance), 2]
 
-    return scipy.cluster.hierarchy.fcluster(Z, threshold, criterion='distance')
+    return scipy.cluster.hierarchy.fcluster(Z, threshold, criterion="distance")
