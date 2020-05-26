@@ -415,13 +415,12 @@ def fcluster_auto(X, Z, metric='euclidean'):
     # within-class sum of squares
     wcss = []
     for threshold in Z[:, 2]:
-        y_t = scipy.cluster.hierarchy.fcluster(Z, threshold, 
+        y_t = scipy.cluster.hierarchy.fcluster(Z, threshold,
                                                criterion='distance')
         D = []
         for k in np.unique(y_t):
             Xk = X[y_t == k]
             Ck = np.mean(Xk, axis=0, keepdims=True)
-            D.append(cdist(Ck, Xk, metric=metric).reshape(-1, ))
             D.append(cdist(Ck, Xk, metric=metric).reshape(-1, ))
         wcss.append(np.mean(np.hstack(D)**2))
     wcss = np.array(wcss)
