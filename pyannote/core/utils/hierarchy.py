@@ -385,7 +385,7 @@ def pool(
     return Z
 
 
-def fcluster_auto(X, Z, metric="euclidean"):
+def fcluster_auto(X, Z, metric='euclidean'):
     """Forms flat clusters using within-class sum of square elbow criterion
 
     Parameters
@@ -415,14 +415,15 @@ def fcluster_auto(X, Z, metric="euclidean"):
     # within-class sum of squares
     wcss = []
     for threshold in Z[:, 2]:
-        y_t = scipy.cluster.hierarchy.fcluster(Z, threshold, criterion="distance")
+        y_t = scipy.cluster.hierarchy.fcluster(Z, threshold, 
+                                               criterion='distance')
         D = []
         for k in np.unique(y_t):
             Xk = X[y_t == k]
             Ck = np.mean(Xk, axis=0, keepdims=True)
             D.append(cdist(Ck, Xk, metric=metric).reshape(-1, ))
-            D.append(cdist(Ck, Xk, metric=metric).reshape(-1,))
-        wcss.append(np.mean(np.hstack(D) ** 2))
+            D.append(cdist(Ck, Xk, metric=metric).reshape(-1, ))
+        wcss.append(np.mean(np.hstack(D)**2))
     wcss = np.array(wcss)
 
     # elbow criterion
@@ -440,6 +441,7 @@ def fcluster_auto(X, Z, metric="euclidean"):
     c = (x2 * y1 - x1 * y2) / (x1 - x2)
 
     # elbow is at maximum distance to this line
+    distance = np.abs(a * np.arange(1, n) + b * wcss + c) / np.sqrt(a**2 + b**2)
     threshold = Z[np.argmax(distance), 2]
 
-    return scipy.cluster.hierarchy.fcluster(Z, threshold, criterion="distance")
+    return scipy.cluster.hierarchy.fcluster(Z, threshold, criterion='distance')
