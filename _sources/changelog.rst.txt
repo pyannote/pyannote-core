@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 4.1 (2020-05-27)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add "must_link_method" option to "pool" clustering
+
 Version 4.0 (2020-05-15)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
