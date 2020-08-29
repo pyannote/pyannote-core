@@ -67,16 +67,14 @@ See :class:`pyannote.core.Segment` for the complete reference.
 """
 
 import warnings
-from typing import Union, Optional, Tuple, List, Iterator
+from typing import Union, Optional, Tuple, List, Iterator, Iterable
+from .utils.types import Alignment
 
 import numpy as np
 from dataclasses import dataclass
 
 # 1 μs (one microsecond)
-from pyannote.core.utils.types import Alignment
-
 SEGMENT_PRECISION = 1e-6
-
 
 # setting 'frozen' to True makes it hashable and immutable
 @dataclass(frozen=True, order=True)
@@ -129,7 +127,7 @@ class Segment:
         A segment is considered empty if its end time is smaller than its
         start time, or its duration is smaller than 1μs.
         """
-        return (self.end - self.start) > SEGMENT_PRECISION
+        return bool((self.end - self.start) > SEGMENT_PRECISION)
 
     @property
     def duration(self) -> float:
@@ -808,3 +806,69 @@ class SlidingWindow:
             duration=duration, step=step, start=start, end=end
         )
         return sliding_window
+
+    def __call__(self,
+                 support: Union[Segment, 'Timeline'],
+                 align_last: bool = False) -> Iterable[Segment]:
+        """Slide window over support
+
+        Parameter
+        ---------
+        support : Segment or Timeline
+            Support on which to slide the window.
+        align_last : bool, optional
+            Yield a final segment so that it aligns exactly with end of support.
+
+        Yields
+        ------
+        chunk : Segment
+
+        Example
+        -------
+        >>> window = SlidingWindow(duration=2., step=1.)
+        >>> for chunk in window(Segment(3, 7.5)):
+        ...     print(tuple(chunk))
+        (3.0, 5.0)
+        (4.0, 6.0)
+        (5.0, 7.0)
+        >>> for chunk in window(Segment(3, 7.5), align_last=True):
+        ...     print(tuple(chunk))
+        (3.0, 5.0)
+        (4.0, 6.0)
+        (5.0, 7.0)
+        (5.5, 7.5)
+        """
+
+        from pyannote.core import Timeline
+        if isinstance(support, Timeline):
+            segments = support
+
+        elif isinstance(support, Segment):
+            segments = Timeline(segments=[support])
+
+        else:
+            msg = (
+                f'"support" must be either a Segment or a Timeline '
+                f'instance (is {type(support)})'
+            )
+            raise TypeError(msg)
+
+        for segment in segments:
+
+            if segment.duration < self.duration:
+                continue
+
+            window = SlidingWindow(duration=self.duration,
+                                   step=self.step,
+                                   start=segment.start,
+                                   end=segment.end)
+
+            for s in window:
+                # ugly hack to account for floating point imprecision
+                if s in segment:
+                    yield s
+                    last = s
+
+            if align_last and last.end < segment.end:
+                yield Segment(start=segment.end - self.duration,
+                              end=segment.end)

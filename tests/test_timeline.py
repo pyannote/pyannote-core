@@ -94,9 +94,14 @@ def test_extent(timeline):
     assert timeline.extent() == Segment(0.5, 10)
 
 def test_support(timeline):
+    # No collar (default).
     assert list(timeline.support()) == [Segment(0.5, 4),
                                         Segment(5, 8),
                                         Segment(8.5, 10)]
+
+    # Collar of 600 ms.
+    assert list(timeline.support(.600)) == [Segment(0.5, 4),
+                                            Segment(5, 10)]
 
 def test_gaps(timeline):
     assert list(timeline.gaps()) == [Segment(4, 5),

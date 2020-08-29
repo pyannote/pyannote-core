@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2017 CNRS
+# Copyright (c) 2014-2020 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 # Grant JENKS - http://www.grantjenks.com/
-
+# Paul LERNER
 
 """
 ########
@@ -89,7 +89,7 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
 from typing import (Optional, Iterable, List, Union, Callable,
-                    TextIO, Tuple, TYPE_CHECKING, Iterator, Dict)
+                    TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
 
 import pandas as pd
 from sortedcontainers import SortedList
@@ -440,6 +440,9 @@ class Timeline:
                 yield yielded
             return
 
+        # if 'support' is a `Timeline`, we use its support
+        support = support.support()
+
         # loose mode
         if mode == 'loose':
             for segment, _ in self.co_iter(support):
@@ -630,6 +633,34 @@ class Timeline:
         """
         return Timeline(uri=self.uri)
 
+    def covers(self, other : 'Timeline') -> bool:
+        """Check whether other timeline is fully covered by the timeline
+        
+        Parameter
+        ---------
+        other : Timeline
+            Second timeline
+
+        Returns
+        -------
+        covers : bool
+            True if timeline covers "other" timeline entirely. False if at least
+            one segment of "other" is not fully covered by timeline
+        """
+        
+        # compute gaps within "other" extent 
+        # this is where we should look for possible faulty segments 
+        gaps = self.gaps(support=other.extent())
+        
+        # if at least one gap intersects with a segment from "other", 
+        # "self" does not cover "other" entirely --> return False
+        for _ in gaps.co_iter(other):
+            return False
+
+        # if no gap intersects with a segment from "other", 
+        # "self" covers "other" entirely --> return True
+        return True
+ 
     def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
             -> 'Timeline':
         """Get a copy of the timeline
@@ -696,7 +727,7 @@ class Timeline:
             import numpy as np
             return Segment(start=np.inf, end=-np.inf)
 
-    def support_iter(self) -> Iterator[Segment]:
+    def support_iter(self, collar: float = 0.) -> Iterator[Segment]:
         """Like `support` but returns a segment generator instead
 
         See also
@@ -722,12 +753,15 @@ class Timeline:
 
         for segment in self:
 
-            # If there is no gap between new support segment and next segment,
-            if not (segment ^ new_segment):
+            # If there is no gap between new support segment and next segment
+            # OR there is a gap with duration < collar seconds,
+            possible_gap = segment ^ new_segment
+            if not possible_gap or possible_gap.duration < collar:
                 # Extend new support segment using next segment
                 new_segment |= segment
 
-            # If there actually is a gap,
+            # If there actually is a gap and the gap duration >= collar
+            # seconds,
             else:
                 yield new_segment
 
@@ -738,7 +772,7 @@ class Timeline:
         # Add new segment to the timeline support
         yield new_segment
 
-    def support(self) -> 'Timeline':
+    def support(self, collar: float = 0.) -> 'Timeline':
         """Timeline support
 
         The support of a timeline is the timeline with the minimum number of
@@ -748,19 +782,32 @@ class Timeline:
 
         A picture is worth a thousand words::
 
+            collar
+            |---|
+
             timeline
-            |------|    |------|     |----|
-              |--|    |-----|     |----------|
+            |------|    |------|      |----|
+              |--|    |-----|      |----------|
 
             timeline.support()
-            |------|  |--------|  |----------|
+            |------|  |--------|   |----------|
+
+            timeline.support(collar)
+            |------------------|   |----------|
+
+        Parameters
+        ----------
+        collar : float, optional
+            Merge separated by less than `collar` seconds. This is why there
+            are only two segments in the final timeline in the above figure.
+            Defaults to 0.
 
         Returns
         -------
         support : Timeline
             Timeline support
         """
-        return Timeline(segments=self.support_iter(), uri=self.uri)
+        return Timeline(segments=self.support_iter(collar), uri=self.uri)
 
     def duration(self) -> float:
         """Timeline duration
@@ -958,7 +1005,7 @@ class Timeline:
         Parameters
         ----------
         file : file object
-        
+
         Usage
         -----
         >>> with open('file.uem', 'w') as file:
@@ -966,7 +1013,10 @@ class Timeline:
         """
 
         uri = self.uri if self.uri else "<NA>"
-
+        if isinstance(uri, Text) and ' ' in uri:
+            msg = (f'Space-separated UEM file format does not allow file URIs '
+                   f'containing spaces (got: "{uri}").')
+            raise ValueError(msg)
         for segment in self:
             line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
             file.write(line)

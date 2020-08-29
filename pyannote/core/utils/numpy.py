@@ -27,14 +27,25 @@
 # Hervé BREDIN - http://herve.niderb.fr
 
 import numpy as np
+from typing import Union
+from typing import List
+from typing import Text
+from typing import Optional
 from ..segment import Segment
 from ..segment import SlidingWindow
+from ..timeline import Timeline
 from ..annotation import Annotation
 from ..feature import SlidingWindowFeature
 from .generators import string_generator
 
 
-def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
+def one_hot_encoding(
+    annotation: Annotation,
+    support: Timeline,
+    window: Union[SlidingWindow, SlidingWindowFeature],
+    labels: Optional[List[Text]] = None,
+    mode: Text = "center",
+) -> SlidingWindowFeature:
     """Convert annotation to one-hot-encoded numpy array
 
     Parameters
@@ -48,11 +59,9 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
 
     Returns
     -------
-    y : `pyannote.core.SlidingWindowFeature`
+    y : SlidingWindowFeature
         (N, K) array where y[t, k] > 0 when labels[k] is active at timestep t.
         y[t, k] = -1 means we have no idea.
-    labels : list
-        List of labels.
 
     See also
     --------
@@ -61,17 +70,19 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
     """
 
     if not isinstance(window, SlidingWindow):
-        if hasattr(window, 'sliding_window'):
+        if hasattr(window, "sliding_window"):
             window = window.sliding_window
         else:
-            msg = (f"`window` must be an instance of `SlidingWindow` "
-                   f"or have an attribute called 'sliding_window'.")
+            msg = (
+                f"`window` must be an instance of `SlidingWindow` "
+                f"or have an attribute called 'sliding_window'."
+            )
             raise TypeError(msg)
 
     extent = support.extent()
-    window = SlidingWindow(start=extent.start,
-                           step=window.step,
-                           duration=window.duration)
+    window = SlidingWindow(
+        start=extent.start, step=window.step, duration=window.duration
+    )
 
     n_samples = window.samples(extent.duration, mode=mode)
 
@@ -83,8 +94,8 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
     # -1 = unknown / +1 = active / 0 = inactive
     y = -np.ones((n_samples, len(labels)), dtype=np.int8)
     for i, j in window.crop(support, mode=mode, return_ranges=True):
-        i = max(0, i)
-        j = min(n_samples, j)
+        i = max(0, min(n_samples, i))
+        j = max(0, min(n_samples, j))
         y[i:j, :] = 0
 
     for label in annotation.labels():
@@ -95,15 +106,16 @@ def one_hot_encoding(annotation, support, window, labels=None, mode='center'):
             print(indices.keys())
             raise ValueError(msg)
 
-        for i, j in window.crop(annotation.label_timeline(label),
-                                mode=mode, return_ranges=True):
-            i = max(0, i)
-            j = min(n_samples, j)
+        for i, j in window.crop(
+            annotation.label_timeline(label), mode=mode, return_ranges=True
+        ):
+            i = max(0, min(n_samples, i))
+            j = max(0, min(n_samples, j))
             y[i:j, k] += 1
 
     y = np.minimum(y, 1, out=y)
 
-    return SlidingWindowFeature(y, window), labels
+    return SlidingWindowFeature(y, window, labels=labels)
 
 
 def one_hot_decoding(y, window, labels=None):
@@ -131,16 +143,18 @@ def one_hot_decoding(y, window, labels=None):
     """
 
     if not isinstance(window, SlidingWindow):
-        if hasattr(window, 'sliding_window'):
+        if hasattr(window, "sliding_window"):
             window = window.sliding_window
         else:
-            msg = (f"`window` must be an instance of `SlidingWindow` "
-                   f"or have an attribute called 'sliding_window'.")
+            msg = (
+                f"`window` must be an instance of `SlidingWindow` "
+                f"or have an attribute called 'sliding_window'."
+            )
             raise TypeError(msg)
 
     # if y has shape (N, ), convert it to (N, K) shape
     if len(y.shape) < 2:
-        N, = y.shape
+        (N,) = y.shape
 
         # estimate the number of classes
         if labels is not None:
