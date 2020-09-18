@@ -723,7 +723,7 @@ class Annotation:
             self._updateLabels()
         return sorted(self._labels, key=str)
 
-    def get_labels(self, segment: Segment, unique: bool = True) -> Set[Label]:
+    def get_labels(self, segment: Segment, unique: bool = True) -> Union[Set[Label], List[Label]]:
         """Query labels by segment
 
         Parameters
@@ -736,8 +736,9 @@ class Annotation:
 
         Returns
         -------
-        labels : set
-            Set of labels for `segment` if it exists, empty set otherwise.
+        labels : set or list
+            Set (resp. list) of labels for `segment` if it exists, empty set (resp. list) otherwise
+            if unique (resp. if not unique).
 
         Examples
         --------
@@ -757,7 +758,7 @@ class Annotation:
         if unique:
             return set(labels)
 
-        return labels
+        return list(labels)
 
     def subset(self, labels: Iterable[Label], invert: bool = False) \
             -> 'Annotation':
