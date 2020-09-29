@@ -106,8 +106,8 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
-from collections import defaultdict
 import itertools
+from collections import defaultdict
 from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text
 
 import numpy as np
@@ -241,9 +241,9 @@ class Annotation:
 
     def itertracks(self, yield_label: bool = False) \
             -> Iterator[Union[
-                             Tuple[Segment, TrackName],
-                             Tuple[Segment, TrackName, Label]
-                         ]]:
+                Tuple[Segment, TrackName],
+                Tuple[Segment, TrackName, Label]
+            ]]:
         """Iterate over tracks (in chronological order)
 
         Parameters
@@ -371,7 +371,8 @@ class Annotation:
             )
             file.write(line)
 
-    def crop(self, support: Support, mode: CropMode = 'intersection'):
+    def crop(self, support: Support, mode: CropMode = 'intersection') \
+            -> 'Annotation':
         """Crop annotation to new support
 
         Parameters
@@ -471,6 +472,85 @@ class Annotation:
 
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
+
+    def truncate(self, removed: Support, mode: CropMode = 'intersection') \
+            -> 'Annotation':
+        """Removes all segments or parts of segments that
+        overlap the `removed` argument.
+
+        Parameters
+        ----------
+        support : Segment or Timeline
+            If `support` is a `Timeline`, its support is used.
+        mode : {'strict', 'loose', 'intersection'}, optional
+            Controls how segments that are not fully included in `removed` are
+            handled. 'strict' mode only removes fully included segments. 'loose'
+            mode removes any intersecting segment. 'intersection' mode removes any
+            intersecting segment but replace them by their actual intersection.
+
+        Returns
+        -------
+        truncated : Annotation
+            Truncated annotation
+
+        Note
+        ----
+        In 'intersection' mode, the best is done to keep the track names
+        unchanged. However, in some cases where two original segments are
+        cropped into the same resulting segments, conflicting track names are
+        modified to make sure no track is lost.
+
+        """
+        if isinstance(removed, Segment):
+            removed = Timeline([removed])
+
+        extent_tl = Timeline([self.get_timeline().extent()], uri=self.uri)
+        truncating_support = removed.gaps(support=extent_tl)
+        # loose for truncate means strict for crop and vice-versa
+        if mode == "loose":
+            mode = "strict"
+        elif mode == "strict":
+            mode = "loose"
+        return self.crop(truncating_support, mode=mode)
+
+    def overlaps(self, for_labels: Optional[List[Label]] = None) -> 'Timeline':
+        """Get overlapped speech reference annotation
+        as a timeline
+
+        A simple illustration:
+
+            annotation
+            A |------|    |------|      |----|
+            B  |--|    |-----|      |----------|
+            C |--------------|      |------|
+
+            annotation.overlaps(for_labels=["A", "B"])
+              |--|      |---|         |----|
+
+        Parameters
+        ----------
+        for_labels : optional list of labels
+            Labels for which to consider the overlap
+
+        Returns
+        -------
+        overlap : `pyannote.core.Annotation`
+           Overlapped speech.
+       """
+        if for_labels:
+            for_labels = set(for_labels)
+
+        overlapped_tl = Timeline(uri=self.uri)
+        for (s1, t1), (s2, t2) in self.co_iter(self):
+            label1 = self[s1, t1]
+            label2 = self[s2, t2]
+            if for_labels:
+                if label1 not in for_labels or label2 not in for_labels:
+                    continue
+            if label1 == label2:
+                continue
+            overlapped_tl.add(s1 & s2)
+        return overlapped_tl.support()
 
     def get_tracks(self, segment: Segment) -> Set[TrackName]:
         """Query tracks by segment

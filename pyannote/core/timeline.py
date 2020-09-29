@@ -554,6 +554,87 @@ class Timeline:
             if segment.overlaps(t):
                 yield segment
 
+    def overlaps_iter(self) -> Iterable[Segment]:
+        """Like `overlaps` but returns a segment iterator instead
+
+        See also
+        --------
+        :func:`pyannote.core.Timeline.overlaps`
+        """
+
+    def overlaps(self) -> 'Timeline':
+        """Get overlapped speech reference annotation
+        as a timeline
+
+        A simple illustration:
+
+            timeline
+            |------|    |------|      |----|
+              |--|    |-----|      |----------|
+
+            timeline.overlaps()
+              |--|      |---|         |----|
+
+
+       Returns
+       -------
+       overlap : `pyannote.core.Timeline`
+           Overlapped speech.
+       """
+        overlapped_tl = Timeline(uri=self.uri)
+        for s1, s2 in self.co_iter(self):
+            if s1 == s2:
+                continue
+            overlapped_tl.add(s1 & s2)
+        return overlapped_tl.support()
+
+    def truncate(self,
+                 removed: Support,
+                 mode: CropMode = 'intersection') -> 'Timeline':
+        """Removes all segments or parts of segments that
+        overlap the `removed` argument.
+
+        Parameters
+        ----------
+        removed : Segment or Timeline
+            If `support` is a `Timeline`, its support is used.
+        mode : {'strict', 'loose', 'intersection'}, optional
+            Controls how segments that are not fully included in `removed` are
+            handled. 'strict' mode only removes fully included segments. 'loose'
+            mode removes any intersecting segment. 'intersection' mode removes any
+            intersecting segment but replace them by their actual intersection.
+
+        Returns
+        -------
+        truncated : Timeline
+            Truncated timeline
+
+        Examples
+        --------
+
+        >>> timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 5)])
+        >>> timeline.truncate(Segment(1, 2))
+        <Timeline(uri=None, segments=[<Segment(0, 1)>, <Segment(3, 5)>])>
+
+        >>> timeline.truncate(Segment(1, 3), mode='loose')
+        <Timeline(uri=None, segments=[<Segment(3, 5)>])>
+
+        >>> timeline.truncate(Segment(1, 3), mode='strict')
+        <Timeline(uri=None, segments=[<Segment(0, 2)>, <Segment(3, 5)>])>
+
+        """
+        if isinstance(removed, Segment):
+            removed = Timeline([removed])
+
+        extent_tl = Timeline([self.extent()], uri=self.uri)
+        truncating_support = removed.gaps(support=extent_tl)
+        # loose for truncate means strict for crop and vice-versa
+        if mode == "loose":
+            mode = "strict"
+        elif mode == "strict":
+            mode = "loose"
+        return self.crop(truncating_support, mode=mode)
+
     def __str__(self):
         """Human-readable representation
 
@@ -633,7 +714,7 @@ class Timeline:
         """
         return Timeline(uri=self.uri)
 
-    def covers(self, other : 'Timeline') -> bool:
+    def covers(self, other: 'Timeline') -> bool:
         """Check whether other timeline is fully covered by the timeline
         
         Parameter
@@ -647,11 +728,11 @@ class Timeline:
             True if timeline covers "other" timeline entirely. False if at least
             one segment of "other" is not fully covered by timeline
         """
-        
+
         # compute gaps within "other" extent 
         # this is where we should look for possible faulty segments 
         gaps = self.gaps(support=other.extent())
-        
+
         # if at least one gap intersects with a segment from "other", 
         # "self" does not cover "other" entirely --> return False
         for _ in gaps.co_iter(other):
@@ -660,7 +741,7 @@ class Timeline:
         # if no gap intersects with a segment from "other", 
         # "self" covers "other" entirely --> return True
         return True
- 
+
     def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
             -> 'Timeline':
         """Get a copy of the timeline
