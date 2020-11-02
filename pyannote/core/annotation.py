@@ -475,8 +475,7 @@ class Annotation:
 
     def extrude(self, removed: Support, mode: CropMode = 'intersection') \
             -> 'Annotation':
-        """Removes all segments or parts of segments that
-        overlap the `removed` Timeline argument.
+        """Remove segments that overlap `removed` support.
 
         A simple illustration:
 
