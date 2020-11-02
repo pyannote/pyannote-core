@@ -563,7 +563,7 @@ class Timeline:
             |------|    |------|      |----|
               |--|    |-----|      |----------|
 
-            timeline.overlaps()
+            timeline.get_overlap()
               |--|      |---|         |----|
 
 
