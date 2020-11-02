@@ -495,7 +495,7 @@ class Annotation:
             extruded Annotation with mode="loose"
             C                               |------|
 
-            annotation
+            extruded Annotation with mode="strict"
             A |------|
             B                  |----------|
             C |--------------|              |------|
