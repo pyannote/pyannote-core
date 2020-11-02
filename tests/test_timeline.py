@@ -197,10 +197,10 @@ def test_timeline_overlaps():
     expected_overlap.add(Segment(5, 10))
     expected_overlap.add(Segment(18, 20))
 
-    assert expected_overlap == overlapped_tl.overlaps()
+    assert expected_overlap == overlapped_tl.get_overlap()
 
 
-def test_truncate():
+def test_extrude():
     removed = Segment(2, 5)
 
     timeline = Timeline(uri='KINGJU')
@@ -212,14 +212,14 @@ def test_truncate():
     expected_answer.add(Segment(0, 2))
     expected_answer.add(Segment(6, 7))
 
-    assert timeline.truncate(removed, mode='intersection') == expected_answer
+    assert timeline.extrude(removed, mode='intersection') == expected_answer
 
     expected_answer = Timeline(uri="MCSALO")
     expected_answer.add(Segment(0, 3))
     expected_answer.add(Segment(6, 7))
-    assert timeline.truncate(removed, mode='strict') == expected_answer
+    assert timeline.extrude(removed, mode='strict') == expected_answer
 
     expected_answer = Timeline(uri="CADILLAC")
     expected_answer.add(Segment(6, 7))
 
-    assert timeline.truncate(removed, mode='loose') == expected_answer
+    assert timeline.extrude(removed, mode='loose') == expected_answer

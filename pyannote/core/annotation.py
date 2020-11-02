@@ -473,25 +473,25 @@ class Annotation:
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
 
-    def truncate(self, removed: Support, mode: CropMode = 'intersection') \
+    def extrude(self, removed: Support, mode: CropMode = 'intersection') \
             -> 'Annotation':
         """Removes all segments or parts of segments that
         overlap the `removed` argument.
 
         Parameters
         ----------
-        support : Segment or Timeline
+        removed : Segment or Timeline
             If `support` is a `Timeline`, its support is used.
         mode : {'strict', 'loose', 'intersection'}, optional
             Controls how segments that are not fully included in `removed` are
             handled. 'strict' mode only removes fully included segments. 'loose'
-            mode removes any intersecting segment. 'intersection' mode removes any
-            intersecting segment but replace them by their actual intersection.
+            mode removes any intersecting segment. 'intersection' mode removes
+            the overlapping part of any intersecting segment.
 
         Returns
         -------
-        truncated : Annotation
-            Truncated annotation
+        extruded : Annotation
+            extruded annotation
 
         Note
         ----
@@ -513,9 +513,9 @@ class Annotation:
             mode = "loose"
         return self.crop(truncating_support, mode=mode)
 
-    def overlaps(self, for_labels: Optional[List[Label]] = None) -> 'Timeline':
-        """Get overlapped speech reference annotation
-        as a timeline
+    def get_overlap(self, labels: Optional[Iterable[Label]] = None) \
+            -> 'Timeline':
+        """Get overlapping parts of the annotation.
 
         A simple illustration:
 
@@ -524,33 +524,34 @@ class Annotation:
             B  |--|    |-----|      |----------|
             C |--------------|      |------|
 
-            annotation.overlaps(for_labels=["A", "B"])
-              |--|      |---|         |----|
+            annotation.get_overlap()
+              |------| |-----|      |--------|
+
+            annotation.get_overlap(for_labels=["A", "B"])
+               |--|       |--|          |----|
 
         Parameters
         ----------
-        for_labels : optional list of labels
+        labels : optional list of labels
             Labels for which to consider the overlap
 
         Returns
         -------
-        overlap : `pyannote.core.Annotation`
-           Overlapped speech.
+        overlap : `pyannote.core.Timeline`
+           Timeline of the overlaps.
        """
-        if for_labels:
-            for_labels = set(for_labels)
+        if labels:
+            annotation = self.subset(labels)
+        else:
+            annotation = self
 
-        overlapped_tl = Timeline(uri=self.uri)
-        for (s1, t1), (s2, t2) in self.co_iter(self):
-            label1 = self[s1, t1]
-            label2 = self[s2, t2]
-            if for_labels:
-                if label1 not in for_labels or label2 not in for_labels:
-                    continue
-            if label1 == label2:
+        overlaps_tl = Timeline(uri=annotation.uri)
+        for (s1, t1), (s2, t2) in annotation.co_iter(annotation):
+            # if labels are the same for the two segments, skipping
+            if self[s1, t1] == self[s2, t2]:
                 continue
-            overlapped_tl.add(s1 & s2)
-        return overlapped_tl.support()
+            overlaps_tl.add(s1 & s2)
+        return overlaps_tl.support()
 
     def get_tracks(self, segment: Segment) -> Set[TrackName]:
         """Query tracks by segment

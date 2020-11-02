@@ -554,17 +554,8 @@ class Timeline:
             if segment.overlaps(t):
                 yield segment
 
-    def overlaps_iter(self) -> Iterable[Segment]:
-        """Like `overlaps` but returns a segment iterator instead
-
-        See also
-        --------
-        :func:`pyannote.core.Timeline.overlaps`
-        """
-
-    def overlaps(self) -> 'Timeline':
-        """Get overlapped speech reference annotation
-        as a timeline
+    def get_overlap(self) -> 'Timeline':
+        """Get overlapping parts of the timeline.
 
         A simple illustration:
 
@@ -579,18 +570,18 @@ class Timeline:
        Returns
        -------
        overlap : `pyannote.core.Timeline`
-           Overlapped speech.
+           Timeline of the overlaps.
        """
-        overlapped_tl = Timeline(uri=self.uri)
+        overlaps_tl = Timeline(uri=self.uri)
         for s1, s2 in self.co_iter(self):
             if s1 == s2:
                 continue
-            overlapped_tl.add(s1 & s2)
-        return overlapped_tl.support()
+            overlaps_tl.add(s1 & s2)
+        return overlaps_tl.support()
 
-    def truncate(self,
-                 removed: Support,
-                 mode: CropMode = 'intersection') -> 'Timeline':
+    def extrude(self,
+                removed: Support,
+                mode: CropMode = 'intersection') -> 'Timeline':
         """Removes all segments or parts of segments that
         overlap the `removed` argument.
 
@@ -601,25 +592,25 @@ class Timeline:
         mode : {'strict', 'loose', 'intersection'}, optional
             Controls how segments that are not fully included in `removed` are
             handled. 'strict' mode only removes fully included segments. 'loose'
-            mode removes any intersecting segment. 'intersection' mode removes any
-            intersecting segment but replace them by their actual intersection.
+            mode removes any intersecting segment. 'intersection' mode removes
+            the overlapping part of any intersecting segment.
 
         Returns
         -------
-        truncated : Timeline
-            Truncated timeline
+        extruded : Timeline
+            Extruded timeline
 
         Examples
         --------
 
         >>> timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 5)])
-        >>> timeline.truncate(Segment(1, 2))
+        >>> timeline.extrude(Segment(1, 2))
         <Timeline(uri=None, segments=[<Segment(0, 1)>, <Segment(3, 5)>])>
 
-        >>> timeline.truncate(Segment(1, 3), mode='loose')
+        >>> timeline.extrude(Segment(1, 3), mode='loose')
         <Timeline(uri=None, segments=[<Segment(3, 5)>])>
 
-        >>> timeline.truncate(Segment(1, 3), mode='strict')
+        >>> timeline.extrude(Segment(1, 3), mode='strict')
         <Timeline(uri=None, segments=[<Segment(0, 2)>, <Segment(3, 5)>])>
 
         """
