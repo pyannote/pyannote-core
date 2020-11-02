@@ -512,7 +512,7 @@ class Annotation:
         Returns
         -------
         extruded : Annotation
-            extruded annotation
+            Extruded annotation
 
         Note
         ----
