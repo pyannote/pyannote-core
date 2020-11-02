@@ -582,8 +582,7 @@ class Timeline:
     def extrude(self,
                 removed: Support,
                 mode: CropMode = 'intersection') -> 'Timeline':
-        """Removes all segments or parts of segments that
-        overlap the `removed` argument.
+        """Remove segments that overlap `removed` support.
 
         Parameters
         ----------
