@@ -33,7 +33,8 @@ Visualization
 
 :class:`pyannote.core.Segment`, :class:`pyannote.core.Timeline`,
 :class:`pyannote.core.Annotation` and :class:`pyannote.core.SlidingWindowFeature`
-instances can be directly visualized in an Ipython notebook by displaying it.
+instances can be directly visualized in notebooks.
+
 You will however need to install ``pytannote.core``'s additional dependencies
 for notebook representations (namely, matplotlib):
 
@@ -43,8 +44,8 @@ for notebook representations (namely, matplotlib):
     pip install pyannote.core[notebook]
 
 
-Displaying Segments
--------------------
+Segments
+--------
 
 .. code-block:: ipython
 
@@ -56,8 +57,8 @@ Displaying Segments
 .. plot:: pyplots/segment.py
 
 
-Displaying Timelines
---------------------
+Timelines
+---------
 
 .. code-block:: ipython
 
@@ -73,8 +74,8 @@ Displaying Timelines
 .. plot:: pyplots/timeline.py
 
 
-Displaying Annotations
-----------------------
+Annotations
+-----------
 
 
 .. code-block:: ipython
