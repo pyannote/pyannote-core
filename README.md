@@ -8,8 +8,7 @@
 $ pip install pyannote.core
 ```
 
-To add support for the Timeline and Annotation graphical representation in Jupyter notebooks,
-you can also install the additional `notebook` dependencies:
+Support for graphical visualization in Jupyter notebooks can be added with:
 
 ```bash
 $ pip install pyannote.core[notebook]
