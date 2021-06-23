@@ -350,7 +350,10 @@ class Segment:
         :mod:`pyannote.core.notebook`
         """
         from .notebook import repr_segment
-        return repr_segment(self)
+        try:
+            return repr_segment(self)
+        except ImportError:
+            return None
 
 
 class SlidingWindow:

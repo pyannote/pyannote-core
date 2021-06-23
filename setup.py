@@ -65,7 +65,15 @@ setup(
         "Topic :: Scientific/Engineering"
     ],
     extras_require={
-        'testing': ['pytest', 'pandas'],
-        'notebook': ["matplotlib"]
+        'testing': ['pytest',
+                    'pandas >= 0.17.1',
+                    'flake8==3.7.9'],
+        'notebook': ["matplotlib >= 2.0.0"],
+        'doc': ['matplotlib >= 2.0.0',
+                'pandas >= 0.17.1',
+                'Sphinx == 2.2.2',
+                'ipython == 7.10.1',
+                'sphinx_rtd_theme == 0.4.3'
+                ]
     },
 )

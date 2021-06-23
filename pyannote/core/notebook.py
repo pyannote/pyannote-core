@@ -30,6 +30,66 @@
 #############
 Visualization
 #############
+
+:class:`pyannote.core.Segment`, :class:`pyannote.core.Timeline`,
+:class:`pyannote.core.Annotation` and :class:`pyannote.core.SlidingWindowFeature`
+instances can be directly visualized in an Ipython notebook by displaying it.
+You will however need to install ``pytannote.core``'s additional dependencies
+for notebook representations (namely, matplotlib):
+
+
+.. code-block:: bash
+
+    pip install pyannote.core[notebook]
+
+
+Displaying Segments
+-------------------
+
+.. code-block:: ipython
+
+  In [1]: from pyannote.core import Segment
+
+  In [2]: segment = Segment(start=5, end=15)
+    ....: segment
+
+.. plot:: pyplots/segment.py
+
+
+Displaying Timelines
+--------------------
+
+.. code-block:: ipython
+
+  In [25]: from pyannote.core import Timeline, Segment
+
+  In [26]: timeline = Timeline()
+     ....: timeline.add(Segment(1, 5))
+     ....: timeline.add(Segment(6, 8))
+     ....: timeline.add(Segment(12, 18))
+     ....: timeline.add(Segment(7, 20))
+     ....: timeline
+
+.. plot:: pyplots/timeline.py
+
+
+Displaying Annotations
+----------------------
+
+
+.. code-block:: ipython
+
+    In [1]: from pyannote.core import Annotation, Segment
+
+    In [6]: annotation = Annotation()
+       ...: annotation[Segment(1, 5)] = 'Carol'
+       ...: annotation[Segment(6, 8)] = 'Bob'
+       ...: annotation[Segment(12, 18)] = 'Carol'
+       ...: annotation[Segment(7, 20)] = 'Alice'
+       ...: annotation
+
+.. plot:: pyplots/annotation.py
+
 """
 from typing import Iterable, Union, Dict, Optional
 

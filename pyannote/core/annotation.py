@@ -1425,4 +1425,7 @@ class Annotation:
         """
 
         from .notebook import repr_annotation
-        return repr_annotation(self)
+        try:
+            return repr_annotation(self)
+        except ImportError:
+            return None

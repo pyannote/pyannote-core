@@ -1131,4 +1131,7 @@ class Timeline:
         """
 
         from .notebook import repr_timeline
-        return repr_timeline(self)
+        try:
+            return repr_timeline(self)
+        except ImportError:
+            return None

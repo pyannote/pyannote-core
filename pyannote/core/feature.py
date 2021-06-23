@@ -58,7 +58,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     """
 
     def __init__(
-        self, data: np.ndarray, sliding_window: SlidingWindow, labels: List[Text] = None
+            self, data: np.ndarray, sliding_window: SlidingWindow, labels: List[Text] = None
     ):
         self.sliding_window: SlidingWindow = sliding_window
         self.data = data
@@ -113,7 +113,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
         return self.__next__()
 
     def iterfeatures(
-        self, window: Optional[bool] = False
+            self, window: Optional[bool] = False
     ) -> Iterator[Union[Tuple[np.ndarray, Segment], np.ndarray]]:
         """Feature vector iterator
 
@@ -132,11 +132,11 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
                 yield self.data[i]
 
     def crop(
-        self,
-        focus: Union[Segment, Timeline],
-        mode: CropMode = "loose",
-        fixed: Optional[float] = None,
-        return_data: bool = True,
+            self,
+            focus: Union[Segment, Timeline],
+            mode: CropMode = "loose",
+            fixed: Optional[float] = None,
+            return_data: bool = True,
     ) -> Union[np.ndarray, "SlidingWindowFeature"]:
         """Extract frames
 
@@ -237,7 +237,10 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     def _repr_png_(self):
         from .notebook import repr_feature
 
-        return repr_feature(self)
+        try:
+            return repr_feature(self)
+        except ImportError:
+            return None
 
     _HANDLED_TYPES = (np.ndarray, numbers.Number)
 
