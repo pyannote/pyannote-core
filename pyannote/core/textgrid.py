@@ -124,6 +124,8 @@ from .utils.generators import string_generator, int_generator
 from .utils.types import Label, Key, Support, LabelGenerator, TierName, CropMode
 
 
+# TODO: add JSON dumping/loading
+
 class PraatTier:
 
     def __init__(self, name: str = None, uri: str = None):
@@ -159,7 +161,7 @@ class PraatTier:
         return self._segments.peekitem(k)
 
     def get_timeline(self, copy: bool = False) -> Timeline:
-        pass # TODO
+        pass  # TODO
 
     def update(self, tier: 'PraatTier') -> 'PraatTier':
         """Add every segments of an existing tier (in place)
@@ -763,65 +765,6 @@ class PraatTier:
         return Timeline(segments=self.gaps_iter(support=support),
                         uri=self.uri)
 
-    def segmentation(self) -> 'Timeline':
-        """Segmentation
-
-        Create the unique timeline with same support and same set of segment
-        boundaries as original timeline, but with no overlapping segments.
-
-        A picture is worth a thousand words::
-
-            timeline
-            |------|    |------|     |----|
-              |--|    |-----|     |----------|
-
-            timeline.segmentation()
-            |-|--|-|  |-|---|--|  |--|----|--|
-
-        Returns
-        -------
-        timeline : Timeline
-            (unique) timeline with same support and same set of segment
-            boundaries as original timeline, but with no overlapping segments.
-        """
-        # COMPLEXITY: O(n)
-        support = self.support()
-
-        # COMPLEXITY: O(n.log n)
-        # get all boundaries (sorted)
-        # |------|    |------|     |----|
-        #   |--|    |-----|     |----------|
-        # becomes
-        # | |  | |  | |   |  |  |  |    |  |
-        timestamps = set([])
-        for (start, end) in self:
-            timestamps.add(start)
-            timestamps.add(end)
-        timestamps = sorted(timestamps)
-
-        # create new partition timeline
-        # | |  | |  | |   |  |  |  |    |  |
-        # becomes
-        # |-|--|-|  |-|---|--|  |--|----|--|
-
-        # start with an empty copy
-        timeline = Timeline(uri=self.uri)
-
-        if len(timestamps) == 0:
-            return Timeline(uri=self.uri)
-
-        segments = []
-        start = timestamps[0]
-        for end in timestamps[1:]:
-            # only add segments that are covered by original timeline
-            segment = Segment(start=start, end=end)
-            if segment and support.overlapping(segment.middle):
-                segments.append(segment)
-            # next segment...
-            start = end
-
-        return Timeline(segments=segments, uri=self.uri)
-
     def to_annotation(self, modality: Optional[str] = None) -> 'Annotation':
         """Turn tier into an annotation
 
@@ -829,9 +772,6 @@ class PraatTier:
 
         Parameters
         ----------
-        generator : 'string', 'int', or iterable, optional
-            If 'string' (default) generate string labels. If 'int', generate
-            integer labels. If iterable, use it to generate labels.
         modality : str, optional
 
         Returns
@@ -842,16 +782,7 @@ class PraatTier:
 
         from .annotation import Annotation
         annotation = Annotation(uri=self.uri, modality=modality)
-        if generator == 'string':
-            from .utils.generators import string_generator
-            generator = string_generator()
-        elif generator == 'int':
-            from .utils.generators import int_generator
-            generator = int_generator()
-
-        for segment in self:
-            annotation[segment] = next(generator)
-
+        # TODO
         return annotation
 
 
@@ -897,7 +828,11 @@ class PraatTextGrid:
         self._uri = uri
 
     @property
-    def tiers(self) -> List[TierName]:
+    def tiers(self) -> List[PraatTier]:
+        return list(self._tiers.values())
+
+    @property
+    def tiers_names(self) -> List[TierName]:
         return list(self._tiers.keys())
 
     @property
@@ -1175,35 +1110,9 @@ class PraatTextGrid:
 
         result = self.copy() if copy else self
 
-        # TODO speed things up by working directly with annotation internals
-        for segment, track, label in annotation.itertracks(yield_label=True):
-            result[segment, track] = label
+        # TODO
 
         return result
-
-    def chart(self, percent: bool = False) -> List[Tuple[Label, float]]:
-        """Get labels chart (from longest to shortest duration)
-
-        Parameters
-        ----------
-        percent : bool, optional
-            Return list of (label, percentage) tuples.
-            Defaults to returning list of (label, duration) tuples.
-
-        Returns
-        -------
-        chart : list
-            List of (label, duration), sorted by duration in decreasing order.
-        """
-
-        chart = sorted(((L, self.label_duration(L)) for L in self.labels()),
-                       key=lambda x: x[1], reverse=True)
-
-        if percent:
-            total = np.sum([duration for _, duration in chart])
-            chart = [(label, duration / total) for (label, duration) in chart]
-
-        return chart
 
     def argmax(self, support: Optional[Support] = None) -> Optional[Label]:
         """Get label with longest duration
@@ -1211,7 +1120,7 @@ class PraatTextGrid:
         Parameters
         ----------
         support : Segment or Timeline, optional
-            Find label with longest duration within provided support.
+            Find label with longest duration within provided support.p
             Defaults to whole extent.
 
         Returns
