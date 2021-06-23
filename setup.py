@@ -26,9 +26,9 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-import versioneer
-
 from setuptools import setup, find_packages
+
+import versioneer
 
 setup(
 
@@ -39,9 +39,7 @@ setup(
         'sortedcontainers >= 2.0.4',
         'numpy >= 1.10.4',
         'scipy >= 1.1',
-        'pandas >= 0.17.1',
         'simplejson >= 3.8.1',
-        'matplotlib >= 2.0.0',
         "dataclasses >= 0.7; python_version <'3.7'",
         'typing-extensions >= 3.7.4.1'
     ],
@@ -66,4 +64,8 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering"
     ],
+    extras_require={
+        'testing': ['pytest', 'pandas'],
+        'notebook': ["matplotlib"]
+    },
 )

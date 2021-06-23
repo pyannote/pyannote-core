@@ -28,7 +28,7 @@ jobs:
     - name: Install from source
       run: |
         python -m pip install --upgrade pip
-        pip install .
+        pip install .[testing]
     - name: Lint with flake8
       run: |
         pip install flake8==3.7.9

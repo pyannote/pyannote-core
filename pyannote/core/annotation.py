@@ -108,10 +108,9 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 """
 import itertools
 from collections import defaultdict
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text, TYPE_CHECKING
 
 import numpy as np
-import pandas as pd
 from sortedcontainers import SortedDict
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
@@ -121,6 +120,9 @@ from .segment import Segment
 from .timeline import Timeline
 from .utils.generators import string_generator, int_generator
 from .utils.types import Label, Key, Support, LabelGenerator, TrackName, CropMode
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 class Annotation:
@@ -142,7 +144,7 @@ class Annotation:
 
     @classmethod
     def from_df(cls,
-                df: pd.DataFrame,
+                df: 'pd.DataFrame',
                 uri: Optional[str] = None,
                 modality: Optional[str] = None) -> 'Annotation':
 

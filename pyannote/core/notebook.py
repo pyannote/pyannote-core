@@ -39,7 +39,6 @@ try:
     from IPython.core.pylabtools import print_figure
 except Exception as e:
     pass
-from matplotlib.cm import get_cmap
 import numpy as np
 from itertools import cycle, product, groupby
 from .segment import Segment
@@ -54,6 +53,8 @@ class Notebook:
         self.reset()
 
     def reset(self):
+        from matplotlib.cm import get_cmap
+
         linewidth = [3, 1]
         linestyle = ['solid', 'dashed', 'dotted']
 

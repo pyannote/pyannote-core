@@ -91,7 +91,6 @@ See :class:`pyannote.core.Timeline` for the complete reference.
 from typing import (Optional, Iterable, List, Union, Callable,
                     TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
 
-import pandas as pd
 from sortedcontainers import SortedList
 
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
@@ -99,11 +98,13 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .utils.types import Support, Label, CropMode
 
-#  this is a moderately ugly way to import `Annotation` to the namespace
+
+# this is a moderately ugly way to import `Annotation` to the namespace
 #  without causing some circular imports :
 #  https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports
 if TYPE_CHECKING:
     from .annotation import Annotation
+    import pandas as pd
 
 
 # =====================================================================
@@ -133,7 +134,7 @@ class Timeline:
     """
 
     @classmethod
-    def from_df(cls, df: pd.DataFrame, uri: Optional[str] = None) -> 'Timeline':
+    def from_df(cls, df: 'pd.DataFrame', uri: Optional[str] = None) -> 'Timeline':
         segments = list(df[PYANNOTE_SEGMENT])
         timeline = cls(segments=segments, uri=uri)
         return timeline
