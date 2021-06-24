@@ -240,6 +240,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
         try:
             return repr_feature(self)
         except ImportError:
+            warnings.warn(f"Couldn't import matplotlib to render the vizualization for object {self}. To enable, install the required dependencies with 'pip install pyannore.core[notebook]'")
             return None
 
     _HANDLED_TYPES = (np.ndarray, numbers.Number)

@@ -107,6 +107,7 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
 import itertools
+import warnings
 from collections import defaultdict
 from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text, TYPE_CHECKING
 
@@ -1428,4 +1429,6 @@ class Annotation:
         try:
             return repr_annotation(self)
         except ImportError:
+            warnings.warn(
+                f"Couldn't import matplotlib to render the vizualization for object {self}. To enable, install the required dependencies with 'pip install pyannore.core[notebook]'")
             return None

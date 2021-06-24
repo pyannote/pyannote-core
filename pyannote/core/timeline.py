@@ -88,6 +88,7 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
+import warnings
 from typing import (Optional, Iterable, List, Union, Callable,
                     TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
 
@@ -1134,4 +1135,6 @@ class Timeline:
         try:
             return repr_timeline(self)
         except ImportError:
+            warnings.warn(
+                f"Couldn't import matplotlib to render the vizualization for object {self}. To enable, install the required dependencies with 'pip install pyannore.core[notebook]'")
             return None
