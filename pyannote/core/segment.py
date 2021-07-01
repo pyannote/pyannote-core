@@ -68,6 +68,7 @@ See :class:`pyannote.core.Segment` for the complete reference.
 
 import warnings
 from typing import Union, Optional, Tuple, List, Iterator, Iterable
+
 from .utils.types import Alignment
 
 import numpy as np
@@ -349,6 +350,11 @@ class Segment:
         --------
         :mod:`pyannote.core.notebook`
         """
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(obj=self))
+            return None
+
         from .notebook import repr_segment
         try:
             return repr_segment(self)

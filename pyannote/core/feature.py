@@ -235,13 +235,13 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
         return SlidingWindowFeature(data, sliding_window, labels=self.labels)
 
     def _repr_png_(self):
-        from .notebook import repr_feature
-
-        try:
-            return repr_feature(self)
-        except ImportError:
-            warnings.warn(f"Couldn't import matplotlib to render the vizualization for object {self}. To enable, install the required dependencies with 'pip install pyannore.core[notebook]'")
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(obj=self))
             return None
+
+        from .notebook import repr_feature
+        return repr_feature(self)
 
     _HANDLED_TYPES = (np.ndarray, numbers.Number)
 

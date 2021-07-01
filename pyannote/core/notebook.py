@@ -92,7 +92,7 @@ Annotations
 .. plot:: pyplots/annotation.py
 
 """
-from typing import Iterable, Union, Dict, Optional
+from typing import Iterable, Dict, Optional
 
 from .utils.types import Label, LabelStyle, Resource
 
@@ -106,6 +106,18 @@ from .segment import Segment
 from .timeline import Timeline
 from .annotation import Annotation
 from .feature import SlidingWindowFeature
+
+try:
+    import matplotlib
+except ImportError:
+    MATPLOTLIB_IS_AVAILABLE = False
+else:
+    MATPLOTLIB_IS_AVAILABLE = True
+
+MATPLOTLIB_WARNING = \
+    "Couldn't import matplotlib to render the vizualization " \
+    "for object {obj}. To enable, install the required dependencies " \
+    "with 'pip install pyannore.core[notebook]'"
 
 
 class Notebook:

@@ -1424,11 +1424,10 @@ class Annotation:
         --------
         :mod:`pyannote.core.notebook`
         """
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(obj=self))
+            return None
 
         from .notebook import repr_annotation
-        try:
-            return repr_annotation(self)
-        except ImportError:
-            warnings.warn(
-                f"Couldn't import matplotlib to render the vizualization for object {self}. To enable, install the required dependencies with 'pip install pyannore.core[notebook]'")
-            return None
+        return repr_annotation(self)
