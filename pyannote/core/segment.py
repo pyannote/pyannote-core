@@ -352,7 +352,7 @@ class Segment:
         """
         from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
         if not MATPLOTLIB_IS_AVAILABLE:
-            warnings.warn(MATPLOTLIB_WARNING.format(obj=self))
+            warnings.warn(MATPLOTLIB_WARNING.format(klass=self.__class__.__name__))
             return None
 
         from .notebook import repr_segment

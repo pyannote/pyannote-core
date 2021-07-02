@@ -116,7 +116,7 @@ else:
 
 MATPLOTLIB_WARNING = \
     "Couldn't import matplotlib to render the vizualization " \
-    "for object {obj}. To enable, install the required dependencies " \
+    "for object {klass}. To enable, install the required dependencies " \
     "with 'pip install pyannore.core[notebook]'"
 
 
