@@ -58,7 +58,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     """
 
     def __init__(
-        self, data: np.ndarray, sliding_window: SlidingWindow, labels: List[Text] = None
+            self, data: np.ndarray, sliding_window: SlidingWindow, labels: List[Text] = None
     ):
         self.sliding_window: SlidingWindow = sliding_window
         self.data = data
@@ -113,7 +113,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
         return self.__next__()
 
     def iterfeatures(
-        self, window: Optional[bool] = False
+            self, window: Optional[bool] = False
     ) -> Iterator[Union[Tuple[np.ndarray, Segment], np.ndarray]]:
         """Feature vector iterator
 
@@ -132,11 +132,11 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
                 yield self.data[i]
 
     def crop(
-        self,
-        focus: Union[Segment, Timeline],
-        mode: CropMode = "loose",
-        fixed: Optional[float] = None,
-        return_data: bool = True,
+            self,
+            focus: Union[Segment, Timeline],
+            mode: CropMode = "loose",
+            fixed: Optional[float] = None,
+            return_data: bool = True,
     ) -> Union[np.ndarray, "SlidingWindowFeature"]:
         """Extract frames
 
@@ -235,8 +235,12 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
         return SlidingWindowFeature(data, sliding_window, labels=self.labels)
 
     def _repr_png_(self):
-        from .notebook import repr_feature
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(klass=self.__class__.__name__))
+            return None
 
+        from .notebook import repr_feature
         return repr_feature(self)
 
     _HANDLED_TYPES = (np.ndarray, numbers.Number)

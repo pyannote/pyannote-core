@@ -225,8 +225,3 @@ def to_squared(n, k):
     i = np.int64(n - np.sqrt(-8*k + 4*n**2 - 4*n + 1)/2 - 1/2)
     j = np.int64(i**2/2 - i*n + 3*i/2 + k + 1)
     return i, j
-
-
-# for n in range(2, 10):
-#     for k in range(int(n*(n-1)/2)):
-#         assert to_condensed(n, *to_squared(n, k)) == k

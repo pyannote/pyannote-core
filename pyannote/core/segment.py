@@ -68,6 +68,7 @@ See :class:`pyannote.core.Segment` for the complete reference.
 
 import warnings
 from typing import Union, Optional, Tuple, List, Iterator, Iterable
+
 from .utils.types import Alignment
 
 import numpy as np
@@ -349,8 +350,18 @@ class Segment:
         --------
         :mod:`pyannote.core.notebook`
         """
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(klass=self.__class__.__name__))
+            return None
+
         from .notebook import repr_segment
-        return repr_segment(self)
+        try:
+            return repr_segment(self)
+        except ImportError:
+            warnings.warn(
+                f"Couldn't import matplotlib to render the vizualization for object {self}. To enable, install the required dependencies with 'pip install pyannore.core[notebook]'")
+            return None
 
 
 class SlidingWindow:
