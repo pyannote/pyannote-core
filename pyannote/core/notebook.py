@@ -261,7 +261,7 @@ class Notebook:
             self.plot_timeline(resource, time=time)
 
         elif isinstance(resource, Annotation):
-            self.plot_annotation(resource, time=time, legend=legend)
+            self.plot_annotation(resource, time=time, legend=legend, arrangement="pack")
 
         elif isinstance(resource, SlidingWindowFeature):
             self.plot_feature(resource, time=time)
@@ -391,13 +391,13 @@ def repr_timeline(timeline: Timeline):
     return data
 
 
-def repr_annotation(annotation: Annotation):
+def repr_annotation(annotation: Annotation, arrangement="pack"):
     """Get `png` data for `annotation`"""
     import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']
     plt.rcParams['figure.figsize'] = (notebook.width, 2)
     fig, ax = plt.subplots()
-    notebook.plot_annotation(annotation, ax=ax)
+    notebook.plot_annotation(annotation, ax=ax, arrangement=arrangement)
     data = print_figure(fig, 'png')
     plt.close(fig)
     plt.rcParams['figure.figsize'] = figsize

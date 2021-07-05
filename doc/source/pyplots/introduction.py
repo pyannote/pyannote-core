@@ -12,7 +12,7 @@ annotation[Segment(1, 5)] = 'Carol'
 annotation[Segment(6, 8)] = 'Bob'
 annotation[Segment(12, 18)] = 'Carol'
 annotation[Segment(7, 20)] = 'Alice'
-notebook.plot_annotation(annotation, legend=True, time=False)
+notebook.plot_annotation(annotation, legend=True, time=False, arrangement="pack")
 
 # plot timeline
 plt.subplot(212)
