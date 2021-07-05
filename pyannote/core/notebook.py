@@ -288,13 +288,27 @@ class Notebook:
 
         # ax.set_aspect(3. / self.crop.duration)
 
-    def plot_annotation(self, annotation: Annotation, ax=None, time=True, legend=True):
+    def plot_annotation(self, annotation: Annotation, ax=None, time=True, legend=True, arrangement="pack"):
+        """ plots annotation
+
+        Parameters
+        ----------
+        arrangement : str
+            To plot segments, they are grouped by certain rules, and each group is plotted
+            on a distinct line. `stack` will group segments according to their label.
+            `pack` will group segments optimally by timestamp, regardless of label.
+
+        Returns
+        -------
+
+        """
 
         if not self.crop:
             self.crop = annotation.get_timeline(copy=False).extent()
 
         cropped = annotation.crop(self.crop, mode='intersection')
         labels = cropped.labels()
+        labels_dict = {label: i for i, label in enumerate(set(labels))}
         segments = [s for s, _ in cropped.itertracks()]
 
         ax = self.setup(ax=ax, time=time)
@@ -302,6 +316,8 @@ class Notebook:
         for (segment, track, label), y in zip(
                 cropped.itertracks(yield_label=True),
                 self.get_y(segments)):
+            if arrangement == "stack":
+                y = 1.0 - 1.0 / (len(labels) + 1) * (1 + labels_dict.get(label))
             self.draw_segment(ax, segment, y, label=label)
 
         if legend:
