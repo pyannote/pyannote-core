@@ -40,7 +40,7 @@ from typing import Tuple, Optional, Union, Iterator, List, Text
 
 import numpy as np
 
-from pyannote.core.utils.types import CropMode
+from pyannote.core.utils.types import Alignment
 from .segment import Segment
 from .segment import SlidingWindow
 from .timeline import Timeline
@@ -134,7 +134,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     def crop(
             self,
             focus: Union[Segment, Timeline],
-            mode: CropMode = "loose",
+            mode: Alignment = "loose",
             fixed: Optional[float] = None,
             return_data: bool = True,
     ) -> Union[np.ndarray, "SlidingWindowFeature"]:
