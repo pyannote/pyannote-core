@@ -130,6 +130,10 @@ class Segment:
         """
         return bool((self.end - self.start) > SEGMENT_PRECISION)
 
+    def __post_init__(self):
+        object.__setattr__(self, 'start', int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
+        object.__setattr__(self, 'end', int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
+
     @property
     def duration(self) -> float:
         """Segment duration (read-only)"""
