@@ -39,7 +39,7 @@ PYANNOTE_LABEL = 'label'
 PYANNOTE_SCORE = 'score'
 PYANNOTE_IDENTITY = 'identity'
 
-from .segment import Segment, SlidingWindow
+from .segment import Segment, SlidingWindow, set_precision
 from .timeline import Timeline
 from .annotation import Annotation
 from .feature import SlidingWindowFeature
@@ -48,3 +48,6 @@ try:
     from .notebook import notebook
 except ImportError as e:
     pass
+
+set_precision()
+

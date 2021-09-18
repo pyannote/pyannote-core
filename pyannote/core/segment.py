@@ -74,8 +74,20 @@ from .utils.types import Alignment
 import numpy as np
 from dataclasses import dataclass
 
-# 1 μs (one microsecond)
-SEGMENT_PRECISION = 1e-6
+
+def set_precision(ndigits: Optional[int] = None):
+    global FORCE_ROUND_TIME
+    global SEGMENT_PRECISION
+
+    if ndigits is None:
+        # backward compatibility
+        FORCE_ROUND_TIME = False
+        # 1 μs (one microsecond)
+        SEGMENT_PRECISION = 1e-6
+    else:
+        FORCE_ROUND_TIME = True
+        SEGMENT_PRECISION = 10 ** (-ndigits)
+
 
 # setting 'frozen' to True makes it hashable and immutable
 @dataclass(frozen=True, order=True)
@@ -131,8 +143,9 @@ class Segment:
         return bool((self.end - self.start) > SEGMENT_PRECISION)
 
     def __post_init__(self):
-        object.__setattr__(self, 'start', int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
-        object.__setattr__(self, 'end', int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
+        if FORCE_ROUND_TIME:
+            object.__setattr__(self, 'start', int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
+            object.__setattr__(self, 'end', int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
 
     @property
     def duration(self) -> float:
