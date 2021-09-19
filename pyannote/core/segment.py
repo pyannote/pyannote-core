@@ -63,6 +63,21 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
 
   In [11]: segment.overlaps(3)  # does segment overlap time t=3?
 
+
+When you handle float value with Segment, you can set precision digits. It will force round up to `ndigits`
+
+.. code-block:: ipython
+
+  In [12]: from pyannote.core import set_precision
+
+  In [13]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)
+  Out[13]: False
+
+  In [14]: set_precision(4)
+
+  In [15]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)
+  Out[15]: True
+
 See :class:`pyannote.core.Segment` for the complete reference.
 """
 
@@ -73,20 +88,6 @@ from .utils.types import Alignment
 
 import numpy as np
 from dataclasses import dataclass
-
-
-def set_precision(ndigits: Optional[int] = None):
-    global FORCE_ROUND_TIME
-    global SEGMENT_PRECISION
-
-    if ndigits is None:
-        # backward compatibility
-        FORCE_ROUND_TIME = False
-        # 1 μs (one microsecond)
-        SEGMENT_PRECISION = 1e-6
-    else:
-        FORCE_ROUND_TIME = True
-        SEGMENT_PRECISION = 10 ** (-ndigits)
 
 
 # setting 'frozen' to True makes it hashable and immutable
@@ -127,6 +128,26 @@ class Segment:
     start: float = 0.0
     end: float = 0.0
 
+    @staticmethod
+    def set_precision(ndigits: Optional[int] = None):
+        """Care SEGMENT_PRECISION
+
+        >>> Segment.set_precision(2)
+        >>> Segment(1/3, 2/3)
+            <Segment(0.33, 0.67)>
+        """
+        global FORCE_ROUND_TIME
+        global SEGMENT_PRECISION
+
+        if ndigits is None:
+            # backward compatibility
+            FORCE_ROUND_TIME = False
+            # 1 μs (one microsecond)
+            SEGMENT_PRECISION = 1e-6
+        else:
+            FORCE_ROUND_TIME = True
+            SEGMENT_PRECISION = 10 ** (-ndigits)
+
     def __bool__(self):
         """Emptiness
 
@@ -143,6 +164,7 @@ class Segment:
         return bool((self.end - self.start) > SEGMENT_PRECISION)
 
     def __post_init__(self):
+        """Round start and end with SEGMENT_PRECISION"""
         if FORCE_ROUND_TIME:
             object.__setattr__(self, 'start', int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
             object.__setattr__(self, 'end', int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)

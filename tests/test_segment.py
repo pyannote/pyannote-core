@@ -1,4 +1,4 @@
-from pyannote.core import Segment, set_precision
+from pyannote.core import Segment
 
 
 def test_creation():
@@ -48,5 +48,5 @@ def test_other_operation():
 
 def test_segment_precision_mode():
     assert not Segment(90/1000, 90/1000+240/1000) == Segment(90/1000, 330/1000)
-    set_precision(4)
+    Segment.set_precision(4)
     assert Segment(90/1000, 90/1000+240/1000) == Segment(90/1000, 330/1000)
