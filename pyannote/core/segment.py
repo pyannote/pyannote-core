@@ -64,7 +64,8 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
   In [11]: segment.overlaps(3)  # does segment overlap time t=3?
 
 
-Use `Segment.set_precision(ndigits)` to automatically round start and end timestamps to `ndigits` precision after the decimal point. 
+Use `Segment.set_precision(ndigits)` to automatically round start and end timestamps to `ndigits` precision after the decimal point.
+To ensure consistency between `Segment` instances, it is recommended to call this method only once, right after importing `pyannote.core.Segment`.
 
 .. code-block:: ipython
 
@@ -130,8 +131,12 @@ class Segment:
     def set_precision(ndigits: Optional[int] = None):
         """Automatically round start and end timestamps to `ndigits` precision after the decimal point
 
+        To ensure consistency between `Segment` instances, it is recommended to call this method only 
+        once, right after importing `pyannote.core.Segment`.
+
         Usage
         -----
+        >>> from pyannote.core import Segment
         >>> Segment.set_precision(2)
         >>> Segment(1/3, 2/3)
         <Segment(0.33, 0.67)>
