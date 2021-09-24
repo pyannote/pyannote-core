@@ -88,10 +88,10 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
+import warnings
 from typing import (Optional, Iterable, List, Union, Callable,
                     TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
 
-import pandas as pd
 from sortedcontainers import SortedList
 
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
@@ -99,11 +99,13 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .utils.types import Support, Label, CropMode
 
-#  this is a moderately ugly way to import `Annotation` to the namespace
+
+# this is a moderately ugly way to import `Annotation` to the namespace
 #  without causing some circular imports :
 #  https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports
 if TYPE_CHECKING:
     from .annotation import Annotation
+    import pandas as pd
 
 
 # =====================================================================
@@ -133,7 +135,7 @@ class Timeline:
     """
 
     @classmethod
-    def from_df(cls, df: pd.DataFrame, uri: Optional[str] = None) -> 'Timeline':
+    def from_df(cls, df: 'pd.DataFrame', uri: Optional[str] = None) -> 'Timeline':
         segments = list(df[PYANNOTE_SEGMENT])
         timeline = cls(segments=segments, uri=uri)
         return timeline
@@ -554,6 +556,77 @@ class Timeline:
             if segment.overlaps(t):
                 yield segment
 
+    def get_overlap(self) -> 'Timeline':
+        """Get overlapping parts of the timeline.
+
+        A simple illustration:
+
+            timeline
+            |------|    |------|      |----|
+              |--|    |-----|      |----------|
+
+            timeline.get_overlap()
+              |--|      |---|         |----|
+
+
+       Returns
+       -------
+       overlap : `pyannote.core.Timeline`
+           Timeline of the overlaps.
+       """
+        overlaps_tl = Timeline(uri=self.uri)
+        for s1, s2 in self.co_iter(self):
+            if s1 == s2:
+                continue
+            overlaps_tl.add(s1 & s2)
+        return overlaps_tl.support()
+
+    def extrude(self,
+                removed: Support,
+                mode: CropMode = 'intersection') -> 'Timeline':
+        """Remove segments that overlap `removed` support.
+
+        Parameters
+        ----------
+        removed : Segment or Timeline
+            If `support` is a `Timeline`, its support is used.
+        mode : {'strict', 'loose', 'intersection'}, optional
+            Controls how segments that are not fully included in `removed` are
+            handled. 'strict' mode only removes fully included segments. 'loose'
+            mode removes any intersecting segment. 'intersection' mode removes
+            the overlapping part of any intersecting segment.
+
+        Returns
+        -------
+        extruded : Timeline
+            Extruded timeline
+
+        Examples
+        --------
+
+        >>> timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 5)])
+        >>> timeline.extrude(Segment(1, 2))
+        <Timeline(uri=None, segments=[<Segment(0, 1)>, <Segment(3, 5)>])>
+
+        >>> timeline.extrude(Segment(1, 3), mode='loose')
+        <Timeline(uri=None, segments=[<Segment(3, 5)>])>
+
+        >>> timeline.extrude(Segment(1, 3), mode='strict')
+        <Timeline(uri=None, segments=[<Segment(0, 2)>, <Segment(3, 5)>])>
+
+        """
+        if isinstance(removed, Segment):
+            removed = Timeline([removed])
+
+        extent_tl = Timeline([self.extent()], uri=self.uri)
+        truncating_support = removed.gaps(support=extent_tl)
+        # loose for truncate means strict for crop and vice-versa
+        if mode == "loose":
+            mode = "strict"
+        elif mode == "strict":
+            mode = "loose"
+        return self.crop(truncating_support, mode=mode)
+
     def __str__(self):
         """Human-readable representation
 
@@ -633,7 +706,7 @@ class Timeline:
         """
         return Timeline(uri=self.uri)
 
-    def covers(self, other : 'Timeline') -> bool:
+    def covers(self, other: 'Timeline') -> bool:
         """Check whether other timeline is fully covered by the timeline
         
         Parameter
@@ -647,11 +720,11 @@ class Timeline:
             True if timeline covers "other" timeline entirely. False if at least
             one segment of "other" is not fully covered by timeline
         """
-        
+
         # compute gaps within "other" extent 
         # this is where we should look for possible faulty segments 
         gaps = self.gaps(support=other.extent())
-        
+
         # if at least one gap intersects with a segment from "other", 
         # "self" does not cover "other" entirely --> return False
         for _ in gaps.co_iter(other):
@@ -660,7 +733,7 @@ class Timeline:
         # if no gap intersects with a segment from "other", 
         # "self" covers "other" entirely --> return True
         return True
- 
+
     def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
             -> 'Timeline':
         """Get a copy of the timeline
@@ -1057,6 +1130,10 @@ class Timeline:
         --------
         :mod:`pyannote.core.notebook`
         """
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(klass=self.__class__.__name__))
+            return None
 
         from .notebook import repr_timeline
         return repr_timeline(self)

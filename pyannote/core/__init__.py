@@ -48,3 +48,6 @@ try:
     from .notebook import notebook
 except ImportError as e:
     pass
+
+Segment.set_precision()
+

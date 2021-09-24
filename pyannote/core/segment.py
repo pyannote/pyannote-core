@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2019 CNRS
+# Copyright (c) 2014-2021 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -63,18 +63,31 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
 
   In [11]: segment.overlaps(3)  # does segment overlap time t=3?
 
+
+Use `Segment.set_precision(ndigits)` to automatically round start and end timestamps to `ndigits` precision after the decimal point.
+To ensure consistency between `Segment` instances, it is recommended to call this method only once, right after importing `pyannote.core.Segment`.
+
+.. code-block:: ipython
+
+  In [12]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)
+  Out[12]: False
+
+  In [13]: Segment.set_precision(ndigits=4)
+
+  In [14]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)
+  Out[14]: True
+
 See :class:`pyannote.core.Segment` for the complete reference.
 """
 
 import warnings
 from typing import Union, Optional, Tuple, List, Iterator, Iterable
+
 from .utils.types import Alignment
 
 import numpy as np
 from dataclasses import dataclass
 
-# 1 μs (one microsecond)
-SEGMENT_PRECISION = 1e-6
 
 # setting 'frozen' to True makes it hashable and immutable
 @dataclass(frozen=True, order=True)
@@ -114,6 +127,32 @@ class Segment:
     start: float = 0.0
     end: float = 0.0
 
+    @staticmethod
+    def set_precision(ndigits: Optional[int] = None):
+        """Automatically round start and end timestamps to `ndigits` precision after the decimal point
+
+        To ensure consistency between `Segment` instances, it is recommended to call this method only 
+        once, right after importing `pyannote.core.Segment`.
+
+        Usage
+        -----
+        >>> from pyannote.core import Segment
+        >>> Segment.set_precision(2)
+        >>> Segment(1/3, 2/3)
+        <Segment(0.33, 0.67)>
+        """
+        global AUTO_ROUND_TIME
+        global SEGMENT_PRECISION
+
+        if ndigits is None:
+            # backward compatibility
+            AUTO_ROUND_TIME = False
+            # 1 μs (one microsecond)
+            SEGMENT_PRECISION = 1e-6
+        else:
+            AUTO_ROUND_TIME = True
+            SEGMENT_PRECISION = 10 ** (-ndigits)
+
     def __bool__(self):
         """Emptiness
 
@@ -128,6 +167,12 @@ class Segment:
         start time, or its duration is smaller than 1μs.
         """
         return bool((self.end - self.start) > SEGMENT_PRECISION)
+
+    def __post_init__(self):
+        """Round start and end up to SEGMENT_PRECISION precision (when required)"""
+        if AUTO_ROUND_TIME:
+            object.__setattr__(self, 'start', int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
+            object.__setattr__(self, 'end', int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
 
     @property
     def duration(self) -> float:
@@ -349,8 +394,18 @@ class Segment:
         --------
         :mod:`pyannote.core.notebook`
         """
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(klass=self.__class__.__name__))
+            return None
+
         from .notebook import repr_segment
-        return repr_segment(self)
+        try:
+            return repr_segment(self)
+        except ImportError:
+            warnings.warn(
+                f"Couldn't import matplotlib to render the vizualization for object {self}. To enable, install the required dependencies with 'pip install pyannore.core[notebook]'")
+            return None
 
 
 class SlidingWindow:
