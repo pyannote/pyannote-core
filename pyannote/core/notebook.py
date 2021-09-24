@@ -30,8 +30,69 @@
 #############
 Visualization
 #############
+
+:class:`pyannote.core.Segment`, :class:`pyannote.core.Timeline`,
+:class:`pyannote.core.Annotation` and :class:`pyannote.core.SlidingWindowFeature`
+instances can be directly visualized in notebooks.
+
+You will however need to install ``pytannote.core``'s additional dependencies
+for notebook representations (namely, matplotlib):
+
+
+.. code-block:: bash
+
+    pip install pyannote.core[notebook]
+
+
+Segments
+--------
+
+.. code-block:: ipython
+
+  In [1]: from pyannote.core import Segment
+
+  In [2]: segment = Segment(start=5, end=15)
+    ....: segment
+
+.. plot:: pyplots/segment.py
+
+
+Timelines
+---------
+
+.. code-block:: ipython
+
+  In [25]: from pyannote.core import Timeline, Segment
+
+  In [26]: timeline = Timeline()
+     ....: timeline.add(Segment(1, 5))
+     ....: timeline.add(Segment(6, 8))
+     ....: timeline.add(Segment(12, 18))
+     ....: timeline.add(Segment(7, 20))
+     ....: timeline
+
+.. plot:: pyplots/timeline.py
+
+
+Annotations
+-----------
+
+
+.. code-block:: ipython
+
+    In [1]: from pyannote.core import Annotation, Segment
+
+    In [6]: annotation = Annotation()
+       ...: annotation[Segment(1, 5)] = 'Carol'
+       ...: annotation[Segment(6, 8)] = 'Bob'
+       ...: annotation[Segment(12, 18)] = 'Carol'
+       ...: annotation[Segment(7, 20)] = 'Alice'
+       ...: annotation
+
+.. plot:: pyplots/annotation.py
+
 """
-from typing import Iterable, Union, Dict, Optional
+from typing import Iterable, Dict, Optional
 
 from .utils.types import Label, LabelStyle, Resource
 
@@ -39,13 +100,24 @@ try:
     from IPython.core.pylabtools import print_figure
 except Exception as e:
     pass
-from matplotlib.cm import get_cmap
 import numpy as np
 from itertools import cycle, product, groupby
 from .segment import Segment
 from .timeline import Timeline
 from .annotation import Annotation
 from .feature import SlidingWindowFeature
+
+try:
+    import matplotlib
+except ImportError:
+    MATPLOTLIB_IS_AVAILABLE = False
+else:
+    MATPLOTLIB_IS_AVAILABLE = True
+
+MATPLOTLIB_WARNING = \
+    "Couldn't import matplotlib to render the vizualization " \
+    "for object {klass}. To enable, install the required dependencies " \
+    "with 'pip install pyannore.core[notebook]'"
 
 
 class Notebook:
@@ -54,6 +126,8 @@ class Notebook:
         self.reset()
 
     def reset(self):
+        from matplotlib.cm import get_cmap
+
         linewidth = [3, 1]
         linestyle = ['solid', 'dashed', 'dotted']
 

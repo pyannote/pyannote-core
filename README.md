@@ -8,6 +8,12 @@
 $ pip install pyannote.core
 ```
 
+Support for graphical visualization in Jupyter notebooks can be added with:
+
+```bash
+$ pip install pyannote.core[notebook]
+```
+
 ## Documentation
 
 The documentation is available at [http://pyannote.github.io/pyannote-core](http://pyannote.github.io/pyannote-core).

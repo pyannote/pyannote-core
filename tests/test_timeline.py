@@ -29,8 +29,9 @@
 import pytest
 
 from pyannote.core import Annotation
-from pyannote.core import Timeline
 from pyannote.core import Segment
+from pyannote.core import Timeline
+
 
 @pytest.fixture
 def timeline():
@@ -44,6 +45,7 @@ def timeline():
 
     return t
 
+
 def test_to_annotation(timeline):
     expected = Annotation(uri='MyAudioFile', modality='MyModality')
     expected[Segment(6, 8)] = 'D'
@@ -54,14 +56,15 @@ def test_to_annotation(timeline):
     expected[Segment(7, 8)] = 'E'
     assert expected == timeline.to_annotation(modality='MyModality')
 
-def test_iteration(timeline):
 
+def test_iteration(timeline):
     assert list(timeline) == [Segment(0.5, 3),
                               Segment(1, 4),
                               Segment(5, 7),
                               Segment(6, 8),
                               Segment(7, 8),
                               Segment(8.5, 10)]
+
 
 def test_remove(timeline):
     timeline.remove(Segment(1, 4))
@@ -71,15 +74,19 @@ def test_remove(timeline):
                               Segment(7, 8),
                               Segment(8.5, 10)]
 
+
 def test_getter(timeline):
     assert len(timeline) == 6
     assert str(timeline[1]) == "[ 00:00:01.000 -->  00:00:04.000]"
 
+
 def test_getter_negative(timeline):
     assert timeline[-2] == Segment(7, 8)
 
+
 def test_extent(timeline):
     assert timeline.extent() == Segment(0.5, 10)
+
 
 def test_remove_and_extent():
     t = Timeline(uri='MyAudioFile')
@@ -90,8 +97,10 @@ def test_remove_and_extent():
     t.remove(Segment(6, 9))
     assert t.extent() == Segment(6, 9)
 
+
 def test_extent(timeline):
     assert timeline.extent() == Segment(0.5, 10)
+
 
 def test_support(timeline):
     # No collar (default).
@@ -103,13 +112,14 @@ def test_support(timeline):
     assert list(timeline.support(.600)) == [Segment(0.5, 4),
                                             Segment(5, 10)]
 
+
 def test_gaps(timeline):
     assert list(timeline.gaps()) == [Segment(4, 5),
                                      Segment(8, 8.5)]
 
-def test_crop(timeline):
 
-    selection = Segment(3,7)
+def test_crop(timeline):
+    selection = Segment(3, 7)
 
     expected_answer = Timeline(uri='MyAudioFile')
     expected_answer.add(Segment(3, 4))
@@ -122,16 +132,15 @@ def test_crop(timeline):
     expected_answer.add(Segment(5, 7))
     assert timeline.crop(selection, mode='strict') == expected_answer
 
-
     expected_answer = Timeline(uri="pouet")
     expected_answer.add(Segment(1, 4))
     expected_answer.add(Segment(5, 7))
     expected_answer.add(Segment(6, 8))
 
-    timeline.crop(selection, mode='loose') == expected_answer
+    assert timeline.crop(selection, mode='loose') == expected_answer
+
 
 def test_crop_mapping():
-
     timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
     cropped, mapping = timeline.crop(Segment(1, 2), returns_mapping=True)
 
@@ -140,6 +149,7 @@ def test_crop_mapping():
 
     expected_mapping = {Segment(1, 2): [Segment(0, 2), Segment(1, 2)]}
     assert mapping == expected_mapping
+
 
 def test_union():
     first_timeline = Timeline([Segment(0, 1),
@@ -157,6 +167,8 @@ def test_union():
 
     assert list(first_timeline.co_iter(second_timeline)) == [(Segment(2, 3), Segment(1.5, 4.5)),
                                                              (Segment(4, 5), Segment(1.5, 4.5))]
+
+
 def test_union_extent():
     first_timeline = Timeline([Segment(0, 1),
                                Segment(2, 3),
@@ -172,3 +184,42 @@ def test_update_extent():
     other_timeline = Timeline([Segment(1.5, 6)])
     timeline.update(other_timeline)
     assert timeline.extent() == Segment(0, 6)
+
+
+def test_timeline_overlaps():
+    overlapped_tl = Timeline(uri="La menuiserie mec")
+    overlapped_tl.add(Segment(0, 10))
+    overlapped_tl.add(Segment(5, 10))
+    overlapped_tl.add(Segment(15, 20))
+    overlapped_tl.add(Segment(18, 23))
+
+    expected_overlap = Timeline()
+    expected_overlap.add(Segment(5, 10))
+    expected_overlap.add(Segment(18, 20))
+
+    assert expected_overlap == overlapped_tl.get_overlap()
+
+
+def test_extrude():
+    removed = Segment(2, 5)
+
+    timeline = Timeline(uri='KINGJU')
+    timeline.add(Segment(0, 3))
+    timeline.add(Segment(2, 5))
+    timeline.add(Segment(6, 7))
+
+    expected_answer = Timeline()
+    expected_answer.add(Segment(0, 2))
+    expected_answer.add(Segment(6, 7))
+
+    assert timeline.extrude(removed, mode='intersection') == expected_answer
+
+    expected_answer = Timeline(uri="MCSALO")
+    expected_answer.add(Segment(0, 3))
+    expected_answer.add(Segment(6, 7))
+    assert timeline.extrude(removed, mode='strict') == expected_answer
+
+    expected_answer = Timeline(uri="CADILLAC")
+    expected_answer.add(Segment(6, 7))
+
+    assert timeline.extrude(removed, mode='loose') == expected_answer

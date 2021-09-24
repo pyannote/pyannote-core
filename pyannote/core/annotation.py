@@ -106,12 +106,12 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
-from collections import defaultdict
 import itertools
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text
+import warnings
+from collections import defaultdict
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text, TYPE_CHECKING
 
 import numpy as np
-import pandas as pd
 from sortedcontainers import SortedDict
 
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
@@ -121,6 +121,9 @@ from .segment import Segment
 from .timeline import Timeline
 from .utils.generators import string_generator, int_generator
 from .utils.types import Label, Key, Support, LabelGenerator, TrackName, CropMode
+
+if TYPE_CHECKING:
+    import pandas as pd
 
 
 class Annotation:
@@ -142,7 +145,7 @@ class Annotation:
 
     @classmethod
     def from_df(cls,
-                df: pd.DataFrame,
+                df: 'pd.DataFrame',
                 uri: Optional[str] = None,
                 modality: Optional[str] = None) -> 'Annotation':
 
@@ -241,9 +244,9 @@ class Annotation:
 
     def itertracks(self, yield_label: bool = False) \
             -> Iterator[Union[
-                             Tuple[Segment, TrackName],
-                             Tuple[Segment, TrackName, Label]
-                         ]]:
+                Tuple[Segment, TrackName],
+                Tuple[Segment, TrackName, Label]
+            ]]:
         """Iterate over tracks (in chronological order)
 
         Parameters
@@ -371,7 +374,8 @@ class Annotation:
             )
             file.write(line)
 
-    def crop(self, support: Support, mode: CropMode = 'intersection'):
+    def crop(self, support: Support, mode: CropMode = 'intersection') \
+            -> 'Annotation':
         """Crop annotation to new support
 
         Parameters
@@ -471,6 +475,107 @@ class Annotation:
 
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
+
+    def extrude(self, removed: Support, mode: CropMode = 'intersection') \
+            -> 'Annotation':
+        """Remove segments that overlap `removed` support.
+
+        A simple illustration:
+
+            annotation
+            A |------|    |------|
+            B                  |----------|
+            C |--------------|              |------|
+
+            removed `Timeline`
+              |-------|  |-----------|
+
+            extruded Annotation with mode="intersection"
+            B                        |---|
+            C         |--|                  |------|
+
+            extruded Annotation with mode="loose"
+            C                               |------|
+
+            extruded Annotation with mode="strict"
+            A |------|
+            B                  |----------|
+            C |--------------|              |------|
+
+        Parameters
+        ----------
+        removed : Segment or Timeline
+            If `support` is a `Timeline`, its support is used.
+        mode : {'strict', 'loose', 'intersection'}, optional
+            Controls how segments that are not fully included in `removed` are
+            handled. 'strict' mode only removes fully included segments. 'loose'
+            mode removes any intersecting segment. 'intersection' mode removes
+            the overlapping part of any intersecting segment.
+
+        Returns
+        -------
+        extruded : Annotation
+            Extruded annotation
+
+        Note
+        ----
+        In 'intersection' mode, the best is done to keep the track names
+        unchanged. However, in some cases where two original segments are
+        cropped into the same resulting segments, conflicting track names are
+        modified to make sure no track is lost.
+
+        """
+        if isinstance(removed, Segment):
+            removed = Timeline([removed])
+
+        extent_tl = Timeline([self.get_timeline().extent()], uri=self.uri)
+        truncating_support = removed.gaps(support=extent_tl)
+        # loose for truncate means strict for crop and vice-versa
+        if mode == "loose":
+            mode = "strict"
+        elif mode == "strict":
+            mode = "loose"
+        return self.crop(truncating_support, mode=mode)
+
+    def get_overlap(self, labels: Optional[Iterable[Label]] = None) \
+            -> 'Timeline':
+        """Get overlapping parts of the annotation.
+
+        A simple illustration:
+
+            annotation
+            A |------|    |------|      |----|
+            B  |--|    |-----|      |----------|
+            C |--------------|      |------|
+
+            annotation.get_overlap()
+              |------| |-----|      |--------|
+
+            annotation.get_overlap(for_labels=["A", "B"])
+               |--|       |--|          |----|
+
+        Parameters
+        ----------
+        labels : optional list of labels
+            Labels for which to consider the overlap
+
+        Returns
+        -------
+        overlap : `pyannote.core.Timeline`
+           Timeline of the overlaps.
+       """
+        if labels:
+            annotation = self.subset(labels)
+        else:
+            annotation = self
+
+        overlaps_tl = Timeline(uri=annotation.uri)
+        for (s1, t1), (s2, t2) in annotation.co_iter(annotation):
+            # if labels are the same for the two segments, skipping
+            if self[s1, t1] == self[s2, t2]:
+                continue
+            overlaps_tl.add(s1 & s2)
+        return overlaps_tl.support()
 
     def get_tracks(self, segment: Segment) -> Set[TrackName]:
         """Query tracks by segment
@@ -723,7 +828,7 @@ class Annotation:
             self._updateLabels()
         return sorted(self._labels, key=str)
 
-    def get_labels(self, segment: Segment, unique: bool = True) -> Set[Label]:
+    def get_labels(self, segment: Segment, unique: bool = True) -> Union[Set[Label], List[Label]]:
         """Query labels by segment
 
         Parameters
@@ -736,8 +841,9 @@ class Annotation:
 
         Returns
         -------
-        labels : set
-            Set of labels for `segment` if it exists, empty set otherwise.
+        labels : set or list
+            Set (resp. list) of labels for `segment` if it exists, empty set (resp. list) otherwise
+            if unique (resp. if not unique).
 
         Examples
         --------
@@ -757,7 +863,7 @@ class Annotation:
         if unique:
             return set(labels)
 
-        return labels
+        return list(labels)
 
     def subset(self, labels: Iterable[Label], invert: bool = False) \
             -> 'Annotation':
@@ -1318,6 +1424,10 @@ class Annotation:
         --------
         :mod:`pyannote.core.notebook`
         """
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(klass=self.__class__.__name__))
+            return None
 
         from .notebook import repr_annotation
         return repr_annotation(self)
