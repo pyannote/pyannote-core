@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2019 CNRS
+# Copyright (c) 2014-2021 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -64,19 +64,17 @@ It is nothing more than 2-tuples augmented with several useful methods and prope
   In [11]: segment.overlaps(3)  # does segment overlap time t=3?
 
 
-When you handle float value with Segment, you can set precision digits. It will force round up to `ndigits`
+Use `Segment.set_precision(ndigits)` to automatically round start and end timestamps to `ndigits` precision after the decimal point. 
 
 .. code-block:: ipython
 
-  In [12]: from pyannote.core import set_precision
+  In [12]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)
+  Out[12]: False
 
-  In [13]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)
-  Out[13]: False
+  In [13]: Segment.set_precision(ndigits=4)
 
-  In [14]: set_precision(4)
-
-  In [15]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)
-  Out[15]: True
+  In [14]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)
+  Out[14]: True
 
 See :class:`pyannote.core.Segment` for the complete reference.
 """
@@ -130,22 +128,24 @@ class Segment:
 
     @staticmethod
     def set_precision(ndigits: Optional[int] = None):
-        """Care SEGMENT_PRECISION
+        """Automatically round start and end timestamps to `ndigits` precision after the decimal point
 
+        Usage
+        -----
         >>> Segment.set_precision(2)
         >>> Segment(1/3, 2/3)
-            <Segment(0.33, 0.67)>
+        <Segment(0.33, 0.67)>
         """
-        global FORCE_ROUND_TIME
+        global AUTO_ROUND_TIME
         global SEGMENT_PRECISION
 
         if ndigits is None:
             # backward compatibility
-            FORCE_ROUND_TIME = False
+            AUTO_ROUND_TIME = False
             # 1 μs (one microsecond)
             SEGMENT_PRECISION = 1e-6
         else:
-            FORCE_ROUND_TIME = True
+            AUTO_ROUND_TIME = True
             SEGMENT_PRECISION = 10 ** (-ndigits)
 
     def __bool__(self):
@@ -164,8 +164,8 @@ class Segment:
         return bool((self.end - self.start) > SEGMENT_PRECISION)
 
     def __post_init__(self):
-        """Round start and end with SEGMENT_PRECISION"""
-        if FORCE_ROUND_TIME:
+        """Round start and end up to SEGMENT_PRECISION precision (when required)"""
+        if AUTO_ROUND_TIME:
             object.__setattr__(self, 'start', int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
             object.__setattr__(self, 'end', int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
 
