@@ -308,17 +308,22 @@ class Notebook:
 
         cropped = annotation.crop(self.crop, mode='intersection')
         labels = cropped.labels()
-        labels_dict = {label: i for i, label in enumerate(set(labels))}
         segments = [s for s, _ in cropped.itertracks()]
 
         ax = self.setup(ax=ax, time=time)
 
-        for (segment, track, label), y in zip(
-                cropped.itertracks(yield_label=True),
-                self.get_y(segments)):
-            if arrangement == "stack":
+        if arrangement == "pack":
+            for (segment, track, label), y in zip(
+                    cropped.itertracks(yield_label=True),
+                    self.get_y(segments)):
+                self.draw_segment(ax, segment, y, label=label)
+
+        elif arrangement == "stack":
+            labels_dict = {label: i for i, label in enumerate(set(labels))}
+            for (segment, track, label) in \
+                    cropped.itertracks(yield_label=True):
                 y = 1.0 - 1.0 / (len(labels) + 1) * (1 + labels_dict.get(label))
-            self.draw_segment(ax, segment, y, label=label)
+                self.draw_segment(ax, segment, y, label=label)
 
         if legend:
             H, L = ax.get_legend_handles_labels()
