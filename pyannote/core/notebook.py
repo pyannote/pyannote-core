@@ -261,7 +261,7 @@ class Notebook:
             self.plot_timeline(resource, time=time)
 
         elif isinstance(resource, Annotation):
-            self.plot_annotation(resource, time=time, legend=legend)
+            self.plot_annotation(resource, time=time, legend=legend, arrangement="pack")
 
         elif isinstance(resource, SlidingWindowFeature):
             self.plot_feature(resource, time=time)
@@ -288,7 +288,20 @@ class Notebook:
 
         # ax.set_aspect(3. / self.crop.duration)
 
-    def plot_annotation(self, annotation: Annotation, ax=None, time=True, legend=True):
+    def plot_annotation(self, annotation: Annotation, ax=None, time=True, legend=True, arrangement="pack"):
+        """ plots annotation
+
+        Parameters
+        ----------
+        arrangement : str
+            To plot segments, they are grouped by certain rules, and each group is plotted
+            on a distinct line. `stack` will group segments according to their label.
+            `pack` will group segments optimally by timestamp, regardless of label.
+
+        Returns
+        -------
+
+        """
 
         if not self.crop:
             self.crop = annotation.get_timeline(copy=False).extent()
@@ -299,10 +312,18 @@ class Notebook:
 
         ax = self.setup(ax=ax, time=time)
 
-        for (segment, track, label), y in zip(
-                cropped.itertracks(yield_label=True),
-                self.get_y(segments)):
-            self.draw_segment(ax, segment, y, label=label)
+        if arrangement == "pack":
+            for (segment, track, label), y in zip(
+                    cropped.itertracks(yield_label=True),
+                    self.get_y(segments)):
+                self.draw_segment(ax, segment, y, label=label)
+
+        elif arrangement == "stack":
+            labels_dict = {label: i for i, label in enumerate(set(labels))}
+            for (segment, track, label) in \
+                    cropped.itertracks(yield_label=True):
+                y = 1.0 - 1.0 / (len(labels) + 1) * (1 + labels_dict.get(label))
+                self.draw_segment(ax, segment, y, label=label)
 
         if legend:
             H, L = ax.get_legend_handles_labels()
@@ -375,13 +396,13 @@ def repr_timeline(timeline: Timeline):
     return data
 
 
-def repr_annotation(annotation: Annotation):
+def repr_annotation(annotation: Annotation, arrangement="pack"):
     """Get `png` data for `annotation`"""
     import matplotlib.pyplot as plt
     figsize = plt.rcParams['figure.figsize']
     plt.rcParams['figure.figsize'] = (notebook.width, 2)
     fig, ax = plt.subplots()
-    notebook.plot_annotation(annotation, ax=ax)
+    notebook.plot_annotation(annotation, ax=ax, arrangement=arrangement)
     data = print_figure(fig, 'png')
     plt.close(fig)
     plt.rcParams['figure.figsize'] = figsize
