@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 4.2.1 (2021-09-27)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix automatic deployment of documentation
+
 Version 4.2 (2021-09-24)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
