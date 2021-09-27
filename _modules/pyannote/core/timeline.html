@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.timeline &mdash; pyannote.core 4.1 documentation</title>
+  <title>pyannote.core.timeline &mdash; pyannote.core 4.2.1 documentation</title>
   
 
   
@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -58,7 +59,7 @@
             
             
               <div class="version">
-                4.1
+                4.2.1
               </div>
             
           
@@ -243,10 +244,10 @@
 
 <span class="sd">See :class:`pyannote.core.Timeline` for the complete reference.</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span><span class="n">Optional</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span>
                     <span class="n">TextIO</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sortedcontainers</span> <span class="kn">import</span> <span class="n">SortedList</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">PYANNOTE_URI</span><span class="p">,</span> <span class="n">PYANNOTE_SEGMENT</span>
@@ -254,11 +255,13 @@
 <span class="kn">from</span> <span class="nn">.segment</span> <span class="kn">import</span> <span class="n">Segment</span>
 <span class="kn">from</span> <span class="nn">.utils.types</span> <span class="kn">import</span> <span class="n">Support</span><span class="p">,</span> <span class="n">Label</span><span class="p">,</span> <span class="n">CropMode</span>
 
-<span class="c1">#  this is a moderately ugly way to import `Annotation` to the namespace</span>
+
+<span class="c1"># this is a moderately ugly way to import `Annotation` to the namespace</span>
 <span class="c1">#  without causing some circular imports :</span>
 <span class="c1">#  https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports</span>
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">.annotation</span> <span class="kn">import</span> <span class="n">Annotation</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 
 <span class="c1"># =====================================================================</span>
@@ -288,7 +291,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_df</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">from_df</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="s1">&#39;pd.DataFrame&#39;</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">:</span>
         <span class="n">segments</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">PYANNOTE_SEGMENT</span><span class="p">])</span>
         <span class="n">timeline</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">segments</span><span class="p">,</span> <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">timeline</span>
@@ -709,6 +712,77 @@
             <span class="k">if</span> <span class="n">segment</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
                 <span class="k">yield</span> <span class="n">segment</span></div>
 
+<div class="viewcode-block" id="Timeline.get_overlap"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.get_overlap">[docs]</a>    <span class="k">def</span> <span class="nf">get_overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get overlapping parts of the timeline.</span>
+
+<span class="sd">        A simple illustration:</span>
+
+<span class="sd">            timeline</span>
+<span class="sd">            |------|    |------|      |----|</span>
+<span class="sd">              |--|    |-----|      |----------|</span>
+
+<span class="sd">            timeline.get_overlap()</span>
+<span class="sd">              |--|      |---|         |----|</span>
+
+
+<span class="sd">       Returns</span>
+<span class="sd">       -------</span>
+<span class="sd">       overlap : `pyannote.core.Timeline`</span>
+<span class="sd">           Timeline of the overlaps.</span>
+<span class="sd">       &quot;&quot;&quot;</span>
+        <span class="n">overlaps_tl</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">s1</span> <span class="o">==</span> <span class="n">s2</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">overlaps_tl</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s1</span> <span class="o">&amp;</span> <span class="n">s2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">overlaps_tl</span><span class="o">.</span><span class="n">support</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Timeline.extrude"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.extrude">[docs]</a>    <span class="k">def</span> <span class="nf">extrude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">removed</span><span class="p">:</span> <span class="n">Support</span><span class="p">,</span>
+                <span class="n">mode</span><span class="p">:</span> <span class="n">CropMode</span> <span class="o">=</span> <span class="s1">&#39;intersection&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Remove segments that overlap `removed` support.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        removed : Segment or Timeline</span>
+<span class="sd">            If `support` is a `Timeline`, its support is used.</span>
+<span class="sd">        mode : {&#39;strict&#39;, &#39;loose&#39;, &#39;intersection&#39;}, optional</span>
+<span class="sd">            Controls how segments that are not fully included in `removed` are</span>
+<span class="sd">            handled. &#39;strict&#39; mode only removes fully included segments. &#39;loose&#39;</span>
+<span class="sd">            mode removes any intersecting segment. &#39;intersection&#39; mode removes</span>
+<span class="sd">            the overlapping part of any intersecting segment.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        extruded : Timeline</span>
+<span class="sd">            Extruded timeline</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        &gt;&gt;&gt; timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 5)])</span>
+<span class="sd">        &gt;&gt;&gt; timeline.extrude(Segment(1, 2))</span>
+<span class="sd">        &lt;Timeline(uri=None, segments=[&lt;Segment(0, 1)&gt;, &lt;Segment(3, 5)&gt;])&gt;</span>
+
+<span class="sd">        &gt;&gt;&gt; timeline.extrude(Segment(1, 3), mode=&#39;loose&#39;)</span>
+<span class="sd">        &lt;Timeline(uri=None, segments=[&lt;Segment(3, 5)&gt;])&gt;</span>
+
+<span class="sd">        &gt;&gt;&gt; timeline.extrude(Segment(1, 3), mode=&#39;strict&#39;)</span>
+<span class="sd">        &lt;Timeline(uri=None, segments=[&lt;Segment(0, 2)&gt;, &lt;Segment(3, 5)&gt;])&gt;</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">removed</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
+            <span class="n">removed</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">removed</span><span class="p">])</span>
+
+        <span class="n">extent_tl</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">extent</span><span class="p">()],</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+        <span class="n">truncating_support</span> <span class="o">=</span> <span class="n">removed</span><span class="o">.</span><span class="n">gaps</span><span class="p">(</span><span class="n">support</span><span class="o">=</span><span class="n">extent_tl</span><span class="p">)</span>
+        <span class="c1"># loose for truncate means strict for crop and vice-versa</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;loose&quot;</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;strict&quot;</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;strict&quot;</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;loose&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">truncating_support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Timeline.__str__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Human-readable representation</span>
 
@@ -788,7 +862,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Timeline.covers"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.covers">[docs]</a>    <span class="k">def</span> <span class="nf">covers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span> <span class="p">:</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="Timeline.covers"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.covers">[docs]</a>    <span class="k">def</span> <span class="nf">covers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Check whether other timeline is fully covered by the timeline</span>
 <span class="sd">        </span>
 <span class="sd">        Parameter</span>
@@ -802,11 +876,11 @@
 <span class="sd">            True if timeline covers &quot;other&quot; timeline entirely. False if at least</span>
 <span class="sd">            one segment of &quot;other&quot; is not fully covered by timeline</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
+
         <span class="c1"># compute gaps within &quot;other&quot; extent </span>
         <span class="c1"># this is where we should look for possible faulty segments </span>
         <span class="n">gaps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaps</span><span class="p">(</span><span class="n">support</span><span class="o">=</span><span class="n">other</span><span class="o">.</span><span class="n">extent</span><span class="p">())</span>
-        
+
         <span class="c1"># if at least one gap intersects with a segment from &quot;other&quot;, </span>
         <span class="c1"># &quot;self&quot; does not cover &quot;other&quot; entirely --&gt; return False</span>
         <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">gaps</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
@@ -815,7 +889,7 @@
         <span class="c1"># if no gap intersects with a segment from &quot;other&quot;, </span>
         <span class="c1"># &quot;self&quot; covers &quot;other&quot; entirely --&gt; return True</span>
         <span class="k">return</span> <span class="kc">True</span></div>
- 
+
 <div class="viewcode-block" id="Timeline.copy"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Timeline.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Segment</span><span class="p">],</span> <span class="n">Segment</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
             <span class="o">-&gt;</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get a copy of the timeline</span>
@@ -1212,6 +1286,10 @@
 <span class="sd">        --------</span>
 <span class="sd">        :mod:`pyannote.core.notebook`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.notebook</span> <span class="kn">import</span> <span class="n">MATPLOTLIB_IS_AVAILABLE</span><span class="p">,</span> <span class="n">MATPLOTLIB_WARNING</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">MATPLOTLIB_IS_AVAILABLE</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">MATPLOTLIB_WARNING</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">klass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
         <span class="kn">from</span> <span class="nn">.notebook</span> <span class="kn">import</span> <span class="n">repr_timeline</span>
         <span class="k">return</span> <span class="n">repr_timeline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>

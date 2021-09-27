@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Available data structures &mdash; pyannote.core 4.1 documentation</title>
+  <title>Available data structures &mdash; pyannote.core 4.2.1 documentation</title>
   
 
   
@@ -33,6 +34,7 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Visualization" href="visualization.html" />
@@ -60,7 +62,7 @@
             
             
               <div class="version">
-                4.1
+                4.2.1
               </div>
             
           
@@ -162,14 +164,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-pyannote.core.segment">
+  <section id="module-pyannote.core.segment">
 <span id="available-data-structures"></span><h1>Available data structures<a class="headerlink" href="#module-pyannote.core.segment" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="segment">
+<section id="segment">
 <h2>Segment<a class="headerlink" href="#segment" title="Permalink to this headline">¶</a></h2>
 <p>(<a class="reference external" href="./pyplots/segment.py">Source code</a>, <a class="reference external" href="./pyplots/segment.png">png</a>, <a class="reference external" href="./pyplots/segment.hires.png">hires.png</a>, <a class="reference external" href="./pyplots/segment.pdf">pdf</a>)</p>
-<div class="figure align-default">
-<img alt="_images/segment.png" src="_images/segment.png" />
-</div>
+<figure class="align-default">
+<img alt="_images/segment.png" class="plot-directive" src="_images/segment.png" />
+</figure>
 <p><a class="reference internal" href="reference.html#pyannote.core.Segment" title="pyannote.core.Segment"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Segment</span></code></a> instances describe temporal fragments (<em>e.g.</em> of an audio file). The segment depicted above can be defined like that:</p>
 <div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">pyannote.core</span> <span class="kn">import</span> <span class="n">Segment</span>
 
@@ -196,14 +198,25 @@
 <span class="n">In</span> <span class="p">[</span><span class="mi">11</span><span class="p">]:</span> <span class="n">segment</span><span class="o">.</span><span class="n">overlaps</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1"># does segment overlap time t=3?</span>
 </pre></div>
 </div>
-<p>See <a class="reference internal" href="reference.html#pyannote.core.Segment" title="pyannote.core.Segment"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Segment</span></code></a> for the complete reference.</p>
+<p>Use <cite>Segment.set_precision(ndigits)</cite> to automatically round start and end timestamps to <cite>ndigits</cite> precision after the decimal point.
+To ensure consistency between <cite>Segment</cite> instances, it is recommended to call this method only once, right after importing <cite>pyannote.core.Segment</cite>.</p>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">330</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span> <span class="o">==</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">90</span><span class="o">/</span><span class="mi">1000</span><span class="o">+</span><span class="mi">240</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">12</span><span class="p">]:</span> <span class="kc">False</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">13</span><span class="p">]:</span> <span class="n">Segment</span><span class="o">.</span><span class="n">set_precision</span><span class="p">(</span><span class="n">ndigits</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">14</span><span class="p">]:</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">330</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span> <span class="o">==</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">90</span><span class="o">/</span><span class="mi">1000</span><span class="o">+</span><span class="mi">240</span><span class="o">/</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">14</span><span class="p">]:</span> <span class="kc">True</span>
+</pre></div>
 </div>
-<span class="target" id="module-pyannote.core.timeline"></span><div class="section" id="timeline">
+<p>See <a class="reference internal" href="reference.html#pyannote.core.Segment" title="pyannote.core.Segment"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Segment</span></code></a> for the complete reference.</p>
+</section>
+<span class="target" id="module-pyannote.core.timeline"></span><section id="timeline">
 <h2>Timeline<a class="headerlink" href="#timeline" title="Permalink to this headline">¶</a></h2>
 <p>(<a class="reference external" href="./pyplots/timeline.py">Source code</a>, <a class="reference external" href="./pyplots/timeline.png">png</a>, <a class="reference external" href="./pyplots/timeline.hires.png">hires.png</a>, <a class="reference external" href="./pyplots/timeline.pdf">pdf</a>)</p>
-<div class="figure align-default">
-<img alt="_images/timeline.png" src="_images/timeline.png" />
-</div>
+<figure class="align-default">
+<img alt="_images/timeline.png" class="plot-directive" src="_images/timeline.png" />
+</figure>
 <p><a class="reference internal" href="reference.html#pyannote.core.Timeline" title="pyannote.core.Timeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Timeline</span></code></a> instances are ordered sets of non-empty
 segments:</p>
 <blockquote>
@@ -252,13 +265,13 @@ segments:</p>
 </pre></div>
 </div>
 <p>See <a class="reference internal" href="reference.html#pyannote.core.Timeline" title="pyannote.core.Timeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Timeline</span></code></a> for the complete reference.</p>
-</div>
-<span class="target" id="module-pyannote.core.annotation"></span><div class="section" id="annotation">
+</section>
+<span class="target" id="module-pyannote.core.annotation"></span><section id="annotation">
 <h2>Annotation<a class="headerlink" href="#annotation" title="Permalink to this headline">¶</a></h2>
 <p>(<a class="reference external" href="./pyplots/annotation.py">Source code</a>, <a class="reference external" href="./pyplots/annotation.png">png</a>, <a class="reference external" href="./pyplots/annotation.hires.png">hires.png</a>, <a class="reference external" href="./pyplots/annotation.pdf">pdf</a>)</p>
-<div class="figure align-default">
-<img alt="_images/annotation.png" src="_images/annotation.png" />
-</div>
+<figure class="align-default">
+<img alt="_images/annotation.png" class="plot-directive" src="_images/annotation.png" />
+</figure>
 <p><a class="reference internal" href="reference.html#pyannote.core.Annotation" title="pyannote.core.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Annotation</span></code></a> instances are ordered sets of non-empty
 tracks:</p>
 <blockquote>
@@ -321,12 +334,12 @@ which document and modality (e.g. speaker or face) it describes.</p>
 </pre></div>
 </div>
 <p>See <a class="reference internal" href="reference.html#pyannote.core.Annotation" title="pyannote.core.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Annotation</span></code></a> for the complete reference.</p>
-</div>
-<span class="target" id="module-pyannote.core.feature"></span><div class="section" id="features">
+</section>
+<span class="target" id="module-pyannote.core.feature"></span><section id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
 <p>See <a class="reference internal" href="reference.html#pyannote.core.SlidingWindowFeature" title="pyannote.core.SlidingWindowFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.SlidingWindowFeature</span></code></a> for the complete reference.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

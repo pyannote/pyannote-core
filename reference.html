@@ -5,10 +5,11 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Reference &mdash; pyannote.core 4.1 documentation</title>
+  <title>Reference &mdash; pyannote.core 4.2.1 documentation</title>
   
 
   
@@ -33,6 +34,7 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Changelog" href="changelog.html" />
@@ -60,7 +62,7 @@
             
             
               <div class="version">
-                4.1
+                4.2.1
               </div>
             
           
@@ -101,7 +103,12 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyannote.core.json">Serialization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pyannote.core.notebook">Visualization</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#id1">Visualization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Visualization</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#segments">Segments</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#timelines">Timelines</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotations">Annotations</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -171,13 +178,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="reference">
+  <section id="reference">
 <h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="data-structures">
+<section id="data-structures">
 <h2>Data structures<a class="headerlink" href="#data-structures" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 </div>
-<div class="section" id="segment">
+<section id="segment">
 <h3>Segment<a class="headerlink" href="#segment" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.Segment">
@@ -186,8 +193,8 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – interval start time, in seconds.</p></li>
-<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – interval end time, in seconds.</p></li>
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – interval start time, in seconds.</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – interval end time, in seconds.</p></li>
 </ul>
 </dd>
 </dl>
@@ -298,6 +305,12 @@ start time, or its duration is smaller than 1μs.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="pyannote.core.Segment.__post_init__">
+<code class="sig-name descname">__post_init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__post_init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__post_init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Round start and end up to SEGMENT_PRECISION precision (when required)</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="pyannote.core.Segment.__repr__">
 <code class="sig-name descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.__repr__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computer-readable representation</p>
@@ -401,7 +414,7 @@ start time, or its duration is smaller than 1μs.</p>
 <dd class="field-even"><p><strong>intersect</strong> – True if segments intersect, False otherwise</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -418,21 +431,35 @@ start time, or its duration is smaller than 1μs.</p>
 <dd><p>Check if segment overlaps a given time</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Time, in seconds.</p>
+<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Time, in seconds.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>overlap</strong> – True if segment overlaps time t, False otherwise.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
 
+<dl class="method">
+<dt id="pyannote.core.Segment.set_precision">
+<em class="property">static </em><code class="sig-name descname">set_precision</code><span class="sig-paren">(</span><em class="sig-param">ndigits: Optional[int] = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/segment.html#Segment.set_precision"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Segment.set_precision" title="Permalink to this definition">¶</a></dt>
+<dd><p>Automatically round start and end timestamps to <cite>ndigits</cite> precision after the decimal point</p>
+<p>To ensure consistency between <cite>Segment</cite> instances, it is recommended to call this method only
+once, right after importing <cite>pyannote.core.Segment</cite>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyannote.core</span> <span class="kn">import</span> <span class="n">Segment</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="o">.</span><span class="n">set_precision</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+<span class="go">&lt;Segment(0.33, 0.67)&gt;</span>
+</pre></div>
+</div>
 </dd></dl>
 
-</div>
-<div class="section" id="timeline">
+</dd></dl>
+
+</section>
+<section id="timeline">
 <h3>Timeline<a class="headerlink" href="#timeline" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.Timeline">
@@ -481,7 +508,7 @@ timeline does nothing.</p>
 False otherwise</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -669,7 +696,7 @@ Defaults to identity function (segment_func(segment) = segment)</p>
 one segment of “other” is not fully covered by timeline</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -686,7 +713,7 @@ one segment of “other” is not fully covered by timeline</p>
 handled. ‘strict’ mode only keeps fully included segments. ‘loose’
 mode keeps any intersecting segment. ‘intersection’ mode keeps any
 intersecting segment but replace them by their actual intersection.</p></li>
-<li><p><strong>returns_mapping</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – In ‘intersection’ mode, return a dictionary whose keys are segments
+<li><p><strong>returns_mapping</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – In ‘intersection’ mode, return a dictionary whose keys are segments
 of the cropped timeline, and values are list of the original
 segments that were cropped. Defaults to False.</p></li>
 </ul>
@@ -753,7 +780,7 @@ in the timeline support.</p>
 <dd class="field-odd"><p><strong>duration</strong> – Duration of timeline support, in seconds.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -805,6 +832,43 @@ The extent of an empty timeline is an empty segment.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="pyannote.core.Timeline.extrude">
+<code class="sig-name descname">extrude</code><span class="sig-paren">(</span><em class="sig-param">removed: Union[Segment, Timeline], mode: typing_extensions.Literal['intersection', 'loose', 'strict'][intersection, loose, strict] = 'intersection'</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.extrude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.extrude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove segments that overlap <cite>removed</cite> support.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>removed</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) – If <cite>support</cite> is a <cite>Timeline</cite>, its support is used.</p></li>
+<li><p><strong>mode</strong> (<em>{'strict'</em><em>, </em><em>'loose'</em><em>, </em><em>'intersection'}</em><em>, </em><em>optional</em>) – Controls how segments that are not fully included in <cite>removed</cite> are
+handled. ‘strict’ mode only removes fully included segments. ‘loose’
+mode removes any intersecting segment. ‘intersection’ mode removes
+the overlapping part of any intersecting segment.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>extruded</strong> – Extruded timeline</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline">Timeline</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">([</span><span class="n">Segment</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">Segment</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">)])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span><span class="o">.</span><span class="n">extrude</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="go">&lt;Timeline(uri=None, segments=[&lt;Segment(0, 1)&gt;, &lt;Segment(3, 5)&gt;])&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span><span class="o">.</span><span class="n">extrude</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;loose&#39;</span><span class="p">)</span>
+<span class="go">&lt;Timeline(uri=None, segments=[&lt;Segment(3, 5)&gt;])&gt;</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">timeline</span><span class="o">.</span><span class="n">extrude</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;strict&#39;</span><span class="p">)</span>
+<span class="go">&lt;Timeline(uri=None, segments=[&lt;Segment(0, 2)&gt;, &lt;Segment(3, 5)&gt;])&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="pyannote.core.Timeline.for_json">
 <code class="sig-name descname">for_json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.for_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.for_json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Serialization</p>
@@ -839,7 +903,7 @@ The extent of an empty timeline is an empty segment.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>support</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)"><em>None</em></a><em>, </em><a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) – Support in which gaps are looked for. Defaults to timeline extent</p>
+<dd class="field-odd"><p><strong>support</strong> (<a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)"><em>None</em></a><em>, </em><a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) – Support in which gaps are looked for. Defaults to timeline extent</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>gaps</strong> – Timeline made of all gaps from original timeline, and delimited
@@ -866,6 +930,34 @@ by provided support</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="pyannote.core.Timeline.get_overlap">
+<code class="sig-name descname">get_overlap</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.get_overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.get_overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get overlapping parts of the timeline.</p>
+<blockquote>
+<div><p>A simple illustration:</p>
+<blockquote>
+<div><p>timeline
+<a href="#id2"><span class="problematic" id="id3">|------|</span></a>    <a href="#id4"><span class="problematic" id="id5">|------|</span></a>      <a href="#id6"><span class="problematic" id="id7">|----|</span></a></p>
+<blockquote>
+<div><p><a href="#id8"><span class="problematic" id="id9">|--|</span></a>    <a href="#id10"><span class="problematic" id="id11">|-----|</span></a>      <a href="#id12"><span class="problematic" id="id13">|----------|</span></a></p>
+</div></blockquote>
+<dl class="simple">
+<dt>timeline.get_overlap()</dt><dd><p><a href="#id14"><span class="problematic" id="id15">|--|</span></a>      <a href="#id16"><span class="problematic" id="id17">|---|</span></a>         <a href="#id18"><span class="problematic" id="id19">|----|</span></a></p>
+</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>overlap</strong> – Timeline of the overlaps.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>pyannote.core.Timeline</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="pyannote.core.Timeline.index">
 <code class="sig-name descname">index</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="_modules/pyannote/core/timeline.html#Timeline.index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Timeline.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get index of (existing) segment</p>
@@ -877,7 +969,7 @@ by provided support</p>
 <dd class="field-even"><p><strong>position</strong> – Index of <cite>segment</cite> in timeline</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 <dt class="field-even">Raises</dt>
 <dd class="field-even"><p><strong>ValueError if segment is not present.</strong> – </p>
@@ -891,13 +983,13 @@ by provided support</p>
 <dd><p>Get list of segments overlapping <cite>t</cite></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Timestamp, in seconds.</p>
+<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Timestamp, in seconds.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>segments</strong> – List of all segments of timeline containing time t</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -984,7 +1076,7 @@ segments.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>collar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Merge separated by less than <cite>collar</cite> seconds. This is why there
+<dd class="field-odd"><p><strong>collar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Merge separated by less than <cite>collar</cite> seconds. This is why there
 are only two segments in the final timeline in the above figure.
 Defaults to 0.</p>
 </dd>
@@ -1017,7 +1109,7 @@ Defaults to 0.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>generator</strong> (<em>'string'</em><em>, </em><em>'int'</em><em>, or </em><em>iterable</em><em>, </em><em>optional</em>) – If ‘string’ (default) generate string labels. If ‘int’, generate
 integer labels. If iterable, use it to generate labels.</p></li>
-<li><p><strong>modality</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – </p></li>
+<li><p><strong>modality</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1092,8 +1184,8 @@ meant to be a <strong>set</strong> of segments (not a list).</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="annotation">
+</section>
+<section id="annotation">
 <h3>Annotation<a class="headerlink" href="#annotation" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.Annotation">
@@ -1138,7 +1230,7 @@ meant to be a <strong>set</strong> of segments (not a list).</p>
 False otherwise</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1267,7 +1359,7 @@ Defaults to whole extent.</p>
 <dd class="field-even"><p><strong>label</strong> – Label with longest intersection</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>any existing label or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.8)">None</a></p>
+<dd class="field-odd"><p>any existing label or <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.9)">None</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1290,14 +1382,14 @@ Defaults to whole extent.</p>
 <dd><p>Get labels chart (from longest to shortest duration)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>percent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Return list of (label, percentage) tuples.
+<dd class="field-odd"><p><strong>percent</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Return list of (label, percentage) tuples.
 Defaults to returning list of (label, duration) tuples.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>chart</strong> – List of (label, duration), sorted by duration in decreasing order.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1315,7 +1407,7 @@ Defaults to returning list of (label, duration) tuples.</p>
 alphabetical) order.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>(<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a>), (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)">object</a>) iterable</p>
+<dd class="field-odd"><p>(<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a>), (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment">Segment</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)">object</a>) iterable</p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -1340,7 +1432,7 @@ alphabetical) order.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.crop">
-<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">support: Union[Segment, Timeline], mode: typing_extensions.Literal['intersection', 'loose', 'strict'][intersection, loose, strict] = 'intersection'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.crop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">support: Union[Segment, Timeline], mode: typing_extensions.Literal['intersection', 'loose', 'strict'][intersection, loose, strict] = 'intersection'</em><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.crop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Crop annotation to new support</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1380,6 +1472,56 @@ modified to make sure no track is lost.</p>
 <dd class="field-even"><p><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyannote.core.Annotation.extrude">
+<code class="sig-name descname">extrude</code><span class="sig-paren">(</span><em class="sig-param">removed: Union[Segment, Timeline], mode: typing_extensions.Literal['intersection', 'loose', 'strict'][intersection, loose, strict] = 'intersection'</em><span class="sig-paren">)</span> &#x2192; pyannote.core.annotation.Annotation<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.extrude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.extrude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove segments that overlap <cite>removed</cite> support.</p>
+<p>A simple illustration:</p>
+<blockquote>
+<div><p>annotation
+A <a href="#id20"><span class="problematic" id="id21">|------|</span></a>    <a href="#id22"><span class="problematic" id="id23">|------|</span></a>
+B                  <a href="#id24"><span class="problematic" id="id25">|----------|</span></a>
+C <a href="#id26"><span class="problematic" id="id27">|--------------|</span></a>              <a href="#id28"><span class="problematic" id="id29">|------|</span></a></p>
+<dl class="simple">
+<dt>removed <cite>Timeline</cite></dt><dd><p><a href="#id30"><span class="problematic" id="id31">|-------|</span></a>  <a href="#id32"><span class="problematic" id="id33">|-----------|</span></a></p>
+</dd>
+</dl>
+<p>extruded Annotation with mode=”intersection”
+B                        <a href="#id34"><span class="problematic" id="id35">|---|</span></a>
+C         <a href="#id36"><span class="problematic" id="id37">|--|</span></a>                  <a href="#id38"><span class="problematic" id="id39">|------|</span></a></p>
+<p>extruded Annotation with mode=”loose”
+C                               <a href="#id40"><span class="problematic" id="id41">|------|</span></a></p>
+<p>extruded Annotation with mode=”strict”
+A <a href="#id42"><span class="problematic" id="id43">|------|</span></a>
+B                  <a href="#id44"><span class="problematic" id="id45">|----------|</span></a>
+C <a href="#id46"><span class="problematic" id="id47">|--------------|</span></a>              <a href="#id48"><span class="problematic" id="id49">|------|</span></a></p>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>removed</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a><em> or </em><a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><em>Timeline</em></a>) – If <cite>support</cite> is a <cite>Timeline</cite>, its support is used.</p></li>
+<li><p><strong>mode</strong> (<em>{'strict'</em><em>, </em><em>'loose'</em><em>, </em><em>'intersection'}</em><em>, </em><em>optional</em>) – Controls how segments that are not fully included in <cite>removed</cite> are
+handled. ‘strict’ mode only removes fully included segments. ‘loose’
+mode removes any intersecting segment. ‘intersection’ mode removes
+the overlapping part of any intersecting segment.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>extruded</strong> – Extruded annotation</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation">Annotation</a></p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In ‘intersection’ mode, the best is done to keep the track names
+unchanged. However, in some cases where two original segments are
+cropped into the same resulting segments, conflicting track names are
+modified to make sure no track is lost.</p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -1425,21 +1567,22 @@ modified to make sure no track is lost.</p>
 
 <dl class="method">
 <dt id="pyannote.core.Annotation.get_labels">
-<code class="sig-name descname">get_labels</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em>, <em class="sig-param">unique: bool = True</em><span class="sig-paren">)</span> &#x2192; Set[Hashable]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_labels" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_labels</code><span class="sig-paren">(</span><em class="sig-param">segment: pyannote.core.segment.Segment</em>, <em class="sig-param">unique: bool = True</em><span class="sig-paren">)</span> &#x2192; Union[Set[Hashable], List[Hashable]]<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Query labels by segment</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>segment</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a>) – Query</p></li>
-<li><p><strong>unique</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – When False, return the list of (possibly repeated) labels.
+<li><p><strong>unique</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – When False, return the list of (possibly repeated) labels.
 Defaults to returning the set of labels.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>labels</strong> – Set of labels for <cite>segment</cite> if it exists, empty set otherwise.</p>
+<dd class="field-even"><p><strong>labels</strong> – Set (resp. list) of labels for <cite>segment</cite> if it exists, empty set (resp. list) otherwise
+if unique (resp. if not unique).</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.8)">set</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)">set</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
@@ -1456,12 +1599,42 @@ Defaults to returning the set of labels.</p></li>
 </dd></dl>
 
 <dl class="method">
+<dt id="pyannote.core.Annotation.get_overlap">
+<code class="sig-name descname">get_overlap</code><span class="sig-paren">(</span><em class="sig-param">labels: Optional[Iterable[Hashable]] = None</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_overlap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_overlap" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get overlapping parts of the annotation.</p>
+<p>A simple illustration:</p>
+<blockquote>
+<div><p>annotation
+A <a href="#id50"><span class="problematic" id="id51">|------|</span></a>    <a href="#id52"><span class="problematic" id="id53">|------|</span></a>      <a href="#id54"><span class="problematic" id="id55">|----|</span></a>
+B  <a href="#id56"><span class="problematic" id="id57">|--|</span></a>    <a href="#id58"><span class="problematic" id="id59">|-----|</span></a>      <a href="#id60"><span class="problematic" id="id61">|----------|</span></a>
+C <a href="#id62"><span class="problematic" id="id63">|--------------|</span></a>      <a href="#id64"><span class="problematic" id="id65">|------|</span></a></p>
+<dl class="simple">
+<dt>annotation.get_overlap()</dt><dd><p><a href="#id66"><span class="problematic" id="id67">|------|</span></a> <a href="#id68"><span class="problematic" id="id69">|-----|</span></a>      <a href="#id70"><span class="problematic" id="id71">|--------|</span></a></p>
+</dd>
+<dt>annotation.get_overlap(for_labels=[“A”, “B”])</dt><dd><p><a href="#id72"><span class="problematic" id="id73">|--|</span></a>       <a href="#id74"><span class="problematic" id="id75">|--|</span></a>          <a href="#id76"><span class="problematic" id="id77">|----|</span></a></p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>labels</strong> (<em>optional list of labels</em>) – Labels for which to consider the overlap</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>overlap</strong> – Timeline of the overlaps.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>pyannote.core.Timeline</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="pyannote.core.Annotation.get_timeline">
 <code class="sig-name descname">get_timeline</code><span class="sig-paren">(</span><em class="sig-param">copy: bool = True</em><span class="sig-paren">)</span> &#x2192; pyannote.core.timeline.Timeline<a class="reference internal" href="_modules/pyannote/core/annotation.html#Annotation.get_timeline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.Annotation.get_timeline" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get timeline made of all annotated segments</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Defaults (True) to returning a copy of the internal timeline.
+<dd class="field-odd"><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Defaults (True) to returning a copy of the internal timeline.
 Set to False to return the actual internal timeline (faster).</p>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1491,7 +1664,7 @@ instance.</p>
 <dd class="field-even"><p><strong>tracks</strong> – Set of tracks</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.8)">set</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.9)">set</a></p>
 </dd>
 </dl>
 <div class="admonition note">
@@ -1515,7 +1688,7 @@ instance.</p>
 <dd class="field-even"><p><strong>exists</strong> – True if track exists for segment</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)">bool</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1540,7 +1713,7 @@ instance.</p>
 <dd><p>Iterate over tracks (in chronological order)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>yield_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, yield (segment, track, label) tuples, such that
+<dd class="field-odd"><p><strong>yield_label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, yield (segment, track, label) tuples, such that
 annotation[segment, track] == label. Defaults to yielding
 (segment, track) tuple.</p>
 </dd>
@@ -1563,13 +1736,13 @@ annotation[segment, track] == label. Defaults to yielding
 <p>Equivalent to <code class="docutils literal notranslate"><span class="pre">Annotation.label_timeline(label).duration()</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Query</p>
+<dd class="field-odd"><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Query</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>duration</strong> – Duration, in seconds.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></p>
 </dd>
 </dl>
 <div class="admonition seealso">
@@ -1586,7 +1759,7 @@ annotation[segment, track] == label. Defaults to yielding
 <p>Equivalent to <code class="docutils literal notranslate"><span class="pre">Annotation.label_timeline(label).support()</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Query</p>
+<dd class="field-odd"><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Query</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>support</strong> – Label support</p>
@@ -1609,8 +1782,8 @@ annotation[segment, track] == label. Defaults to yielding
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><em>object</em></a>) – Query</p></li>
-<li><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Defaults (True) to returning a copy of the internal timeline.
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><em>object</em></a>) – Query</p></li>
+<li><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Defaults (True) to returning a copy of the internal timeline.
 Set to False to return the actual internal timeline (faster).</p></li>
 </ul>
 </dd>
@@ -1643,7 +1816,7 @@ instance.</p>
 <dd class="field-odd"><p><strong>labels</strong> – Sorted list of labels</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1659,14 +1832,14 @@ exist for the given segment.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>segment</strong> (<a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><em>Segment</em></a>) – Segment for which a new track name is generated.</p></li>
 <li><p><strong>candidate</strong> (<em>any valid track name</em><em>, </em><em>optional</em>) – When provided, try this candidate name first.</p></li>
-<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)"><em>str</em></a><em>, </em><em>optional</em>) – Track name prefix. Defaults to the empty string ‘’.</p></li>
+<li><p><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)"><em>str</em></a><em>, </em><em>optional</em>) – Track name prefix. Defaults to the empty string ‘’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>name</strong> – New track name</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -1697,10 +1870,10 @@ relabel to 0, 1, 2, … If iterable, use it to generate labels.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>mapping</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)"><em>dict</em></a><em>, </em><em>optional</em>) – {old_name: new_name} mapping dictionary.</p></li>
+<li><p><strong>mapping</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)"><em>dict</em></a><em>, </em><em>optional</em>) – {old_name: new_name} mapping dictionary.</p></li>
 <li><p><strong>generator</strong> (<em>'string'</em><em>, </em><em>'int'</em><em> or </em><em>iterable</em><em>, </em><em>optional</em>) – If ‘string’ (default) rename label to ‘A’, ‘B’, ‘C’, … If ‘int’,
 rename to 0, 1, 2, etc. If iterable, use it to generate labels.</p></li>
-<li><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Set to True to return a copy of the annotation. Set to False to
+<li><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Set to True to return a copy of the annotation. Set to False to
 update the annotation in-place. Defaults to True.</p></li>
 </ul>
 </dd>
@@ -1766,7 +1939,7 @@ If iterable, use it to generate track names.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>labels</strong> (<em>iterable</em>) – List of filtered labels</p></li>
-<li><p><strong>invert</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – If invert is True, extract all but requested labels</p></li>
+<li><p><strong>invert</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – If invert is True, extract all but requested labels</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -1799,7 +1972,7 @@ with same label are merged into one unique covering track.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>collar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Merge tracks with same label and separated by less than <cite>collar</cite>
+<dd class="field-odd"><p><strong>collar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Merge tracks with same label and separated by less than <cite>collar</cite>
 seconds. This is why ‘A’ tracks are merged in above figure.
 Defaults to 0.</p>
 </dd>
@@ -1824,7 +1997,7 @@ Defaults to 0.</p>
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>annotation</strong> (<a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation"><em>Annotation</em></a>) – Annotation whose tracks are being added</p></li>
-<li><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Return a copy of the annotation. Defaults to updating the
+<li><p><strong>copy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Return a copy of the annotation. Defaults to updating the
 annotation in-place.</p></li>
 </ul>
 </dd>
@@ -1860,8 +2033,8 @@ annotation in-place.</p></li>
 
 </dd></dl>
 
-</div>
-<div class="section" id="slidingwindow">
+</section>
+<section id="slidingwindow">
 <h3>SlidingWindow<a class="headerlink" href="#slidingwindow" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.SlidingWindow">
@@ -1872,7 +2045,7 @@ annotation in-place.</p></li>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>duration</strong> (<em>float &gt; 0</em><em>, </em><em>optional</em>) – Window duration, in seconds. Default is 30 ms.</p></li>
 <li><p><strong>step</strong> (<em>float &gt; 0</em><em>, </em><em>optional</em>) – Step between two consecutive position, in seconds. Default is 10 ms.</p></li>
-<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – First start position of window, in seconds. Default is 0.</p></li>
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – First start position of window, in seconds. Default is 0.</p></li>
 <li><p><strong>end</strong> (float &gt; <cite>start</cite>, optional) – Default is infinity (ie. window keeps sliding forever)</p></li>
 </ul>
 </dd>
@@ -1886,7 +2059,7 @@ annotation in-place.</p></li>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">new_segment</span> <span class="o">=</span> <span class="n">sw</span><span class="o">.</span><span class="n">toSegment</span><span class="p">(</span><span class="o">*</span><span class="n">sw</span><span class="o">.</span><span class="n">toFrameRange</span><span class="p">(</span><span class="n">segment</span><span class="p">))</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">abs</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">segment</span> <span class="o">&amp;</span> <span class="n">new_segment</span><span class="p">)</span> <span class="o">&lt;</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="n">sw</span><span class="o">.</span><span class="n">step</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">abs</span><span class="p">(</span><span class="n">segment</span><span class="p">)</span> <span class="o">-</span> <span class="nb">abs</span><span class="p">(</span><span class="n">segment</span> <span class="o">&amp;</span> <span class="n">new_segment</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">.5</span> <span class="o">*</span> <span class="n">sw</span><span class="o">.</span><span class="n">step</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sw</span> <span class="o">=</span> <span class="n">SlidingWindow</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
@@ -1933,7 +2106,7 @@ annotation in-place.</p></li>
 <code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param">i: int</em><span class="sig-paren">)</span> &#x2192; pyannote.core.segment.Segment<a class="reference internal" href="_modules/pyannote/core/segment.html#SlidingWindow.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindow.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of sliding window position</p>
+<dd class="field-odd"><p><strong>i</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Index of sliding window position</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>segment</strong> – Sliding window at ith position</p>
@@ -1984,7 +2157,7 @@ annotation in-place.</p></li>
 (from start times to end times)</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2001,13 +2174,13 @@ annotation in-place.</p></li>
 <dd><p>Closest frame to timestamp.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Timestamp, in seconds.</p>
+<dd class="field-odd"><p><strong>t</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Timestamp, in seconds.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>index</strong> – Index of frame whose middle is the closest to <cite>timestamp</cite></p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -2031,10 +2204,10 @@ annotation in-place.</p></li>
 intersecting segments are returned. In ‘center’ mode, first and
 last positions are chosen to be the positions whose centers are the
 closest to ‘focus’ start and end times. Defaults to ‘loose’.</p></li>
-<li><p><strong>fixed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Overrides <cite>Segment</cite> ‘focus’ duration and ensures that the number of
+<li><p><strong>fixed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Overrides <cite>Segment</cite> ‘focus’ duration and ensures that the number of
 returned frames is fixed (which might otherwise not be the case
 because of rounding erros).</p></li>
-<li><p><strong>return_ranges</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Return as list of ranges. Defaults to indices numpy array.</p></li>
+<li><p><strong>return_ranges</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Return as list of ranges. Defaults to indices numpy array.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2075,8 +2248,8 @@ sliding window start time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>i0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of first frame</p></li>
-<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of frames</p></li>
+<li><p><strong>i0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Index of first frame</p></li>
+<li><p><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)"><em>int</em></a>) – Number of frames</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -2101,7 +2274,7 @@ sliding window start time.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>from_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Duration in seconds.</p></li>
+<li><p><strong>from_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a>) – Duration in seconds.</p></li>
 <li><p><strong>mode</strong> (<em>{'strict'</em><em>, </em><em>'loose'</em><em>, </em><em>'center'}</em>) – In ‘strict’ mode, computes the maximum number of consecutive frames
 that can be fitted into a segment with duration <cite>from_duration</cite>.
 In ‘loose’ mode, computes the maximum number of consecutive frames
@@ -2159,8 +2332,8 @@ is centered on the end time of a segment with duration
 
 </dd></dl>
 
-</div>
-<div class="section" id="slidingwindowfeature">
+</section>
+<section id="slidingwindowfeature">
 <h3>SlidingWindowFeature<a class="headerlink" href="#slidingwindowfeature" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pyannote.core.SlidingWindowFeature">
@@ -2171,7 +2344,7 @@ is centered on the end time of a segment with duration
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>(</em><em>n_frames</em><em>, </em><em>n_features</em><em>) </em><em>numpy array</em>) – </p></li>
 <li><p><strong>sliding_window</strong> (<a class="reference internal" href="#pyannote.core.SlidingWindow" title="pyannote.core.SlidingWindow"><em>SlidingWindow</em></a>) – </p></li>
-<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)"><em>list</em></a><em>, </em><em>optional</em>) – Textual description of each dimension.</p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)"><em>list</em></a><em>, </em><em>optional</em>) – Textual description of each dimension.</p></li>
 </ul>
 </dd>
 </dl>
@@ -2212,7 +2385,7 @@ is centered on the end time of a segment with duration
 
 <dl class="method">
 <dt id="pyannote.core.SlidingWindowFeature.crop">
-<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">focus: Union[pyannote.core.segment.Segment, pyannote.core.timeline.Timeline], mode: typing_extensions.Literal['intersection', 'loose', 'strict'][intersection, loose, strict] = 'loose', fixed: Optional[float] = None, return_data: bool = True</em><span class="sig-paren">)</span> &#x2192; Union[numpy.ndarray, pyannote.core.feature.SlidingWindowFeature]<a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.crop" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">crop</code><span class="sig-paren">(</span><em class="sig-param">focus: Union[pyannote.core.segment.Segment, pyannote.core.timeline.Timeline], mode: typing_extensions.Literal['center', 'loose', 'strict'][center, loose, strict] = 'loose', fixed: Optional[float] = None, return_data: bool = True</em><span class="sig-paren">)</span> &#x2192; Union[numpy.ndarray, pyannote.core.feature.SlidingWindowFeature]<a class="reference internal" href="_modules/pyannote/core/feature.html#SlidingWindowFeature.crop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.SlidingWindowFeature.crop" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract frames</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -2223,10 +2396,10 @@ returned. In ‘loose’ mode, any intersecting frames are returned. In
 ‘center’ mode, first and last frames are chosen to be the ones
 whose centers are the closest to ‘focus’ start and end times.
 Defaults to ‘loose’.</p></li>
-<li><p><strong>fixed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a><em>, </em><em>optional</em>) – Overrides <cite>Segment</cite> ‘focus’ duration and ensures that the number of
+<li><p><strong>fixed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)"><em>float</em></a><em>, </em><em>optional</em>) – Overrides <cite>Segment</cite> ‘focus’ duration and ensures that the number of
 returned frames is fixed (which might otherwise not be the case
 because of rounding errors).</p></li>
-<li><p><strong>return_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – Return a numpy array (default). For <cite>Segment</cite> ‘focus’, setting it
+<li><p><strong>return_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – Return a numpy array (default). For <cite>Segment</cite> ‘focus’, setting it
 to False will return a <cite>SlidingWindowFeature</cite> instance.</p></li>
 </ul>
 </dd>
@@ -2255,7 +2428,7 @@ to False will return a <cite>SlidingWindowFeature</cite> instance.</p></li>
 <dd><p>Feature vector iterator</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, yield both feature vector and corresponding window.
+<dd class="field-odd"><p><strong>window</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.9)"><em>bool</em></a><em>, </em><em>optional</em>) – When True, yield both feature vector and corresponding window.
 Default is to only yield feature vector</p>
 </dd>
 </dl>
@@ -2263,9 +2436,9 @@ Default is to only yield feature vector</p>
 
 </dd></dl>
 
-</div>
-</div>
-<div class="section" id="module-pyannote.core.json">
+</section>
+</section>
+<section id="module-pyannote.core.json">
 <span id="serialization"></span><h2>Serialization<a class="headerlink" href="#module-pyannote.core.json" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="pyannote.core.json.dump">
@@ -2373,11 +2546,65 @@ Default is to only yield feature vector</p>
 </div>
 </dd></dl>
 
-</div>
-<div class="section" id="module-pyannote.core.notebook">
+</section>
+<section id="module-pyannote.core.notebook">
 <span id="visualization"></span><h2>Visualization<a class="headerlink" href="#module-pyannote.core.notebook" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id1">
+<section id="id1">
 <h3>Visualization<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p><a class="reference internal" href="#pyannote.core.Segment" title="pyannote.core.Segment"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Segment</span></code></a>, <a class="reference internal" href="#pyannote.core.Timeline" title="pyannote.core.Timeline"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Timeline</span></code></a>,
+<a class="reference internal" href="#pyannote.core.Annotation" title="pyannote.core.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.Annotation</span></code></a> and <a class="reference internal" href="#pyannote.core.SlidingWindowFeature" title="pyannote.core.SlidingWindowFeature"><code class="xref py py-class docutils literal notranslate"><span class="pre">pyannote.core.SlidingWindowFeature</span></code></a>
+instances can be directly visualized in notebooks.</p>
+<p>You will however need to install <code class="docutils literal notranslate"><span class="pre">pytannote.core</span></code>’s additional dependencies
+for notebook representations (namely, matplotlib):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install pyannote.core<span class="o">[</span>notebook<span class="o">]</span>
+</pre></div>
+</div>
+<section id="segments">
+<h4>Segments<a class="headerlink" href="#segments" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">pyannote.core</span> <span class="kn">import</span> <span class="n">Segment</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="n">segment</span> <span class="o">=</span> <span class="n">Segment</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+  <span class="o">....</span><span class="p">:</span> <span class="n">segment</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="./pyplots/segment.py">Source code</a>, <a class="reference external" href="./pyplots/segment.png">png</a>, <a class="reference external" href="./pyplots/segment.hires.png">hires.png</a>, <a class="reference external" href="./pyplots/segment.pdf">pdf</a>)</p>
+<figure class="align-default">
+<img alt="_images/segment.png" class="plot-directive" src="_images/segment.png" />
+</figure>
+</section>
+<section id="timelines">
+<h4>Timelines<a class="headerlink" href="#timelines" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">25</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">pyannote.core</span> <span class="kn">import</span> <span class="n">Timeline</span><span class="p">,</span> <span class="n">Segment</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">26</span><span class="p">]:</span> <span class="n">timeline</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">()</span>
+   <span class="o">....</span><span class="p">:</span> <span class="n">timeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+   <span class="o">....</span><span class="p">:</span> <span class="n">timeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+   <span class="o">....</span><span class="p">:</span> <span class="n">timeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">18</span><span class="p">))</span>
+   <span class="o">....</span><span class="p">:</span> <span class="n">timeline</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Segment</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+   <span class="o">....</span><span class="p">:</span> <span class="n">timeline</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="./pyplots/timeline.py">Source code</a>, <a class="reference external" href="./pyplots/timeline.png">png</a>, <a class="reference external" href="./pyplots/timeline.hires.png">hires.png</a>, <a class="reference external" href="./pyplots/timeline.pdf">pdf</a>)</p>
+<figure class="align-default">
+<img alt="_images/timeline.png" class="plot-directive" src="_images/timeline.png" />
+</figure>
+</section>
+<section id="annotations">
+<h4>Annotations<a class="headerlink" href="#annotations" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-ipython notranslate"><div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="kn">from</span> <span class="nn">pyannote.core</span> <span class="kn">import</span> <span class="n">Annotation</span><span class="p">,</span> <span class="n">Segment</span>
+
+<span class="n">In</span> <span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="n">annotation</span> <span class="o">=</span> <span class="n">Annotation</span><span class="p">()</span>
+   <span class="o">...</span><span class="p">:</span> <span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;Carol&#39;</span>
+   <span class="o">...</span><span class="p">:</span> <span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;Bob&#39;</span>
+   <span class="o">...</span><span class="p">:</span> <span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">18</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;Carol&#39;</span>
+   <span class="o">...</span><span class="p">:</span> <span class="n">annotation</span><span class="p">[</span><span class="n">Segment</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">20</span><span class="p">)]</span> <span class="o">=</span> <span class="s1">&#39;Alice&#39;</span>
+   <span class="o">...</span><span class="p">:</span> <span class="n">annotation</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="./pyplots/annotation.py">Source code</a>, <a class="reference external" href="./pyplots/annotation.png">png</a>, <a class="reference external" href="./pyplots/annotation.hires.png">hires.png</a>, <a class="reference external" href="./pyplots/annotation.pdf">pdf</a>)</p>
+<figure class="align-default">
+<img alt="_images/annotation.png" class="plot-directive" src="_images/annotation.png" />
+</figure>
 <dl class="function">
 <dt id="pyannote.core.notebook.repr_annotation">
 <code class="sig-prename descclassname">pyannote.core.notebook.</code><code class="sig-name descname">repr_annotation</code><span class="sig-paren">(</span><em class="sig-param">annotation: pyannote.core.annotation.Annotation</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyannote/core/notebook.html#repr_annotation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyannote.core.notebook.repr_annotation" title="Permalink to this definition">¶</a></dt>
@@ -2402,9 +2629,10 @@ Default is to only yield feature vector</p>
 <dd><p>Get <cite>png</cite> data for <cite>timeline</cite></p>
 </dd></dl>
 
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
+</section>
 
 
            </div>

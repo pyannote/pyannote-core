@@ -2,6 +2,21 @@
 Changelog
 #########
 
+Version 4.2.1 (2021-09-27)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix automatic deployment of documentation
+
+Version 4.2 (2021-09-24)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add Segment.set_precision to automatically round start/end timestamps (@kimdwkimdw)
+- feat: add methods {Timeline|Annotation}.{extrude|get_overlap} (@hadware)
+- feat: add support for `Segment` in `one_hot_encoding`
+- feat: make notebook visualization support an optional installation via the [notebook] extra_requires (@hadware)
+- setup: add [doc] and [testing] extra_requires (@hadware)
+- fix: several type annotation fixes (@kimdwkimdw, @PaulLerner)
+
 Version 4.1 (2020-05-27)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

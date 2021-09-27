@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.segment &mdash; pyannote.core 4.1 documentation</title>
+  <title>pyannote.core.segment &mdash; pyannote.core 4.2.1 documentation</title>
   
 
   
@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -58,7 +59,7 @@
             
             
               <div class="version">
-                4.1
+                4.2.1
               </div>
             
           
@@ -158,7 +159,7 @@
 
 <span class="c1"># The MIT License (MIT)</span>
 
-<span class="c1"># Copyright (c) 2014-2019 CNRS</span>
+<span class="c1"># Copyright (c) 2014-2021 CNRS</span>
 
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
 <span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
@@ -218,18 +219,31 @@
 
 <span class="sd">  In [11]: segment.overlaps(3)  # does segment overlap time t=3?</span>
 
+
+<span class="sd">Use `Segment.set_precision(ndigits)` to automatically round start and end timestamps to `ndigits` precision after the decimal point.</span>
+<span class="sd">To ensure consistency between `Segment` instances, it is recommended to call this method only once, right after importing `pyannote.core.Segment`.</span>
+
+<span class="sd">.. code-block:: ipython</span>
+
+<span class="sd">  In [12]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)</span>
+<span class="sd">  Out[12]: False</span>
+
+<span class="sd">  In [13]: Segment.set_precision(ndigits=4)</span>
+
+<span class="sd">  In [14]: Segment(1/1000, 330/1000) == Segment(1/1000, 90/1000+240/1000)</span>
+<span class="sd">  Out[14]: True</span>
+
 <span class="sd">See :class:`pyannote.core.Segment` for the complete reference.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Iterable</span>
+
 <span class="kn">from</span> <span class="nn">.utils.types</span> <span class="kn">import</span> <span class="n">Alignment</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
 
-<span class="c1"># 1 μs (one microsecond)</span>
-<span class="n">SEGMENT_PRECISION</span> <span class="o">=</span> <span class="mf">1e-6</span>
 
 <span class="c1"># setting &#39;frozen&#39; to True makes it hashable and immutable</span>
 <div class="viewcode-block" id="Segment"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment">[docs]</a><span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -269,6 +283,32 @@
     <span class="n">start</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
     <span class="n">end</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
 
+<div class="viewcode-block" id="Segment.set_precision"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.set_precision">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">set_precision</span><span class="p">(</span><span class="n">ndigits</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Automatically round start and end timestamps to `ndigits` precision after the decimal point</span>
+
+<span class="sd">        To ensure consistency between `Segment` instances, it is recommended to call this method only </span>
+<span class="sd">        once, right after importing `pyannote.core.Segment`.</span>
+
+<span class="sd">        Usage</span>
+<span class="sd">        -----</span>
+<span class="sd">        &gt;&gt;&gt; from pyannote.core import Segment</span>
+<span class="sd">        &gt;&gt;&gt; Segment.set_precision(2)</span>
+<span class="sd">        &gt;&gt;&gt; Segment(1/3, 2/3)</span>
+<span class="sd">        &lt;Segment(0.33, 0.67)&gt;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">global</span> <span class="n">AUTO_ROUND_TIME</span>
+        <span class="k">global</span> <span class="n">SEGMENT_PRECISION</span>
+
+        <span class="k">if</span> <span class="n">ndigits</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># backward compatibility</span>
+            <span class="n">AUTO_ROUND_TIME</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="c1"># 1 μs (one microsecond)</span>
+            <span class="n">SEGMENT_PRECISION</span> <span class="o">=</span> <span class="mf">1e-6</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">AUTO_ROUND_TIME</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">SEGMENT_PRECISION</span> <span class="o">=</span> <span class="mi">10</span> <span class="o">**</span> <span class="p">(</span><span class="o">-</span><span class="n">ndigits</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Segment.__bool__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__bool__">[docs]</a>    <span class="k">def</span> <span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Emptiness</span>
 
@@ -284,6 +324,12 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">SEGMENT_PRECISION</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Segment.__post_init__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__post_init__">[docs]</a>    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Round start and end up to SEGMENT_PRECISION precision (when required)&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">AUTO_ROUND_TIME</span><span class="p">:</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;start&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">/</span> <span class="n">SEGMENT_PRECISION</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">SEGMENT_PRECISION</span><span class="p">)</span>
+            <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;end&#39;</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">/</span> <span class="n">SEGMENT_PRECISION</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">*</span> <span class="n">SEGMENT_PRECISION</span><span class="p">)</span></div>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Segment duration (read-only)&quot;&quot;&quot;</span>
@@ -292,7 +338,7 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">middle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Segment mid-time (read-only)&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">.5</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Segment.__iter__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Segment.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Unpack segment boundaries</span>
@@ -504,8 +550,18 @@
 <span class="sd">        --------</span>
 <span class="sd">        :mod:`pyannote.core.notebook`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">.notebook</span> <span class="kn">import</span> <span class="n">MATPLOTLIB_IS_AVAILABLE</span><span class="p">,</span> <span class="n">MATPLOTLIB_WARNING</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">MATPLOTLIB_IS_AVAILABLE</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">MATPLOTLIB_WARNING</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">klass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
         <span class="kn">from</span> <span class="nn">.notebook</span> <span class="kn">import</span> <span class="n">repr_segment</span>
-        <span class="k">return</span> <span class="n">repr_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">repr_segment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Couldn&#39;t import matplotlib to render the vizualization for object </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">. To enable, install the required dependencies with &#39;pip install pyannore.core[notebook]&#39;&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="SlidingWindow"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow">[docs]</a><span class="k">class</span> <span class="nc">SlidingWindow</span><span class="p">:</span>
@@ -603,7 +659,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">rint</span><span class="p">(</span>
-            <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__duration</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span>
+            <span class="p">(</span><span class="n">t</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">-</span> <span class="mf">.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__duration</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span>
         <span class="p">))</span></div>
 
 <div class="viewcode-block" id="SlidingWindow.samples"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindow.samples">[docs]</a>    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">Alignment</span> <span class="o">=</span> <span class="s1">&#39;strict&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -835,7 +891,7 @@
         <span class="c1"># start += .5 * self.duration</span>
         <span class="c1"># subframe start time</span>
         <span class="c1"># start -= .5 * self.step</span>
-        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">+</span> <span class="p">(</span><span class="n">i0</span> <span class="o">-</span> <span class="o">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span> <span class="o">+</span> <span class="o">.</span><span class="mi">5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__duration</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start</span> <span class="o">+</span> <span class="p">(</span><span class="n">i0</span> <span class="o">-</span> <span class="mf">.5</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span> <span class="o">+</span> <span class="mf">.5</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__duration</span>
         <span class="n">duration</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">duration</span>
 

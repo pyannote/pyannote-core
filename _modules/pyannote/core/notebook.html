@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.notebook &mdash; pyannote.core 4.1 documentation</title>
+  <title>pyannote.core.notebook &mdash; pyannote.core 4.2.1 documentation</title>
   
 
   
@@ -33,6 +33,7 @@
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
 </head>
@@ -58,7 +59,7 @@
             
             
               <div class="version">
-                4.1
+                4.2.1
               </div>
             
           
@@ -185,8 +186,69 @@
 <span class="sd">#############</span>
 <span class="sd">Visualization</span>
 <span class="sd">#############</span>
+
+<span class="sd">:class:`pyannote.core.Segment`, :class:`pyannote.core.Timeline`,</span>
+<span class="sd">:class:`pyannote.core.Annotation` and :class:`pyannote.core.SlidingWindowFeature`</span>
+<span class="sd">instances can be directly visualized in notebooks.</span>
+
+<span class="sd">You will however need to install ``pytannote.core``&#39;s additional dependencies</span>
+<span class="sd">for notebook representations (namely, matplotlib):</span>
+
+
+<span class="sd">.. code-block:: bash</span>
+
+<span class="sd">    pip install pyannote.core[notebook]</span>
+
+
+<span class="sd">Segments</span>
+<span class="sd">--------</span>
+
+<span class="sd">.. code-block:: ipython</span>
+
+<span class="sd">  In [1]: from pyannote.core import Segment</span>
+
+<span class="sd">  In [2]: segment = Segment(start=5, end=15)</span>
+<span class="sd">    ....: segment</span>
+
+<span class="sd">.. plot:: pyplots/segment.py</span>
+
+
+<span class="sd">Timelines</span>
+<span class="sd">---------</span>
+
+<span class="sd">.. code-block:: ipython</span>
+
+<span class="sd">  In [25]: from pyannote.core import Timeline, Segment</span>
+
+<span class="sd">  In [26]: timeline = Timeline()</span>
+<span class="sd">     ....: timeline.add(Segment(1, 5))</span>
+<span class="sd">     ....: timeline.add(Segment(6, 8))</span>
+<span class="sd">     ....: timeline.add(Segment(12, 18))</span>
+<span class="sd">     ....: timeline.add(Segment(7, 20))</span>
+<span class="sd">     ....: timeline</span>
+
+<span class="sd">.. plot:: pyplots/timeline.py</span>
+
+
+<span class="sd">Annotations</span>
+<span class="sd">-----------</span>
+
+
+<span class="sd">.. code-block:: ipython</span>
+
+<span class="sd">    In [1]: from pyannote.core import Annotation, Segment</span>
+
+<span class="sd">    In [6]: annotation = Annotation()</span>
+<span class="sd">       ...: annotation[Segment(1, 5)] = &#39;Carol&#39;</span>
+<span class="sd">       ...: annotation[Segment(6, 8)] = &#39;Bob&#39;</span>
+<span class="sd">       ...: annotation[Segment(12, 18)] = &#39;Carol&#39;</span>
+<span class="sd">       ...: annotation[Segment(7, 20)] = &#39;Alice&#39;</span>
+<span class="sd">       ...: annotation</span>
+
+<span class="sd">.. plot:: pyplots/annotation.py</span>
+
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">.utils.types</span> <span class="kn">import</span> <span class="n">Label</span><span class="p">,</span> <span class="n">LabelStyle</span><span class="p">,</span> <span class="n">Resource</span>
 
@@ -194,13 +256,24 @@
     <span class="kn">from</span> <span class="nn">IPython.core.pylabtools</span> <span class="kn">import</span> <span class="n">print_figure</span>
 <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="k">pass</span>
-<span class="kn">from</span> <span class="nn">matplotlib.cm</span> <span class="kn">import</span> <span class="n">get_cmap</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">groupby</span>
 <span class="kn">from</span> <span class="nn">.segment</span> <span class="kn">import</span> <span class="n">Segment</span>
 <span class="kn">from</span> <span class="nn">.timeline</span> <span class="kn">import</span> <span class="n">Timeline</span>
 <span class="kn">from</span> <span class="nn">.annotation</span> <span class="kn">import</span> <span class="n">Annotation</span>
 <span class="kn">from</span> <span class="nn">.feature</span> <span class="kn">import</span> <span class="n">SlidingWindowFeature</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">MATPLOTLIB_IS_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">MATPLOTLIB_IS_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="n">MATPLOTLIB_WARNING</span> <span class="o">=</span> \
+    <span class="s2">&quot;Couldn&#39;t import matplotlib to render the vizualization &quot;</span> \
+    <span class="s2">&quot;for object </span><span class="si">{klass}</span><span class="s2">. To enable, install the required dependencies &quot;</span> \
+    <span class="s2">&quot;with &#39;pip install pyannore.core[notebook]&#39;&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">Notebook</span><span class="p">:</span>
@@ -209,6 +282,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">matplotlib.cm</span> <span class="kn">import</span> <span class="n">get_cmap</span>
+
         <span class="n">linewidth</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
         <span class="n">linestyle</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;solid&#39;</span><span class="p">,</span> <span class="s1">&#39;dashed&#39;</span><span class="p">,</span> <span class="s1">&#39;dotted&#39;</span><span class="p">]</span>
 
