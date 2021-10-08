@@ -110,6 +110,7 @@ import itertools
 import warnings
 from collections import defaultdict
 from typing import (
+    Hashable,
     Optional,
     Dict,
     Union,
@@ -1374,15 +1375,17 @@ class Annotation:
 
     def discretize(
         self,
-        duration: float = None,
+        support: Segment = None,
         resolution: Union[float, SlidingWindow] = 0.1,
-        labels: List[Text] = None,
+        labels: List[Hashable] = None,
     ):
         """Discretize
         
         Parameters
         ----------
-        duration : float
+        support : Segment, optional
+            Part of annotation to discretize. 
+            Defaults to annotation full extent.
         resolution : float or SlidingWindow, optional
             Defaults to 10ms frames.
         labels : list of labels, optional
@@ -1391,31 +1394,38 @@ class Annotation:
         Returns
         -------
         discretized : SlidingWindowFeature
+            (num_frames, num_labels)-shaped binary features.
         """
 
-        extent = self.get_timeline().extent()
-        assert extent.start >= 0.0
+        if support is None:
+            support = self.get_timeline().extent()
+        start_time, end_time = support
 
-        if duration is None:
-            duration = self.get_timeline().extent().end
-        else:
-            assert extent.end <= duration
+        cropped = self.crop(support, mode="intersection")
 
         if labels is None:
-            labels = self.labels()
+            labels = cropped.labels()
 
-        if not isinstance(resolution, SlidingWindow):
-            resolution = SlidingWindow(step=resolution, duration=resolution)
+        if isinstance(resolution, SlidingWindow):
+            resolution = SlidingWindow(
+                start=start_time, step=resolution.step, duration=resolution.duration
+            )
+        else:
+            resolution = SlidingWindow(
+                start=start_time, step=resolution, duration=resolution
+            )
 
-        num_frames = resolution.closest_frame(duration)
+        start_frame = resolution.closest_frame(start_time)
+        end_frame = resolution.closest_frame(end_time)
+        num_frames = end_frame - start_frame
 
         data = np.zeros((num_frames, len(labels)), dtype=np.uint8)
         for k, label in enumerate(labels):
-            segments = self.label_timeline(label)
+            segments = cropped.label_timeline(label)
             for start, stop in resolution.crop(
                 segments, mode="center", return_ranges=True
             ):
-                data[start:stop, k] += 1
+                data[max(0, start) : min(stop, num_frames), k] += 1
         data = np.minimum(data, 1, out=data)
 
         return SlidingWindowFeature(data, resolution, labels=labels)
