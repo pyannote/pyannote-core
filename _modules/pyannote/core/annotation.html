@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.annotation &mdash; pyannote.core 4.2.1 documentation</title>
+  <title>pyannote.core.annotation &mdash; pyannote.core 4.3 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                4.2.1
+                4.3
               </div>
             
           
@@ -159,7 +159,7 @@
 
 <span class="c1"># The MIT License (MIT)</span>
 
-<span class="c1"># Copyright (c) 2014-2020 CNRS</span>
+<span class="c1"># Copyright (c) 2014-2021 CNRS</span>
 
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
 <span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
@@ -265,16 +265,35 @@
 <span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TextIO</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">Text</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Hashable</span><span class="p">,</span>
+    <span class="n">Optional</span><span class="p">,</span>
+    <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">Union</span><span class="p">,</span>
+    <span class="n">Iterable</span><span class="p">,</span>
+    <span class="n">List</span><span class="p">,</span>
+    <span class="n">Set</span><span class="p">,</span>
+    <span class="n">TextIO</span><span class="p">,</span>
+    <span class="n">Tuple</span><span class="p">,</span>
+    <span class="n">Iterator</span><span class="p">,</span>
+    <span class="n">Text</span><span class="p">,</span>
+    <span class="n">TYPE_CHECKING</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">sortedcontainers</span> <span class="kn">import</span> <span class="n">SortedDict</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">PYANNOTE_URI</span><span class="p">,</span> <span class="n">PYANNOTE_MODALITY</span><span class="p">,</span> \
-    <span class="n">PYANNOTE_SEGMENT</span><span class="p">,</span> <span class="n">PYANNOTE_TRACK</span><span class="p">,</span> <span class="n">PYANNOTE_LABEL</span>
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PYANNOTE_URI</span><span class="p">,</span>
+    <span class="n">PYANNOTE_MODALITY</span><span class="p">,</span>
+    <span class="n">PYANNOTE_SEGMENT</span><span class="p">,</span>
+    <span class="n">PYANNOTE_TRACK</span><span class="p">,</span>
+    <span class="n">PYANNOTE_LABEL</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.json</span> <span class="kn">import</span> <span class="n">PYANNOTE_JSON</span><span class="p">,</span> <span class="n">PYANNOTE_JSON_CONTENT</span>
-<span class="kn">from</span> <span class="nn">.segment</span> <span class="kn">import</span> <span class="n">Segment</span>
+<span class="kn">from</span> <span class="nn">.segment</span> <span class="kn">import</span> <span class="n">Segment</span><span class="p">,</span> <span class="n">SlidingWindow</span>
 <span class="kn">from</span> <span class="nn">.timeline</span> <span class="kn">import</span> <span class="n">Timeline</span>
+<span class="kn">from</span> <span class="nn">.feature</span> <span class="kn">import</span> <span class="n">SlidingWindowFeature</span>
 <span class="kn">from</span> <span class="nn">.utils.generators</span> <span class="kn">import</span> <span class="n">string_generator</span><span class="p">,</span> <span class="n">int_generator</span>
 <span class="kn">from</span> <span class="nn">.utils.types</span> <span class="kn">import</span> <span class="n">Label</span><span class="p">,</span> <span class="n">Key</span><span class="p">,</span> <span class="n">Support</span><span class="p">,</span> <span class="n">LabelGenerator</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">,</span> <span class="n">CropMode</span>
 
@@ -300,14 +319,15 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_df</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
-                <span class="n">df</span><span class="p">:</span> <span class="s1">&#39;pd.DataFrame&#39;</span><span class="p">,</span>
-                <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">modality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">from_df</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">df</span><span class="p">:</span> <span class="s2">&quot;pd.DataFrame&quot;</span><span class="p">,</span>
+        <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">modality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
 
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[[</span><span class="n">PYANNOTE_SEGMENT</span><span class="p">,</span> <span class="n">PYANNOTE_TRACK</span><span class="p">,</span> <span class="n">PYANNOTE_LABEL</span><span class="p">]]</span>
-        <span class="k">return</span> <span class="n">Annotation</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span>
-            <span class="n">df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Annotation</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Annotation.__init__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">modality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
 
@@ -347,7 +367,8 @@
 
         <span class="c1"># list of labels that needs to be updated</span>
         <span class="n">update</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-            <span class="n">label</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">update</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">update</span><span class="p">)</span>
+            <span class="n">label</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">update</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">update</span>
+        <span class="p">)</span>
 
         <span class="c1"># accumulate segments for updated labels</span>
         <span class="n">_segments</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">update</span><span class="p">}</span>
@@ -358,8 +379,7 @@
         <span class="c1"># create timeline with accumulated segments for updated labels</span>
         <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">update</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">_segments</span><span class="p">[</span><span class="n">label</span><span class="p">]:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span>
-                    <span class="n">segments</span><span class="o">=</span><span class="n">_segments</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">Timeline</span><span class="p">(</span><span class="n">segments</span><span class="o">=</span><span class="n">_segments</span><span class="p">[</span><span class="n">label</span><span class="p">],</span> <span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -398,11 +418,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Annotation.itertracks"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.itertracks">[docs]</a>    <span class="k">def</span> <span class="nf">itertracks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">yield_label</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> \
-            <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span>
-                <span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">],</span>
-                <span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">,</span> <span class="n">Label</span><span class="p">]</span>
-            <span class="p">]]:</span>
+<div class="viewcode-block" id="Annotation.itertracks"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.itertracks">[docs]</a>    <span class="k">def</span> <span class="nf">itertracks</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">yield_label</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">,</span> <span class="n">Label</span><span class="p">]]]:</span>
         <span class="sd">&quot;&quot;&quot;Iterate over tracks (in chronological order)</span>
 
 <span class="sd">        Parameters</span>
@@ -423,8 +441,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">tracks</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">for</span> <span class="n">track</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">tracks</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
-                                     <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tl</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="mi">1</span><span class="p">]))):</span>
+            <span class="k">for</span> <span class="n">track</span><span class="p">,</span> <span class="n">lbl</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="n">tracks</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tl</span><span class="p">:</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">str</span><span class="p">(</span><span class="n">tl</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="p">):</span>
                 <span class="k">if</span> <span class="n">yield_label</span><span class="p">:</span>
                     <span class="k">yield</span> <span class="n">segment</span><span class="p">,</span> <span class="n">track</span><span class="p">,</span> <span class="n">lbl</span>
                 <span class="k">else</span><span class="p">:</span>
@@ -461,7 +480,7 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeline</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_timeline</span></div>
 
-<div class="viewcode-block" id="Annotation.__eq__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Annotation.__eq__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__eq__">[docs]</a>    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Equality</span>
 
 <span class="sd">        &gt;&gt;&gt; annotation == other</span>
@@ -470,15 +489,15 @@
 <span class="sd">        labels are equal.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pairOfTracks</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">zip_longest</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-            <span class="n">other</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">other</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">t1</span> <span class="o">==</span> <span class="n">t2</span> <span class="k">for</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span> <span class="ow">in</span> <span class="n">pairOfTracks</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Annotation.__ne__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__ne__">[docs]</a>    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="Annotation.__ne__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__ne__">[docs]</a>    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Inequality&quot;&quot;&quot;</span>
         <span class="n">pairOfTracks</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">zip_longest</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-            <span class="n">other</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">other</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">t1</span> <span class="o">!=</span> <span class="n">t2</span> <span class="k">for</span> <span class="n">t1</span><span class="p">,</span> <span class="n">t2</span> <span class="ow">in</span> <span class="n">pairOfTracks</span><span class="p">)</span></div>
 
@@ -515,23 +534,26 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="k">else</span> <span class="s2">&quot;&lt;NA&gt;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">uri</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Space-separated RTTM file format does not allow file URIs &#39;</span>
-                   <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s1">&quot;).&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">uri</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Space-separated RTTM file format does not allow file URIs &quot;</span>
+                <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s1">&quot;).&#39;</span>
+            <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span> <span class="ow">and</span> <span class="s1">&#39; &#39;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
-                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Space-separated RTTM file format does not allow labels &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">&quot;).&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">Text</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">label</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Space-separated RTTM file format does not allow labels &quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;containing spaces (got: &quot;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">&quot;).&#39;</span>
+                <span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="n">line</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;SPEAKER </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s1"> 1 </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">start</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">duration</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;&lt;NA&gt; &lt;NA&gt; </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1"> &lt;NA&gt; &lt;NA&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="sa">f</span><span class="s2">&quot;SPEAKER </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2"> 1 </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">start</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">segment</span><span class="o">.</span><span class="n">duration</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;&lt;NA&gt; &lt;NA&gt; </span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s2"> &lt;NA&gt; &lt;NA&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="p">)</span>
             <span class="n">file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Annotation.crop"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.crop">[docs]</a>    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">support</span><span class="p">:</span> <span class="n">Support</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">CropMode</span> <span class="o">=</span> <span class="s1">&#39;intersection&#39;</span><span class="p">)</span> \
-            <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.crop"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.crop">[docs]</a>    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">support</span><span class="p">:</span> <span class="n">Support</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">CropMode</span> <span class="o">=</span> <span class="s2">&quot;intersection&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Crop annotation to new support</span>
 
 <span class="sd">        Parameters</span>
@@ -570,13 +592,12 @@
             <span class="n">support</span> <span class="o">=</span> <span class="n">support</span><span class="o">.</span><span class="n">support</span><span class="p">()</span>
             <span class="n">cropped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">modality</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;loose&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;loose&quot;</span><span class="p">:</span>
 
                 <span class="n">_tracks</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">_labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
 
-                <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> \
-                        <span class="bp">self</span><span class="o">.</span><span class="n">get_timeline</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">support</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timeline</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">support</span><span class="p">):</span>
                     <span class="n">tracks</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="p">[</span><span class="n">segment</span><span class="p">])</span>
                     <span class="n">_tracks</span><span class="p">[</span><span class="n">segment</span><span class="p">]</span> <span class="o">=</span> <span class="n">tracks</span>
                     <span class="n">_labels</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">tracks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -591,13 +612,14 @@
 
                 <span class="k">return</span> <span class="n">cropped</span>
 
-            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;strict&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;strict&quot;</span><span class="p">:</span>
 
                 <span class="n">_tracks</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="n">_labels</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
 
-                <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">other_segment</span> <span class="ow">in</span> \
-                        <span class="bp">self</span><span class="o">.</span><span class="n">get_timeline</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">support</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">other_segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timeline</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span>
+                    <span class="n">support</span>
+                <span class="p">):</span>
 
                     <span class="k">if</span> <span class="n">segment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">other_segment</span><span class="p">:</span>
                         <span class="k">continue</span>
@@ -616,15 +638,15 @@
 
                 <span class="k">return</span> <span class="n">cropped</span>
 
-            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;intersection&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;intersection&quot;</span><span class="p">:</span>
 
-                <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">other_segment</span> <span class="ow">in</span> \
-                        <span class="bp">self</span><span class="o">.</span><span class="n">get_timeline</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span><span class="n">support</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">other_segment</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timeline</span><span class="p">(</span><span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">co_iter</span><span class="p">(</span>
+                    <span class="n">support</span>
+                <span class="p">):</span>
 
                     <span class="n">intersection</span> <span class="o">=</span> <span class="n">segment</span> <span class="o">&amp;</span> <span class="n">other_segment</span>
                     <span class="k">for</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="p">[</span><span class="n">segment</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                        <span class="n">track</span> <span class="o">=</span> <span class="n">cropped</span><span class="o">.</span><span class="n">new_track</span><span class="p">(</span><span class="n">intersection</span><span class="p">,</span>
-                                                  <span class="n">candidate</span><span class="o">=</span><span class="n">track</span><span class="p">)</span>
+                        <span class="n">track</span> <span class="o">=</span> <span class="n">cropped</span><span class="o">.</span><span class="n">new_track</span><span class="p">(</span><span class="n">intersection</span><span class="p">,</span> <span class="n">candidate</span><span class="o">=</span><span class="n">track</span><span class="p">)</span>
                         <span class="n">cropped</span><span class="p">[</span><span class="n">intersection</span><span class="p">,</span> <span class="n">track</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
 
                 <span class="k">return</span> <span class="n">cropped</span>
@@ -632,8 +654,9 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;unsupported mode: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">mode</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Annotation.extrude"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.extrude">[docs]</a>    <span class="k">def</span> <span class="nf">extrude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">removed</span><span class="p">:</span> <span class="n">Support</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">CropMode</span> <span class="o">=</span> <span class="s1">&#39;intersection&#39;</span><span class="p">)</span> \
-            <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.extrude"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.extrude">[docs]</a>    <span class="k">def</span> <span class="nf">extrude</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">removed</span><span class="p">:</span> <span class="n">Support</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="n">CropMode</span> <span class="o">=</span> <span class="s2">&quot;intersection&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Remove segments that overlap `removed` support.</span>
 
 <span class="sd">        A simple illustration:</span>
@@ -693,8 +716,7 @@
             <span class="n">mode</span> <span class="o">=</span> <span class="s2">&quot;loose&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">truncating_support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Annotation.get_overlap"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.get_overlap">[docs]</a>    <span class="k">def</span> <span class="nf">get_overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Label</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
-            <span class="o">-&gt;</span> <span class="s1">&#39;Timeline&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.get_overlap"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.get_overlap">[docs]</a>    <span class="k">def</span> <span class="nf">get_overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Label</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Timeline&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get overlapping parts of the annotation.</span>
 
 <span class="sd">        A simple illustration:</span>
@@ -769,7 +791,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">track</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">segment</span><span class="p">,</span> <span class="p">{})</span></div>
 
-<div class="viewcode-block" id="Annotation.copy"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.copy"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get a copy of the annotation</span>
 
 <span class="sd">        Returns</span>
@@ -797,9 +819,12 @@
 
         <span class="k">return</span> <span class="n">copied</span></div>
 
-<div class="viewcode-block" id="Annotation.new_track"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.new_track">[docs]</a>    <span class="k">def</span> <span class="nf">new_track</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">:</span> <span class="n">Segment</span><span class="p">,</span>
-                  <span class="n">candidate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrackName</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                  <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrackName</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.new_track"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.new_track">[docs]</a>    <span class="k">def</span> <span class="nf">new_track</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">segment</span><span class="p">:</span> <span class="n">Segment</span><span class="p">,</span>
+        <span class="n">candidate</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrackName</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TrackName</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Generate a new track name for given segment</span>
 
 <span class="sd">        Ensures that the returned track name does not already</span>
@@ -833,22 +858,23 @@
 
         <span class="c1"># by default (if prefix is not provided), use &#39;&#39;</span>
         <span class="k">if</span> <span class="n">prefix</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">prefix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="c1"># find first non-existing track name for segment</span>
         <span class="c1"># eg. if &#39;0&#39; exists, try &#39;1&#39;, then &#39;2&#39;, ...</span>
         <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">while</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">count</span><span class="p">))</span> <span class="ow">in</span> <span class="n">existing_tracks</span><span class="p">:</span>
+        <span class="k">while</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%s%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">count</span><span class="p">))</span> <span class="ow">in</span> <span class="n">existing_tracks</span><span class="p">:</span>
             <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="c1"># return first non-existing track name</span>
-        <span class="k">return</span> <span class="s1">&#39;</span><span class="si">%s%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Annotation.__str__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__str__">[docs]</a>    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Human-friendly representation&quot;&quot;&quot;</span>
         <span class="c1"># TODO: use pandas.DataFrame</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
-                          <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">)])</span></div>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+        <span class="p">)</span></div>
 
 <div class="viewcode-block" id="Annotation.__delitem__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__delitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Key</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Delete one track</span>
@@ -899,7 +925,8 @@
 
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s1">&#39;Deletion only works with Segment or (Segment, track) keys.&#39;</span><span class="p">)</span></div>
+                <span class="s2">&quot;Deletion only works with Segment or (Segment, track) keys.&quot;</span>
+            <span class="p">)</span></div>
 
     <span class="c1"># label = annotation[segment, track]</span>
 <div class="viewcode-block" id="Annotation.__getitem__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="n">Key</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Label</span><span class="p">:</span>
@@ -914,7 +941,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="p">[</span><span class="n">key</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">key</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span></div>
 
@@ -937,7 +964,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">Segment</span><span class="p">):</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span>
 
         <span class="n">segment</span><span class="p">,</span> <span class="n">track</span> <span class="o">=</span> <span class="n">key</span>
 
@@ -961,7 +988,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="p">[</span><span class="n">segment</span><span class="p">][</span><span class="n">track</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span></div>
 
-<div class="viewcode-block" id="Annotation.empty"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.empty">[docs]</a>    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.empty"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.empty">[docs]</a>    <span class="k">def</span> <span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return an empty copy</span>
 
 <span class="sd">        Returns</span>
@@ -984,7 +1011,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_updateLabels</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_labels</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Annotation.get_labels"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">:</span> <span class="n">Segment</span><span class="p">,</span> <span class="n">unique</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="n">Label</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Label</span><span class="p">]]:</span>
+<div class="viewcode-block" id="Annotation.get_labels"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.get_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_labels</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">segment</span><span class="p">:</span> <span class="n">Segment</span><span class="p">,</span> <span class="n">unique</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Set</span><span class="p">[</span><span class="n">Label</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">Label</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Query labels by segment</span>
 
 <span class="sd">        Parameters</span>
@@ -1021,8 +1050,7 @@
 
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Annotation.subset"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.subset">[docs]</a>    <span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Label</span><span class="p">],</span> <span class="n">invert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> \
-            <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.subset"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.subset">[docs]</a>    <span class="k">def</span> <span class="nf">subset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Label</span><span class="p">],</span> <span class="n">invert</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Filter annotation by labels</span>
 
 <span class="sd">        Parameters</span>
@@ -1049,8 +1077,9 @@
 
         <span class="n">_tracks</span><span class="p">,</span> <span class="n">_labels</span> <span class="o">=</span> <span class="p">{},</span> <span class="nb">set</span><span class="p">([])</span>
         <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">tracks</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">sub_tracks</span> <span class="o">=</span> <span class="p">{</span><span class="n">track</span><span class="p">:</span> <span class="n">label</span> <span class="k">for</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">tracks</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-                          <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">}</span>
+            <span class="n">sub_tracks</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">track</span><span class="p">:</span> <span class="n">label</span> <span class="k">for</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">tracks</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span>
+            <span class="p">}</span>
             <span class="k">if</span> <span class="n">sub_tracks</span><span class="p">:</span>
                 <span class="n">_tracks</span><span class="p">[</span><span class="n">segment</span><span class="p">]</span> <span class="o">=</span> <span class="n">sub_tracks</span>
                 <span class="n">_labels</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">sub_tracks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
@@ -1065,8 +1094,7 @@
 
         <span class="k">return</span> <span class="n">sub</span></div>
 
-<div class="viewcode-block" id="Annotation.update"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> \
-            <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.update"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">annotation</span><span class="p">:</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">,</span> <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Add every track of an existing annotation (in place)</span>
 
 <span class="sd">        Parameters</span>
@@ -1196,8 +1224,11 @@
 <span class="sd">            List of (label, duration), sorted by duration in decreasing order.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">chart</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(((</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_duration</span><span class="p">(</span><span class="n">L</span><span class="p">))</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">()),</span>
-                       <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">chart</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">((</span><span class="n">L</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_duration</span><span class="p">(</span><span class="n">L</span><span class="p">))</span> <span class="k">for</span> <span class="n">L</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">()),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">percent</span><span class="p">:</span>
             <span class="n">total</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="n">duration</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">duration</span> <span class="ow">in</span> <span class="n">chart</span><span class="p">])</span>
@@ -1235,16 +1266,17 @@
 
         <span class="n">cropped</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="k">if</span> <span class="n">support</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">cropped</span> <span class="o">=</span> <span class="n">cropped</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;intersection&#39;</span><span class="p">)</span>
+            <span class="n">cropped</span> <span class="o">=</span> <span class="n">cropped</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;intersection&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">cropped</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="k">return</span> <span class="nb">max</span><span class="p">(((</span><span class="n">_</span><span class="p">,</span> <span class="n">cropped</span><span class="o">.</span><span class="n">label_duration</span><span class="p">(</span><span class="n">_</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">cropped</span><span class="o">.</span><span class="n">labels</span><span class="p">()),</span>
-                   <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="p">((</span><span class="n">_</span><span class="p">,</span> <span class="n">cropped</span><span class="o">.</span><span class="n">label_duration</span><span class="p">(</span><span class="n">_</span><span class="p">))</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">cropped</span><span class="o">.</span><span class="n">labels</span><span class="p">()),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Annotation.rename_tracks"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.rename_tracks">[docs]</a>    <span class="k">def</span> <span class="nf">rename_tracks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">LabelGenerator</span> <span class="o">=</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> \
-            <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.rename_tracks"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.rename_tracks">[docs]</a>    <span class="k">def</span> <span class="nf">rename_tracks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">LabelGenerator</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Rename all tracks</span>
 
 <span class="sd">        Parameters</span>
@@ -1280,9 +1312,9 @@
 
         <span class="n">renamed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">modality</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">generator</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">generator</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">:</span>
             <span class="n">generator</span> <span class="o">=</span> <span class="n">string_generator</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">generator</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">generator</span> <span class="o">==</span> <span class="s2">&quot;int&quot;</span><span class="p">:</span>
             <span class="n">generator</span> <span class="o">=</span> <span class="n">int_generator</span><span class="p">()</span>
 
         <span class="c1"># TODO speed things up by working directly with annotation internals</span>
@@ -1290,10 +1322,12 @@
             <span class="n">renamed</span><span class="p">[</span><span class="n">s</span><span class="p">,</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)]</span> <span class="o">=</span> <span class="n">label</span>
         <span class="k">return</span> <span class="n">renamed</span></div>
 
-<div class="viewcode-block" id="Annotation.rename_labels"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.rename_labels">[docs]</a>    <span class="k">def</span> <span class="nf">rename_labels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                      <span class="n">mapping</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                      <span class="n">generator</span><span class="p">:</span> <span class="n">LabelGenerator</span> <span class="o">=</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                      <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.rename_labels"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.rename_labels">[docs]</a>    <span class="k">def</span> <span class="nf">rename_labels</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mapping</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">generator</span><span class="p">:</span> <span class="n">LabelGenerator</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+        <span class="n">copy</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Rename labels</span>
 
 <span class="sd">        Parameters</span>
@@ -1323,9 +1357,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">mapping</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">generator</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">generator</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">:</span>
                 <span class="n">generator</span> <span class="o">=</span> <span class="n">string_generator</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">generator</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">generator</span> <span class="o">==</span> <span class="s2">&quot;int&quot;</span><span class="p">:</span>
                 <span class="n">generator</span> <span class="o">=</span> <span class="n">int_generator</span><span class="p">()</span>
             <span class="c1"># generate mapping</span>
             <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">next</span><span class="p">(</span><span class="n">generator</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">()}</span>
@@ -1337,14 +1371,14 @@
             <span class="n">renamed</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span><span class="p">[</span><span class="n">new_label</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">for</span> <span class="n">segment</span><span class="p">,</span> <span class="n">tracks</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">new_tracks</span> <span class="o">=</span> <span class="p">{</span><span class="n">track</span><span class="p">:</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
-                          <span class="k">for</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">tracks</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">new_tracks</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">track</span><span class="p">:</span> <span class="n">mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span> <span class="k">for</span> <span class="n">track</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">tracks</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
             <span class="n">renamed</span><span class="o">.</span><span class="n">_tracks</span><span class="p">[</span><span class="n">segment</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_tracks</span>
 
         <span class="k">return</span> <span class="n">renamed</span></div>
 
-<div class="viewcode-block" id="Annotation.relabel_tracks"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.relabel_tracks">[docs]</a>    <span class="k">def</span> <span class="nf">relabel_tracks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">LabelGenerator</span> <span class="o">=</span> <span class="s1">&#39;string&#39;</span><span class="p">)</span> \
-            <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.relabel_tracks"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.relabel_tracks">[docs]</a>    <span class="k">def</span> <span class="nf">relabel_tracks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">generator</span><span class="p">:</span> <span class="n">LabelGenerator</span> <span class="o">=</span> <span class="s2">&quot;string&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Relabel tracks</span>
 
 <span class="sd">        Create a new annotation where each track has a unique label.</span>
@@ -1361,9 +1395,9 @@
 <span class="sd">            New annotation with relabeled tracks.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">generator</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">generator</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">:</span>
             <span class="n">generator</span> <span class="o">=</span> <span class="n">string_generator</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="n">generator</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">generator</span> <span class="o">==</span> <span class="s2">&quot;int&quot;</span><span class="p">:</span>
             <span class="n">generator</span> <span class="o">=</span> <span class="n">int_generator</span><span class="p">()</span>
 
         <span class="n">relabeled</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span><span class="p">()</span>
@@ -1372,7 +1406,7 @@
 
         <span class="k">return</span> <span class="n">relabeled</span></div>
 
-<div class="viewcode-block" id="Annotation.support"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.support">[docs]</a>    <span class="k">def</span> <span class="nf">support</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collar</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.support"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.support">[docs]</a>    <span class="k">def</span> <span class="nf">support</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">collar</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Annotation support</span>
 
 <span class="sd">        The support of an annotation is an annotation where contiguous tracks</span>
@@ -1427,10 +1461,9 @@
 
         <span class="k">return</span> <span class="n">support</span></div>
 
-<div class="viewcode-block" id="Annotation.co_iter"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.co_iter">[docs]</a>    <span class="k">def</span> <span class="nf">co_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">)</span> \
-            <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">],</span>
-                              <span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">]]</span>
-            <span class="p">]:</span>
+<div class="viewcode-block" id="Annotation.co_iter"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.co_iter">[docs]</a>    <span class="k">def</span> <span class="nf">co_iter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Annotation&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">],</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">]]]:</span>
         <span class="sd">&quot;&quot;&quot;Iterate over pairs of intersecting tracks</span>
 
 <span class="sd">        Parameters</span>
@@ -1457,7 +1490,7 @@
             <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">T</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">tracks</span><span class="p">,</span> <span class="n">other_tracks</span><span class="p">):</span>
                 <span class="k">yield</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">),</span> <span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Annotation.__mul__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__mul__">[docs]</a>    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<div class="viewcode-block" id="Annotation.__mul__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.__mul__">[docs]</a>    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Cooccurrence (or confusion) matrix</span>
 
 <span class="sd">        &gt;&gt;&gt; matrix = annotation * other</span>
@@ -1476,8 +1509,8 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Annotation</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="s1">&#39;computing cooccurrence matrix only works with Annotation &#39;</span>
-                <span class="s1">&#39;instances.&#39;</span><span class="p">)</span>
+                <span class="s2">&quot;computing cooccurrence matrix only works with Annotation &quot;</span> <span class="s2">&quot;instances.&quot;</span>
+            <span class="p">)</span>
 
         <span class="n">i_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">()</span>
         <span class="n">j_labels</span> <span class="o">=</span> <span class="n">other</span><span class="o">.</span><span class="n">labels</span><span class="p">()</span>
@@ -1496,6 +1529,63 @@
 
         <span class="k">return</span> <span class="n">matrix</span></div>
 
+<div class="viewcode-block" id="Annotation.discretize"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.discretize">[docs]</a>    <span class="k">def</span> <span class="nf">discretize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">support</span><span class="p">:</span> <span class="n">Segment</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">resolution</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">SlidingWindow</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Discretize</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        support : Segment, optional</span>
+<span class="sd">            Part of annotation to discretize. </span>
+<span class="sd">            Defaults to annotation full extent.</span>
+<span class="sd">        resolution : float or SlidingWindow, optional</span>
+<span class="sd">            Defaults to 10ms frames.</span>
+<span class="sd">        labels : list of labels, optional</span>
+<span class="sd">            Defaults to self.labels()</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        discretized : SlidingWindowFeature</span>
+<span class="sd">            (num_frames, num_labels)-shaped binary features.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">support</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">support</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_timeline</span><span class="p">()</span><span class="o">.</span><span class="n">extent</span><span class="p">()</span>
+        <span class="n">start_time</span><span class="p">,</span> <span class="n">end_time</span> <span class="o">=</span> <span class="n">support</span>
+
+        <span class="n">cropped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">support</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;intersection&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">labels</span> <span class="o">=</span> <span class="n">cropped</span><span class="o">.</span><span class="n">labels</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">resolution</span><span class="p">,</span> <span class="n">SlidingWindow</span><span class="p">):</span>
+            <span class="n">resolution</span> <span class="o">=</span> <span class="n">SlidingWindow</span><span class="p">(</span>
+                <span class="n">start</span><span class="o">=</span><span class="n">start_time</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">resolution</span><span class="o">.</span><span class="n">step</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">resolution</span><span class="o">.</span><span class="n">duration</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">resolution</span> <span class="o">=</span> <span class="n">SlidingWindow</span><span class="p">(</span>
+                <span class="n">start</span><span class="o">=</span><span class="n">start_time</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="n">resolution</span><span class="p">,</span> <span class="n">duration</span><span class="o">=</span><span class="n">resolution</span>
+            <span class="p">)</span>
+
+        <span class="n">start_frame</span> <span class="o">=</span> <span class="n">resolution</span><span class="o">.</span><span class="n">closest_frame</span><span class="p">(</span><span class="n">start_time</span><span class="p">)</span>
+        <span class="n">end_frame</span> <span class="o">=</span> <span class="n">resolution</span><span class="o">.</span><span class="n">closest_frame</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
+        <span class="n">num_frames</span> <span class="o">=</span> <span class="n">end_frame</span> <span class="o">-</span> <span class="n">start_frame</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_frames</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="n">segments</span> <span class="o">=</span> <span class="n">cropped</span><span class="o">.</span><span class="n">label_timeline</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span> <span class="ow">in</span> <span class="n">resolution</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span>
+                <span class="n">segments</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;center&quot;</span><span class="p">,</span> <span class="n">return_ranges</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">):</span>
+                <span class="n">data</span><span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span> <span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">stop</span><span class="p">,</span> <span class="n">num_frames</span><span class="p">),</span> <span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">SlidingWindowFeature</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Annotation.for_json"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.for_json">[docs]</a>    <span class="k">def</span> <span class="nf">for_json</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Serialization</span>
 
@@ -1505,10 +1595,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="n">PYANNOTE_JSON</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">}</span>
-        <span class="n">content</span> <span class="o">=</span> <span class="p">[{</span><span class="n">PYANNOTE_SEGMENT</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">for_json</span><span class="p">(),</span>
-                    <span class="n">PYANNOTE_TRACK</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span>
-                    <span class="n">PYANNOTE_LABEL</span><span class="p">:</span> <span class="n">l</span><span class="p">}</span>
-                   <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="n">PYANNOTE_SEGMENT</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">for_json</span><span class="p">(),</span> <span class="n">PYANNOTE_TRACK</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span> <span class="n">PYANNOTE_LABEL</span><span class="p">:</span> <span class="n">l</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">itertracks</span><span class="p">(</span><span class="n">yield_label</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">]</span>
         <span class="n">data</span><span class="p">[</span><span class="n">PYANNOTE_JSON_CONTENT</span><span class="p">]</span> <span class="o">=</span> <span class="n">content</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">:</span>
@@ -1520,7 +1610,7 @@
         <span class="k">return</span> <span class="n">data</span></div>
 
 <div class="viewcode-block" id="Annotation.from_json"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.from_json">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Deserialization</span>
 
 <span class="sd">        See also</span>
@@ -1538,9 +1628,12 @@
         <span class="k">return</span> <span class="n">Annotation</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">records</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">modality</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Annotation.from_records"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.from_records">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_records</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">records</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">,</span> <span class="n">Label</span><span class="p">]],</span>
-                     <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                     <span class="n">modality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Annotation&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">from_records</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">records</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">TrackName</span><span class="p">,</span> <span class="n">Label</span><span class="p">]],</span>
+        <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">modality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Annotation&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Annotation</span>
 
 <span class="sd">        Parameters</span>
@@ -1566,8 +1659,7 @@
             <span class="n">labels</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
         <span class="n">annotation</span><span class="o">.</span><span class="n">_tracks</span> <span class="o">=</span> <span class="n">SortedDict</span><span class="p">(</span><span class="n">tracks</span><span class="p">)</span>
         <span class="n">annotation</span><span class="o">.</span><span class="n">_labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">}</span>
-        <span class="n">annotation</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">label</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">annotation</span><span class="o">.</span><span class="n">_labels</span><span class="p">}</span>
+        <span class="n">annotation</span><span class="o">.</span><span class="n">_labelNeedsUpdate</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="kc">True</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">annotation</span><span class="o">.</span><span class="n">_labels</span><span class="p">}</span>
         <span class="n">annotation</span><span class="o">.</span><span class="n">_timeline</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">annotation</span><span class="o">.</span><span class="n">_timelineNeedsUpdate</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -1581,11 +1673,13 @@
 <span class="sd">        :mod:`pyannote.core.notebook`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">.notebook</span> <span class="kn">import</span> <span class="n">MATPLOTLIB_IS_AVAILABLE</span><span class="p">,</span> <span class="n">MATPLOTLIB_WARNING</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">MATPLOTLIB_IS_AVAILABLE</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">MATPLOTLIB_WARNING</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">klass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="kn">from</span> <span class="nn">.notebook</span> <span class="kn">import</span> <span class="n">repr_annotation</span>
+
         <span class="k">return</span> <span class="n">repr_annotation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </pre></div>
 

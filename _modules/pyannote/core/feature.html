@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.feature &mdash; pyannote.core 4.2.1 documentation</title>
+  <title>pyannote.core.feature &mdash; pyannote.core 4.3 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                4.2.1
+                4.3
               </div>
             
           
@@ -214,7 +214,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="SlidingWindowFeature.__init__"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sliding_window</span><span class="p">:</span> <span class="n">SlidingWindow</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Text</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sliding_window</span><span class="p">:</span> <span class="n">SlidingWindow</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Text</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="p">:</span> <span class="n">SlidingWindow</span> <span class="o">=</span> <span class="n">sliding_window</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
@@ -269,7 +269,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__next__</span><span class="p">()</span>
 
 <div class="viewcode-block" id="SlidingWindowFeature.iterfeatures"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.iterfeatures">[docs]</a>    <span class="k">def</span> <span class="nf">iterfeatures</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Segment</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
         <span class="sd">&quot;&quot;&quot;Feature vector iterator</span>
 
@@ -288,11 +288,11 @@
                 <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="SlidingWindowFeature.crop"><a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.crop">[docs]</a>    <span class="k">def</span> <span class="nf">crop</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span>
-            <span class="n">focus</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">],</span>
-            <span class="n">mode</span><span class="p">:</span> <span class="n">Alignment</span> <span class="o">=</span> <span class="s2">&quot;loose&quot;</span><span class="p">,</span>
-            <span class="n">fixed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">return_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">focus</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">],</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="n">Alignment</span> <span class="o">=</span> <span class="s2">&quot;loose&quot;</span><span class="p">,</span>
+        <span class="n">fixed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">return_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="s2">&quot;SlidingWindowFeature&quot;</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Extract frames</span>
 
@@ -331,6 +331,10 @@
             <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">return_data</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fixed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&quot;fixed&quot; cannot be set when &quot;return_data&quot; is set to False.&#39;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
         <span class="n">ranges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span>
             <span class="n">focus</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">fixed</span><span class="o">=</span><span class="n">fixed</span><span class="p">,</span> <span class="n">return_ranges</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
@@ -353,8 +357,9 @@
             <span class="c1"># if all requested samples are out of bounds, skip</span>
             <span class="k">if</span> <span class="n">end</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">start</span> <span class="o">&gt;=</span> <span class="n">n_samples</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="c1"># keep track of non-empty clipped ranges</span>
-            <span class="n">clipped_ranges</span> <span class="o">+=</span> <span class="p">[[</span><span class="nb">max</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)]]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># keep track of non-empty clipped ranges</span>
+                <span class="n">clipped_ranges</span> <span class="o">+=</span> <span class="p">[[</span><span class="nb">max</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)]]</span>
 
         <span class="k">if</span> <span class="n">clipped_ranges</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">,</span> <span class="p">:]</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">clipped_ranges</span><span class="p">])</span>
@@ -363,7 +368,7 @@
             <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
-        <span class="c1"># corner case when &#39;fixed&#39; duration cropping is requested:</span>
+        <span class="c1"># corner case when &quot;fixed&quot; duration cropping is requested:</span>
         <span class="c1"># correct number of samples even with out-of-bounds indices</span>
         <span class="k">if</span> <span class="n">fixed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
@@ -384,19 +389,22 @@
 
         <span class="c1"># wrap data in a SlidingWindowFeature and return</span>
         <span class="n">sliding_window</span> <span class="o">=</span> <span class="n">SlidingWindow</span><span class="p">(</span>
-            <span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="p">[</span><span class="n">ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+            <span class="n">start</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="p">[</span><span class="n">clipped_ranges</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
             <span class="n">duration</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">duration</span><span class="p">,</span>
             <span class="n">step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">step</span><span class="p">,</span>
         <span class="p">)</span>
+
         <span class="k">return</span> <span class="n">SlidingWindowFeature</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sliding_window</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_repr_png_</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">.notebook</span> <span class="kn">import</span> <span class="n">MATPLOTLIB_IS_AVAILABLE</span><span class="p">,</span> <span class="n">MATPLOTLIB_WARNING</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">MATPLOTLIB_IS_AVAILABLE</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">MATPLOTLIB_WARNING</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">klass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">None</span>
 
         <span class="kn">from</span> <span class="nn">.notebook</span> <span class="kn">import</span> <span class="n">repr_feature</span>
+
         <span class="k">return</span> <span class="n">repr_feature</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
     <span class="n">_HANDLED_TYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">)</span>
