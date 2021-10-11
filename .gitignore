@@ -57,3 +57,5 @@ doc/.ipynb_checkpoints
 
 # emacs temporary files
 *~
+
+.mypy_cache/
