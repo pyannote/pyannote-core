@@ -2,6 +2,12 @@
 Changelog
 #########
 
+Version 4.3 (2021-10-11)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add support for visualizing 3D SlidingWindowFeatures (#66)
+- feat: add Annotation.discretize (#65)
+
 Version 4.2.1 (2021-09-27)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
