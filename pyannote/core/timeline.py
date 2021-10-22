@@ -146,11 +146,12 @@ class Timeline:
         if segments is None:
             segments = ()
 
-        # set of segments  (used for checking inclusion)
-        segments_set = set(segments)
-
-        if any(not segment for segment in segments_set):
-            raise ValueError('Segments must not be empty.')
+        # set of segments (used for checking inclusion)
+        segments_set = set()
+        for segment in segments:
+            # Store only non-empty Segments.
+            if segment:
+                segments_set.add(segment)
 
         self.segments_set_ = segments_set
 
