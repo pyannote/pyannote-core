@@ -147,11 +147,8 @@ class Timeline:
             segments = ()
 
         # set of segments (used for checking inclusion)
-        segments_set = set()
-        for segment in segments:
-            # Store only non-empty Segments.
-            if segment:
-                segments_set.add(segment)
+        # Store only non-empty Segments.
+        segments_set = set([segment for segment in segments if segment])
 
         self.segments_set_ = segments_set
 
