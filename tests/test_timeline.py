@@ -118,6 +118,13 @@ def test_gaps(timeline):
                                      Segment(8, 8.5)]
 
 
+def test_empty_gaps():
+    empty_timeline = Timeline(uri='MyAudioFile')
+    assert list(empty_timeline.gaps()) == []
+    Segment.set_precision(3)
+    assert list(empty_timeline.gaps()) == []
+
+
 def test_crop(timeline):
     selection = Segment(3, 7)
 

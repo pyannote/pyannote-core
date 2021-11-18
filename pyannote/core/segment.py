@@ -170,7 +170,7 @@ class Segment:
 
     def __post_init__(self):
         """Round start and end up to SEGMENT_PRECISION precision (when required)"""
-        if AUTO_ROUND_TIME:
+        if self and AUTO_ROUND_TIME:
             object.__setattr__(self, 'start', int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
             object.__setattr__(self, 'end', int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
 
