@@ -794,11 +794,10 @@ class Timeline:
             start = segments_boundaries_[0]
             end = segments_boundaries_[-1]
             return Segment(start=start, end=end)
-        else:
-            import numpy as np
-            return Segment(start=np.inf, end=-np.inf)
 
-    def support_iter(self, collar: float = 0.) -> Iterator[Segment]:
+        return Segment(start=0.0, end=0.0)
+
+    def support_iter(self, collar: float = 0.0) -> Iterator[Segment]:
         """Like `support` but returns a segment generator instead
 
         See also
