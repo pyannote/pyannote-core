@@ -90,8 +90,10 @@ def dist_range(metric='euclidean', normalize=False):
 def _pdist_func_1D(X, func):
     """Helper function for pdist"""
 
-    X = X.squeeze()
-    n_items, = X.shape
+    (n_items,) = X.shape
+
+    if n_items < 2:
+        return np.array([])
 
     distances = []
 
