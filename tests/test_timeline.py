@@ -31,6 +31,7 @@ import pytest
 from pyannote.core import Annotation
 from pyannote.core import Segment
 from pyannote.core import Timeline
+from pyannote.core import segment
 
 
 @pytest.fixture
@@ -248,6 +249,16 @@ def test_added_empty_segments():
   second_timeline.add(Segment(8, 10))
 
   assert first_timeline == second_timeline
+
+
+def test_empty_gaps():
+    prev_round_time = segment.AUTO_ROUND_TIME
+    empty_timeline = Timeline(uri='MyAudioFile')
+    assert list(empty_timeline.gaps()) == []
+    Segment.set_precision(3)
+    assert list(empty_timeline.gaps()) == []
+    segment.AUTO_ROUND_TIME = prev_round_time
+
 
 def test_consistent_timelines_with_empty_segments():
   # The first timeline is initialized with Segments, some empty.
