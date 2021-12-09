@@ -1375,9 +1375,10 @@ class Annotation:
 
     def discretize(
         self,
-        support: Segment = None,
-        resolution: Union[float, SlidingWindow] = 0.1,
-        labels: List[Hashable] = None,
+        support: Optional[Segment] = None,
+        resolution: Union[float, SlidingWindow] = 0.01,
+        labels: Optional[List[Hashable]] = None,
+        duration: Optional[float] = None,
     ):
         """Discretize
         
@@ -1390,6 +1391,10 @@ class Annotation:
             Defaults to 10ms frames.
         labels : list of labels, optional
             Defaults to self.labels()
+        duration : float, optional
+            Overrides support duration and ensures that the number of
+            returned frames is fixed (which might otherwise not be the case
+            because of rounding errors).
 
         Returns
         -------
@@ -1416,8 +1421,11 @@ class Annotation:
             )
 
         start_frame = resolution.closest_frame(start_time)
-        end_frame = resolution.closest_frame(end_time)
-        num_frames = end_frame - start_frame
+        if duration is None:
+            end_frame = resolution.closest_frame(end_time)
+            num_frames = end_frame - start_frame
+        else:
+            num_frames = int(round(duration / resolution.step))
 
         data = np.zeros((num_frames, len(labels)), dtype=np.uint8)
         for k, label in enumerate(labels):
