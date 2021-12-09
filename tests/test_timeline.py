@@ -31,6 +31,8 @@ import pytest
 from pyannote.core import Annotation
 from pyannote.core import Segment
 from pyannote.core import Timeline
+from pyannote.core import segment
+from tests.utils import preserve_segment_state
 
 
 @pytest.fixture
@@ -116,6 +118,14 @@ def test_support(timeline):
 def test_gaps(timeline):
     assert list(timeline.gaps()) == [Segment(4, 5),
                                      Segment(8, 8.5)]
+
+
+@preserve_segment_state
+def test_empty_gaps():
+    empty_timeline = Timeline(uri='MyEmptyGaps')
+    assert list(empty_timeline.gaps()) == []
+    Segment.set_precision(3)
+    assert list(empty_timeline.gaps()) == []
 
 
 def test_crop(timeline):
@@ -248,6 +258,7 @@ def test_added_empty_segments():
   second_timeline.add(Segment(8, 10))
 
   assert first_timeline == second_timeline
+
 
 def test_consistent_timelines_with_empty_segments():
   # The first timeline is initialized with Segments, some empty.
