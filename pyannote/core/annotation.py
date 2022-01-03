@@ -244,9 +244,9 @@ class Annotation:
         """Emptiness
 
         >>> if annotation:
-        ...    # annotation is empty
-        ... else:
         ...    # annotation is not empty
+        ... else:
+        ...    # annotation is empty
         """
         return len(self._tracks) > 0
 

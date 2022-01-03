@@ -177,9 +177,9 @@ class Timeline:
         """Emptiness
 
         >>> if timeline:
-        ...    # timeline is empty
-        ... else:
         ...    # timeline is not empty
+        ... else:
+        ...    # timeline is empty
         """
         return len(self.segments_set_) > 0
 
