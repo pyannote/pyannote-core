@@ -391,10 +391,16 @@ class Annotation:
                     f'containing spaces (got: "{label}").'
                 )
                 raise ValueError(msg)
-            line = (
-                f"SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} "
-                f"<NA> <NA> {label} <NA> <NA>\n"
-            )
+            if label not in ['noise', 'music', 'other']:
+                line = (
+                    f"SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} "
+                    f"<NA> <NA> {label} <NA> <NA>\n"
+                )
+            else:
+                line = (
+                    f"NON-SPEECH {uri} 1 {segment.start:.3f} {segment.duration:.3f} "
+                    f"<NA> <NA> {label} <NA> <NA>\n"
+                )
             file.write(line)
 
     def crop(self, support: Support, mode: CropMode = "intersection") -> "Annotation":
