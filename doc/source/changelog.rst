@@ -2,6 +2,16 @@
 Changelog
 #########
 
+Version 4.4 (2022-03-09)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- BREAKING: remove empty segments in Timeline.__init__
+- BREAKING: Timeline.extent() returns Segment(0.0, 0.0) for empty timelines
+- feat: add "duration" option to Annotation.discretize
+- fix: handle various corner cases in 1D pdist and cdist
+- fix: fix documentation of {Timeline | Annotation}.__bool__
+- test: check robustness to Segment.set_precision
+
 Version 4.3 (2021-10-11)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
