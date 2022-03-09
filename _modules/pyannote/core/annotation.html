@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyannote.core.annotation &mdash; pyannote.core 4.3 documentation</title>
+  <title>pyannote.core.annotation &mdash; pyannote.core 4.4 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                4.3
+                4.4
               </div>
             
           
@@ -400,9 +400,9 @@
         <span class="sd">&quot;&quot;&quot;Emptiness</span>
 
 <span class="sd">        &gt;&gt;&gt; if annotation:</span>
-<span class="sd">        ...    # annotation is empty</span>
-<span class="sd">        ... else:</span>
 <span class="sd">        ...    # annotation is not empty</span>
+<span class="sd">        ... else:</span>
+<span class="sd">        ...    # annotation is empty</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tracks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
 
@@ -1531,9 +1531,10 @@
 
 <div class="viewcode-block" id="Annotation.discretize"><a class="viewcode-back" href="../../../reference.html#pyannote.core.Annotation.discretize">[docs]</a>    <span class="k">def</span> <span class="nf">discretize</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">support</span><span class="p">:</span> <span class="n">Segment</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">resolution</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">SlidingWindow</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
-        <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">support</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Segment</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">resolution</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">SlidingWindow</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">duration</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Discretize</span>
 <span class="sd">        </span>
@@ -1546,6 +1547,10 @@
 <span class="sd">            Defaults to 10ms frames.</span>
 <span class="sd">        labels : list of labels, optional</span>
 <span class="sd">            Defaults to self.labels()</span>
+<span class="sd">        duration : float, optional</span>
+<span class="sd">            Overrides support duration and ensures that the number of</span>
+<span class="sd">            returned frames is fixed (which might otherwise not be the case</span>
+<span class="sd">            because of rounding errors).</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1572,8 +1577,11 @@
             <span class="p">)</span>
 
         <span class="n">start_frame</span> <span class="o">=</span> <span class="n">resolution</span><span class="o">.</span><span class="n">closest_frame</span><span class="p">(</span><span class="n">start_time</span><span class="p">)</span>
-        <span class="n">end_frame</span> <span class="o">=</span> <span class="n">resolution</span><span class="o">.</span><span class="n">closest_frame</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
-        <span class="n">num_frames</span> <span class="o">=</span> <span class="n">end_frame</span> <span class="o">-</span> <span class="n">start_frame</span>
+        <span class="k">if</span> <span class="n">duration</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">end_frame</span> <span class="o">=</span> <span class="n">resolution</span><span class="o">.</span><span class="n">closest_frame</span><span class="p">(</span><span class="n">end_time</span><span class="p">)</span>
+            <span class="n">num_frames</span> <span class="o">=</span> <span class="n">end_frame</span> <span class="o">-</span> <span class="n">start_frame</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">num_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">duration</span> <span class="o">/</span> <span class="n">resolution</span><span class="o">.</span><span class="n">step</span><span class="p">))</span>
 
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_frames</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
