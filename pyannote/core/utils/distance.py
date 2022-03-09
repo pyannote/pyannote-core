@@ -137,8 +137,6 @@ def pdist(fX, metric='euclidean', **kwargs):
 
 def _cdist_func_1D(X_trn, X_tst, func):
     """Helper function for cdist"""
-    X_trn = X_trn.squeeze()
-    X_tst = X_tst.squeeze()
     return np.vstack(func(x_trn, X_tst) for x_trn in iter(X_trn))
 
 
