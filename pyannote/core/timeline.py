@@ -146,11 +146,9 @@ class Timeline:
         if segments is None:
             segments = ()
 
-        # set of segments  (used for checking inclusion)
-        segments_set = set(segments)
-
-        if any(not segment for segment in segments_set):
-            raise ValueError('Segments must not be empty.')
+        # set of segments (used for checking inclusion)
+        # Store only non-empty Segments.
+        segments_set = set([segment for segment in segments if segment])
 
         self.segments_set_ = segments_set
 
@@ -179,9 +177,9 @@ class Timeline:
         """Emptiness
 
         >>> if timeline:
-        ...    # timeline is empty
-        ... else:
         ...    # timeline is not empty
+        ... else:
+        ...    # timeline is empty
         """
         return len(self.segments_set_) > 0
 
@@ -796,11 +794,10 @@ class Timeline:
             start = segments_boundaries_[0]
             end = segments_boundaries_[-1]
             return Segment(start=start, end=end)
-        else:
-            import numpy as np
-            return Segment(start=np.inf, end=-np.inf)
 
-    def support_iter(self, collar: float = 0.) -> Iterator[Segment]:
+        return Segment(start=0.0, end=0.0)
+
+    def support_iter(self, collar: float = 0.0) -> Iterator[Segment]:
         """Like `support` but returns a segment generator instead
 
         See also
