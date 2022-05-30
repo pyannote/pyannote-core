@@ -34,7 +34,7 @@ setup(
 
     # package
     namespace_packages=['pyannote'],
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     install_requires=[
         'sortedcontainers >= 2.0.4',
         'numpy >= 1.10.4',
