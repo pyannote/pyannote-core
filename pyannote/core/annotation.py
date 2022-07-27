@@ -364,19 +364,7 @@ class Annotation:
         """
         return included in self.get_timeline(copy=False)
 
-    def write_rttm(self, file: TextIO):
-        """Dump annotation to file using RTTM format
-
-        Parameters
-        ----------
-        file : file object
-
-        Usage
-        -----
-        >>> with open('file.rttm', 'w') as file:
-        ...     annotation.write_rttm(file)
-        """
-
+    def _iter_rttm(self):
         uri = self.uri if self.uri else "<NA>"
         if isinstance(uri, Text) and " " in uri:
             msg = (
@@ -391,10 +379,34 @@ class Annotation:
                     f'containing spaces (got: "{label}").'
                 )
                 raise ValueError(msg)
-            line = (
+            yield (
                 f"SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} "
                 f"<NA> <NA> {label} <NA> <NA>\n"
             )
+
+    def to_rttm(self) -> Text:
+        """Serialize annotation as a string using RTTM format
+
+        Returns
+        -------
+        serialized: str
+            RTTM string
+        """
+        return "".join([line for line in self._iter_rttm()])
+
+    def write_rttm(self, file: TextIO):
+        """Dump annotation to file using RTTM format
+
+        Parameters
+        ----------
+        file : file object
+
+        Usage
+        -----
+        >>> with open('file.rttm', 'w') as file:
+        ...     annotation.write_rttm(file)
+        """
+        for line in self._iter_rttm():
             file.write(line)
 
     def write_lab(self, file: TextIO):
