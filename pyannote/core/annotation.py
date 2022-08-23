@@ -364,7 +364,14 @@ class Annotation:
         """
         return included in self.get_timeline(copy=False)
 
-    def _iter_rttm(self):
+    def _iter_rttm(self) -> Iterator[Text]:
+        """Generate lines for an RTTM file for this annotation
+
+        Returns
+        -------
+        iterator: Iterator[str]
+            An iterator over RTTM text lines
+        """
         uri = self.uri if self.uri else "<NA>"
         if isinstance(uri, Text) and " " in uri:
             msg = (
@@ -409,6 +416,33 @@ class Annotation:
         for line in self._iter_rttm():
             file.write(line)
 
+    def _iter_lab(self) -> Iterator[Text]:
+        """Generate lines for a LAB file for this annotation
+
+        Returns
+        -------
+        iterator: Iterator[str]
+            An iterator over LAB text lines
+        """
+        for segment, _, label in self.itertracks(yield_label=True):
+            if isinstance(label, Text) and " " in label:
+                msg = (
+                    f"Space-separated LAB file format does not allow labels "
+                    f'containing spaces (got: "{label}").'
+                )
+                raise ValueError(msg)
+            yield f"{segment.start:.3f} {segment.start + segment.duration:.3f} {label}\n"
+
+    def to_lab(self) -> Text:
+        """Serialize annotation as a string using LAB format
+
+        Returns
+        -------
+        serialized: str
+            LAB string
+        """
+        return "".join([line for line in self._iter_lab()])
+
     def write_lab(self, file: TextIO):
         """Dump annotation to file using LAB format
 
@@ -421,17 +455,7 @@ class Annotation:
         >>> with open('file.lab', 'w') as file:
         ...     annotation.write_lab(file)
         """
-
-        for segment, _, label in self.itertracks(yield_label=True):
-            if isinstance(label, Text) and " " in label:
-                msg = (
-                    f"Space-separated LAB file format does not allow labels "
-                    f'containing spaces (got: "{label}").'
-                )
-                raise ValueError(msg)
-            line = (
-                f"{segment.start:.3f} {segment.start + segment.duration:.3f} {label}\n"
-            )
+        for line in self._iter_lab():
             file.write(line)
 
     def crop(self, support: Support, mode: CropMode = "intersection") -> "Annotation":
