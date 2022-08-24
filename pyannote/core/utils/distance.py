@@ -47,11 +47,11 @@ def l2_normalize(X: np.ndarray):
     """
 
     norm = np.sqrt(np.sum(X ** 2, axis=1))
-    norm[norm == 0] = 1.
+    norm[norm == 0] = 1.0
     return (X.T / norm).T
 
 
-def dist_range(metric='euclidean', normalize=False):
+def dist_range(metric="euclidean", normalize=False):
     """Return range of possible distance between two vectors
 
     Parameters
@@ -67,42 +67,44 @@ def dist_range(metric='euclidean', normalize=False):
         Range of possible distance.
     """
 
-    if metric == 'euclidean':
+    if metric == "euclidean":
         if normalize:
-            return (0., 2.)
-        return (0., np.inf)
+            return (0.0, 2.0)
+        return (0.0, np.inf)
 
-    if metric == 'sqeuclidean':
+    if metric == "sqeuclidean":
         if normalize:
-            return (0., 4.)
-        return (0., np.inf)
+            return (0.0, 4.0)
+        return (0.0, np.inf)
 
-    if metric == 'cosine':
-        return (0., 2.)
+    if metric == "cosine":
+        return (0.0, 2.0)
 
-    if metric == 'angular':
-        return (0., np.pi)
+    if metric == "angular":
+        return (0.0, np.pi)
 
-    msg = f'dist_range does not support {metric} metric.'
+    msg = f"dist_range does not support {metric} metric."
     raise NotImplementedError(msg)
 
 
 def _pdist_func_1D(X, func):
     """Helper function for pdist"""
 
-    X = X.squeeze()
-    n_items, = X.shape
+    (n_items,) = X.shape
+
+    if n_items < 2:
+        return np.array([])
 
     distances = []
 
     for i in range(n_items - 1):
-        distance = func(X[i], X[i+1:])
+        distance = func(X[i], X[i + 1 :])
         distances.append(distance)
 
     return np.hstack(distances)
 
 
-def pdist(fX, metric='euclidean', **kwargs):
+def pdist(fX, metric="euclidean", **kwargs):
     """Same as scipy.spatial.distance with support for additional metrics
 
     * 'angular': pairwise angular distance
@@ -112,22 +114,25 @@ def pdist(fX, metric='euclidean', **kwargs):
     * 'average': pairwise average (only for 1-dimensional fX)
     """
 
-    if metric == 'angular':
-        cosine = scipy.spatial.distance.pdist(
-            fX, metric='cosine', **kwargs)
+    if metric == "angular":
+        cosine = scipy.spatial.distance.pdist(fX, metric="cosine", **kwargs)
         return np.arccos(np.clip(1.0 - cosine, -1.0, 1.0))
 
-    elif metric == 'equal':
+    elif metric == "equal":
+        assert fX.ndim == 1, f"'{metric}' metric only supports 1-dimensional fX."
         return _pdist_func_1D(fX, lambda x, X: x == X)
 
-    elif metric == 'minimum':
+    elif metric == "minimum":
+        assert fX.ndim == 1, f"'{metric}' metric only supports 1-dimensional fX."
         return _pdist_func_1D(fX, np.minimum)
 
-    elif metric == 'maximum':
+    elif metric == "maximum":
+        assert fX.ndim == 1, f"'{metric}' metric only supports 1-dimensional fX."
         return _pdist_func_1D(fX, np.maximum)
 
-    elif metric == 'average':
-        return _pdist_func_1D(fX, lambda x, X: .5 * (x + X))
+    elif metric == "average":
+        assert fX.ndim == 1, f"'{metric}' metric only supports 1-dimensional fX."
+        return _pdist_func_1D(fX, lambda x, X: 0.5 * (x + X))
 
     else:
         return scipy.spatial.distance.pdist(fX, metric=metric, **kwargs)
@@ -135,12 +140,10 @@ def pdist(fX, metric='euclidean', **kwargs):
 
 def _cdist_func_1D(X_trn, X_tst, func):
     """Helper function for cdist"""
-    X_trn = X_trn.squeeze()
-    X_tst = X_tst.squeeze()
     return np.vstack(func(x_trn, X_tst) for x_trn in iter(X_trn))
 
 
-def cdist(fX_trn, fX_tst, metric='euclidean', **kwargs):
+def cdist(fX_trn, fX_tst, metric="euclidean", **kwargs):
     """Same as scipy.spatial.distance.cdist with support for additional metrics
 
     * 'angular': pairwise angular distance
@@ -150,28 +153,38 @@ def cdist(fX_trn, fX_tst, metric='euclidean', **kwargs):
     * 'average': pairwise average (only for 1-dimensional fX)
     """
 
-    if metric == 'angular':
-        cosine = scipy.spatial.distance.cdist(
-            fX_trn, fX_tst, metric='cosine', **kwargs)
+    if metric == "angular":
+        cosine = scipy.spatial.distance.cdist(fX_trn, fX_tst, metric="cosine", **kwargs)
         return np.arccos(np.clip(1.0 - cosine, -1.0, 1.0))
 
-    elif metric == 'equal':
-        return _cdist_func_1D(fX_trn, fX_tst,
-                              lambda x_trn, X_tst: x_trn == X_tst)
+    elif metric == "equal":
+        assert (
+            fX_trn.ndim == 1 and fX_tst.ndim == 1
+        ), f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        return _cdist_func_1D(fX_trn, fX_tst, lambda x_trn, X_tst: x_trn == X_tst)
 
-    elif metric == 'minimum':
+    elif metric == "minimum":
+        assert (
+            fX_trn.ndim == 1 and fX_tst.ndim == 1
+        ), f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
         return _cdist_func_1D(fX_trn, fX_tst, np.minimum)
 
-    elif metric == 'maximum':
+    elif metric == "maximum":
+        assert (
+            fX_trn.ndim == 1 and fX_tst.ndim == 1
+        ), f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
         return _cdist_func_1D(fX_trn, fX_tst, np.maximum)
 
-    elif metric == 'average':
-        return _cdist_func_1D(fX_trn, fX_tst,
-                              lambda x_trn, X_tst: .5 * (x_trn + X_tst))
+    elif metric == "average":
+        assert (
+            fX_trn.ndim == 1 and fX_tst.ndim == 1
+        ), f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        return _cdist_func_1D(
+            fX_trn, fX_tst, lambda x_trn, X_tst: 0.5 * (x_trn + X_tst)
+        )
 
     else:
-        return scipy.spatial.distance.cdist(
-            fX_trn, fX_tst, metric=metric, **kwargs)
+        return scipy.spatial.distance.cdist(fX_trn, fX_tst, metric=metric, **kwargs)
 
 
 def to_condensed(n, i, j):
@@ -200,7 +213,7 @@ def to_condensed(n, i, j):
     """
     i, j = np.array(i), np.array(j)
     if np.any(i == j):
-        raise ValueError('i and j should be different.')
+        raise ValueError("i and j should be different.")
     i, j = np.minimum(i, j), np.maximum(i, j)
     return np.int64(i * n - i * i / 2 - 3 * i / 2 + j - 1)
 
@@ -222,11 +235,6 @@ def to_squared(n, k):
 
     """
     k = np.array(k)
-    i = np.int64(n - np.sqrt(-8*k + 4*n**2 - 4*n + 1)/2 - 1/2)
-    j = np.int64(i**2/2 - i*n + 3*i/2 + k + 1)
+    i = np.int64(n - np.sqrt(-8 * k + 4 * n ** 2 - 4 * n + 1) / 2 - 1 / 2)
+    j = np.int64(i ** 2 / 2 - i * n + 3 * i / 2 + k + 1)
     return i, j
-
-
-# for n in range(2, 10):
-#     for k in range(int(n*(n-1)/2)):
-#         assert to_condensed(n, *to_squared(n, k)) == k

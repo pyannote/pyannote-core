@@ -40,7 +40,7 @@ from typing import Tuple, Optional, Union, Iterator, List, Text
 
 import numpy as np
 
-from pyannote.core.utils.types import CropMode
+from pyannote.core.utils.types import Alignment
 from .segment import Segment
 from .segment import SlidingWindow
 from .timeline import Timeline
@@ -134,7 +134,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     def crop(
         self,
         focus: Union[Segment, Timeline],
-        mode: CropMode = "loose",
+        mode: Alignment = "loose",
         fixed: Optional[float] = None,
         return_data: bool = True,
     ) -> Union[np.ndarray, "SlidingWindowFeature"]:
@@ -175,6 +175,10 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
             )
             raise ValueError(msg)
 
+        if (not return_data) and (fixed is not None):
+            msg = '"fixed" cannot be set when "return_data" is set to False.'
+            raise ValueError(msg)
+
         ranges = self.sliding_window.crop(
             focus, mode=mode, fixed=fixed, return_ranges=True
         )
@@ -197,8 +201,9 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
             # if all requested samples are out of bounds, skip
             if end < 0 or start >= n_samples:
                 continue
-            # keep track of non-empty clipped ranges
-            clipped_ranges += [[max(start, 0), min(end, n_samples)]]
+            else:
+                # keep track of non-empty clipped ranges
+                clipped_ranges += [[max(start, 0), min(end, n_samples)]]
 
         if clipped_ranges:
             data = np.vstack([self.data[start:end, :] for start, end in clipped_ranges])
@@ -207,7 +212,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
             shape = (0,) + self.data.shape[1:]
             data = np.empty(shape)
 
-        # corner case when 'fixed' duration cropping is requested:
+        # corner case when "fixed" duration cropping is requested:
         # correct number of samples even with out-of-bounds indices
         if fixed is not None:
             data = np.vstack(
@@ -228,13 +233,20 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
 
         # wrap data in a SlidingWindowFeature and return
         sliding_window = SlidingWindow(
-            start=self.sliding_window[ranges[0][0]].start,
+            start=self.sliding_window[clipped_ranges[0][0]].start,
             duration=self.sliding_window.duration,
             step=self.sliding_window.step,
         )
+
         return SlidingWindowFeature(data, sliding_window, labels=self.labels)
 
     def _repr_png_(self):
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(klass=self.__class__.__name__))
+            return None
+
         from .notebook import repr_feature
 
         return repr_feature(self)

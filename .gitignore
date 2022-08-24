@@ -57,3 +57,8 @@ doc/.ipynb_checkpoints
 
 # emacs temporary files
 *~
+
+# PyCharm
+.idea/
+
+.mypy_cache/

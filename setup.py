@@ -26,22 +26,20 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-import versioneer
-
 from setuptools import setup, find_packages
+
+import versioneer
 
 setup(
 
     # package
     namespace_packages=['pyannote'],
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     install_requires=[
         'sortedcontainers >= 2.0.4',
         'numpy >= 1.10.4',
         'scipy >= 1.1',
-        'pandas >= 0.17.1',
         'simplejson >= 3.8.1',
-        'matplotlib >= 2.0.0',
         "dataclasses >= 0.7; python_version <'3.7'",
         'typing-extensions >= 3.7.4.1'
     ],
@@ -66,4 +64,16 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Topic :: Scientific/Engineering"
     ],
+    extras_require={
+        'testing': ['pytest',
+                    'pandas >= 0.17.1',
+                    'flake8==3.7.9'],
+        'notebook': ["matplotlib >= 2.0.0"],
+        'doc': ['matplotlib >= 2.0.0',
+                'pandas >= 0.17.1',
+                'Sphinx == 2.2.2',
+                'ipython == 7.10.1',
+                'sphinx_rtd_theme == 0.4.3'
+                ]
+    },
 )

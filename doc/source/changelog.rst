@@ -2,6 +2,44 @@
 Changelog
 #########
 
+Version 4.5 (2022-08-24)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add Annotation.write_lab method (@FrancescoBonzi)
+- feat: add Annotation.to_{rttm|lab} and Timeline.to_uem serializers (@juanmc2005)
+- setup: exclude tests from package (@kimdwkimdw)
+
+Version 4.4 (2022-03-09)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- BREAKING: remove empty segments in Timeline.__init__
+- BREAKING: Timeline.extent() returns Segment(0.0, 0.0) for empty timelines
+- feat: add "duration" option to Annotation.discretize
+- fix: handle various corner cases in 1D pdist and cdist
+- fix: fix documentation of {Timeline | Annotation}.__bool__
+- test: check robustness to Segment.set_precision
+
+Version 4.3 (2021-10-11)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add support for visualizing 3D SlidingWindowFeatures (#66)
+- feat: add Annotation.discretize (#65)
+
+Version 4.2.1 (2021-09-27)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix automatic deployment of documentation
+
+Version 4.2 (2021-09-24)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add Segment.set_precision to automatically round start/end timestamps (@kimdwkimdw)
+- feat: add methods {Timeline|Annotation}.{extrude|get_overlap} (@hadware)
+- feat: add support for `Segment` in `one_hot_encoding`
+- feat: make notebook visualization support an optional installation via the [notebook] extra_requires (@hadware)
+- setup: add [doc] and [testing] extra_requires (@hadware)
+- fix: several type annotation fixes (@kimdwkimdw, @PaulLerner)
+
 Version 4.1 (2020-05-27)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

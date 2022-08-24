@@ -88,10 +88,10 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
+import warnings
 from typing import (Optional, Iterable, List, Union, Callable,
                     TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
 
-import pandas as pd
 from sortedcontainers import SortedList
 
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
@@ -99,11 +99,13 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .utils.types import Support, Label, CropMode
 
-#  this is a moderately ugly way to import `Annotation` to the namespace
+
+# this is a moderately ugly way to import `Annotation` to the namespace
 #  without causing some circular imports :
 #  https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports
 if TYPE_CHECKING:
     from .annotation import Annotation
+    import pandas as pd
 
 
 # =====================================================================
@@ -133,7 +135,7 @@ class Timeline:
     """
 
     @classmethod
-    def from_df(cls, df: pd.DataFrame, uri: Optional[str] = None) -> 'Timeline':
+    def from_df(cls, df: 'pd.DataFrame', uri: Optional[str] = None) -> 'Timeline':
         segments = list(df[PYANNOTE_SEGMENT])
         timeline = cls(segments=segments, uri=uri)
         return timeline
@@ -144,11 +146,9 @@ class Timeline:
         if segments is None:
             segments = ()
 
-        # set of segments  (used for checking inclusion)
-        segments_set = set(segments)
-
-        if any(not segment for segment in segments_set):
-            raise ValueError('Segments must not be empty.')
+        # set of segments (used for checking inclusion)
+        # Store only non-empty Segments.
+        segments_set = set([segment for segment in segments if segment])
 
         self.segments_set_ = segments_set
 
@@ -177,9 +177,9 @@ class Timeline:
         """Emptiness
 
         >>> if timeline:
-        ...    # timeline is empty
-        ... else:
         ...    # timeline is not empty
+        ... else:
+        ...    # timeline is empty
         """
         return len(self.segments_set_) > 0
 
@@ -794,11 +794,10 @@ class Timeline:
             start = segments_boundaries_[0]
             end = segments_boundaries_[-1]
             return Segment(start=start, end=end)
-        else:
-            import numpy as np
-            return Segment(start=np.inf, end=-np.inf)
 
-    def support_iter(self, collar: float = 0.) -> Iterator[Segment]:
+        return Segment(start=0.0, end=0.0)
+
+    def support_iter(self, collar: float = 0.0) -> Iterator[Segment]:
         """Like `support` but returns a segment generator instead
 
         See also
@@ -1070,6 +1069,32 @@ class Timeline:
 
         return annotation
 
+    def _iter_uem(self) -> Iterator[Text]:
+        """Generate lines for a UEM file for this timeline
+
+        Returns
+        -------
+        iterator: Iterator[str]
+            An iterator over UEM text lines
+        """
+        uri = self.uri if self.uri else "<NA>"
+        if isinstance(uri, Text) and ' ' in uri:
+            msg = (f'Space-separated UEM file format does not allow file URIs '
+                   f'containing spaces (got: "{uri}").')
+            raise ValueError(msg)
+        for segment in self:
+            yield f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
+
+    def to_uem(self) -> Text:
+        """Serialize timeline as a string using UEM format
+
+        Returns
+        -------
+        serialized: str
+            UEM string
+        """
+        return "".join([line for line in self._iter_uem()])
+
     def write_uem(self, file: TextIO):
         """Dump timeline to file using UEM format
 
@@ -1082,14 +1107,7 @@ class Timeline:
         >>> with open('file.uem', 'w') as file:
         ...    timeline.write_uem(file)
         """
-
-        uri = self.uri if self.uri else "<NA>"
-        if isinstance(uri, Text) and ' ' in uri:
-            msg = (f'Space-separated UEM file format does not allow file URIs '
-                   f'containing spaces (got: "{uri}").')
-            raise ValueError(msg)
-        for segment in self:
-            line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
+        for line in self._iter_uem():
             file.write(line)
 
     def for_json(self):
@@ -1128,6 +1146,10 @@ class Timeline:
         --------
         :mod:`pyannote.core.notebook`
         """
+        from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+        if not MATPLOTLIB_IS_AVAILABLE:
+            warnings.warn(MATPLOTLIB_WARNING.format(klass=self.__class__.__name__))
+            return None
 
         from .notebook import repr_timeline
         return repr_timeline(self)

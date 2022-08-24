@@ -41,7 +41,7 @@ from .generators import string_generator
 
 def one_hot_encoding(
     annotation: Annotation,
-    support: Timeline,
+    support: Union[Segment, Timeline],
     window: Union[SlidingWindow, SlidingWindowFeature],
     labels: Optional[List[Text]] = None,
     mode: Text = "center",
@@ -51,7 +51,7 @@ def one_hot_encoding(
     Parameters
     ----------
     annotation : `pyannote.core.Annotation`
-    support : `pyannote.core.Timeline`
+    support : `pyannote.core.Timeline` or `pyannote.core.Segment`
     window : `SlidingWindow`
         Use this `window`.
     labels : list, optional
@@ -79,7 +79,12 @@ def one_hot_encoding(
             )
             raise TypeError(msg)
 
-    extent = support.extent()
+    if isinstance(support, Segment):
+        extent = support
+        support = Timeline([support])
+    else:
+        extent = support.extent()
+
     window = SlidingWindow(
         start=extent.start, step=window.step, duration=window.duration
     )

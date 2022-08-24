@@ -31,6 +31,8 @@ import pytest
 from pyannote.core import Annotation
 from pyannote.core import Segment
 from pyannote.core import Timeline
+from pyannote.core import segment
+from tests.utils import preserve_segment_state
 
 
 @pytest.fixture
@@ -116,6 +118,14 @@ def test_support(timeline):
 def test_gaps(timeline):
     assert list(timeline.gaps()) == [Segment(4, 5),
                                      Segment(8, 8.5)]
+
+
+@preserve_segment_state
+def test_empty_gaps():
+    empty_timeline = Timeline(uri='MyEmptyGaps')
+    assert list(empty_timeline.gaps()) == []
+    Segment.set_precision(3)
+    assert list(empty_timeline.gaps()) == []
 
 
 def test_crop(timeline):
@@ -223,3 +233,43 @@ def test_extrude():
     expected_answer.add(Segment(6, 7))
 
     assert timeline.extrude(removed, mode='loose') == expected_answer
+
+def test_initialized_with_empty_segments():
+  # The first timeline includes empty segments.
+  first_timeline = Timeline([Segment(1, 5), Segment(6, 6), Segment(7, 7), Segment(8, 10)])
+
+  # The second has no empty segments.
+  second_timeline = Timeline([Segment(1, 5), Segment(8, 10)])
+
+  assert first_timeline == second_timeline
+
+
+def test_added_empty_segments():
+  # The first timeline includes empty segments.
+  first_timeline = Timeline()
+  first_timeline.add(Segment(1, 5))
+  first_timeline.add(Segment(6, 6))
+  first_timeline.add(Segment(7, 7))
+  first_timeline.add(Segment(8, 10))
+
+  # The second has no empty segments.
+  second_timeline = Timeline()
+  second_timeline.add(Segment(1, 5))
+  second_timeline.add(Segment(8, 10))
+
+  assert first_timeline == second_timeline
+
+
+def test_consistent_timelines_with_empty_segments():
+  # The first timeline is initialized with Segments, some empty.
+  first_timeline = Timeline([Segment(1, 5), Segment(6, 6), Segment(7, 7), Segment(8, 10)])
+
+  # The second timeline adds one Segment at a time, including empty ones.
+  second_timeline = Timeline()
+  second_timeline.add(Segment(1, 5))
+  second_timeline.add(Segment(6, 6))
+  second_timeline.add(Segment(7, 7))
+  second_timeline.add(Segment(8, 10))
+
+  assert first_timeline == second_timeline
+
