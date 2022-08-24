@@ -1069,6 +1069,32 @@ class Timeline:
 
         return annotation
 
+    def _iter_uem(self) -> Iterator[Text]:
+        """Generate lines for a UEM file for this timeline
+
+        Returns
+        -------
+        iterator: Iterator[str]
+            An iterator over UEM text lines
+        """
+        uri = self.uri if self.uri else "<NA>"
+        if isinstance(uri, Text) and ' ' in uri:
+            msg = (f'Space-separated UEM file format does not allow file URIs '
+                   f'containing spaces (got: "{uri}").')
+            raise ValueError(msg)
+        for segment in self:
+            yield f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
+
+    def to_uem(self) -> Text:
+        """Serialize timeline as a string using UEM format
+
+        Returns
+        -------
+        serialized: str
+            UEM string
+        """
+        return "".join([line for line in self._iter_uem()])
+
     def write_uem(self, file: TextIO):
         """Dump timeline to file using UEM format
 
@@ -1081,14 +1107,7 @@ class Timeline:
         >>> with open('file.uem', 'w') as file:
         ...    timeline.write_uem(file)
         """
-
-        uri = self.uri if self.uri else "<NA>"
-        if isinstance(uri, Text) and ' ' in uri:
-            msg = (f'Space-separated UEM file format does not allow file URIs '
-                   f'containing spaces (got: "{uri}").')
-            raise ValueError(msg)
-        for segment in self:
-            line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
+        for line in self._iter_uem():
             file.write(line)
 
     def for_json(self):
