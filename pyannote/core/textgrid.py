@@ -126,7 +126,7 @@ from .utils.types import Label, Key, Support, LabelGenerator, TierName, CropMode
 
 # TODO: add JSON dumping/loading
 
-class PraatTier:
+class Tier:
 
     def __init__(self, name: str = None, uri: str = None):
         self.name = name
@@ -163,17 +163,17 @@ class PraatTier:
     def get_timeline(self, copy: bool = False) -> Timeline:
         pass  # TODO
 
-    def update(self, tier: 'PraatTier') -> 'PraatTier':
+    def update(self, tier: 'Tier') -> 'Tier':
         """Add every segments of an existing tier (in place)
 
         Parameters
         ----------
-        tier : PraatTier
+        tier : Tier
             Tier whose segments and their annotations are being added
 
         Returns
         -------
-        self : PraatTier
+        self : Tier
             Updated tier
 
         Note
@@ -217,7 +217,7 @@ class PraatTier:
         """
         return iter(self._segments.items())
 
-    def __eq__(self, other: 'PraatTier'):
+    def __eq__(self, other: 'Tier'):
         """Equality
 
         Two PraatTiers are equal if and only if their segments and their annotations are equal.
@@ -233,7 +233,7 @@ class PraatTier:
         """
         return self._segments == other._segments
 
-    def __ne__(self, other: 'PraatTier'):
+    def __ne__(self, other: 'Tier'):
         """Inequality"""
         return self._segments != other._segments
 
@@ -332,7 +332,7 @@ class PraatTier:
              support: Support,
              mode: CropMode = 'intersection',
              returns_mapping: bool = False) \
-            -> 'PraatTier':
+            -> 'Tier':
         """Crop timeline to new support
 
         Parameters
@@ -484,18 +484,18 @@ class PraatTier:
                 'Checking for inclusion only supports Segment and '
                 'Timeline instances')
 
-    def empty(self) -> 'PraatTier':
+    def empty(self) -> 'Tier':
         """Return an empty copy
 
         Returns
         -------
-        empty : PraatTier
+        empty : Tier
             Empty timeline using the same 'uri' attribute.
 
         """
-        return PraatTier(self.name, uri=self.uri)
+        return Tier(self.name, uri=self.uri)
 
-    def covers(self, other: Union[Timeline, 'PraatTier']) -> bool:
+    def covers(self, other: Union[Timeline, 'Tier']) -> bool:
         """Check whether other timeline  is fully covered by the timeline
 
         Parameter
@@ -786,7 +786,7 @@ class PraatTier:
         return annotation
 
 
-class PraatTextGrid:
+class TieredAnnotation:
     """Tiered Annotation. Implementation of Praat's TextGrid file structure
 
     Parameters
@@ -810,7 +810,7 @@ class PraatTextGrid:
 
         # sorted dictionary
         # values: {tiername: tier} dictionary
-        self._tiers: Dict[TierName, PraatTier] = SortedDict()
+        self._tiers: Dict[TierName, Tier] = SortedDict()
 
         # timeline meant to store all annotated segments
         self._timeline: Timeline = None
@@ -828,7 +828,7 @@ class PraatTextGrid:
         self._uri = uri
 
     @property
-    def tiers(self) -> List[PraatTier]:
+    def tiers(self) -> List[Tier]:
         return list(self._tiers.values())
 
     @property
@@ -907,7 +907,7 @@ class PraatTextGrid:
             return self._timeline.copy()
         return self._timeline
 
-    def __eq__(self, other: 'PraatTextGrid'):
+    def __eq__(self, other: 'TieredAnnotation'):
         """Equality
 
         >>> annotation == other
@@ -920,7 +920,7 @@ class PraatTextGrid:
             other.itertracks(yield_label=True))
         return all(t1 == t2 for t1, t2 in pairOfTracks)
 
-    def __ne__(self, other: 'PraatTextGrid'):
+    def __ne__(self, other: 'TieredAnnotation'):
         """Inequality"""
         pairOfTracks = itertools.zip_longest(
             self.itertracks(yield_label=True),
@@ -977,7 +977,7 @@ class PraatTextGrid:
         return annotation
 
     def crop(self, support: Support, mode: CropMode = 'intersection') \
-            -> 'PraatTextGrid':
+            -> 'TieredAnnotation':
         """Crop textgrid to new support
 
         Parameters
@@ -992,20 +992,20 @@ class PraatTextGrid:
 
         Returns
         -------
-        cropped : PraatTextGrid
+        cropped : TieredAnnotation
             Cropped textgrid
         """
-        new_tg = PraatTextGrid(self.uri)
+        new_tg = TieredAnnotation(self.uri)
         for tier_name, tier in self._tiers.items():
             new_tg._tiers[tier_name] = tier.crop(support)
         return new_tg
 
-    def copy(self) -> 'PraatTextGrid':
+    def copy(self) -> 'TieredAnnotation':
         """Get a copy of the annotation
 
         Returns
         -------
-        annotation : PraatTextGrid
+        annotation : TieredAnnotation
             Copy of the textgrid
         """
 
@@ -1024,7 +1024,7 @@ class PraatTextGrid:
         """
         del self._tiers[key]
 
-    def __getitem__(self, key: TierName) -> PraatTier:
+    def __getitem__(self, key: TierName) -> Tier:
         """Get a tier
 
         >>> praat_tier = annotation[tiername]
@@ -1086,8 +1086,8 @@ class PraatTextGrid:
         """
         return self.__class__(uri=self.uri, modality=self.modality)
 
-    def update(self, textgrid: 'PraatTextGrid', copy: bool = False) \
-            -> 'PraatTextGrid':
+    def update(self, textgrid: 'TieredAnnotation', copy: bool = False) \
+            -> 'TieredAnnotation':
         """Add every track of an existing annotation (in place)
 
         Parameters
@@ -1152,7 +1152,7 @@ class PraatTextGrid:
         return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
                    key=lambda x: x[1])[0]
 
-    def support(self, collar: float = 0.) -> 'PraatTextGrid':
+    def support(self, collar: float = 0.) -> 'TieredAnnotation':
         # TODO
         """Annotation support
 
