@@ -99,7 +99,6 @@ from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .utils.types import Support, Label, CropMode
 
-
 # this is a moderately ugly way to import `Annotation` to the namespace
 #  without causing some circular imports :
 #  https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports
@@ -321,7 +320,7 @@ class Timeline:
     def __ior__(self, timeline: 'Timeline') -> 'Timeline':
         return self.update(timeline)
 
-    def update(self, timeline: Segment) -> 'Timeline':
+    def update(self, timeline: 'Timeline') -> 'Timeline':
         """Add every segments of an existing timeline (in place)
 
         Parameters
@@ -354,10 +353,10 @@ class Timeline:
 
         return self
 
-    def __or__(self, timeline: 'Timeline') -> 'Timeline':
+    def __or__(self, timeline: Union['Timeline', Segment]) -> 'Timeline':
         return self.union(timeline)
 
-    def union(self, timeline: 'Timeline') -> 'Timeline':
+    def union(self, timeline: Union['Timeline', Segment]) -> 'Timeline':
         """Create new timeline made of union of segments
 
         Parameters
@@ -375,10 +374,16 @@ class Timeline:
         This does the same as timeline.update(...) except it returns a new
         timeline, and the original one is not modified.
         """
+        if isinstance(timeline, Segment):
+            timeline = Timeline([timeline])
+
         segments = self.segments_set_ | timeline.segments_set_
         return Timeline(segments=segments, uri=self.uri)
 
-    def co_iter(self, other: 'Timeline') -> Iterator[Tuple[Segment, Segment]]:
+    def __and__(self, timeline: Union['Timeline', Segment]) -> 'Timeline':
+        return self.crop(timeline, mode="intersection")
+
+    def co_iter(self, other: Union['Timeline', Segment]) -> Iterator[Tuple[Segment, Segment]]:
         """Iterate over pairs of intersecting segments
 
         >>> timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
@@ -399,6 +404,8 @@ class Timeline:
         iterable : (Segment, Segment) iterable
             Yields pairs of intersecting segments in chronological order.
         """
+        if isinstance(other, Segment):
+            other = Timeline([other])
 
         for segment in self.segments_list_:
 

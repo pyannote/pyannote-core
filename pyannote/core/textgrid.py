@@ -108,8 +108,9 @@ See :class:`pyannote.core.Annotation` for the complete reference.
 """
 import itertools
 from collections import defaultdict
+from numbers import Number
 from pathlib import Path
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text, Callable
 
 import numpy as np
 from sortedcontainers import SortedDict
@@ -123,48 +124,69 @@ from .timeline import Timeline
 from .utils.generators import string_generator, int_generator
 from .utils.types import Label, Key, Support, LabelGenerator, TierName, CropMode
 
-
 # TODO: add JSON dumping/loading
+# TODO: QUESTIONS:
+#  - iterator for the TieredAnnotation
+
+# TODO: IDEA: use a timeline in the Tier to do all the cropping/etc/ operations
+#  and just make this class a thin wrapper for it
+TierLabel = Union[Text, Number]
+TierValuePair = Tuple[Segment, TierLabel]
+
 
 class Tier:
+    """A set of chronologically-ordered, non-overlapping and annotated segments"""
 
-    def __init__(self, name: str = None, uri: str = None):
+    def __init__(self, name: str = None,
+                 uri: str = None,
+                 allow_overlap: bool = True):
         self.name = name
         self.uri = uri
-        self._segments = SortedDict()
-
-        self._needs_labels_update = False
-        self._labels_index: Dict[str, Timeline] = dict()
-
-        self._needs_timeline_update = False
+        self.allow_overlap = allow_overlap
+        self._segments: Dict[Segment, TierLabel] = dict()
         self._timeline = Timeline()
 
-    def __setitem__(self, key: Segment, value: str):
-        self._segments.irange()
-        self._needs_timeline_update = True
-        self._needs_labels_update = True
+    def __setitem__(self, segment: Segment, label: str):
+        if not self.allow_overlap:
+            for seg, _ in self._timeline.crop_iter(segment, mode="intersection"):
+                raise ValueError(f"Segment overlaps with {seg}")
 
-    def __getitem__(self, item: Segment) -> str:
-        return self._segments[item]
+        self._timeline.add(segment)
+        self._segments[segment] = label
 
-    def __delitem__(self, item: Segment):
-        del self._segments[item]
-        self._needs_timeline_update = True
-        self._needs_labels_update = True
+    def __getitem__(self, segment: Segment) -> str:
+        return self._segments[segment]
 
-    def get_index(self, k: int) -> Tuple[Segment, str]:
-        """
+    def __delitem__(self, segment: Segment):
+        del self._segments[segment]
+        self._timeline.remove(segment)
+
+    def __contains__(self, included: Union[Segment, Timeline]):
         # TODO
-        :param k:
-        :return:
+        """Inclusion
+
+        Check whether every segment of `included` does exist in annotation.
+
+        Parameters
+        ----------
+        included : Segment or Timeline
+            Segment or timeline being checked for inclusion
+
+        Returns
+        -------
+        contains : bool
+            True if every segment in `included` exists in timeline,
+            False otherwise
+
         """
-        return self._segments.peekitem(k)
+        return included in self._timeline
 
     def get_timeline(self, copy: bool = False) -> Timeline:
-        pass  # TODO
+        return self._timeline
 
     def update(self, tier: 'Tier') -> 'Tier':
-        """Add every segments of an existing tier (in place)
+        # TODO : Doc
+        """Add every segment of an existing tier (in place)
 
         Parameters
         ----------
@@ -182,7 +204,10 @@ class Tier:
         meant to be a **set** of segments (not a list).
 
         """
-        pass  # TODO
+        if not self.allow_overlap and \
+                any(True for _ in self._timeline.crop_iter(tier.get_timeline(),
+                                                           mode="intersection")):
+            raise ValueError("Segments in a tier cannot overlap")
 
     def __len__(self):
         """Number of segments in the tier
@@ -240,7 +265,8 @@ class Tier:
     def __or__(self, timeline: 'Timeline') -> 'Timeline':
         return self.union(timeline)
 
-    def co_iter(self, other: 'Timeline') -> Iterator[Tuple[Segment, Segment]]:
+    def co_iter(self, other: Union[Timeline, Segment]) -> Iterator[Tuple[Segment, Segment]]:
+        # TODO : Doc
         """Iterate over pairs of intersecting segments
 
         >>> timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
@@ -262,13 +288,7 @@ class Tier:
             Yields pairs of intersecting segments in chronological order.
         """
 
-        for segment in self.segments_list_:
-
-            # iterate over segments that starts before 'segment' ends
-            temp = Segment(start=segment.end, end=segment.end)
-            for other_segment in other.segments_list_.irange(maximum=temp):
-                if segment.intersects(other_segment):
-                    yield segment, other_segment
+        yield from self._timeline.co_iter(other)
 
     def crop_iter(self,
                   support: Support,
@@ -377,6 +397,8 @@ class Tier:
 
         """
 
+        # TODO
+
         if mode == 'intersection' and returns_mapping:
             segments, mapping = [], {}
             for segment, mapped_to in self.crop_iter(support,
@@ -402,7 +424,7 @@ class Tier:
         segments : list
             List of all segments of timeline containing time t
         """
-        return list(self.overlapping_iter(t))
+        return self._timeline.overlapping(t)
 
     def overlapping_iter(self, t: float) -> Iterator[Segment]:
         """Like `overlapping` but returns a segment iterator instead
@@ -509,6 +531,7 @@ class Tier:
             True if timeline covers "other" timeline entirely. False if at least
             one segment of "other" is not fully covered by timeline
         """
+        # TODO
 
         # compute gaps within "other" extent
         # this is where we should look for possible faulty segments
@@ -525,6 +548,7 @@ class Tier:
 
     def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
             -> 'Timeline':
+        # TODO
         """Get a copy of the timeline
 
         If `segment_func` is provided, it is applied to each segment first.
@@ -580,14 +604,7 @@ class Tier:
         <Segment(0, 10)>
 
         """
-        if self.segments_set_:
-            segments_boundaries_ = self.segments_boundaries_
-            start = segments_boundaries_[0]
-            end = segments_boundaries_[-1]
-            return Segment(start=start, end=end)
-        else:
-            import numpy as np
-            return Segment(start=np.inf, end=-np.inf)
+        return self._timeline.extent()
 
     def support_iter(self, collar: float = 0.) -> Iterator[Segment]:
         """Like `support` but returns a segment generator instead
@@ -597,44 +614,10 @@ class Tier:
         :func:`pyannote.core.Timeline.support`
         """
 
-        # The support of an empty timeline is an empty timeline.
-        if not self:
-            return
-
-        # Principle:
-        #   * gather all segments with no gap between them
-        #   * add one segment per resulting group (their union |)
-        # Note:
-        #   Since segments are kept sorted internally,
-        #   there is no need to perform an exhaustive segment clustering.
-        #   We just have to consider them in their natural order.
-
-        # Initialize new support segment
-        # as very first segment of the timeline
-        new_segment = self.segments_list_[0]
-
-        for segment in self:
-
-            # If there is no gap between new support segment and next segment
-            # OR there is a gap with duration < collar seconds,
-            possible_gap = segment ^ new_segment
-            if not possible_gap or possible_gap.duration < collar:
-                # Extend new support segment using next segment
-                new_segment |= segment
-
-            # If there actually is a gap and the gap duration >= collar
-            # seconds,
-            else:
-                yield new_segment
-
-                # Initialize new support segment as next segment
-                # (right after the gap)
-                new_segment = segment
-
-        # Add new segment to the timeline support
-        yield new_segment
+        yield from self._timeline.support_iter(collar)
 
     def support(self, collar: float = 0.) -> 'Timeline':
+        # TODO: doc
         """Timeline support
 
         The support of a timeline is the timeline with the minimum number of
@@ -669,7 +652,7 @@ class Tier:
         support : Timeline
             Timeline support
         """
-        return Timeline(segments=self.support_iter(collar), uri=self.uri)
+        return self._timeline.support(collar)
 
     def duration(self) -> float:
         """Timeline duration
@@ -685,7 +668,7 @@ class Tier:
 
         # The timeline duration is the sum of the durations
         # of the segments in the timeline support.
-        return sum(s.duration for s in self.support_iter())
+        return self._timeline.duration()
 
     def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
         """Like `gaps` but returns a segment generator instead
@@ -765,6 +748,44 @@ class Tier:
         return Timeline(segments=self.gaps_iter(support=support),
                         uri=self.uri)
 
+    def argmax(self, support: Optional[Support] = None) -> Optional[Label]:
+        """Get label with longest duration
+
+        Parameters
+        ----------
+        support : Segment or Timeline, optional
+            Find label with longest duration within provided support.
+            Defaults to whole extent.
+
+        Returns
+        -------
+        label : any existing label or None
+            Label with longest intersection
+
+        Examples
+        --------
+        >>> annotation = Annotation(modality='speaker')
+        >>> annotation[Segment(0, 10), 'speaker1'] = 'Alice'
+        >>> annotation[Segment(8, 20), 'speaker1'] = 'Bob'
+        >>> print "%s is such a talker!" % annotation.argmax()
+        Bob is such a talker!
+        >>> segment = Segment(22, 23)
+        >>> if not annotation.argmax(support):
+        ...    print "No label intersecting %s" % segment
+        No label intersection [22 --> 23]
+
+        """
+
+        cropped = self
+        if support is not None:
+            cropped = cropped.crop(support, mode='intersection')
+
+        if not cropped:
+            return None
+
+        return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
+                   key=lambda x: x[1])[0]
+
     def to_annotation(self, modality: Optional[str] = None) -> 'Annotation':
         """Turn tier into an annotation
 
@@ -787,7 +808,7 @@ class Tier:
 
 
 class TieredAnnotation:
-    """Tiered Annotation. Implementation of Praat's TextGrid file structure
+    """Tiered Annotation.
 
     Parameters
     ----------
@@ -806,7 +827,6 @@ class TieredAnnotation:
     def __init__(self, uri: Optional[str] = None):
 
         self._uri: Optional[str] = uri
-        self.modality: Optional[str] = modality
 
         # sorted dictionary
         # values: {tiername: tier} dictionary
@@ -815,6 +835,18 @@ class TieredAnnotation:
         # timeline meant to store all annotated segments
         self._timeline: Timeline = None
         self._timelineNeedsUpdate: bool = True
+
+    @classmethod
+    def from_textgrid(cls, textgrid: Union[str, Path, TextIO],
+                      textgrid_format: str = "full"):
+        try:
+            from textgrid_parser import parse_textgrid
+        except ImportError:
+            raise ImportError("The dependencies used to parse TextGrid file cannot be found. "
+                              "Please install using pyannote.core[textgrid]")
+        # TODO : check for tiers with duplicate names
+
+        return parse_textgrid(textgrid, textgrid_format=textgrid_format)
 
     @property
     def uri(self):
@@ -836,7 +868,7 @@ class TieredAnnotation:
         return list(self._tiers.keys())
 
     @property
-    def tiers_nb(self):
+    def tiers_count(self):
         return len(self._tiers)
 
     def __len__(self):
@@ -852,7 +884,7 @@ class TieredAnnotation:
 
     def __bool__(self):
         """Emptiness
-
+        # TODO : docfix
         >>> if annotation:
         ...    # annotation is empty
         ... else:
@@ -872,7 +904,7 @@ class TieredAnnotation:
         """
         return iter(self._timeline)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterable[Tuple[Segment, str]]:
         return iter(self._tiers.items())
 
     def _update_timeline(self):
@@ -915,6 +947,7 @@ class TieredAnnotation:
         Two annotations are equal if and only if their tracks and associated
         labels are equal.
         """
+        # TODO
         pairOfTracks = itertools.zip_longest(
             self.itertracks(yield_label=True),
             other.itertracks(yield_label=True))
@@ -922,6 +955,7 @@ class TieredAnnotation:
 
     def __ne__(self, other: 'TieredAnnotation'):
         """Inequality"""
+        # TODO
         pairOfTracks = itertools.zip_longest(
             self.itertracks(yield_label=True),
             other.itertracks(yield_label=True))
@@ -1010,6 +1044,7 @@ class TieredAnnotation:
         """
 
         # create new empty annotation
+        # TODO
         pass
 
     def __str__(self):
@@ -1114,44 +1149,6 @@ class TieredAnnotation:
 
         return result
 
-    def argmax(self, support: Optional[Support] = None) -> Optional[Label]:
-        """Get label with longest duration
-
-        Parameters
-        ----------
-        support : Segment or Timeline, optional
-            Find label with longest duration within provided support.p
-            Defaults to whole extent.
-
-        Returns
-        -------
-        label : any existing label or None
-            Label with longest intersection
-
-        Examples
-        --------
-        >>> annotation = Annotation(modality='speaker')
-        >>> annotation[Segment(0, 10), 'speaker1'] = 'Alice'
-        >>> annotation[Segment(8, 20), 'speaker1'] = 'Bob'
-        >>> print "%s is such a talker!" % annotation.argmax()
-        Bob is such a talker!
-        >>> segment = Segment(22, 23)
-        >>> if not annotation.argmax(support):
-        ...    print "No label intersecting %s" % segment
-        No label intersection [22 --> 23]
-
-        """
-
-        cropped = self
-        if support is not None:
-            cropped = cropped.crop(support, mode='intersection')
-
-        if not cropped:
-            return None
-
-        return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
-                   key=lambda x: x[1])[0]
-
     def support(self, collar: float = 0.) -> 'TieredAnnotation':
         # TODO
         """Annotation support
@@ -1207,75 +1204,6 @@ class TieredAnnotation:
                 support[segment, next(generator)] = label
 
         return support
-
-    def co_iter(self, other: 'Annotation') \
-            -> Iterator[Tuple[Tuple[Segment, TierName],
-                              Tuple[Segment, TierName]]
-            ]:
-        """Iterate over pairs of intersecting tracks
-
-        Parameters
-        ----------
-        other : Annotation
-            Second annotation
-
-        Returns
-        -------
-        iterable : (Segment, object), (Segment, object) iterable
-            Yields pairs of intersecting tracks, in chronological (then
-            alphabetical) order.
-
-        See also
-        --------
-        :func:`~pyannote.core.Timeline.co_iter`
-
-        """
-        timeline = self.get_timeline(copy=False)
-        other_timeline = other.get_timeline(copy=False)
-        for s, S in timeline.co_iter(other_timeline):
-            tracks = sorted(self.get_tracks(s), key=str)
-            other_tracks = sorted(other.get_tracks(S), key=str)
-            for t, T in itertools.product(tracks, other_tracks):
-                yield (s, t), (S, T)
-
-    def __mul__(self, other: 'Annotation') -> np.ndarray:
-        """Cooccurrence (or confusion) matrix
-
-        >>> matrix = annotation * other
-
-        Parameters
-        ----------
-        other : Annotation
-            Second annotation
-
-        Returns
-        -------
-        cooccurrence : (n_self, n_other) np.ndarray
-            Cooccurrence matrix where `n_self` (resp. `n_other`) is the number
-            of labels in `self` (resp. `other`).
-        """
-
-        if not isinstance(other, Annotation):
-            raise TypeError(
-                'computing cooccurrence matrix only works with Annotation '
-                'instances.')
-
-        i_labels = self.labels()
-        j_labels = other.labels()
-
-        I = {label: i for i, label in enumerate(i_labels)}
-        J = {label: j for j, label in enumerate(j_labels)}
-
-        matrix = np.zeros((len(I), len(J)))
-
-        # iterate over intersecting tracks and accumulate durations
-        for (segment, track), (other_segment, other_track) in self.co_iter(other):
-            i = I[self[segment, track]]
-            j = J[other[other_segment, other_track]]
-            duration = (segment & other_segment).duration
-            matrix[i, j] += duration
-
-        return matrix
 
     def _repr_png(self):
         """IPython notebook support
