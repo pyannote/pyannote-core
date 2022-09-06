@@ -128,6 +128,8 @@ from .utils.types import Label, Key, Support, LabelGenerator, TierName, CropMode
 # TODO: QUESTIONS:
 #  - iterator for the TieredAnnotation
 
+# TODO: add segmentation abstract class
+
 # TODO: IDEA: use a timeline in the Tier to do all the cropping/etc/ operations
 #  and just make this class a thin wrapper for it
 TierLabel = Union[Text, Number]
@@ -135,7 +137,8 @@ TierValuePair = Tuple[Segment, TierLabel]
 
 
 class Tier:
-    """A set of chronologically-ordered, non-overlapping and annotated segments"""
+    """A set of chronologically-ordered, optionally non-overlapping
+    and annotated segments"""
 
     def __init__(self, name: str = None,
                  uri: str = None,
@@ -154,12 +157,17 @@ class Tier:
         self._timeline.add(segment)
         self._segments[segment] = label
 
-    def __getitem__(self, segment: Segment) -> str:
-        return self._segments[segment]
+    def __getitem__(self, key: Union[Segment, int]) -> str:
+        if isinstance(key, int):
+            key = self._timeline.__getitem__(key)
+        return self._segments[key]
 
-    def __delitem__(self, segment: Segment):
-        del self._segments[segment]
-        self._timeline.remove(segment)
+    def __delitem__(self, key: Union[Segment, int]):
+        if isinstance(key, int):
+            key = self._timeline.__getitem__(key)
+
+        del self._segments[key]
+        self._timeline.remove(key)
 
     def __contains__(self, included: Union[Segment, Timeline]):
         # TODO
@@ -679,44 +687,7 @@ class Tier:
 
         """
 
-        if support is None:
-            support = self.extent()
-
-        if not isinstance(support, (Segment, Timeline)):
-            raise TypeError("unsupported operand type(s) for -':"
-                            "%s and Timeline." % type(support).__name__)
-
-        # segment support
-        if isinstance(support, Segment):
-
-            # `end` is meant to store the end time of former segment
-            # initialize it with beginning of provided segment `support`
-            end = support.start
-
-            # support on the intersection of timeline and provided segment
-            for segment in self.crop(support, mode='intersection').support():
-
-                # add gap between each pair of consecutive segments
-                # if there is no gap, segment is empty, therefore not added
-                gap = Segment(start=end, end=segment.start)
-                if gap:
-                    yield gap
-
-                # keep track of the end of former segment
-                end = segment.end
-
-            # add final gap (if not empty)
-            gap = Segment(start=end, end=support.end)
-            if gap:
-                yield gap
-
-        # timeline support
-        elif isinstance(support, Timeline):
-
-            # yield gaps for every segment in support of provided timeline
-            for segment in support.support():
-                for gap in self.gaps_iter(support=segment):
-                    yield gap
+        yield from self._timeline.gaps_iter(support)
 
     def gaps(self, support: Optional[Support] = None) -> 'Timeline':
         """Gaps
