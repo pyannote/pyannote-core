@@ -94,8 +94,7 @@ from typing import (Optional, Iterable, List, Union, Callable,
 
 from sortedcontainers import SortedList
 
-from . import PYANNOTE_URI, PYANNOTE_SEGMENT
-from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from . import PYANNOTE_SEGMENT
 from .segment import Segment
 from .utils.types import Support, Label, CropMode
 
@@ -1109,35 +1108,6 @@ class Timeline:
         """
         for line in self._iter_uem():
             file.write(line)
-
-    def for_json(self):
-        """Serialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-
-        data = {PYANNOTE_JSON: self.__class__.__name__}
-        data[PYANNOTE_JSON_CONTENT] = [s.for_json() for s in self]
-
-        if self.uri:
-            data[PYANNOTE_URI] = self.uri
-
-        return data
-
-    @classmethod
-    def from_json(cls, data):
-        """Deserialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-
-        uri = data.get(PYANNOTE_URI, None)
-        segments = [Segment.from_json(s) for s in data[PYANNOTE_JSON_CONTENT]]
-        return cls(segments=segments, uri=uri)
 
     def _repr_png_(self):
         """IPython notebook support

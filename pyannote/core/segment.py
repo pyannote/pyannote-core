@@ -368,25 +368,6 @@ class Segment:
         """
         return '<Segment(%g, %g)>' % (self.start, self.end)
 
-    def for_json(self):
-        """Serialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-        return {'start': self.start, 'end': self.end}
-
-    @classmethod
-    def from_json(cls, data):
-        """Deserialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-        return cls(start=data['start'], end=data['end'])
-
     def _repr_png_(self):
         """IPython notebook support
 
