@@ -128,13 +128,10 @@ import numpy as np
 from sortedcontainers import SortedDict
 
 from . import (
-    PYANNOTE_URI,
-    PYANNOTE_MODALITY,
     PYANNOTE_SEGMENT,
     PYANNOTE_TRACK,
     PYANNOTE_LABEL,
 )
-from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment, SlidingWindow
 from .timeline import Timeline
 from .feature import SlidingWindowFeature
@@ -1498,47 +1495,6 @@ class Annotation:
         data = np.minimum(data, 1, out=data)
 
         return SlidingWindowFeature(data, resolution, labels=labels)
-
-    def for_json(self) -> Dict:
-        """Serialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-
-        data = {PYANNOTE_JSON: self.__class__.__name__}
-        content = [
-            {PYANNOTE_SEGMENT: s.for_json(), PYANNOTE_TRACK: t, PYANNOTE_LABEL: l}
-            for s, t, l in self.itertracks(yield_label=True)
-        ]
-        data[PYANNOTE_JSON_CONTENT] = content
-
-        if self.uri:
-            data[PYANNOTE_URI] = self.uri
-
-        if self.modality:
-            data[PYANNOTE_MODALITY] = self.modality
-
-        return data
-
-    @classmethod
-    def from_json(cls, data: Dict) -> "Annotation":
-        """Deserialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-        uri = data.get(PYANNOTE_URI, None)
-        modality = data.get(PYANNOTE_MODALITY, None)
-        records = []
-        for record_dict in data[PYANNOTE_JSON_CONTENT]:
-            segment = Segment.from_json(record_dict[PYANNOTE_SEGMENT])
-            track = record_dict[PYANNOTE_TRACK]
-            label = record_dict[PYANNOTE_LABEL]
-            records.append((segment, track, label))
-        return Annotation.from_records(records, uri, modality)
 
     @classmethod
     def from_records(

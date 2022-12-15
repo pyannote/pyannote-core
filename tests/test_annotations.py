@@ -177,15 +177,6 @@ def test_from_df(annotation):
     assert actual == expected
 
 
-def test_from_json(annotation):
-    # Check that we can reconstruct an annotation from the dict
-    # returned by for_json.
-    data = annotation.for_json()
-    actual = Annotation.from_json(data)
-    expected = annotation
-    assert actual == expected
-
-
 def test_extrude():
     annotation = Annotation()
     annotation[Segment(0, 10)] = "A"
