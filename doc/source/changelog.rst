@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 5.0.0 (2022-12-15)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- BREAKING: remove support for JSON serialization
+
 Version 4.5 (2022-08-24)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

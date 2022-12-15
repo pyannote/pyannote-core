@@ -52,13 +52,6 @@ SlidingWindowFeature
    :special-members:
 
 *************
-Serialization
-*************
-
-.. automodule:: pyannote.core.json
-   :members:
-
-*************
 Visualization
 *************
 

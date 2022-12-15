@@ -35,7 +35,6 @@ User guide
 
    structure
    visualization
-   serialization
 
 
 API documentation
