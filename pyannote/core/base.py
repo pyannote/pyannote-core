@@ -42,29 +42,7 @@ class BaseSegmentation(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def crop_iter(self,
-                  support: Support,
-                  mode: CropMode = 'intersection',
-                  returns_mapping: bool = False) \
-            -> Iterator[Union[Tuple[Segment, Segment], Segment]]:
-        pass
-
-    @abstractmethod
-    def crop(self,
-             support: Support,
-             mode: CropMode = 'intersection',
-             returns_mapping: bool = False) \
-            -> Union['Timeline', Tuple['Timeline', Dict[Segment, Segment]]]:
-        pass
-
-    @abstractmethod
     def get_overlap(self) -> 'Timeline':
-        pass
-
-    @abstractmethod
-    def extrude(self,
-                removed: Support,
-                mode: CropMode = 'intersection') -> 'Timeline':
         pass
 
     @abstractmethod
@@ -105,14 +83,6 @@ class BaseSegmentation(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
-        pass
-
-    @abstractmethod
-    def gaps(self, support: Optional[Support] = None) -> 'Timeline':
-        pass
-
-    @abstractmethod
     def for_json(self):
         pass
 
@@ -123,4 +93,37 @@ class BaseSegmentation(metaclass=ABCMeta):
 
     @abstractmethod
     def _repr_png_(self):
+        pass
+
+
+class GappedAnnotationMixin(metaclass=ABCMeta):
+
+    @abstractmethod
+    def crop_iter(self,
+                  support: Support,
+                  mode: CropMode = 'intersection',
+                  returns_mapping: bool = False) \
+            -> Iterator[Union[Tuple[Segment, Segment], Segment]]:
+        pass
+
+    @abstractmethod
+    def crop(self,
+             support: Support,
+             mode: CropMode = 'intersection',
+             returns_mapping: bool = False) \
+            -> Union['Timeline', Tuple['Timeline', Dict[Segment, Segment]]]:
+        pass
+
+    @abstractmethod
+    def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
+        pass
+
+    @abstractmethod
+    def gaps(self, support: Optional[Support] = None) -> 'Timeline':
+        pass
+
+    @abstractmethod
+    def extrude(self,
+                removed: Support,
+                mode: CropMode = 'intersection') -> 'Timeline':
         pass
