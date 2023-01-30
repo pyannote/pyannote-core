@@ -64,6 +64,9 @@ setup(
         "Topic :: Scientific/Engineering"
     ],
     extras_require={
+        'textgrid': [
+            "git+ssh://git@github.com/hadware/textgrid-parser.git"
+        ],
         'testing': ['pytest',
                     'pandas >= 0.17.1',
                     'flake8==3.7.9'],

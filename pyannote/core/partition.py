@@ -93,26 +93,25 @@ from typing import (Optional, Iterable, List, Union, Callable,
                     TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
 
 from sortedcontainers import SortedList
-from typing_extensions import Self
 
-from . import PYANNOTE_SEGMENT
+from . import PYANNOTE_URI, PYANNOTE_SEGMENT, Timeline
+from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .utils.types import Support, Label, CropMode
 
-# this is a moderately ugly way to import `Annotation` to the namespace
-#  without causing some circular imports :
-#  https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports
 if TYPE_CHECKING:
     from .annotation import Annotation
-    import pandas as pd
 
 
 # =====================================================================
-# Timeline class
+# Partition class
 # =====================================================================
 
+# TODO: Questions:
+#  - "autofill" the partition if the initialized segments aren't filling?
+#  - partition empty if only one segment?
 
-class Timeline:
+class Partition(Timeline):
     """
     Ordered set of segments.
 
@@ -133,46 +132,34 @@ class Timeline:
         New timeline
     """
 
-    @classmethod
-    def from_df(cls, df: 'pd.DataFrame', uri: Optional[str] = None) -> 'Timeline':
-        segments = list(df[PYANNOTE_SEGMENT])
-        timeline = cls(segments=segments, uri=uri)
-        return timeline
-
     def __init__(self,
                  segments: Optional[Iterable[Segment]] = None,
+                 start: float = 0.0,
+                 end: float = None,
                  uri: str = None):
-        if segments is None:
-            segments = ()
+        segments = list(segments)
+        if segments is None and end is None:
+            raise ValueError("Cannot initialize an empty timeline without and end boundary")
+        elif end is None:
+            end = max(seg.end for seg in segments)
+        elif not segments:
+            segments = Segment(start, end)
 
-        # set of segments (used for checking inclusion)
-        # Store only non-empty Segments.
-        segments_set = set([segment for segment in segments if segment])
+        self.start = start
+        self.end = end
+        super().__init__(segments, uri)
 
-        self.segments_set_ = segments_set
-
-        # sorted list of segments (used for sorted iteration)
-        self.segments_list_ = SortedList(segments_set)
-
-        # sorted list of (possibly redundant) segment boundaries
-        boundaries = (boundary for segment in segments_set for boundary in segment)
-        self.segments_boundaries_ = SortedList(boundaries)
-
-        # path to (or any identifier of) segmented resource
-        self.uri: str = uri
-
-    def __len__(self):
-        """Number of segments
-
-        >>> len(timeline)  # timeline contains three segments
-        3
-        """
-        return len(self.segments_set_)
+        # TODO: check "filling"? autofill if not valid?
+        self.update(self.gaps(support=self.extent()))
+        if self[0].start < self.start or self[-1].end > self.end:
+            raise ValueError(f"Segments have to be within ({start, end}) bounds")
 
     def __nonzero__(self):
+        # TODO
         return self.__bool__()
 
     def __bool__(self):
+        # TODO
         """Emptiness
 
         >>> if timeline:
@@ -182,63 +169,8 @@ class Timeline:
         """
         return len(self.segments_set_) > 0
 
-    def __iter__(self) -> Iterable[Segment]:
-        """Iterate over segments (in chronological order)
-
-        >>> for segment in timeline:
-        ...     # do something with the segment
-
-        See also
-        --------
-        :class:`pyannote.core.Segment` describes how segments are sorted.
-        """
-        return iter(self.segments_list_)
-
-    def __getitem__(self, k: int) -> Segment:
-        """Get segment by index (in chronological order)
-
-        >>> first_segment = timeline[0]
-        >>> penultimate_segment = timeline[-2]
-        """
-        return self.segments_list_[k]
-
-    def __eq__(self, other: Self):
-        """Equality
-
-        Two timelines are equal if and only if their segments are equal.
-
-        >>> timeline1 = Timeline([Segment(0, 1), Segment(2, 3)])
-        >>> timeline2 = Timeline([Segment(2, 3), Segment(0, 1)])
-        >>> timeline3 = Timeline([Segment(2, 3)])
-        >>> timeline1 == timeline2
-        True
-        >>> timeline1 == timeline3
-        False
-        """
-        return self.segments_set_ == other.segments_set_
-
-    def __ne__(self, other: Self):
-        """Inequality"""
-        return self.segments_set_ != other.segments_set_
-
-    def index(self, segment: Segment) -> int:
-        """Get index of (existing) segment
-
-        Parameters
-        ----------
-        segment : Segment
-            Segment that is being looked for.
-
-        Returns
-        -------
-        position : int
-            Index of `segment` in timeline
-
-        Raises
-        ------
-        ValueError if `segment` is not present.
-        """
-        return self.segments_list_.index(segment)
+    def bisect(self, at: float):
+        pass
 
     def add(self, segment: Segment) -> 'Timeline':
         """Add a segment (in place)
@@ -275,6 +207,8 @@ class Timeline:
         segments_boundaries_.add(segment.end)
 
         return self
+
+
 
     def remove(self, segment: Segment) -> 'Timeline':
         """Remove a segment (in place)
@@ -588,14 +522,14 @@ class Timeline:
 
     def extrude(self,
                 removed: Support,
-                mode: CropMode = 'intersection') -> 'Timeline':
+                mode: CropMode = 'strict') -> 'Timeline':
         """Remove segments that overlap `removed` support.
 
         Parameters
         ----------
         removed : Segment or Timeline
             If `support` is a `Timeline`, its support is used.
-        mode : {'strict', 'loose', 'intersection'}, optional
+        mode : {'strict', 'loose'}, optional
             Controls how segments that are not fully included in `removed` are
             handled. 'strict' mode only removes fully included segments. 'loose'
             mode removes any intersecting segment. 'intersection' mode removes
@@ -632,23 +566,6 @@ class Timeline:
             mode = "loose"
         return self.crop(truncating_support, mode=mode)
 
-    def __str__(self):
-        """Human-readable representation
-
-        >>> timeline = Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])
-        >>> print(timeline)
-        [[ 00:00:00.000 -->  00:00:10.000]
-         [ 00:00:01.000 -->  00:00:13.370]]
-
-        """
-
-        n = len(self.segments_list_)
-        string = "["
-        for i, segment in enumerate(self.segments_list_):
-            string += str(segment)
-            string += "\n " if i + 1 < n else ""
-        string += "]"
-        return string
 
     def __repr__(self):
         """Computer-readable representation
@@ -658,7 +575,7 @@ class Timeline:
 
         """
 
-        return "<Timeline(uri=%s, segments=%s)>" % (self.uri,
+        return "<Partition(uri=%s, segments=%s)>" % (self.uri,
                                                     list(self.segments_list_))
 
     def __contains__(self, included: Union[Segment, 'Timeline']):
@@ -769,40 +686,7 @@ class Timeline:
                         uri=self.uri)
 
     def extent(self) -> Segment:
-        """Extent
-
-        The extent of a timeline is the segment of minimum duration that
-        contains every segments of the timeline. It is unique, by definition.
-        The extent of an empty timeline is an empty segment.
-
-        A picture is worth a thousand words::
-
-            timeline
-            |------|    |------|     |----|
-              |--|    |-----|     |----------|
-
-            timeline.extent()
-            |--------------------------------|
-
-        Returns
-        -------
-        extent : Segment
-            Timeline extent
-
-        Examples
-        --------
-        >>> timeline = Timeline(segments=[Segment(0, 1), Segment(9, 10)])
-        >>> timeline.extent()
-        <Segment(0, 10)>
-
-        """
-        if self.segments_set_:
-            segments_boundaries_ = self.segments_boundaries_
-            start = segments_boundaries_[0]
-            end = segments_boundaries_[-1]
-            return Segment(start=start, end=end)
-
-        return Segment(start=0.0, end=0.0)
+        return Segment(start=self.start, end=self.end)
 
     def support_iter(self, collar: float = 0.0) -> Iterator[Segment]:
         """Like `support` but returns a segment generator instead
@@ -1116,6 +1000,35 @@ class Timeline:
         """
         for line in self._iter_uem():
             file.write(line)
+
+    def for_json(self):
+        """Serialization
+
+        See also
+        --------
+        :mod:`pyannote.core.json`
+        """
+
+        data = {PYANNOTE_JSON: self.__class__.__name__}
+        data[PYANNOTE_JSON_CONTENT] = [s.for_json() for s in self]
+
+        if self.uri:
+            data[PYANNOTE_URI] = self.uri
+
+        return data
+
+    @classmethod
+    def from_json(cls, data):
+        """Deserialization
+
+        See also
+        --------
+        :mod:`pyannote.core.json`
+        """
+
+        uri = data.get(PYANNOTE_URI, None)
+        segments = [Segment.from_json(s) for s in data[PYANNOTE_JSON_CONTENT]]
+        return cls(segments=segments, uri=uri)
 
     def _repr_png_(self):
         """IPython notebook support

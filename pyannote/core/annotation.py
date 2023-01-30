@@ -631,7 +631,7 @@ class Annotation:
             annotation.get_overlap()
               |------| |-----|      |--------|
 
-            annotation.get_overlap(for_labels=["A", "B"])
+            annotation.get_overlap(labels=["A", "B"])
                |--|       |--|          |----|
 
         Parameters
