@@ -128,13 +128,10 @@ import numpy as np
 from sortedcontainers import SortedDict
 
 from . import (
-    PYANNOTE_URI,
-    PYANNOTE_MODALITY,
     PYANNOTE_SEGMENT,
     PYANNOTE_TRACK,
     PYANNOTE_LABEL,
 )
-from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment, SlidingWindow
 from .timeline import Timeline
 from .feature import SlidingWindowFeature
@@ -394,19 +391,14 @@ class Annotation:
             filled[second_half] = mapping[second_half.end]   
         return filled.support()
     
-    def write_rttm(self, file: TextIO):
-        """Dump annotation to file using RTTM format
+    def _iter_rttm(self) -> Iterator[Text]:
+        """Generate lines for an RTTM file for this annotation
 
-        Parameters
-        ----------
-        file : file object
-
-        Usage
-        -----
-        >>> with open('file.rttm', 'w') as file:
-        ...     annotation.write_rttm(file)
+        Returns
+        -------
+        iterator: Iterator[str]
+            An iterator over RTTM text lines
         """
-
         uri = self.uri if self.uri else "<NA>"
         if isinstance(uri, Text) and " " in uri:
             msg = (
@@ -421,10 +413,76 @@ class Annotation:
                     f'containing spaces (got: "{label}").'
                 )
                 raise ValueError(msg)
-            line = (
+            yield (
                 f"SPEAKER {uri} 1 {segment.start:.3f} {segment.duration:.3f} "
                 f"<NA> <NA> {label} <NA> <NA>\n"
             )
+
+    def to_rttm(self) -> Text:
+        """Serialize annotation as a string using RTTM format
+
+        Returns
+        -------
+        serialized: str
+            RTTM string
+        """
+        return "".join([line for line in self._iter_rttm()])
+
+    def write_rttm(self, file: TextIO):
+        """Dump annotation to file using RTTM format
+
+        Parameters
+        ----------
+        file : file object
+
+        Usage
+        -----
+        >>> with open('file.rttm', 'w') as file:
+        ...     annotation.write_rttm(file)
+        """
+        for line in self._iter_rttm():
+            file.write(line)
+
+    def _iter_lab(self) -> Iterator[Text]:
+        """Generate lines for a LAB file for this annotation
+
+        Returns
+        -------
+        iterator: Iterator[str]
+            An iterator over LAB text lines
+        """
+        for segment, _, label in self.itertracks(yield_label=True):
+            if isinstance(label, Text) and " " in label:
+                msg = (
+                    f"Space-separated LAB file format does not allow labels "
+                    f'containing spaces (got: "{label}").'
+                )
+                raise ValueError(msg)
+            yield f"{segment.start:.3f} {segment.start + segment.duration:.3f} {label}\n"
+
+    def to_lab(self) -> Text:
+        """Serialize annotation as a string using LAB format
+
+        Returns
+        -------
+        serialized: str
+            LAB string
+        """
+        return "".join([line for line in self._iter_lab()])
+
+    def write_lab(self, file: TextIO):
+        """Dump annotation to file using LAB format
+
+        Parameters
+        ----------
+        file : file object
+
+        Usage
+        -----
+        >>> with open('file.lab', 'w') as file:
+        ...     annotation.write_lab(file)
+        """
+        for line in self._iter_lab():
             file.write(line)
 
     def crop(self, support: Support, mode: CropMode = "intersection") -> "Annotation":
@@ -1467,47 +1525,6 @@ class Annotation:
         data = np.minimum(data, 1, out=data)
 
         return SlidingWindowFeature(data, resolution, labels=labels)
-
-    def for_json(self) -> Dict:
-        """Serialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-
-        data = {PYANNOTE_JSON: self.__class__.__name__}
-        content = [
-            {PYANNOTE_SEGMENT: s.for_json(), PYANNOTE_TRACK: t, PYANNOTE_LABEL: l}
-            for s, t, l in self.itertracks(yield_label=True)
-        ]
-        data[PYANNOTE_JSON_CONTENT] = content
-
-        if self.uri:
-            data[PYANNOTE_URI] = self.uri
-
-        if self.modality:
-            data[PYANNOTE_MODALITY] = self.modality
-
-        return data
-
-    @classmethod
-    def from_json(cls, data: Dict) -> "Annotation":
-        """Deserialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-        uri = data.get(PYANNOTE_URI, None)
-        modality = data.get(PYANNOTE_MODALITY, None)
-        records = []
-        for record_dict in data[PYANNOTE_JSON_CONTENT]:
-            segment = Segment.from_json(record_dict[PYANNOTE_SEGMENT])
-            track = record_dict[PYANNOTE_TRACK]
-            label = record_dict[PYANNOTE_LABEL]
-            records.append((segment, track, label))
-        return Annotation.from_records(records, uri, modality)
 
     @classmethod
     def from_records(

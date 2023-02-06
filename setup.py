@@ -34,12 +34,11 @@ setup(
 
     # package
     namespace_packages=['pyannote'],
-    packages=find_packages(),
+    packages=find_packages(exclude=["tests"]),
     install_requires=[
         'sortedcontainers >= 2.0.4',
         'numpy >= 1.10.4',
         'scipy >= 1.1',
-        'simplejson >= 3.8.1',
         "dataclasses >= 0.7; python_version <'3.7'",
         'typing-extensions >= 3.7.4.1'
     ],

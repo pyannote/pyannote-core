@@ -94,8 +94,7 @@ from typing import (Optional, Iterable, List, Union, Callable,
 
 from sortedcontainers import SortedList
 
-from . import PYANNOTE_URI, PYANNOTE_SEGMENT
-from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from . import PYANNOTE_SEGMENT
 from .segment import Segment
 from .utils.types import Support, Label, CropMode
 
@@ -1069,6 +1068,32 @@ class Timeline:
 
         return annotation
 
+    def _iter_uem(self) -> Iterator[Text]:
+        """Generate lines for a UEM file for this timeline
+
+        Returns
+        -------
+        iterator: Iterator[str]
+            An iterator over UEM text lines
+        """
+        uri = self.uri if self.uri else "<NA>"
+        if isinstance(uri, Text) and ' ' in uri:
+            msg = (f'Space-separated UEM file format does not allow file URIs '
+                   f'containing spaces (got: "{uri}").')
+            raise ValueError(msg)
+        for segment in self:
+            yield f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
+
+    def to_uem(self) -> Text:
+        """Serialize timeline as a string using UEM format
+
+        Returns
+        -------
+        serialized: str
+            UEM string
+        """
+        return "".join([line for line in self._iter_uem()])
+
     def write_uem(self, file: TextIO):
         """Dump timeline to file using UEM format
 
@@ -1081,44 +1106,8 @@ class Timeline:
         >>> with open('file.uem', 'w') as file:
         ...    timeline.write_uem(file)
         """
-
-        uri = self.uri if self.uri else "<NA>"
-        if isinstance(uri, Text) and ' ' in uri:
-            msg = (f'Space-separated UEM file format does not allow file URIs '
-                   f'containing spaces (got: "{uri}").')
-            raise ValueError(msg)
-        for segment in self:
-            line = f"{uri} 1 {segment.start:.3f} {segment.end:.3f}\n"
+        for line in self._iter_uem():
             file.write(line)
-
-    def for_json(self):
-        """Serialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-
-        data = {PYANNOTE_JSON: self.__class__.__name__}
-        data[PYANNOTE_JSON_CONTENT] = [s.for_json() for s in self]
-
-        if self.uri:
-            data[PYANNOTE_URI] = self.uri
-
-        return data
-
-    @classmethod
-    def from_json(cls, data):
-        """Deserialization
-
-        See also
-        --------
-        :mod:`pyannote.core.json`
-        """
-
-        uri = data.get(PYANNOTE_URI, None)
-        segments = [Segment.from_json(s) for s in data[PYANNOTE_JSON_CONTENT]]
-        return cls(segments=segments, uri=uri)
 
     def _repr_png_(self):
         """IPython notebook support

@@ -2,6 +2,18 @@
 Changelog
 #########
 
+Version 5.0.0 (2022-12-15)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- BREAKING: remove support for JSON serialization
+
+Version 4.5 (2022-08-24)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add Annotation.write_lab method (@FrancescoBonzi)
+- feat: add Annotation.to_{rttm|lab} and Timeline.to_uem serializers (@juanmc2005)
+- setup: exclude tests from package (@kimdwkimdw)
+
 Version 4.4 (2022-03-09)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
