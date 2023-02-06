@@ -364,6 +364,36 @@ class Annotation:
         """
         return included in self.get_timeline(copy=False)
 
+    def fill_gaps(self) -> "Annotation":
+        """Fill the gaps of the annotation assigning the closest label 
+        
+        A simple illustration:
+
+            annotation
+              |------|                 |------|             |------|
+              | spk0 |                 | spk1 |             | spk0 |
+            
+            filled `Annotation`
+              |----------------------------------------------------|
+              | spk0 |  spk0  |  spk1  | spk1 | spk1 | spk0 | spk0 |
+
+        Returns
+        -------
+        filled : Annotation
+            Filled annotation
+            
+        """
+        mapping = dict()
+        filled = self.__class__(uri=self.uri, modality=self.modality)
+        for segment, _, label in self.itertracks(yield_label=True):
+            mapping[segment.start] = label
+            mapping[segment.end] = label
+        gaps = [[Segment(segment.start, segment.middle), Segment(segment.middle, segment.end)] for segment in self.get_timeline().gaps()]
+        for first_half, second_half in gaps:
+            filled[first_half] = mapping[first_half.start]
+            filled[second_half] = mapping[second_half.end]   
+        return filled.support()
+    
     def write_rttm(self, file: TextIO):
         """Dump annotation to file using RTTM format
 
