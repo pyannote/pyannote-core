@@ -427,31 +427,6 @@ class Annotation:
             )
             file.write(line)
 
-    def write_lab(self, file: TextIO):
-        """Dump annotation to file using LAB format
-
-        Parameters
-        ----------
-        file : file object
-
-        Usage
-        -----
-        >>> with open('file.lab', 'w') as file:
-        ...     annotation.write_lab(file)
-        """
-
-        for segment, _, label in self.itertracks(yield_label=True):
-            if isinstance(label, Text) and " " in label:
-                msg = (
-                    f"Space-separated LAB file format does not allow labels "
-                    f'containing spaces (got: "{label}").'
-                )
-                raise ValueError(msg)
-            line = (
-                f"{segment.start:.3f} {segment.start + segment.duration:.3f} {label}\n"
-            )
-            file.write(line)
-
     def crop(self, support: Support, mode: CropMode = "intersection") -> "Annotation":
         """Crop annotation to new support
 
