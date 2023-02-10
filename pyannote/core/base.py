@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Optional, Iterable, Iterator, Tuple, Union, Dict, TYPE_CHECKING, Callable
+from typing import Optional, Iterator, Tuple, Union, Dict, TYPE_CHECKING, Callable, List
 
 from typing_extensions import Self
 
@@ -13,6 +13,18 @@ if TYPE_CHECKING:
 class BaseSegmentation(metaclass=ABCMeta):
     """Abstract base  class for all segmented annotations"""
 
+    def __init__(self, uri: Optional[str] = None):
+        # path to (or any identifier of) segmented resource
+        self._uri: Optional[str] = uri
+
+    @property
+    def uri(self):
+        return self._uri
+
+    @uri.setter
+    def uri(self, uri: str):
+        self._uri = uri
+
     @abstractmethod
     def __len__(self) -> int:
         pass
@@ -23,6 +35,8 @@ class BaseSegmentation(metaclass=ABCMeta):
 
     @abstractmethod
     def __bool__(self):
+        """Truthiness of the segmentation. Truthy means that it contains something
+        False means it's empty."""
         pass
 
     @abstractmethod
@@ -31,6 +45,14 @@ class BaseSegmentation(metaclass=ABCMeta):
 
     @abstractmethod
     def __ne__(self, other: Self):
+        pass
+
+    @abstractmethod
+    def itersegments(self):
+        pass
+
+    @abstractmethod
+    def get_timeline(self) -> 'Timeline':
         pass
 
     @abstractmethod
@@ -54,11 +76,11 @@ class BaseSegmentation(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def __contains__(self, included: Union[Segment, 'Timeline']):
+    def __contains__(self, included: Union[Segment, 'Timeline']) -> bool:
         pass
 
     @abstractmethod
-    def empty(self) -> 'Timeline':
+    def empty(self) -> Self:
         pass
 
     @abstractmethod
@@ -71,34 +93,6 @@ class BaseSegmentation(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def support_iter(self, collar: float = 0.0) -> Iterator[Segment]:
-        pass
-
-    @abstractmethod
-    def support(self, collar: float = 0.) -> 'Timeline':
-        pass
-
-    @abstractmethod
-    def duration(self) -> float:
-        pass
-
-    @abstractmethod
-    def for_json(self):
-        pass
-
-    @classmethod
-    # TODO
-    def from_json(cls, data):
-        pass
-
-    @abstractmethod
-    def _repr_png_(self):
-        pass
-
-
-class GappedAnnotationMixin(metaclass=ABCMeta):
-
-    @abstractmethod
     def crop_iter(self,
                   support: Support,
                   mode: CropMode = 'intersection',
@@ -107,12 +101,15 @@ class GappedAnnotationMixin(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def crop(self,
-             support: Support,
-             mode: CropMode = 'intersection',
-             returns_mapping: bool = False) \
-            -> Union['Timeline', Tuple['Timeline', Dict[Segment, Segment]]]:
+    def duration(self) -> float:
         pass
+
+    @abstractmethod
+    def _repr_png_(self):
+        pass
+
+
+class GappedAnnotationMixin(metaclass=ABCMeta):
 
     @abstractmethod
     def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
@@ -125,5 +122,38 @@ class GappedAnnotationMixin(metaclass=ABCMeta):
     @abstractmethod
     def extrude(self,
                 removed: Support,
-                mode: CropMode = 'intersection') -> 'Timeline':
+                mode: CropMode = 'intersection') -> Self:
+        pass
+
+    # TODO : maybe put inside the base seg class, add conditions for
+    #  partition
+    @abstractmethod
+    def crop(self,
+             support: Support,
+             mode: CropMode = 'intersection',
+             returns_mapping: bool = False) \
+            -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
+        pass
+
+    @abstractmethod
+    def support(self, collar: float = 0.) -> Self:
+        pass
+
+
+class SegmentSet(metaclass=ABCMeta):
+
+    @abstractmethod
+    def add(self, segment: Segment):
+        pass
+
+    @abstractmethod
+    def remove(self, segment: Segment):
+        pass
+
+    @abstractmethod
+    def index(self, segment: Segment) -> int:
+        pass
+
+    @abstractmethod
+    def overlapping(self, t: float) -> List[Segment]:
         pass

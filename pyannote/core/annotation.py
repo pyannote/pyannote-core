@@ -134,6 +134,7 @@ from . import (
     PYANNOTE_TRACK,
     PYANNOTE_LABEL,
 )
+from .base import BaseSegmentation, GappedAnnotationMixin
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment, SlidingWindow
 from .timeline import Timeline
@@ -145,7 +146,7 @@ if TYPE_CHECKING:
     import pandas as pd
 
 
-class Annotation:
+class Annotation(GappedAnnotationMixin, BaseSegmentation):
     """Annotation
 
     Parameters
@@ -175,7 +176,7 @@ class Annotation:
 
     def __init__(self, uri: Optional[str] = None, modality: Optional[str] = None):
 
-        self._uri: Optional[str] = uri
+        super().__init__(uri)
         self.modality: Optional[str] = modality
 
         # sorted dictionary
@@ -207,7 +208,7 @@ class Annotation:
         timeline.uri = uri
         self._uri = uri
 
-    def _updateLabels(self):
+    def _update_labels(self):
 
         # list of labels that needs to be updated
         update = set(
@@ -293,7 +294,7 @@ class Annotation:
                 else:
                     yield segment, track
 
-    def _updateTimeline(self):
+    def _update_timeline(self):
         self._timeline = Timeline(segments=self._tracks, uri=self.uri)
         self._timelineNeedsUpdate = False
 
@@ -319,7 +320,7 @@ class Annotation:
 
         """
         if self._timelineNeedsUpdate:
-            self._updateTimeline()
+            self._update_timeline()
         if copy:
             return self._timeline.copy()
         return self._timeline
@@ -332,18 +333,18 @@ class Annotation:
         Two annotations are equal if and only if their tracks and associated
         labels are equal.
         """
-        pairOfTracks = itertools.zip_longest(
+        pair_of_tracks = itertools.zip_longest(
             self.itertracks(yield_label=True), other.itertracks(yield_label=True)
         )
-        return all(t1 == t2 for t1, t2 in pairOfTracks)
+        return all(t1 == t2 for t1, t2 in pair_of_tracks)
 
     def __ne__(self, other: "Annotation"):
         """Inequality"""
-        pairOfTracks = itertools.zip_longest(
+        pair_of_tracks = itertools.zip_longest(
             self.itertracks(yield_label=True), other.itertracks(yield_label=True)
         )
 
-        return any(t1 != t2 for t1, t2 in pairOfTracks)
+        return any(t1 != t2 for t1, t2 in pair_of_tracks)
 
     def __contains__(self, included: Union[Segment, Timeline]):
         """Inclusion
@@ -913,7 +914,7 @@ class Annotation:
             Sorted list of labels
         """
         if any([lnu for lnu in self._labelNeedsUpdate.values()]):
-            self._updateLabels()
+            self._update_labels()
         return sorted(self._labels, key=str)
 
     def get_labels(
@@ -1060,7 +1061,7 @@ class Annotation:
             return Timeline(uri=self.uri)
 
         if self._labelNeedsUpdate[label]:
-            self._updateLabels()
+            self._update_labels()
 
         if copy:
             return self._labels[label].copy()

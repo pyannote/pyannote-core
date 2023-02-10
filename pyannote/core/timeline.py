@@ -96,6 +96,7 @@ from sortedcontainers import SortedList
 from typing_extensions import Self
 
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT
+from .base import GappedAnnotationMixin, BaseSegmentation
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .utils.types import Support, Label, CropMode
@@ -113,7 +114,7 @@ if TYPE_CHECKING:
 # =====================================================================
 
 
-class Timeline:
+class Timeline(GappedAnnotationMixin, BaseSegmentation):
     """
     Ordered set of segments.
 
@@ -143,6 +144,7 @@ class Timeline:
     def __init__(self,
                  segments: Optional[Iterable[Segment]] = None,
                  uri: str = None):
+        super().__init__(uri)
         if segments is None:
             segments = ()
 
@@ -159,8 +161,6 @@ class Timeline:
         boundaries = (boundary for segment in segments_set for boundary in segment)
         self.segments_boundaries_ = SortedList(boundaries)
 
-        # path to (or any identifier of) segmented resource
-        self.uri: str = uri
 
     def __len__(self):
         """Number of segments

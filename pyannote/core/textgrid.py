@@ -110,7 +110,8 @@ import itertools
 from collections import defaultdict
 from numbers import Number
 from pathlib import Path
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text, Callable
+from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text, Callable, Type, Generic, \
+    TypeVar
 
 import numpy as np
 from sortedcontainers import SortedDict
@@ -118,7 +119,9 @@ from sortedcontainers import SortedDict
 from pyannote.core import Annotation
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
+from .base import BaseSegmentation, GappedAnnotationMixin
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from .partition import Partition
 from .segment import Segment
 from .timeline import Timeline
 from .utils.generators import string_generator, int_generator
@@ -135,39 +138,66 @@ from .utils.types import Label, Key, Support, LabelGenerator, TierName, CropMode
 TierLabel = Union[Text, Number]
 TierValuePair = Tuple[Segment, TierLabel]
 
+T = Type[Union[Partition, Timeline]]
 
-class Tier:
-    """A set of chronologically-ordered, optionally non-overlapping
-    and annotated segments"""
 
-    def __init__(self, name: str = None,
-                 uri: str = None,
-                 allow_overlap: bool = True):
+class BaseTier(BaseSegmentation, Generic[T]):
+    _segmentation_type: T
+
+    def __init__(self,  name: str = None, uri: str = None):
+        super().__init__(uri)
         self.name = name
-        self.uri = uri
-        self.allow_overlap = allow_overlap
+
+        self._segmentation = self._segmentation_type()
         self._segments: Dict[Segment, TierLabel] = dict()
-        self._timeline = Timeline()
 
     def __setitem__(self, segment: Segment, label: str):
-        if not self.allow_overlap:
-            for seg, _ in self._timeline.crop_iter(segment, mode="intersection"):
-                raise ValueError(f"Segment overlaps with {seg}")
-
-        self._timeline.add(segment)
+        # TODO: check
+        self._segmentation.add(segment)
         self._segments[segment] = label
 
     def __getitem__(self, key: Union[Segment, int]) -> str:
+        # TODO: check
         if isinstance(key, int):
-            key = self._timeline.__getitem__(key)
+            key = self._segmentation.__getitem__(key)
         return self._segments[key]
 
     def __delitem__(self, key: Union[Segment, int]):
+        # TODO: check
         if isinstance(key, int):
-            key = self._timeline.__getitem__(key)
+            key = self._segmentation.__getitem__(key)
 
         del self._segments[key]
-        self._timeline.remove(key)
+        self._segmentation.remove(key)
+
+    def __iter__(self) -> Iterable[TierValuePair]:
+        """Return segments with their annotation, in chronological order"""
+        for segment in self._segmentation.itersegments():
+            yield segment, self._segments[segment]
+
+    def __len__(self):
+        """Number of segments in the tier
+
+        >>> len(tier)  # tier contains three segments
+        3
+        """
+        return len(self._segments)
+
+    def empty(self) -> 'Tier':
+        """Return an empty copy
+
+        Returns
+        -------
+        empty : Tier
+            Empty timeline using the same 'uri' attribute.
+
+        """
+        return Tier(self.name, uri=self.uri)
+
+class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
+    _segmentation_type = Timeline
+    """A set of chronologically-ordered, optionally non-overlapping
+    and annotated segments"""
 
     def __contains__(self, included: Union[Segment, Timeline]):
         # TODO
@@ -187,7 +217,7 @@ class Tier:
             False otherwise
 
         """
-        return included in self._timeline
+        return included in self._segmentation
 
     def get_timeline(self, copy: bool = False) -> Timeline:
         return self._timeline
@@ -217,13 +247,7 @@ class Tier:
                                                            mode="intersection")):
             raise ValueError("Segments in a tier cannot overlap")
 
-    def __len__(self):
-        """Number of segments in the tier
 
-        >>> len(tier)  # tier contains three segments
-        3
-        """
-        return len(self._segments)
 
     def __nonzero__(self):
         return self.__bool__()
@@ -236,19 +260,7 @@ class Tier:
         ... else:
         ...    # timeline is not empty
         """
-        return len(self._segments) > 0
-
-    def __iter__(self) -> Iterable[Segment, str]:
-        """Iterate over segments (in chronological order)
-
-        >>> for segment, annotation in tier:
-        ...     # do something with the segment
-
-        See also
-        --------
-        :class:`pyannote.core.Segment` describes how segments are sorted.
-        """
-        return iter(self._segments.items())
+        return bool(self._segments)
 
     def __eq__(self, other: 'Tier'):
         """Equality
@@ -475,55 +487,8 @@ class Tier:
         return "<Timeline(uri=%s, segments=%s)>" % (self.uri,
                                                     list(self.segments_list_))
 
-    def __contains__(self, included: Union[Segment, 'Timeline']):
-        """Inclusion
 
-        Check whether every segment of `included` does exist in timeline.
 
-        Parameters
-        ----------
-        included : Segment or Timeline
-            Segment or timeline being checked for inclusion
-
-        Returns
-        -------
-        contains : bool
-            True if every segment in `included` exists in timeline,
-            False otherwise
-
-        Examples
-        --------
-        >>> timeline1 = Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])
-        >>> timeline2 = Timeline(segments=[Segment(0, 10)])
-        >>> timeline1 in timeline2
-        False
-        >>> timeline2 in timeline1
-        >>> Segment(1, 13.37) in timeline1
-        True
-
-        """
-
-        if isinstance(included, Segment):
-            return included in self.segments_set_
-
-        elif isinstance(included, Timeline):
-            return self.segments_set_.issuperset(included.segments_set_)
-
-        else:
-            raise TypeError(
-                'Checking for inclusion only supports Segment and '
-                'Timeline instances')
-
-    def empty(self) -> 'Tier':
-        """Return an empty copy
-
-        Returns
-        -------
-        empty : Tier
-            Empty timeline using the same 'uri' attribute.
-
-        """
-        return Tier(self.name, uri=self.uri)
 
     def covers(self, other: Union[Timeline, 'Tier']) -> bool:
         """Check whether other timeline  is fully covered by the timeline
