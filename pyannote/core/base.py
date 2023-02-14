@@ -1,10 +1,11 @@
 from abc import ABCMeta, abstractmethod
 from typing import Optional, Iterator, Tuple, Union, Dict, TYPE_CHECKING, Callable, List
 
+from sortedcontainers import SortedList
 from typing_extensions import Self
 
 from pyannote.core import Segment
-from pyannote.core.utils.types import Support, CropMode
+from pyannote.core.utils.types import Support, CropMode, ContiguousSupport
 
 if TYPE_CHECKING:
     from .timeline import Timeline
@@ -51,17 +52,27 @@ class BaseSegmentation(metaclass=ABCMeta):
     def itersegments(self):
         pass
 
-    @abstractmethod
     def get_timeline(self) -> 'Timeline':
-        pass
+        from .timeline import Timeline
+        return Timeline(self.itersegments())
 
     @abstractmethod
     def update(self, other: Self) -> Self:
         pass
 
-    @abstractmethod
-    def co_iter(self, other: 'BaseSegmentation') -> Iterator[Tuple[Segment, Segment]]:
-        pass
+    def co_iter(self, other: Union['BaseSegmentation', Segment]) -> Iterator[Tuple[Segment, Segment]]:
+        if isinstance(other, Segment):
+            other_segments = SortedList([other])
+        else:
+            other_segments = SortedList(other.itersegments())
+
+        for segment in self.itersegments():
+
+            # iterate over segments that starts before 'segment' ends
+            temp = Segment(start=segment.end, end=segment.end)
+            for other_segment in other_segments.irange(maximum=temp):
+                if segment.intersects(other_segment):
+                    yield segment, other_segment
 
     @abstractmethod
     def get_overlap(self) -> 'Timeline':
@@ -125,8 +136,7 @@ class GappedAnnotationMixin(metaclass=ABCMeta):
                 mode: CropMode = 'intersection') -> Self:
         pass
 
-    # TODO : maybe put inside the base seg class, add conditions for
-    #  partition
+
     @abstractmethod
     def crop(self,
              support: Support,
@@ -140,7 +150,19 @@ class GappedAnnotationMixin(metaclass=ABCMeta):
         pass
 
 
-class SegmentSet(metaclass=ABCMeta):
+class ContiguousAnnotationMixin(metaclass=ABCMeta):
+    # TODO : figure out if the return mapping still makes sense
+    #  (propably not)
+    @abstractmethod
+    def crop(self,
+             support: ContiguousSupport,
+             mode: CropMode = 'intersection',
+             returns_mapping: bool = False) \
+            -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
+        pass
+
+
+class SegmentSetMixin(metaclass=ABCMeta):
 
     @abstractmethod
     def add(self, segment: Segment):

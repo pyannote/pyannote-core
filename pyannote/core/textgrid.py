@@ -144,7 +144,7 @@ T = Type[Union[Partition, Timeline]]
 class BaseTier(BaseSegmentation, Generic[T]):
     _segmentation_type: T
 
-    def __init__(self,  name: str = None, uri: str = None):
+    def __init__(self, name: str = None, uri: str = None):
         super().__init__(uri)
         self.name = name
 
@@ -193,6 +193,7 @@ class BaseTier(BaseSegmentation, Generic[T]):
 
         """
         return Tier(self.name, uri=self.uri)
+
 
 class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
     _segmentation_type = Timeline
@@ -246,8 +247,6 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
                 any(True for _ in self._timeline.crop_iter(tier.get_timeline(),
                                                            mode="intersection")):
             raise ValueError("Segments in a tier cannot overlap")
-
-
 
     def __nonzero__(self):
         return self.__bool__()
@@ -486,9 +485,6 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
 
         return "<Timeline(uri=%s, segments=%s)>" % (self.uri,
                                                     list(self.segments_list_))
-
-
-
 
     def covers(self, other: Union[Timeline, 'Tier']) -> bool:
         """Check whether other timeline  is fully covered by the timeline
@@ -743,22 +739,7 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
         return annotation
 
 
-class TieredAnnotation:
-    """Tiered Annotation.
-
-    Parameters
-    ----------
-    uri : string, optional
-        name of annotated resource (e.g. audio or video file)
-    modality : string, optional
-        name of annotated modality
-
-    Returns
-    -------
-    annotation : Annotation
-        New annotation
-
-    """
+class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
 
     def __init__(self, uri: Optional[str] = None):
 
@@ -838,7 +819,8 @@ class TieredAnnotation:
         --------
         :class:`pyannote.core.Segment` describes how segments are sorted.
         """
-        return iter(self._timeline)
+        for tier in self.tiers:
+            yield from tier
 
     def __iter__(self) -> Iterable[Tuple[Segment, str]]:
         return iter(self._tiers.items())

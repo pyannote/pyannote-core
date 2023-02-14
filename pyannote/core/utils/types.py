@@ -4,6 +4,7 @@ from typing_extensions import Literal
 
 Label = Hashable
 Support = Union['Segment', 'SegmentSet']
+ContiguousSupport = Union['Segment', 'ContiguousAnnotationMixin']
 LabelGeneratorMode = Literal['int', 'string']
 LabelGenerator = Union[LabelGeneratorMode, Iterator[Label]]
 TrackName = Union[str, int]

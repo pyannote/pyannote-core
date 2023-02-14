@@ -96,7 +96,7 @@ from typing_extensions import Self
 from sortedcontainers import SortedList
 
 from . import PYANNOTE_URI, PYANNOTE_SEGMENT, Timeline
-from .base import BaseSegmentation, SegmentSet
+from .base import BaseSegmentation, SegmentSetMixin
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .segment import Segment
 from .utils.types import Support, Label, CropMode
@@ -114,7 +114,7 @@ if TYPE_CHECKING:
 #  - partition empty if only one segment?
 #  - truthiness?
 
-class Partition(SegmentSet, BaseSegmentation):
+class Partition(SegmentSetMixin, BaseSegmentation):
     """
     Ordered set of segments that are all contiguous.
 
@@ -165,10 +165,10 @@ class Partition(SegmentSet, BaseSegmentation):
         pass
 
     def __nonzero__(self):
-        pass
+        return True
 
     def __bool__(self):
-        pass
+        return True
 
     def __eq__(self, other: Self):
         pass
@@ -216,7 +216,7 @@ class Partition(SegmentSet, BaseSegmentation):
         pass
 
     def extent(self) -> Segment:
-        pass
+        return Segment(self.start, self.end)
 
     def support_iter(self, collar: float = 0.0) -> Iterator[Segment]:
         pass
