@@ -112,6 +112,7 @@ from numbers import Number
 from pathlib import Path
 from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text, Callable, Type, Generic, \
     TypeVar
+from typing_extensions import Self
 
 import numpy as np
 from sortedcontainers import SortedDict
@@ -119,7 +120,7 @@ from sortedcontainers import SortedDict
 from pyannote.core import Annotation
 from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
     PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
-from .base import BaseSegmentation, GappedAnnotationMixin
+from .base import BaseSegmentation, GappedAnnotationMixin, ContiguousAnnotationMixin
 from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .partition import Partition
 from .segment import Segment
@@ -143,6 +144,11 @@ T = Type[Union[Partition, Timeline]]
 
 class BaseTier(BaseSegmentation, Generic[T]):
     _segmentation_type: T
+    # TODO: handle segment sets changes for
+    #  - add (partition)
+    #  - bisect (partition)
+    #  - crop (partition/timeline)
+    #  - for extrusion, should be based on cropping
 
     def __init__(self, name: str = None, uri: str = None):
         super().__init__(uri)
@@ -183,85 +189,17 @@ class BaseTier(BaseSegmentation, Generic[T]):
         """
         return len(self._segments)
 
-    def empty(self) -> 'Tier':
-        """Return an empty copy
-
-        Returns
-        -------
-        empty : Tier
-            Empty timeline using the same 'uri' attribute.
-
-        """
-        return Tier(self.name, uri=self.uri)
-
-
-class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
-    _segmentation_type = Timeline
-    """A set of chronologically-ordered, optionally non-overlapping
-    and annotated segments"""
-
-    def __contains__(self, included: Union[Segment, Timeline]):
-        # TODO
-        """Inclusion
-
-        Check whether every segment of `included` does exist in annotation.
-
-        Parameters
-        ----------
-        included : Segment or Timeline
-            Segment or timeline being checked for inclusion
-
-        Returns
-        -------
-        contains : bool
-            True if every segment in `included` exists in timeline,
-            False otherwise
-
-        """
-        return included in self._segmentation
-
-    def get_timeline(self, copy: bool = False) -> Timeline:
-        return self._timeline
-
-    def update(self, tier: 'Tier') -> 'Tier':
-        # TODO : Doc
-        """Add every segment of an existing tier (in place)
-
-        Parameters
-        ----------
-        tier : Tier
-            Tier whose segments and their annotations are being added
-
-        Returns
-        -------
-        self : Tier
-            Updated tier
-
-        Note
-        ----
-        Only segments that do not already exist will be added, as a timeline is
-        meant to be a **set** of segments (not a list).
-
-        """
-        if not self.allow_overlap and \
-                any(True for _ in self._timeline.crop_iter(tier.get_timeline(),
-                                                           mode="intersection")):
-            raise ValueError("Segments in a tier cannot overlap")
-
-    def __nonzero__(self):
-        return self.__bool__()
-
     def __bool__(self):
         """Emptiness
 
         >>> if tier:
-        ...    # timeline is empty
+        ...    # tier is empty
         ... else:
-        ...    # timeline is not empty
+        ...    # tier is not empty
         """
         return bool(self._segments)
 
-    def __eq__(self, other: 'Tier'):
+    def __eq__(self, other: 'BaseTier'):
         """Equality
 
         Two PraatTiers are equal if and only if their segments and their annotations are equal.
@@ -277,12 +215,67 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
         """
         return self._segments == other._segments
 
-    def __ne__(self, other: 'Tier'):
+    def __ne__(self, other: 'BaseTier'):
         """Inequality"""
         return self._segments != other._segments
 
-    def __or__(self, timeline: 'Timeline') -> 'Timeline':
-        return self.union(timeline)
+    def itersegments(self):
+        return self._segmentation.itersegments()
+
+    def empty(self) -> 'BaseTier':
+        """Return an empty copy
+
+        Returns
+        -------
+        empty : Tier
+            Empty timeline using the same 'uri' attribute.
+
+        """
+        return self.__class__(self.name, uri=self.uri)
+
+    def update(self, tier: 'BaseTier') -> 'BaseTier':
+        pass  # TODO
+
+    def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) -> Self:
+        pass  # TODO
+
+    def extent(self) -> Segment:
+        return self._segmentation.extent()
+
+    def crop_iter(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Iterator[
+        Union[Tuple[Segment, Segment], Segment]]:
+        pass
+
+    def duration(self) -> float:
+        return self._segmentation.duration()
+
+    def _repr_png_(self):
+        pass
+
+
+class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
+    _segmentation_type = Timeline
+    """A set of chronologically-ordered, optionally non-overlapping
+    and annotated segments"""
+
+    def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
+        return self._segmentation.gaps_iter(support)
+
+    def gaps(self, support: Optional[Support] = None) -> 'Timeline':
+        return self._segmentation.gaps(support)
+
+    def extrude(self, removed: Support, mode: CropMode = 'intersection') -> Self:
+        return self._segmentation.extrude(removed, mode)
+
+    def crop(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Union[
+        Self, Tuple[Self, Dict[Segment, Segment]]]:
+        return self._segmentation.crop(support, mode, returns_mapping)
+
+    def support(self, collar: float = 0.) -> Timeline:
+        return self._segmentation.support(collar)
+
+    def get_overlap(self) -> 'Timeline':
+        return self._segmentation.get_overlap()
 
     def co_iter(self, other: Union[Timeline, Segment]) -> Iterator[Tuple[Segment, Segment]]:
         # TODO : Doc
@@ -309,439 +302,15 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
 
         yield from self._timeline.co_iter(other)
 
-    def crop_iter(self,
-                  support: Support,
-                  mode: CropMode = 'intersection',
-                  returns_mapping: bool = False) \
-            -> Iterator[Union[Tuple[Segment, Segment], Segment]]:
-        """Like `crop` but returns a segment iterator instead
 
-        See also
-        --------
-        :func:`pyannote.core.Timeline.crop`
-        """
-
-        if mode not in {'loose', 'strict', 'intersection'}:
-            raise ValueError("Mode must be one of 'loose', 'strict', or "
-                             "'intersection'.")
-
-        if not isinstance(support, (Segment, Timeline)):
-            raise TypeError("Support must be a Segment or a Timeline.")
-
-        if isinstance(support, Segment):
-            # corner case where "support" is empty
-            if support:
-                segments = [support]
-            else:
-                segments = []
-
-            support = Timeline(segments=segments, uri=self.uri)
-            for yielded in self.crop_iter(support, mode=mode,
-                                          returns_mapping=returns_mapping):
-                yield yielded
-            return
-
-        # if 'support' is a `Timeline`, we use its support
-        support = support.support()
-
-        # loose mode
-        if mode == 'loose':
-            for segment, _ in self.co_iter(support):
-                yield segment
-            return
-
-        # strict mode
-        if mode == 'strict':
-            for segment, other_segment in self.co_iter(support):
-                if segment in other_segment:
-                    yield segment
-            return
-
-        # intersection mode
-        for segment, other_segment in self.co_iter(support):
-            mapped_to = segment & other_segment
-            if not mapped_to:
-                continue
-            if returns_mapping:
-                yield segment, mapped_to
-            else:
-                yield mapped_to
-
-    def crop(self,
-             support: Support,
-             mode: CropMode = 'intersection',
-             returns_mapping: bool = False) \
-            -> 'Tier':
-        """Crop timeline to new support
-
-        Parameters
-        ----------
-        support : Segment or Timeline
-            If `support` is a `Timeline`, its support is used.
-        mode : {'strict', 'loose', 'intersection'}, optional
-            Controls how segments that are not fully included in `support` are
-            handled. 'strict' mode only keeps fully included segments. 'loose'
-            mode keeps any intersecting segment. 'intersection' mode keeps any
-            intersecting segment but replace them by their actual intersection.
-        returns_mapping : bool, optional
-            In 'intersection' mode, return a dictionary whose keys are segments
-            of the cropped timeline, and values are list of the original
-            segments that were cropped. Defaults to False.
-
-        Returns
-        -------
-        cropped : Timeline
-            Cropped timeline
-        mapping : dict
-            When 'returns_mapping' is True, dictionary whose keys are segments
-            of 'cropped', and values are lists of corresponding original
-            segments.
-
-        Examples
-        --------
-
-        >>> timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
-        >>> timeline.crop(Segment(1, 3))
-        <Timeline(uri=None, segments=[<Segment(1, 2)>])>
-
-        >>> timeline.crop(Segment(1, 3), mode='loose')
-        <Timeline(uri=None, segments=[<Segment(0, 2)>, <Segment(1, 2)>])>
-
-        >>> timeline.crop(Segment(1, 3), mode='strict')
-        <Timeline(uri=None, segments=[<Segment(1, 2)>])>
-
-        >>> cropped, mapping = timeline.crop(Segment(1, 3), returns_mapping=True)
-        >>> print(mapping)
-        {<Segment(1, 2)>: [<Segment(0, 2)>, <Segment(1, 2)>]}
-
-        """
-
-        # TODO
-
-        if mode == 'intersection' and returns_mapping:
-            segments, mapping = [], {}
-            for segment, mapped_to in self.crop_iter(support,
-                                                     mode='intersection',
-                                                     returns_mapping=True):
-                segments.append(mapped_to)
-                mapping[mapped_to] = mapping.get(mapped_to, list()) + [segment]
-            return Timeline(segments=segments, uri=self.uri), mapping
-
-        return Timeline(segments=self.crop_iter(support, mode=mode),
-                        uri=self.uri)
-
-    def overlapping(self, t: float) -> List[Segment]:
-        """Get list of segments overlapping `t`
-
-        Parameters
-        ----------
-        t : float
-            Timestamp, in seconds.
-
-        Returns
-        -------
-        segments : list
-            List of all segments of timeline containing time t
-        """
-        return self._timeline.overlapping(t)
-
-    def overlapping_iter(self, t: float) -> Iterator[Segment]:
-        """Like `overlapping` but returns a segment iterator instead
-
-        See also
-        --------
-        :func:`pyannote.core.Timeline.overlapping`
-        """
-        segment = Segment(start=t, end=t)
-        for segment in self.segments_list_.irange(maximum=segment):
-            if segment.overlaps(t):
-                yield segment
-
-    def __str__(self):
-        """Human-readable representation
-
-        >>> timeline = Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])
-        >>> print(timeline)
-        [[ 00:00:00.000 -->  00:00:10.000]
-         [ 00:00:01.000 -->  00:00:13.370]]
-
-        """
-
-        n = len(self.segments_list_)
-        string = "["
-        for i, segment in enumerate(self.segments_list_):
-            string += str(segment)
-            string += "\n " if i + 1 < n else ""
-        string += "]"
-        return string
-
-    def __repr__(self):
-        """Computer-readable representation
-
-        >>> Timeline(segments=[Segment(0, 10), Segment(1, 13.37)])
-        <Timeline(uri=None, segments=[<Segment(0, 10)>, <Segment(1, 13.37)>])>
-
-        """
-
-        return "<Timeline(uri=%s, segments=%s)>" % (self.uri,
-                                                    list(self.segments_list_))
-
-    def covers(self, other: Union[Timeline, 'Tier']) -> bool:
-        """Check whether other timeline  is fully covered by the timeline
-
-        Parameter
-        ---------
-        other : Timeline
-            Second timeline
-
-        Returns
-        -------
-        covers : bool
-            True if timeline covers "other" timeline entirely. False if at least
-            one segment of "other" is not fully covered by timeline
-        """
-        # TODO
-
-        # compute gaps within "other" extent
-        # this is where we should look for possible faulty segments
-        gaps = self.gaps(support=other.extent())
-
-        # if at least one gap intersects with a segment from "other",
-        # "self" does not cover "other" entirely --> return False
-        for _ in gaps.co_iter(other):
-            return False
-
-        # if no gap intersects with a segment from "other",
-        # "self" covers "other" entirely --> return True
-        return True
-
-    def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
-            -> 'Timeline':
-        # TODO
-        """Get a copy of the timeline
-
-        If `segment_func` is provided, it is applied to each segment first.
-
-        Parameters
-        ----------
-        segment_func : callable, optional
-            Callable that takes a segment as input, and returns a segment.
-            Defaults to identity function (segment_func(segment) = segment)
-
-        Returns
-        -------
-        timeline : Timeline
-            Copy of the timeline
-
-        """
-
-        # if segment_func is not provided
-        # just add every segment
-        if segment_func is None:
-            return Timeline(segments=self.segments_list_, uri=self.uri)
-
-        # if is provided
-        # apply it to each segment before adding them
-        return Timeline(segments=[segment_func(s) for s in self.segments_list_],
-                        uri=self.uri)
-
-    def extent(self) -> Segment:
-        """Extent
-
-        The extent of a timeline is the segment of minimum duration that
-        contains every segments of the timeline. It is unique, by definition.
-        The extent of an empty timeline is an empty segment.
-
-        A picture is worth a thousand words::
-
-            timeline
-            |------|    |------|     |----|
-              |--|    |-----|     |----------|
-
-            timeline.extent()
-            |--------------------------------|
-
-        Returns
-        -------
-        extent : Segment
-            Timeline extent
-
-        Examples
-        --------
-        >>> timeline = Timeline(segments=[Segment(0, 1), Segment(9, 10)])
-        >>> timeline.extent()
-        <Segment(0, 10)>
-
-        """
-        return self._timeline.extent()
-
-    def support_iter(self, collar: float = 0.) -> Iterator[Segment]:
-        """Like `support` but returns a segment generator instead
-
-        See also
-        --------
-        :func:`pyannote.core.Timeline.support`
-        """
-
-        yield from self._timeline.support_iter(collar)
-
-    def support(self, collar: float = 0.) -> 'Timeline':
-        # TODO: doc
-        """Timeline support
-
-        The support of a timeline is the timeline with the minimum number of
-        segments with exactly the same time span as the original timeline. It
-        is (by definition) unique and does not contain any overlapping
-        segments.
-
-        A picture is worth a thousand words::
-
-            collar
-            |---|
-
-            timeline
-            |------|    |------|      |----|
-              |--|    |-----|      |----------|
-
-            timeline.support()
-            |------|  |--------|   |----------|
-
-            timeline.support(collar)
-            |------------------|   |----------|
-
-        Parameters
-        ----------
-        collar : float, optional
-            Merge separated by less than `collar` seconds. This is why there
-            are only two segments in the final timeline in the above figure.
-            Defaults to 0.
-
-        Returns
-        -------
-        support : Timeline
-            Timeline support
-        """
-        return self._timeline.support(collar)
-
-    def duration(self) -> float:
-        """Timeline duration
-
-        The timeline duration is the sum of the durations of the segments
-        in the timeline support.
-
-        Returns
-        -------
-        duration : float
-            Duration of timeline support, in seconds.
-        """
-
-        # The timeline duration is the sum of the durations
-        # of the segments in the timeline support.
-        return self._timeline.duration()
-
-    def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
-        """Like `gaps` but returns a segment generator instead
-
-        See also
-        --------
-        :func:`pyannote.core.Timeline.gaps`
-
-        """
-
-        yield from self._timeline.gaps_iter(support)
-
-    def gaps(self, support: Optional[Support] = None) -> 'Timeline':
-        """Gaps
-
-        A picture is worth a thousand words::
-
-            tier
-            |------|    |------|     |----|
-
-            timeline.gaps()
-                   |--|        |----|
-
-        Parameters
-        ----------
-        support : None, Segment or Timeline
-            Support in which gaps are looked for. Defaults to timeline extent
-
-        Returns
-        -------
-        gaps : Timeline
-            Timeline made of all gaps from original timeline, and delimited
-            by provided support
-
-        See also
-        --------
-        :func:`pyannote.core.Timeline.extent`
-
-        """
-        return Timeline(segments=self.gaps_iter(support=support),
-                        uri=self.uri)
-
-    def argmax(self, support: Optional[Support] = None) -> Optional[Label]:
-        """Get label with longest duration
-
-        Parameters
-        ----------
-        support : Segment or Timeline, optional
-            Find label with longest duration within provided support.
-            Defaults to whole extent.
-
-        Returns
-        -------
-        label : any existing label or None
-            Label with longest intersection
-
-        Examples
-        --------
-        >>> annotation = Annotation(modality='speaker')
-        >>> annotation[Segment(0, 10), 'speaker1'] = 'Alice'
-        >>> annotation[Segment(8, 20), 'speaker1'] = 'Bob'
-        >>> print "%s is such a talker!" % annotation.argmax()
-        Bob is such a talker!
-        >>> segment = Segment(22, 23)
-        >>> if not annotation.argmax(support):
-        ...    print "No label intersecting %s" % segment
-        No label intersection [22 --> 23]
-
-        """
-
-        cropped = self
-        if support is not None:
-            cropped = cropped.crop(support, mode='intersection')
-
-        if not cropped:
-            return None
-
-        return max(((_, cropped.label_duration(_)) for _ in cropped.labels()),
-                   key=lambda x: x[1])[0]
-
-    def to_annotation(self, modality: Optional[str] = None) -> 'Annotation':
-        """Turn tier into an annotation
-
-        Each segment is labeled by a unique label.
-
-        Parameters
-        ----------
-        modality : str, optional
-
-        Returns
-        -------
-        annotation : Annotation
-            Annotation
-        """
-
-        from .annotation import Annotation
-        annotation = Annotation(uri=self.uri, modality=modality)
-        # TODO
-        return annotation
+class PartitionTier(ContiguousAnnotationMixin, BaseTier[Partition]):
+    _segmentation_type = Partition
 
 
 class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
 
     def __init__(self, uri: Optional[str] = None):
+        super().__init__(uri)
 
         self._uri: Optional[str] = uri
 

@@ -157,10 +157,6 @@ class Timeline(GappedAnnotationMixin, BaseSegmentation):
         # sorted list of segments (used for sorted iteration)
         self.segments_list_ = SortedList(segments_set)
 
-        # sorted list of (possibly redundant) segment boundaries
-        boundaries = (boundary for segment in segments_set for boundary in segment)
-        self.segments_boundaries_ = SortedList(boundaries)
-
 
     def __len__(self):
         """Number of segments
@@ -270,11 +266,6 @@ class Timeline(GappedAnnotationMixin, BaseSegmentation):
         segments_set_.add(segment)
 
         self.segments_list_.add(segment)
-
-        segments_boundaries_ = self.segments_boundaries_
-        segments_boundaries_.add(segment.start)
-        segments_boundaries_.add(segment.end)
-
         return self
 
     def remove(self, segment: Segment) -> 'Timeline':
@@ -302,10 +293,6 @@ class Timeline(GappedAnnotationMixin, BaseSegmentation):
         segments_set_.remove(segment)
 
         self.segments_list_.remove(segment)
-
-        segments_boundaries_ = self.segments_boundaries_
-        segments_boundaries_.remove(segment.start)
-        segments_boundaries_.remove(segment.end)
 
         return self
 
@@ -347,10 +334,6 @@ class Timeline(GappedAnnotationMixin, BaseSegmentation):
 
         # sorted list of segments (used for sorted iteration)
         self.segments_list_ = SortedList(segments_set)
-
-        # sorted list of (possibly redundant) segment boundaries
-        boundaries = (boundary for segment in segments_set for boundary in segment)
-        self.segments_boundaries_ = SortedList(boundaries)
 
         return self
 
@@ -798,9 +781,8 @@ class Timeline(GappedAnnotationMixin, BaseSegmentation):
 
         """
         if self.segments_set_:
-            segments_boundaries_ = self.segments_boundaries_
-            start = segments_boundaries_[0]
-            end = segments_boundaries_[-1]
+            start = self.segments_list_[0].start
+            end = self.segments_list_[-1].end
             return Segment(start=start, end=end)
 
         return Segment(start=0.0, end=0.0)

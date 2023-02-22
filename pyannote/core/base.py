@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Optional, Iterator, Tuple, Union, Dict, TYPE_CHECKING, Callable, List
+from typing import Optional, Iterator, Tuple, Union, Dict, TYPE_CHECKING, Callable, List, Set
 
 from sortedcontainers import SortedList
 from typing_extensions import Self
@@ -30,9 +30,8 @@ class BaseSegmentation(metaclass=ABCMeta):
     def __len__(self) -> int:
         pass
 
-    @abstractmethod
     def __nonzero__(self):
-        pass
+        return self.__bool__()
 
     @abstractmethod
     def __bool__(self):
@@ -51,6 +50,10 @@ class BaseSegmentation(metaclass=ABCMeta):
     @abstractmethod
     def itersegments(self):
         pass
+
+    def segments_set(self) -> Set[Segment]:
+        # default implementation, may be overriden for better performance
+        return set(self.itersegments())
 
     def get_timeline(self) -> 'Timeline':
         from .timeline import Timeline
@@ -75,10 +78,6 @@ class BaseSegmentation(metaclass=ABCMeta):
                     yield segment, other_segment
 
     @abstractmethod
-    def get_overlap(self) -> 'Timeline':
-        pass
-
-    @abstractmethod
     def __str__(self):
         pass
 
@@ -86,17 +85,22 @@ class BaseSegmentation(metaclass=ABCMeta):
     def __repr__(self):
         pass
 
-    @abstractmethod
-    def __contains__(self, included: Union[Segment, 'Timeline']) -> bool:
-        pass
+    def __contains__(self, included: Union[Segment, 'BaseSegmentation']) -> bool:
+        # Base implementation, may be overloaded for better performance
+        seg_set = self.segments_set()
+        if isinstance(included, Segment):
+            return included in seg_set
+        elif isinstance(included, BaseSegmentation):
+            return seg_set.issuperset(included.segments_set())
+        else:
+            raise ValueError("")
 
     @abstractmethod
     def empty(self) -> Self:
         pass
 
     @abstractmethod
-    def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) \
-            -> Self:
+    def copy(self) -> Self:
         pass
 
     @abstractmethod
@@ -136,7 +140,6 @@ class GappedAnnotationMixin(metaclass=ABCMeta):
                 mode: CropMode = 'intersection') -> Self:
         pass
 
-
     @abstractmethod
     def crop(self,
              support: Support,
@@ -147,6 +150,10 @@ class GappedAnnotationMixin(metaclass=ABCMeta):
 
     @abstractmethod
     def support(self, collar: float = 0.) -> Self:
+        pass
+
+    @abstractmethod
+    def get_overlap(self) -> 'Timeline':
         pass
 
 
@@ -161,8 +168,15 @@ class ContiguousAnnotationMixin(metaclass=ABCMeta):
             -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
         pass
 
+    @abstractmethod
+    def bisect(self, at: float):
+        pass
 
-class SegmentSetMixin(metaclass=ABCMeta):
+
+class PureSegmentationMixin(metaclass=ABCMeta):
+    """A segmentation containing _only_ segments"""
+
+    # TODO: add __and__ (defaults to crop intersection, not in place), that only takes objects of Self type?
 
     @abstractmethod
     def add(self, segment: Segment):

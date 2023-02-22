@@ -88,21 +88,19 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
-import warnings
-from typing import (Optional, Iterable, List, Union, Callable,
-                    TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
+from typing import (Optional, Iterable, Union, Callable,
+                    Tuple, TYPE_CHECKING, Iterator, Dict, List)
+
+from sortedcontainers import SortedDict, SortedList, SortedSet
 from typing_extensions import Self
 
-from sortedcontainers import SortedList
-
-from . import PYANNOTE_URI, PYANNOTE_SEGMENT, Timeline
-from .base import BaseSegmentation, SegmentSetMixin
-from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
+from . import Timeline
+from .base import BaseSegmentation, PureSegmentationMixin
 from .segment import Segment
-from .utils.types import Support, Label, CropMode
+from .utils.types import Support, CropMode
 
 if TYPE_CHECKING:
-    from .annotation import Annotation
+    pass
 
 
 # =====================================================================
@@ -114,7 +112,13 @@ if TYPE_CHECKING:
 #  - partition empty if only one segment?
 #  - truthiness?
 
-class Partition(SegmentSetMixin, BaseSegmentation):
+
+def pairwise(iterable):
+    "s -> (s0, s1), (s2, s3), (s4, s5), ..."
+    a = iter(iterable)
+    return zip(a, a)
+
+class Partition(PureSegmentationMixin, BaseSegmentation):
     """
     Ordered set of segments that are all contiguous.
 
@@ -138,31 +142,36 @@ class Partition(SegmentSetMixin, BaseSegmentation):
         New timeline
     """
 
+
+
     def __init__(self,
                  segments: Optional[Iterable[Segment]] = None,
                  start: float = 0.0,
                  end: float = None,
                  uri: str = None):
-        segments = list(segments)
+        segments = list(segments) if segments else []
         if segments is None and end is None:
             raise ValueError("Cannot initialize an empty timeline without and end boundary")
         elif end is None:
             end = max(seg.end for seg in segments)
         elif not segments:
             segments = Segment(start, end)
-
-        self.start = start
-        self.end = end
-        self._boundaries = None # TODO: figure out if needed
         super().__init__(uri)
-
-        # TODO: check "filling"? autofill if not valid?
-        self.update(self.gaps(support=self.extent()))
-        if self[0].start < self.start or self[-1].end > self.end:
+        self.boundaries = Segment(start, end)
+        timeline = Timeline(segments)
+        if timeline.extent() not in self.boundaries:
             raise ValueError(f"Segments have to be within ({start, end}) bounds")
 
+        # automatically filling in the gaps in the segments
+        # TODO: ask about behavior?
+        timeline.add(self.boundaries)
+        self._segments_bounds_set = SortedSet()
+        for (start, end) in timeline:
+            self._segments_bounds_set.update(start, end)
+
+
     def __len__(self) -> int:
-        pass
+        return len(self._segments_bounds_set) - 1
 
     def __nonzero__(self):
         return True
@@ -170,35 +179,43 @@ class Partition(SegmentSetMixin, BaseSegmentation):
     def __bool__(self):
         return True
 
-    def __eq__(self, other: Self):
-        pass
+    def __eq__(self, other: 'Partition'):
+        return isinstance(other, Partition) and self._segments_set == other._segments_set
 
-    def __ne__(self, other: Self):
-        pass
+    def __ne__(self, other: 'Partition'):
+        return not other == self
+
+    def index(self, segment: Segment) -> int:
+        return self._segments_bounds_set.index(segment.start)
 
     def bisect(self, at: float):
-        pass
+        if not self.boundaries.overlaps(at):
+            raise ValueError("Cannot bisect outside of partition boundaries")
+
+        self._segments_bounds_set.add(at)
 
     def add(self, segment: Segment):
-        pass
+        # TODO: ask about this behavior
+        if len(list(self.co_iter(segment))) > 1:
+            raise ValueError("Segment overlaps a boundary")
+        self.bisect(segment.start)
+        self.bisect(segment.end)
 
     def remove(self, segment: Segment):
-        pass
+        if not (set(segment) & self._segments_bounds_set):
+            raise KeyError(f"Segment {segment} not in partition")
+        self._segments_bounds_set.difference_update(segment)
 
     def itersegments(self):
-        pass
+        for (start, end) in pairwise(self._segments_bounds_set):
+            yield Segment(start, end)
 
     def get_timeline(self) -> 'Timeline':
-        pass
+        return Timeline(self.itersegments(), uri=self.uri)
 
-    def update(self, other: Self) -> Self:
-        pass
-
-    def co_iter(self, other: 'BaseSegmentation') -> Iterator[Tuple[Segment, Segment]]:
-        pass
-
-    def get_overlap(self) -> 'Timeline':
-        pass
+    def update(self, other: 'Partition') -> 'Partition':
+        assert other.boundaries in self.boundaries
+        self._segments_bounds_set |= other._segments_bounds_set
 
     def __str__(self):
         pass
@@ -206,23 +223,27 @@ class Partition(SegmentSetMixin, BaseSegmentation):
     def __repr__(self):
         pass
 
-    def __contains__(self, included: Union[Segment, 'Timeline']) -> bool:
-        pass
-
     def empty(self) -> Self:
-        pass
+        return Partition(None,
+                         start=self.boundaries.start,
+                         end=self.boundaries.end,
+                         uri=self.uri)
 
-    def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) -> Self:
-        pass
+    def copy(self) -> Self:
+        return Partition(self.itersegments(),
+                         start=self.boundaries.start,
+                         end=self.boundaries.end,
+                         uri=self.uri)
 
     def extent(self) -> Segment:
-        return Segment(self.start, self.end)
+        return self.boundaries
 
-    def support_iter(self, collar: float = 0.0) -> Iterator[Segment]:
-        pass
-
-    def support(self, collar: float = 0.) -> 'Timeline':
-        pass
+    def overlapping(self, t: float) -> List[Segment]:
+        assert self.boundaries.overlaps(t)
+        end = next(self._segments_bounds_set.irange(mininum=t))
+        end_idx = self._segments_bounds_set.index(end)
+        start = self._segments_bounds_set[end_idx - 1]
+        return [Segment(start, end)]
 
     def crop_iter(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Iterator[
         Union[Tuple[Segment, Segment], Segment]]:
@@ -233,7 +254,7 @@ class Partition(SegmentSetMixin, BaseSegmentation):
         pass
 
     def duration(self) -> float:
-        pass
+        return self.extent().duration
 
     def _repr_png_(self):
         pass
