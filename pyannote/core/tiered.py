@@ -107,26 +107,19 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
 import itertools
-from collections import defaultdict
-from numbers import Number
 from pathlib import Path
-from typing import Optional, Dict, Union, Iterable, List, Set, TextIO, Tuple, Iterator, Text, Callable, Type, Generic, \
-    TypeVar
+from typing import Optional, Dict, Union, Iterable, List, TextIO, Tuple, Iterator, Callable, Type, Generic
+
+from sortedcontainers import SortedDict
 from typing_extensions import Self
 
-import numpy as np
-from sortedcontainers import SortedDict
-
 from pyannote.core import Annotation
-from . import PYANNOTE_URI, PYANNOTE_MODALITY, \
-    PYANNOTE_SEGMENT, PYANNOTE_TRACK, PYANNOTE_LABEL
 from .base import BaseSegmentation, GappedAnnotationMixin, ContiguousAnnotationMixin
-from .json import PYANNOTE_JSON, PYANNOTE_JSON_CONTENT
 from .partition import Partition
 from .segment import Segment
 from .timeline import Timeline
-from .utils.generators import string_generator, int_generator
-from .utils.types import Label, Key, Support, LabelGenerator, TierName, CropMode
+from .utils.generators import string_generator
+from .utils.types import Label, Key, Support, TierName, CropMode, ContiguousSupport, TierItemPair
 
 # TODO: add JSON dumping/loading
 # TODO: QUESTIONS:
@@ -136,14 +129,12 @@ from .utils.types import Label, Key, Support, LabelGenerator, TierName, CropMode
 
 # TODO: IDEA: use a timeline in the Tier to do all the cropping/etc/ operations
 #  and just make this class a thin wrapper for it
-TierLabel = Union[Text, Number]
-TierValuePair = Tuple[Segment, TierLabel]
-
 T = Type[Union[Partition, Timeline]]
 
 
 class BaseTier(BaseSegmentation, Generic[T]):
     _segmentation_type: T
+
     # TODO: handle segment sets changes for
     #  - add (partition)
     #  - bisect (partition)
@@ -176,7 +167,7 @@ class BaseTier(BaseSegmentation, Generic[T]):
         del self._segments[key]
         self._segmentation.remove(key)
 
-    def __iter__(self) -> Iterable[TierValuePair]:
+    def __iter__(self) -> Iterable[TierItemPair]:
         """Return segments with their annotation, in chronological order"""
         for segment in self._segmentation.itersegments():
             yield segment, self._segments[segment]
@@ -269,6 +260,9 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
 
     def crop(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Union[
         Self, Tuple[Self, Dict[Segment, Segment]]]:
+        # TODO (for segments mapping):
+        #  - if loose/strict, use segment_set of cropped segmentation to find deleted segments
+        #  - if intersection, use return_mapping to replace sliced segments
         return self._segmentation.crop(support, mode, returns_mapping)
 
     def support(self, collar: float = 0.) -> Timeline:
@@ -300,11 +294,21 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
             Yields pairs of intersecting segments in chronological order.
         """
 
-        yield from self._timeline.co_iter(other)
+        yield from self._segmentation.co_iter(other)
 
 
 class PartitionTier(ContiguousAnnotationMixin, BaseTier[Partition]):
     _segmentation_type = Partition
+    # TODO:
+    # - __iter__ should also yield empty segments, with a None annotation
+
+    def crop(self,
+             support: ContiguousSupport,
+             mode: CropMode = 'intersection',
+             returns_mapping: bool = False) -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
+        # TODO:
+        #  - think about using crop_iter first
+        pass
 
 
 class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):

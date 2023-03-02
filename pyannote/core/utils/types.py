@@ -10,7 +10,7 @@ LabelGenerator = Union[LabelGeneratorMode, Iterator[Label]]
 TrackName = Union[str, int]
 Key = Union['Segment', Tuple['Segment', TrackName]]
 TierName = str
-TierKey = Tuple[TierName, 'Segment']
+TierItemPair = Tuple[TierName, 'Segment']
 Resource = Union['Segment', 'Timeline', 'SlidingWindowFeature',
                  'Annotation']
 CropMode = Literal['intersection', 'loose', 'strict']
