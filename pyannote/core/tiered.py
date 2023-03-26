@@ -111,7 +111,7 @@ from pathlib import Path
 from typing import Optional, Dict, Union, Iterable, List, TextIO, Tuple, Iterator, Callable, Type, Generic
 
 from sortedcontainers import SortedDict
-from typing_extensions import Self
+from typing_extensions import Self, Any
 
 from pyannote.core import Annotation
 from .base import BaseSegmentation, GappedAnnotationMixin, ContiguousAnnotationMixin
@@ -148,12 +148,12 @@ class BaseTier(BaseSegmentation, Generic[T]):
         self._segmentation = self._segmentation_type()
         self._segments: Dict[Segment, TierLabel] = dict()
 
-    def __setitem__(self, segment: Segment, label: str):
+    def __setitem__(self, segment: Segment, label: Any):
         # TODO: check
         self._segmentation.add(segment)
         self._segments[segment] = label
 
-    def __getitem__(self, key: Union[Segment, int]) -> str:
+    def __getitem__(self, key: Union[Segment, int]) -> Any:
         # TODO: check
         if isinstance(key, int):
             key = self._segmentation.__getitem__(key)
@@ -258,6 +258,10 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
     def extrude(self, removed: Support, mode: CropMode = 'intersection') -> Self:
         return self._segmentation.extrude(removed, mode)
 
+    def crop_iter(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Iterator[
+        Union[Tuple[Segment, Segment], Segment]]:
+        pass
+
     def crop(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Union[
         Self, Tuple[Self, Dict[Segment, Segment]]]:
         # TODO (for segments mapping):
@@ -272,7 +276,6 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
         return self._segmentation.get_overlap()
 
     def co_iter(self, other: Union[Timeline, Segment]) -> Iterator[Tuple[Segment, Segment]]:
-        # TODO : Doc
         """Iterate over pairs of intersecting segments
 
         >>> timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
@@ -310,6 +313,9 @@ class PartitionTier(ContiguousAnnotationMixin, BaseTier[Partition]):
         #  - think about using crop_iter first
         pass
 
+    # |------A-|-----C------|--B---|
+    #          |-----C------|
+
 
 class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
 
@@ -329,7 +335,7 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
     @classmethod
     def from_textgrid(cls, textgrid: Union[str, Path, TextIO],
                       textgrid_format: str = "full"):
-        try:
+        try:Pos
             from textgrid_parser import parse_textgrid
         except ImportError:
             raise ImportError("The dependencies used to parse TextGrid file cannot be found. "

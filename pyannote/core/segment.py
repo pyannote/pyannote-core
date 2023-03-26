@@ -170,6 +170,7 @@ class Segment:
 
     def __post_init__(self):
         """Round start and end up to SEGMENT_PRECISION precision (when required)"""
+        # TODO: check for start < end ?
         if AUTO_ROUND_TIME:
             object.__setattr__(self, 'start', int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
             object.__setattr__(self, 'end', int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
@@ -217,7 +218,7 @@ class Segment:
         """
         return (self.start <= other.start) and (self.end >= other.end)
 
-    def __and__(self, other):
+    def __and__(self, other: 'Segment'):
         """Intersection
 
         >>> segment = Segment(0, 10)
@@ -238,6 +239,7 @@ class Segment:
         start = max(self.start, other.start)
         end = min(self.end, other.end)
         return Segment(start=start, end=end)
+
 
     def intersects(self, other: 'Segment') -> bool:
         """Check whether two segments intersect each other

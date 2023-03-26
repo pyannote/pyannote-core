@@ -123,7 +123,7 @@ class BaseSegmentation(metaclass=ABCMeta):
     def _repr_png_(self):
         pass
 
-
+# TODO: rename to SegmentSet?
 class GappedAnnotationMixin(metaclass=ABCMeta):
 
     @abstractmethod
@@ -166,6 +166,7 @@ class ContiguousAnnotationMixin(metaclass=ABCMeta):
              mode: CropMode = 'intersection',
              returns_mapping: bool = False) \
             -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
+        # TODO: add errors messages explaining why the support isn't of the right type
         pass
 
     @abstractmethod
@@ -178,6 +179,7 @@ class PureSegmentationMixin(metaclass=ABCMeta):
 
     # TODO: add __and__ (defaults to crop intersection, not in place), that only takes objects of Self type?
 
+    # TODO: can actually take any BaseSegmentation for add & remove
     @abstractmethod
     def add(self, segment: Segment):
         pass

@@ -364,9 +364,6 @@ class Timeline(GappedAnnotationMixin, BaseSegmentation):
         segments = self.segments_set_ | timeline.segments_set_
         return Timeline(segments=segments, uri=self.uri)
 
-    def __and__(self, timeline: Union['Timeline', Segment]) -> 'Timeline':
-        return self.crop(timeline, mode="intersection")
-
     def co_iter(self, other: Union['Timeline', Segment]) -> Iterator[Tuple[Segment, Segment]]:
         """Iterate over pairs of intersecting segments
 
