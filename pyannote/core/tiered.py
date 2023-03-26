@@ -335,7 +335,7 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
     @classmethod
     def from_textgrid(cls, textgrid: Union[str, Path, TextIO],
                       textgrid_format: str = "full"):
-        try:Pos
+        try:
             from textgrid_parser import parse_textgrid
         except ImportError:
             raise ImportError("The dependencies used to parse TextGrid file cannot be found. "
