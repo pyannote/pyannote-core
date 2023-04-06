@@ -107,6 +107,7 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
 import itertools
+from abc import abstractmethod
 from pathlib import Path
 from typing import Optional, Dict, Union, Iterable, List, TextIO, Tuple, Iterator, Callable, Type, Generic
 
@@ -136,7 +137,6 @@ class BaseTier(BaseSegmentation, Generic[T]):
     _segmentation_type: T
 
     # TODO: handle segment sets changes for
-    #  - add (partition)
     #  - bisect (partition)
     #  - crop (partition/timeline)
     #  - for extrusion, should be based on cropping
@@ -148,13 +148,11 @@ class BaseTier(BaseSegmentation, Generic[T]):
         self._segmentation = self._segmentation_type()
         self._segments: Dict[Segment, TierLabel] = dict()
 
+    @abstractmethod
     def __setitem__(self, segment: Segment, label: Any):
-        # TODO: check
-        self._segmentation.add(segment)
-        self._segments[segment] = label
+        pass
 
     def __getitem__(self, key: Union[Segment, int]) -> Any:
-        # TODO: check
         if isinstance(key, int):
             key = self._segmentation.__getitem__(key)
         return self._segments[key]
@@ -246,8 +244,13 @@ class BaseTier(BaseSegmentation, Generic[T]):
 
 class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
     _segmentation_type = Timeline
-    """A set of chronologically-ordered, optionally non-overlapping
-    and annotated segments"""
+    _segmentation: Timeline
+    """A set of chronologically-ordered and annotated segments"""
+
+    def __setitem__(self, segment: Segment, label: Any):
+        # TODO: check
+        self._segmentation.add(segment)
+        self._segments[segment] = label
 
     def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
         return self._segmentation.gaps_iter(support)
@@ -256,7 +259,17 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
         return self._segmentation.gaps(support)
 
     def extrude(self, removed: Support, mode: CropMode = 'intersection') -> Self:
-        return self._segmentation.extrude(removed, mode)
+        if isinstance(removed, Segment):
+            removed = Timeline([removed])
+
+        extent_tl = Timeline([self.get_timeline().extent()], uri=self.uri)
+        truncating_support = removed.gaps(support=extent_tl)
+        # loose for truncate means strict for crop and vice-versa
+        if mode == "loose":
+            mode = "strict"
+        elif mode == "strict":
+            mode = "loose"
+        return self.crop(truncating_support, mode=mode)
 
     def crop_iter(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Iterator[
         Union[Tuple[Segment, Segment], Segment]]:
@@ -276,39 +289,27 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
         return self._segmentation.get_overlap()
 
     def co_iter(self, other: Union[Timeline, Segment]) -> Iterator[Tuple[Segment, Segment]]:
-        """Iterate over pairs of intersecting segments
-
-        >>> timeline1 = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 4)])
-        >>> timeline2 = Timeline([Segment(1, 3), Segment(3, 5)])
-        >>> for segment1, segment2 in timeline1.co_iter(timeline2):
-        ...     print(segment1, segment2)
-        (<Segment(0, 2)>, <Segment(1, 3)>)
-        (<Segment(1, 2)>, <Segment(1, 3)>)
-        (<Segment(3, 4)>, <Segment(3, 5)>)
-
-        Parameters
-        ----------
-        other : Timeline
-            Second timeline
-
-        Returns
-        -------
-        iterable : (Segment, Segment) iterable
-            Yields pairs of intersecting segments in chronological order.
-        """
-
         yield from self._segmentation.co_iter(other)
 
 
 class PartitionTier(ContiguousAnnotationMixin, BaseTier[Partition]):
+    """A set of chronologically-ordered, contiguous and non-overlapping annotated segments"""
     _segmentation_type = Partition
+    _segmentation: Partition
+
     # TODO:
-    # - __iter__ should also yield empty segments, with a None annotation
+    # - look into praat's way of dealing with segments insertions, and match its behavior
+    # - probably just allow bisect to create new segments, then use __setitem__ to set the segment's annotation
+    def bisect(self, at: float):
+        self._segmentation.bisect(at)
+        bisected_segment = self._segmentation.overlapping(at)[0]
+        annot = self._segments[bisected_segment]
+        del self._segments[bisected_segment]
+        self._segments.update({seg: annot for seg in bisected_segment.bisect(at)})
 
     def crop(self,
              support: ContiguousSupport,
-             mode: CropMode = 'intersection',
-             returns_mapping: bool = False) -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
+             mode: CropMode = 'intersection') -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
         # TODO:
         #  - think about using crop_iter first
         pass

@@ -276,6 +276,11 @@ class Segment:
         """
         return self.start <= t and self.end >= t
 
+    def bisect(self, at: float) -> Tuple['Segment', 'Segment']:
+        if not self.overlaps(at):
+            raise RuntimeError("bisection time isn't contained in the segment")
+        return Segment(self.start, at), Segment(at, self.end)
+
     def __or__(self, other: 'Segment') -> 'Segment':
         """Union
 

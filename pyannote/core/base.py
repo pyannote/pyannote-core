@@ -1,11 +1,11 @@
 from abc import ABCMeta, abstractmethod
-from typing import Optional, Iterator, Tuple, Union, Dict, TYPE_CHECKING, Callable, List, Set
+from typing import Optional, Iterator, Tuple, Union, Dict, TYPE_CHECKING, Callable, List, Set, Iterable
 
 from sortedcontainers import SortedList
 from typing_extensions import Self
 
 from pyannote.core import Segment
-from pyannote.core.utils.types import Support, CropMode, ContiguousSupport
+from pyannote.core.utils.types import Support, CropMode, ContiguousSupport, Label
 
 if TYPE_CHECKING:
     from .timeline import Timeline
@@ -134,11 +134,53 @@ class GappedAnnotationMixin(metaclass=ABCMeta):
     def gaps(self, support: Optional[Support] = None) -> 'Timeline':
         pass
 
-    @abstractmethod
     def extrude(self,
                 removed: Support,
                 mode: CropMode = 'intersection') -> Self:
-        pass
+        """Remove segments that overlap `removed` support.
+
+                Parameters
+                ----------
+                removed : Segment or Timeline
+                    If `support` is a `Timeline`, its support is used.
+                mode : {'strict', 'loose', 'intersection'}, optional
+                    Controls how segments that are not fully included in `removed` are
+                    handled. 'strict' mode only removes fully included segments. 'loose'
+                    mode removes any intersecting segment. 'intersection' mode removes
+                    the overlapping part of any intersecting segment.
+
+                Returns
+                -------
+                extruded : Timeline
+                    Extruded timeline
+
+                Examples
+                --------
+
+                >>> timeline = Timeline([Segment(0, 2), Segment(1, 2), Segment(3, 5)])
+                >>> timeline.extrude(Segment(1, 2))
+                <Timeline(uri=None, segments=[<Segment(0, 1)>, <Segment(3, 5)>])>
+
+                >>> timeline.extrude(Segment(1, 3), mode='loose')
+                <Timeline(uri=None, segments=[<Segment(3, 5)>])>
+
+                >>> timeline.extrude(Segment(1, 3), mode='strict')
+                <Timeline(uri=None, segments=[<Segment(0, 2)>, <Segment(3, 5)>])>
+
+                """
+        if isinstance(removed, Segment):
+            removed = Timeline([removed])
+        else:
+            removed = removed.get_timeline()
+
+        extent_tl = Timeline([self.extent()], uri=self.uri)
+        truncating_support = removed.gaps(support=extent_tl)
+        # loose for truncate means strict for crop and vice-versa
+        if mode == "loose":
+            mode = "strict"
+        elif mode == "strict":
+            mode = "loose"
+        return self.crop(truncating_support, mode=mode)
 
     @abstractmethod
     def crop(self,
@@ -194,4 +236,15 @@ class PureSegmentationMixin(metaclass=ABCMeta):
 
     @abstractmethod
     def overlapping(self, t: float) -> List[Segment]:
+        pass
+
+    @abstractmethod
+    def __iter__(self) -> Iterable[Segment]:
+        pass
+
+
+class AnnotatedSegmentationMixin(metaclass=ABCMeta):
+
+    @abstractmethod
+    def __iter__(self) -> Iterable[Tuple[Segment, Label]]:
         pass

@@ -107,16 +107,12 @@ if TYPE_CHECKING:
 # Partition class
 # =====================================================================
 
-# TODO: Questions:
-#  - "autofill" the partition if the initialized segments aren't filling?
-#  - partition empty if only one segment?
-#  - truthiness?
-
 
 def pairwise(iterable):
     "s -> (s0, s1), (s2, s3), (s4, s5), ..."
     a = iter(iterable)
     return zip(a, a)
+
 
 class Partition(PureSegmentationMixin, BaseSegmentation):
     """
@@ -142,7 +138,8 @@ class Partition(PureSegmentationMixin, BaseSegmentation):
         New timeline
     """
 
-
+    # TODO: need to reimplement the co_iter function to make it much faster (the whole point of having partitions)
+    #  -> if co_iter with another partition, even faster (need to distinguish the case)
 
     def __init__(self,
                  segments: Optional[Iterable[Segment]] = None,
@@ -169,7 +166,6 @@ class Partition(PureSegmentationMixin, BaseSegmentation):
         for (start, end) in timeline:
             self._segments_bounds_set.update(start, end)
 
-
     def __len__(self) -> int:
         return len(self._segments_bounds_set) - 1
 
@@ -184,6 +180,9 @@ class Partition(PureSegmentationMixin, BaseSegmentation):
 
     def __ne__(self, other: 'Partition'):
         return not other == self
+
+    def __iter__(self) -> Iterable[Segment]:
+        return self.itersegments()
 
     def index(self, segment: Segment) -> int:
         return self._segments_bounds_set.index(segment.start)
