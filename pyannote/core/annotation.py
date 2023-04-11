@@ -125,7 +125,6 @@ from typing import (
 )
 
 import numpy as np
-from sortedcontainers import SortedDict
 
 from . import (
     PYANNOTE_SEGMENT,
@@ -175,12 +174,10 @@ class Annotation:
         self._uri: Optional[str] = uri
         self.modality: Optional[str] = modality
 
-        # (sorted) dictionary
+        # dictionary
         # keys: annotated segments
         # values: {track: label} dictionary
         self._tracks: Dict[Segment, Dict[TrackName, Label]] = dict()
-        # tracks are not sorted at __init__ time but only later when needed
-        # (in which case dict is converted to SortedDict)
 
         # dictionary
         # key: label
@@ -259,11 +256,7 @@ class Annotation:
         --------
         :class:`pyannote.core.Segment` describes how segments are sorted.
         """
-
-        if not isinstance(self._tracks, SortedDict):
-            self._tracks = SortedDict(self._tracks)
-
-        return iter(self._tracks)
+        return iter(self.get_timeline())
 
     def itertracks(
         self, yield_label: bool = False
@@ -287,10 +280,8 @@ class Annotation:
         ...     # do something with the track and its label
         """
 
-        if not isinstance(self._tracks, SortedDict):
-            self._tracks = SortedDict(self._tracks)
-
-        for segment, tracks in self._tracks.items():
+        for segment in iter(self.get_timeline()):
+            tracks = self._tracks[segment]
             for track, lbl in sorted(
                 tracks.items(), key=lambda tl: (str(tl[0]), str(tl[1]))
             ):
@@ -513,7 +504,7 @@ class Annotation:
                     _tracks[segment] = tracks
                     _labels.update(tracks.values())
 
-                cropped._tracks = SortedDict(_tracks)
+                cropped._tracks = dict(_tracks)
 
                 cropped._labelNeedsUpdate = {label: True for label in _labels}
                 cropped._labels = {label: None for label in _labels}
@@ -539,7 +530,7 @@ class Annotation:
                     _tracks[segment] = tracks
                     _labels.update(tracks.values())
 
-                cropped._tracks = SortedDict(_tracks)
+                cropped._tracks = dict(_tracks)
 
                 cropped._labelNeedsUpdate = {label: True for label in _labels}
                 cropped._labels = {label: None for label in _labels}
