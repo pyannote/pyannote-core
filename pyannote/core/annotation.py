@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014-2021 CNRS
+# Copyright (c) 2014- CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -175,10 +175,12 @@ class Annotation:
         self._uri: Optional[str] = uri
         self.modality: Optional[str] = modality
 
-        # sorted dictionary
+        # (sorted) dictionary
         # keys: annotated segments
         # values: {track: label} dictionary
-        self._tracks: Dict[Segment, Dict[TrackName, Label]] = SortedDict()
+        self._tracks: Dict[Segment, Dict[TrackName, Label]] = dict()
+        # tracks are not sorted at __init__ time but only later when needed
+        # (in which case dict is converted to SortedDict)
 
         # dictionary
         # key: label
@@ -257,6 +259,10 @@ class Annotation:
         --------
         :class:`pyannote.core.Segment` describes how segments are sorted.
         """
+
+        if not isinstance(self._tracks, SortedDict):
+            self._tracks = SortedDict(self._tracks)
+
         return iter(self._tracks)
 
     def itertracks(
@@ -280,6 +286,9 @@ class Annotation:
         >>> for segment, track, label in annotation.itertracks(yield_label=True):
         ...     # do something with the track and its label
         """
+
+        if not isinstance(self._tracks, SortedDict):
+            self._tracks = SortedDict(self._tracks)
 
         for segment, tracks in self._tracks.items():
             for track, lbl in sorted(
@@ -711,7 +720,7 @@ class Annotation:
             _labels.update(value.values())
             _tracks.append((key, dict(value)))
 
-        copied._tracks = SortedDict(_tracks)
+        copied._tracks = dict(_tracks)
 
         copied._labels = {label: None for label in _labels}
         copied._labelNeedsUpdate = {label: True for label in _labels}
@@ -986,7 +995,7 @@ class Annotation:
                 _tracks[segment] = sub_tracks
                 _labels.update(sub_tracks.values())
 
-        sub._tracks = SortedDict(_tracks)
+        sub._tracks = dict(_tracks)
 
         sub._labelNeedsUpdate = {label: True for label in _labels}
         sub._labels = {label: None for label in _labels}
@@ -1526,7 +1535,7 @@ class Annotation:
         for segment, track, label in records:
             tracks[segment][track] = label
             labels.add(label)
-        annotation._tracks = SortedDict(tracks)
+        annotation._tracks = dict(tracks)
         annotation._labels = {label: None for label in labels}
         annotation._labelNeedsUpdate = {label: True for label in annotation._labels}
         annotation._timeline = None
