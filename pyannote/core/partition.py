@@ -95,9 +95,9 @@ from sortedcontainers import SortedDict, SortedList, SortedSet
 from typing_extensions import Self
 
 from . import Timeline
-from .base import BaseSegmentation, PureSegmentationMixin
+from .base import BaseSegmentation, PureSegmentationMixin, ContiguousAnnotationMixin
 from .segment import Segment
-from .utils.types import Support, CropMode
+from .utils.types import Support, CropMode, ContiguousSupport
 
 if TYPE_CHECKING:
     pass
@@ -114,7 +114,7 @@ def pairwise(iterable):
     return zip(a, a)
 
 
-class Partition(PureSegmentationMixin, BaseSegmentation):
+class Partition(PureSegmentationMixin, ContiguousAnnotationMixin, BaseSegmentation):
     """
     Ordered set of segments that are all contiguous.
 
@@ -127,8 +127,7 @@ class Partition(PureSegmentationMixin, BaseSegmentation):
     ----------
     segments : Segment iterator, optional
         initial set of (non-empty) segments
-    start: float TODO
-    end: float TODO
+    boundaries: Segment, optional
     uri : string, optional
         name of segmented resource
 
@@ -143,24 +142,18 @@ class Partition(PureSegmentationMixin, BaseSegmentation):
 
     def __init__(self,
                  segments: Optional[Iterable[Segment]] = None,
-                 start: float = 0.0,
-                 end: float = None,
+                 boundaries: Optional[Segment] = None,
                  uri: str = None):
         segments = list(segments) if segments else []
-        if segments is None and end is None:
-            raise ValueError("Cannot initialize an empty timeline without and end boundary")
-        elif end is None:
-            end = max(seg.end for seg in segments)
-        elif not segments:
-            segments = Segment(start, end)
+        if not segments and boundaries is None:
+            raise ValueError("Cannot initialize an empty Partition without definin boundaries")
         super().__init__(uri)
-        self.boundaries = Segment(start, end)
+        self.boundaries = boundaries
         timeline = Timeline(segments)
         if timeline.extent() not in self.boundaries:
-            raise ValueError(f"Segments have to be within ({start, end}) bounds")
+            raise ValueError(f"Segments have to be within {boundaries}")
 
         # automatically filling in the gaps in the segments
-        # TODO: ask about behavior?
         timeline.add(self.boundaries)
         self._segments_bounds_set = SortedSet()
         for (start, end) in timeline:
@@ -193,8 +186,14 @@ class Partition(PureSegmentationMixin, BaseSegmentation):
 
         self._segments_bounds_set.add(at)
 
+    def fuse(self, at: float):
+        try:
+            self._segments_bounds_set.remove(at)
+        except KeyError:
+            raise RuntimeError("Cannot fuse non-existing boundary")
+
     def add(self, segment: Segment):
-        # TODO: ask about this behavior
+        # TODO: fix (check for segment inclusion)
         if len(list(self.co_iter(segment))) > 1:
             raise ValueError("Segment overlaps a boundary")
         self.bisect(segment.start)
@@ -224,14 +223,12 @@ class Partition(PureSegmentationMixin, BaseSegmentation):
 
     def empty(self) -> Self:
         return Partition(None,
-                         start=self.boundaries.start,
-                         end=self.boundaries.end,
+                         boundaries=self.boundaries,
                          uri=self.uri)
 
     def copy(self) -> Self:
         return Partition(self.itersegments(),
-                         start=self.boundaries.start,
-                         end=self.boundaries.end,
+                         boundaries=self.boundaries,
                          uri=self.uri)
 
     def extent(self) -> Segment:
@@ -244,13 +241,67 @@ class Partition(PureSegmentationMixin, BaseSegmentation):
         start = self._segments_bounds_set[end_idx - 1]
         return [Segment(start, end)]
 
-    def crop_iter(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Iterator[
-        Union[Tuple[Segment, Segment], Segment]]:
-        pass
+    def crop_iter(self, support: ContiguousSupport, mode: CropMode = 'intersection', returns_mapping: bool = False) \
+            -> Iterator[Union[Tuple[Segment, Segment], Segment]]:
+        # TODO: check algo when boundaries match
+        if not isinstance(support, (Segment, ContiguousAnnotationMixin)):
+            raise ValueError(f"Only contiguous supports are allowed for cropping a {self.__class__.__name__}.")
 
-    def crop(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Union[
-        Self, Tuple[Self, Dict[Segment, Segment]]]:
-        pass
+        if not isinstance(support, Segment):
+            support = support.extent()
+        if self.extent() in support:
+            return self.itersegments()
+
+        cropped_boundaries = SortedSet(self._segments_bounds_set.irange(minimum=support.start,
+                                                                        maximum=support.end,
+                                                                        inclusive=(False, False)))
+
+        # first, yielding the first "cut" segment depending on mode
+        if support.start > self.extent().start:
+            idx_start = self._segments_bounds_set.index(cropped_boundaries[0])
+            first_seg = Segment(start=self._segments_bounds_set[idx_start - 1], end=self._segments_bounds_set[idx_start])
+            if mode == "intersection":
+                mapped_to = Segment(start=support.start, end=first_seg.end)
+                if returns_mapping:
+                    yield first_seg, mapped_to
+                else:
+                    yield mapped_to
+            elif mode == "loose":
+                yield first_seg
+
+        # then, yielding "untouched" segments
+        for (start, end) in pairwise(cropped_boundaries):
+            seg = Segment(start, end)
+            if returns_mapping:
+                yield seg, seg
+            else:
+                yield seg
+
+        # finally, yielding the last "cut" segment depending on mode
+        if support.end < self.extent().end:
+            idx_end = self._segments_bounds_set.index(cropped_boundaries[0])
+            last_seg = Segment(start=self._segments_bounds_set[idx_end], end=self._segments_bounds_set[idx_end + 1])
+            if mode == "intersection":
+                mapped_to = Segment(start=last_seg.start, end=support.end)
+                if returns_mapping:
+                    yield last_seg, mapped_to
+                else:
+                    yield last_seg
+            elif mode == "loose":
+                yield last_seg
+
+    def crop(self, support: ContiguousSupport, mode: CropMode = 'intersection', returns_mapping: bool = False) \
+            -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
+        if mode == 'intersection' and returns_mapping:
+            segments, mapping = [], {}
+            for segment, mapped_to in self.crop_iter(support,
+                                                     mode='intersection',
+                                                     returns_mapping=True):
+                segments.append(segment)
+                mapping[mapped_to] = [segment]
+            return Partition(segments=segments, uri=self.uri), mapping
+
+        return Partition(segments=self.crop_iter(support, mode=mode), uri=self.uri)
 
     def duration(self) -> float:
         return self.extent().duration

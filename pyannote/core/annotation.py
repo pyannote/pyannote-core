@@ -560,6 +560,7 @@ class Annotation(GappedAnnotationMixin, BaseSegmentation):
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
 
+    # TODO: remove (already in base class)
     def extrude(
         self, removed: Support, mode: CropMode = "intersection"
     ) -> "Annotation":

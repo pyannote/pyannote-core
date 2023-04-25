@@ -412,6 +412,7 @@ class Timeline(GappedAnnotationMixin, BaseSegmentation):
             raise ValueError("Mode must be one of 'loose', 'strict', or "
                              "'intersection'.")
 
+        # TODO: make more generic using SegmentSet
         if not isinstance(support, (Segment, Timeline)):
             raise TypeError("Support must be a Segment or a Timeline.")
 
@@ -567,6 +568,7 @@ class Timeline(GappedAnnotationMixin, BaseSegmentation):
             overlaps_tl.add(s1 & s2)
         return overlaps_tl.support()
 
+    # TODO: remove (already in base class)
     def extrude(self,
                 removed: Support,
                 mode: CropMode = 'intersection') -> 'Timeline':

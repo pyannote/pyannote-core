@@ -106,7 +106,6 @@ Several convenient methods are available. Here are a few examples:
 
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
-import itertools
 from abc import abstractmethod
 from pathlib import Path
 from typing import Optional, Dict, Union, Iterable, List, TextIO, Tuple, Iterator, Callable, Type, Generic
@@ -115,14 +114,13 @@ from sortedcontainers import SortedDict
 from typing_extensions import Self, Any
 
 from pyannote.core import Annotation
-from .base import BaseSegmentation, GappedAnnotationMixin, ContiguousAnnotationMixin
+from .base import BaseSegmentation, GappedAnnotationMixin, ContiguousAnnotationMixin, AnnotatedSegmentationMixin
 from .partition import Partition
 from .segment import Segment
 from .timeline import Timeline
 from .utils.generators import string_generator
 from .utils.types import Label, Key, Support, TierName, CropMode, ContiguousSupport, TierItemPair
 
-# TODO: add JSON dumping/loading
 # TODO: QUESTIONS:
 #  - iterator for the TieredAnnotation
 
@@ -133,7 +131,7 @@ from .utils.types import Label, Key, Support, TierName, CropMode, ContiguousSupp
 T = Type[Union[Partition, Timeline]]
 
 
-class BaseTier(BaseSegmentation, Generic[T]):
+class BaseTier(BaseSegmentation, AnnotatedSegmentationMixin, Generic[T]):
     _segmentation_type: T
 
     # TODO: handle segment sets changes for
@@ -168,7 +166,7 @@ class BaseTier(BaseSegmentation, Generic[T]):
     def __iter__(self) -> Iterable[TierItemPair]:
         """Return segments with their annotation, in chronological order"""
         for segment in self._segmentation.itersegments():
-            yield segment, self._segments[segment]
+            yield segment, self._segments.get(segment, None)
 
     def __len__(self):
         """Number of segments in the tier
@@ -191,7 +189,7 @@ class BaseTier(BaseSegmentation, Generic[T]):
     def __eq__(self, other: 'BaseTier'):
         """Equality
 
-        Two PraatTiers are equal if and only if their segments and their annotations are equal.
+        Two Tiers are equal if and only if their segments and their annotations are equal.
 
         # TODO : doc
         >>> timeline1 = Timeline([Segment(0, 1), Segment(2, 3)])
@@ -222,18 +220,15 @@ class BaseTier(BaseSegmentation, Generic[T]):
         """
         return self.__class__(self.name, uri=self.uri)
 
-    def update(self, tier: 'BaseTier') -> 'BaseTier':
-        pass  # TODO
-
     def copy(self, segment_func: Optional[Callable[[Segment], Segment]] = None) -> Self:
-        pass  # TODO
+        copy = self.__class__(name=self.name, uri=self.uri)
+        copy._segmentation = self._segmentation.copy()
+        copy._segments = self._segments.copy()
+        return copy
 
     def extent(self) -> Segment:
         return self._segmentation.extent()
 
-    def crop_iter(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Iterator[
-        Union[Tuple[Segment, Segment], Segment]]:
-        pass
 
     def duration(self) -> float:
         return self._segmentation.duration()
@@ -258,23 +253,6 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
     def gaps(self, support: Optional[Support] = None) -> 'Timeline':
         return self._segmentation.gaps(support)
 
-    def extrude(self, removed: Support, mode: CropMode = 'intersection') -> Self:
-        if isinstance(removed, Segment):
-            removed = Timeline([removed])
-
-        extent_tl = Timeline([self.get_timeline().extent()], uri=self.uri)
-        truncating_support = removed.gaps(support=extent_tl)
-        # loose for truncate means strict for crop and vice-versa
-        if mode == "loose":
-            mode = "strict"
-        elif mode == "strict":
-            mode = "loose"
-        return self.crop(truncating_support, mode=mode)
-
-    def crop_iter(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Iterator[
-        Union[Tuple[Segment, Segment], Segment]]:
-        pass
-
     def crop(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Union[
         Self, Tuple[Self, Dict[Segment, Segment]]]:
         # TODO (for segments mapping):
@@ -291,15 +269,27 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
     def co_iter(self, other: Union[Timeline, Segment]) -> Iterator[Tuple[Segment, Segment]]:
         yield from self._segmentation.co_iter(other)
 
+    def update(self, tier: 'Tier') -> 'Tier':
+        self._segmentation.update(tier._segmentation)
+        self._segments.update(tier._segments)
+
 
 class PartitionTier(ContiguousAnnotationMixin, BaseTier[Partition]):
     """A set of chronologically-ordered, contiguous and non-overlapping annotated segments"""
     _segmentation_type = Partition
     _segmentation: Partition
 
-    # TODO:
-    # - look into praat's way of dealing with segments insertions, and match its behavior
-    # - probably just allow bisect to create new segments, then use __setitem__ to set the segment's annotation
+    def __setitem__(self, segment: Segment, label: Any):
+        if not segment in self._segmentation:
+            raise RuntimeError(f"Segment {segment} not contained in the tier's partition")
+        self._segments[segment] = label
+
+    def __str__(self):
+        pass
+
+    def __repr__(self):
+        pass
+
     def bisect(self, at: float):
         self._segmentation.bisect(at)
         bisected_segment = self._segmentation.overlapping(at)[0]
@@ -307,15 +297,35 @@ class PartitionTier(ContiguousAnnotationMixin, BaseTier[Partition]):
         del self._segments[bisected_segment]
         self._segments.update({seg: annot for seg in bisected_segment.bisect(at)})
 
+    def fuse(self, at: float):
+        # To know if segments can be fused, check segment before fuse and after fuse
+        # if they have matching annotations, allow fuse
+        pass
+
     def crop(self,
              support: ContiguousSupport,
              mode: CropMode = 'intersection') -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
+        seg_set = self.segments_set().copy()
+        if mode in {"loose", "strict"}:
+            cropped_seg = self._segmentation.crop(support, mode=mode)
+            annotated_segments = {seg: self._segments[seg] for seg in cropped_seg}
+        else: # it's "intersection"
+            cropped_seg, mapping = self._segmentation.crop(support, mode="intersection", returns_mapping=True)
+            annotated_segments = {}
+            # TODO: for tiers based on timelines, figure out what to do when cropped segment maps to several
+            #  annotations. Use (segment, annot) pairs maybe? Raise an error?
+            for seg, mapped_to in mapping.items():
+                annotated_segments.update({
+                    seg: self._segments[mapped_seg] for mapped_seg in mapped_to
+                })
+
         # TODO:
-        #  - think about using crop_iter first
+        #  - if "intersection", use the return mapping to remove segments
+        #  - if loose or strict, find missing segments and remove them
         pass
 
-    # |------A-|-----C------|--B---|
-    #          |-----C------|
+    def update(self, tier: 'BaseTier') -> 'BaseTier':
+        raise RuntimeError(f"A {self.__class__.__name__} cannot be updated.")
 
 
 class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
@@ -389,6 +399,88 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
         """
         return len(self) > 0
 
+
+
+    def __iter__(self) -> Iterable[Tuple[Segment, str]]:
+        # TODO
+        pass
+
+
+    def __eq__(self, other: 'TieredAnnotation'):
+        """Equality
+
+        >>> annotation == other
+
+        Two annotations are equal if and only if their tracks and associated
+        labels are equal.
+        """
+        # TODO
+        pass
+
+    def __ne__(self, other: 'TieredAnnotation'):
+        """Inequality"""
+        # TODO
+        pass
+
+    def __contains__(self, included: Union[Segment, Timeline]):
+        """Inclusion
+
+        Check whether every segment of `included` does exist in annotation.
+
+        Parameters
+        ----------
+        included : Segment or Timeline
+            Segment or timeline being checked for inclusion
+
+        Returns
+        -------
+        contains : bool
+            True if every segment in `included` exists in timeline,
+            False otherwise
+
+        """
+        return included in self.get_timeline(copy=False)
+
+
+    def __delitem__(self, key: TierName):
+        """Delete a tier
+        # TODO : doc
+        """
+        del self._tiers[key]
+
+    def __getitem__(self, key: TierName) -> Tier:
+        """Get a tier
+
+        >>> praat_tier = annotation[tiername]
+
+        """
+
+        return self._tiers[key]
+
+
+    def __setitem__(self, key: Key, label: Label):
+        pass  # TODO : set a tier
+
+    def __repr__(self):
+        pass  # TODO
+
+    def __str__(self):
+        """Human-friendly representation"""
+        # TODO: use pandas.DataFrame
+        return "\n".join(["%s %s %s" % (s, t, l)
+                          for s, t, l in self.itertracks(yield_label=True)])
+
+    def empty(self) -> 'Annotation':
+        """Return an empty copy
+
+        Returns
+        -------
+        empty : Annotation
+            Empty annotation using the same 'uri' and 'modality' attributes.
+
+        """
+        return self.__class__(uri=self.uri, modality=self.modality)
+
     def itersegments(self):
         """Iterate over segments (in chronological order)
 
@@ -402,13 +494,36 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
         for tier in self.tiers:
             yield from tier
 
-    def __iter__(self) -> Iterable[Tuple[Segment, str]]:
-        return iter(self._tiers.items())
+    def to_textgrid(self, file: Union[str, Path, TextIO]):
+        pass
 
-    def _update_timeline(self):
-        segments = list(itertools.chain.from_iterable(self._tiers.keys()))
-        self._timeline = Timeline(segments=segments, uri=self.uri)
-        self._timelineNeedsUpdate = False
+
+
+    def to_annotation(self, modality: Optional[str] = None) -> Annotation:
+        """Convert to an annotation object. The new annotation's labels
+        are the tier names of each segments. In short, the segment's
+        # TODO : visual example
+
+        Parameters
+        ----------
+        modality: optional str
+
+        Returns
+        -------
+        annotation : Annotation
+            A new Annotation Object
+
+        Note
+        ----
+        If you want to convert part of a `PraatTextGrid` to an `Annotation` object
+        while keeping the segment's labels, you can use the tier's
+        :func:`~pyannote.textgrid.PraatTier.to_annotation`
+        """
+        annotation = Annotation(uri=self.uri, modality=modality)
+        for tier_name, tier in self._tiers.items():
+            for segment, _ in tier:
+                annotation[segment] = tier_name
+        return annotation
 
     def get_timeline(self, copy: bool = True) -> Timeline:
         """Get timeline made of all annotated segments
@@ -436,77 +551,6 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
         if copy:
             return self._timeline.copy()
         return self._timeline
-
-    def __eq__(self, other: 'TieredAnnotation'):
-        """Equality
-
-        >>> annotation == other
-
-        Two annotations are equal if and only if their tracks and associated
-        labels are equal.
-        """
-        # TODO
-        pairOfTracks = itertools.zip_longest(
-            self.itertracks(yield_label=True),
-            other.itertracks(yield_label=True))
-        return all(t1 == t2 for t1, t2 in pairOfTracks)
-
-    def __ne__(self, other: 'TieredAnnotation'):
-        """Inequality"""
-        # TODO
-        pairOfTracks = itertools.zip_longest(
-            self.itertracks(yield_label=True),
-            other.itertracks(yield_label=True))
-
-        return any(t1 != t2 for t1, t2 in pairOfTracks)
-
-    def __contains__(self, included: Union[Segment, Timeline]):
-        """Inclusion
-
-        Check whether every segment of `included` does exist in annotation.
-
-        Parameters
-        ----------
-        included : Segment or Timeline
-            Segment or timeline being checked for inclusion
-
-        Returns
-        -------
-        contains : bool
-            True if every segment in `included` exists in timeline,
-            False otherwise
-
-        """
-        return included in self.get_timeline(copy=False)
-
-    def to_textgrid(self, file: Union[str, Path, TextIO]):
-        pass
-
-    def to_annotation(self, modality: Optional[str] = None) -> Annotation:
-        """Convert to an annotation object. The new annotation's labels
-        are the tier names of each segments. In short, the segment's
-        # TODO : visual example
-
-        Parameters
-        ----------
-        modality: optional str
-
-        Returns
-        -------
-        annotation : Annotation
-            A new Annotation Object
-
-        Note
-        ----
-        If you want to convert part of a `PraatTextGrid` to an `Annotation` object
-        while keeping the segment's labels, you can use the tier's
-        :func:`~pyannote.textgrid.PraatTier.to_annotation`
-        """
-        annotation = Annotation(uri=self.uri, modality=modality)
-        for tier_name, tier in self._tiers.items():
-            for segment, _ in tier:
-                annotation[segment] = tier_name
-        return annotation
 
     def crop(self, support: Support, mode: CropMode = 'intersection') \
             -> 'TieredAnnotation':
@@ -544,80 +588,6 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
         # create new empty annotation
         # TODO
         pass
-
-    def __str__(self):
-        """Human-friendly representation"""
-        # TODO: use pandas.DataFrame
-        return "\n".join(["%s %s %s" % (s, t, l)
-                          for s, t, l in self.itertracks(yield_label=True)])
-
-    def __delitem__(self, key: TierName):
-        """Delete a tier
-        # TODO : doc
-        """
-        del self._tiers[key]
-
-    def __getitem__(self, key: TierName) -> Tier:
-        """Get a tier
-
-        >>> praat_tier = annotation[tiername]
-
-        """
-
-        return self._tiers[key]
-
-    def __setitem__(self, key: Key, label: Label):
-        """Add new or update existing track
-
-        >>> annotation[segment, track] = label
-
-        If (segment, track) does not exist, it is added.
-        If (segment, track) already exists, it is updated.
-
-        Note
-        ----
-        ``annotation[segment] = label`` is equivalent to ``annotation[segment, '_'] = label``
-
-        Note
-        ----
-        If `segment` is empty, it does nothing.
-        """
-
-        if isinstance(key, Segment):
-            key = (key, '_')
-
-        segment, track = key
-
-        # do not add empty track
-        if not segment:
-            return
-
-        # in case we create a new segment
-        # mark timeline as modified
-        if segment not in self._tiers:
-            self._tiers[segment] = {}
-            self._timelineNeedsUpdate = True
-
-        # in case we modify an existing track
-        # mark old label as modified
-        if track in self._tiers[segment]:
-            old_label = self._tiers[segment][track]
-            self._labelNeedsUpdate[old_label] = True
-
-        # mark new label as modified
-        self._tiers[segment][track] = label
-        self._labelNeedsUpdate[label] = True
-
-    def empty(self) -> 'Annotation':
-        """Return an empty copy
-
-        Returns
-        -------
-        empty : Annotation
-            Empty annotation using the same 'uri' and 'modality' attributes.
-
-        """
-        return self.__class__(uri=self.uri, modality=self.modality)
 
     def update(self, textgrid: 'TieredAnnotation', copy: bool = False) \
             -> 'TieredAnnotation':
@@ -702,6 +672,28 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
                 support[segment, next(generator)] = label
 
         return support
+
+    def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
+        pass
+
+    def gaps(self, support: Optional[Support] = None) -> 'Timeline':
+        pass
+
+    def get_overlap(self) -> 'Timeline':
+        pass
+
+    def extent(self) -> Segment:
+        pass
+
+    def crop_iter(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Iterator[
+        Union[Tuple[Segment, Segment], Segment]]:
+        pass
+
+    def duration(self) -> float:
+        pass
+
+    def _repr_png_(self):
+        pass
 
     def _repr_png(self):
         """IPython notebook support

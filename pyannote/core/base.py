@@ -47,6 +47,9 @@ class BaseSegmentation(metaclass=ABCMeta):
     def __ne__(self, other: Self):
         pass
 
+    def __matmul__(self, other: Union['BaseSegmentation', Segment]):
+        return self.co_iter(other)
+
     @abstractmethod
     def itersegments(self):
         pass
@@ -69,6 +72,7 @@ class BaseSegmentation(metaclass=ABCMeta):
         else:
             other_segments = SortedList(other.itersegments())
 
+        # TODO maybe wrap self.itersegs in a sortedlist as well?
         for segment in self.itersegments():
 
             # iterate over segments that starts before 'segment' ends
@@ -107,13 +111,7 @@ class BaseSegmentation(metaclass=ABCMeta):
     def extent(self) -> Segment:
         pass
 
-    @abstractmethod
-    def crop_iter(self,
-                  support: Support,
-                  mode: CropMode = 'intersection',
-                  returns_mapping: bool = False) \
-            -> Iterator[Union[Tuple[Segment, Segment], Segment]]:
-        pass
+
 
     @abstractmethod
     def duration(self) -> float:
@@ -123,8 +121,9 @@ class BaseSegmentation(metaclass=ABCMeta):
     def _repr_png_(self):
         pass
 
+
 # TODO: rename to SegmentSet?
-class GappedAnnotationMixin(metaclass=ABCMeta):
+class GappedAnnotationMixin(BaseSegmentation):
 
     @abstractmethod
     def gaps_iter(self, support: Optional[Support] = None) -> Iterator[Segment]:
@@ -199,9 +198,34 @@ class GappedAnnotationMixin(metaclass=ABCMeta):
         pass
 
 
-class ContiguousAnnotationMixin(metaclass=ABCMeta):
+class ContiguousAnnotationMixin(BaseSegmentation):
     # TODO : figure out if the return mapping still makes sense
     #  (propably not)
+
+
+    def co_iter(self, other: Union['BaseSegmentation', Segment]) -> Iterator[Tuple[Segment, Segment]]:
+        if not isinstance(other, (ContiguousAnnotationMixin, Segment)):
+            return super().co_iter(other)
+
+        # we're dealing with another contiguous segmentation, things can be much quicker
+        if isinstance(other, Segment):
+            other_segments = SortedList([other])
+        else:
+            other_segments = SortedList(other.itersegments())
+        my_segments = SortedList(self.itersegments())
+        try:
+            seg_a: Segment = my_segments.pop(0)
+            seg_b: Segment = other_segments.pop(0)
+            while True:
+                if seg_a.intersects(seg_b):
+                    yield seg_a, seg_b
+                if seg_b.end < seg_a.end:
+                    seg_b = other_segments.pop(0)
+                else:
+                    seg_a = other_segments.pop(0)
+        except IndexError:  # exhausting any of the stacks: yielding nothing and ending
+            yield from ()
+
     @abstractmethod
     def crop(self,
              support: ContiguousSupport,
@@ -215,6 +239,10 @@ class ContiguousAnnotationMixin(metaclass=ABCMeta):
     def bisect(self, at: float):
         pass
 
+    @abstractmethod
+    def fuse(self, at: float):
+        pass
+
 
 class PureSegmentationMixin(metaclass=ABCMeta):
     """A segmentation containing _only_ segments"""
@@ -222,6 +250,15 @@ class PureSegmentationMixin(metaclass=ABCMeta):
     # TODO: add __and__ (defaults to crop intersection, not in place), that only takes objects of Self type?
 
     # TODO: can actually take any BaseSegmentation for add & remove
+
+    @abstractmethod
+    def crop_iter(self,
+                  support: Support,
+                  mode: CropMode = 'intersection',
+                  returns_mapping: bool = False) \
+            -> Iterator[Union[Tuple[Segment, Segment], Segment]]:
+        pass
+
     @abstractmethod
     def add(self, segment: Segment):
         pass
@@ -230,10 +267,12 @@ class PureSegmentationMixin(metaclass=ABCMeta):
     def remove(self, segment: Segment):
         pass
 
+    # TODO: maybe could be in BaseSegmentation
     @abstractmethod
     def index(self, segment: Segment) -> int:
         pass
 
+    # TODO: maybe could be in BaseSegmentation
     @abstractmethod
     def overlapping(self, t: float) -> List[Segment]:
         pass
