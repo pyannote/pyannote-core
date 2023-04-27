@@ -187,15 +187,14 @@ class Partition(PureSegmentationMixin, ContiguousAnnotationMixin, BaseSegmentati
         self._segments_bounds_set.add(at)
 
     def fuse(self, at: float):
+        if at in set(self.boundaries):
+            raise RuntimeError("Cannot fuse start or end boundary of the partition")
         try:
             self._segments_bounds_set.remove(at)
         except KeyError:
             raise RuntimeError("Cannot fuse non-existing boundary")
 
     def add(self, segment: Segment):
-        # TODO: fix (check for segment inclusion)
-        if len(list(self.co_iter(segment))) > 1:
-            raise ValueError("Segment overlaps a boundary")
         self.bisect(segment.start)
         self.bisect(segment.end)
 

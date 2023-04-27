@@ -124,26 +124,15 @@ from .utils.types import Label, Key, Support, TierName, CropMode, ContiguousSupp
 # TODO: QUESTIONS:
 #  - iterator for the TieredAnnotation
 
-# TODO: add segmentation abstract class
-
-# TODO: IDEA: use a timeline in the Tier to do all the cropping/etc/ operations
-#  and just make this class a thin wrapper for it
 T = Type[Union[Partition, Timeline]]
 
 
 class BaseTier(BaseSegmentation, AnnotatedSegmentationMixin, Generic[T]):
-    _segmentation_type: T
-
-    # TODO: handle segment sets changes for
-    #  - bisect (partition)
-    #  - crop (partition/timeline)
-    #  - for extrusion, should be based on cropping
+    _segmentation: Union[Partition, Timeline]
 
     def __init__(self, name: str = None, uri: str = None):
         super().__init__(uri)
         self.name = name
-
-        self._segmentation = self._segmentation_type()
         self._segments: Dict[Segment, TierLabel] = dict()
 
     @abstractmethod
@@ -151,12 +140,13 @@ class BaseTier(BaseSegmentation, AnnotatedSegmentationMixin, Generic[T]):
         pass
 
     def __getitem__(self, key: Union[Segment, int]) -> Any:
+        # TODO: check int key
         if isinstance(key, int):
             key = self._segmentation.__getitem__(key)
         return self._segments[key]
 
     def __delitem__(self, key: Union[Segment, int]):
-        # TODO: check
+        #  TODO: check int key
         if isinstance(key, int):
             key = self._segmentation.__getitem__(key)
 
@@ -229,21 +219,49 @@ class BaseTier(BaseSegmentation, AnnotatedSegmentationMixin, Generic[T]):
     def extent(self) -> Segment:
         return self._segmentation.extent()
 
-
     def duration(self) -> float:
         return self._segmentation.duration()
+
+    def crop(self,
+             support: ContiguousSupport,
+             mode: CropMode = 'intersection',
+             returns_mapping: bool = False) \
+            -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
+        if mode in {"loose", "strict"}:
+            cropped_seg = self._segmentation.crop(support, mode=mode)
+            annotated_segments = {seg: self._segments[seg] for seg in cropped_seg}
+        else:  # it's "intersection"
+            cropped_seg, mapping = self._segmentation.crop(support, mode="intersection", returns_mapping=True)
+            annotated_segments = {}
+            for seg, mapped_to in mapping.items():
+                annotated_segments.update({
+                    seg: self._segments[mapped_seg] for mapped_seg in mapped_to
+                })
+
+        new_tier = self.__class__(self.name, uri=self.uri)
+        new_tier._segmentation = cropped_seg
+        new_tier._segments = annotated_segments
+        if returns_mapping and mode == "intersection":
+            return new_tier, mapping  # noqa
+        else:
+            return new_tier
 
     def _repr_png_(self):
         pass
 
 
 class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
-    _segmentation_type = Timeline
-    _segmentation: Timeline
-    """A set of chronologically-ordered and annotated segments"""
+    """A set of chronologically-ordered and non-overlapping annotated segments"""
+
+    # TODO: crop-safe or non-overlapping?
+
+    def __init__(self, name: str = None, uri: str = None):
+        super().__init__(name, uri)
+        self._segmentation = Timeline()
 
     def __setitem__(self, segment: Segment, label: Any):
-        # TODO: check
+        if list(self._segmentation.co_iter(segment)):
+            raise RuntimeError("Cannot add a segment that overlaps a pre-existing segment")
         self._segmentation.add(segment)
         self._segments[segment] = label
 
@@ -252,13 +270,6 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
 
     def gaps(self, support: Optional[Support] = None) -> 'Timeline':
         return self._segmentation.gaps(support)
-
-    def crop(self, support: Support, mode: CropMode = 'intersection', returns_mapping: bool = False) -> Union[
-        Self, Tuple[Self, Dict[Segment, Segment]]]:
-        # TODO (for segments mapping):
-        #  - if loose/strict, use segment_set of cropped segmentation to find deleted segments
-        #  - if intersection, use return_mapping to replace sliced segments
-        return self._segmentation.crop(support, mode, returns_mapping)
 
     def support(self, collar: float = 0.) -> Timeline:
         return self._segmentation.support(collar)
@@ -276,10 +287,13 @@ class Tier(GappedAnnotationMixin, BaseTier[Timeline]):
 
 class PartitionTier(ContiguousAnnotationMixin, BaseTier[Partition]):
     """A set of chronologically-ordered, contiguous and non-overlapping annotated segments"""
-    _segmentation_type = Partition
-    _segmentation: Partition
+
+    def __init__(self, boundaries: Segment, name: str = None, uri: str = None):
+        super().__init__(name, uri)
+        self._segmentation = Partition(boundaries=boundaries)
 
     def __setitem__(self, segment: Segment, label: Any):
+        # TODO: maybe allow segment setting for segments that are not yet annotated?
         if not segment in self._segmentation:
             raise RuntimeError(f"Segment {segment} not contained in the tier's partition")
         self._segments[segment] = label
@@ -296,33 +310,6 @@ class PartitionTier(ContiguousAnnotationMixin, BaseTier[Partition]):
         annot = self._segments[bisected_segment]
         del self._segments[bisected_segment]
         self._segments.update({seg: annot for seg in bisected_segment.bisect(at)})
-
-    def fuse(self, at: float):
-        # To know if segments can be fused, check segment before fuse and after fuse
-        # if they have matching annotations, allow fuse
-        pass
-
-    def crop(self,
-             support: ContiguousSupport,
-             mode: CropMode = 'intersection') -> Union[Self, Tuple[Self, Dict[Segment, Segment]]]:
-        seg_set = self.segments_set().copy()
-        if mode in {"loose", "strict"}:
-            cropped_seg = self._segmentation.crop(support, mode=mode)
-            annotated_segments = {seg: self._segments[seg] for seg in cropped_seg}
-        else: # it's "intersection"
-            cropped_seg, mapping = self._segmentation.crop(support, mode="intersection", returns_mapping=True)
-            annotated_segments = {}
-            # TODO: for tiers based on timelines, figure out what to do when cropped segment maps to several
-            #  annotations. Use (segment, annot) pairs maybe? Raise an error?
-            for seg, mapped_to in mapping.items():
-                annotated_segments.update({
-                    seg: self._segments[mapped_seg] for mapped_seg in mapped_to
-                })
-
-        # TODO:
-        #  - if "intersection", use the return mapping to remove segments
-        #  - if loose or strict, find missing segments and remove them
-        pass
 
     def update(self, tier: 'BaseTier') -> 'BaseTier':
         raise RuntimeError(f"A {self.__class__.__name__} cannot be updated.")
@@ -399,12 +386,9 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
         """
         return len(self) > 0
 
-
-
     def __iter__(self) -> Iterable[Tuple[Segment, str]]:
         # TODO
         pass
-
 
     def __eq__(self, other: 'TieredAnnotation'):
         """Equality
@@ -441,7 +425,6 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
         """
         return included in self.get_timeline(copy=False)
 
-
     def __delitem__(self, key: TierName):
         """Delete a tier
         # TODO : doc
@@ -456,7 +439,6 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
         """
 
         return self._tiers[key]
-
 
     def __setitem__(self, key: Key, label: Label):
         pass  # TODO : set a tier
@@ -479,7 +461,7 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
             Empty annotation using the same 'uri' and 'modality' attributes.
 
         """
-        return self.__class__(uri=self.uri, modality=self.modality)
+        return self.__class__(uri=self.uri)
 
     def itersegments(self):
         """Iterate over segments (in chronological order)
@@ -496,8 +478,6 @@ class TieredAnnotation(GappedAnnotationMixin, BaseSegmentation):
 
     def to_textgrid(self, file: Union[str, Path, TextIO]):
         pass
-
-
 
     def to_annotation(self, modality: Optional[str] = None) -> Annotation:
         """Convert to an annotation object. The new annotation's labels

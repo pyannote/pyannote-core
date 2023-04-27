@@ -111,8 +111,6 @@ class BaseSegmentation(metaclass=ABCMeta):
     def extent(self) -> Segment:
         pass
 
-
-
     @abstractmethod
     def duration(self) -> float:
         pass
@@ -202,7 +200,6 @@ class ContiguousAnnotationMixin(BaseSegmentation):
     # TODO : figure out if the return mapping still makes sense
     #  (propably not)
 
-
     def co_iter(self, other: Union['BaseSegmentation', Segment]) -> Iterator[Tuple[Segment, Segment]]:
         if not isinstance(other, (ContiguousAnnotationMixin, Segment)):
             return super().co_iter(other)
@@ -237,10 +234,6 @@ class ContiguousAnnotationMixin(BaseSegmentation):
 
     @abstractmethod
     def bisect(self, at: float):
-        pass
-
-    @abstractmethod
-    def fuse(self, at: float):
         pass
 
 
