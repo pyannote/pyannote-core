@@ -126,7 +126,7 @@ class Notebook:
         self.reset()
 
     def reset(self):
-        from matplotlib.cm import get_cmap
+        from matplotlib.pyplot import get_cmap
 
         linewidth = [3, 1]
         linestyle = ["solid", "dashed", "dotted"]
