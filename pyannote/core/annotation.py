@@ -187,15 +187,17 @@ class Annotation:
         """
         segment_list = []
         for line in rttm_file:
-            splitted_line = line.rstrip().split(" ")
-            uri = uri if isinstance(uri,str) else splitted_line[1]
-            segment_list.append(
-                (
-                    Segment(start=float(splitted_line[3]), end=float(splitted_line[3]) + float(splitted_line[4])),
-                    int(splitted_line[2]),
-                    str(splitted_line[7]),
+            if not line.isspace() :
+                line =  ' '.join(line.split()) # Remove eventual multiple and trailing spaces in rttm line
+                splitted_line = line.rstrip().split(" ") 
+                uri = uri if isinstance(uri,str) else splitted_line[1]
+                segment_list.append(
+                    (
+                        Segment(start=float(splitted_line[3]), end=float(splitted_line[3]) + float(splitted_line[4])),
+                        int(splitted_line[2]),
+                        str(splitted_line[7]),
+                    )
                 )
-            )
         return Annotation.from_records(segment_list, uri, modality)
 
     @classmethod
@@ -224,10 +226,11 @@ class Annotation:
         """
         segment_list = []
         for line in audacity_file:
-            start, end, label = line.rstrip().split("\t")
-            segment_list.append(
-                (Segment(start=float(start), end=float(end)), 1, str(label))
-            )
+            if not line.isspace() :
+                start, end, label = line.rstrip().split("\t")
+                segment_list.append(
+                    (Segment(start=float(start), end=float(end)), 1, str(label))
+                )
         return Annotation.from_records(segment_list, uri, modality)
 
     @classmethod
