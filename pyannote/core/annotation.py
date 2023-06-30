@@ -107,9 +107,11 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
 import itertools
+import functools
 import warnings
 from collections import defaultdict
 from typing import (
+    Callable,
     Hashable,
     Optional,
     Dict,
@@ -388,31 +390,6 @@ class Annotation:
                 f"<NA> <NA> {label} <NA> <NA>\n"
             )
 
-    def to_rttm(self) -> Text:
-        """Serialize annotation as a string using RTTM format
-
-        Returns
-        -------
-        serialized: str
-            RTTM string
-        """
-        return "".join([line for line in self._iter_rttm()])
-
-    def write_rttm(self, file: TextIO):
-        """Dump annotation to file using RTTM format
-
-        Parameters
-        ----------
-        file : file object
-
-        Usage
-        -----
-        >>> with open('file.rttm', 'w') as file:
-        ...     annotation.write_rttm(file)
-        """
-        for line in self._iter_rttm():
-            file.write(line)
-
     def _iter_lab(self) -> Iterator[Text]:
         """Generate lines for a LAB file for this annotation
 
@@ -430,30 +407,43 @@ class Annotation:
                 raise ValueError(msg)
             yield f"{segment.start:.3f} {segment.start + segment.duration:.3f} {label}\n"
 
-    def to_lab(self) -> Text:
-        """Serialize annotation as a string using LAB format
+    def _serialize(self, iter_func : Callable) -> Text :
+        """Serialize annotation as a string given an iter function
 
+        Parameters
+        ----------
+        iter_func : function
+            Function generating lines for a given format, e.g. "_iter_rttm","_iter_lab",etc.
         Returns
         -------
         serialized: str
-            LAB string
+            String in the specified format
         """
-        return "".join([line for line in self._iter_lab()])
-
-    def write_lab(self, file: TextIO):
-        """Dump annotation to file using LAB format
+        return "".join([line for line in iter_func(self)])
+    
+    to_rttm = functools.partialmethod(_serialize, iter_func = _iter_rttm) # Serialize to RTTM string 
+    to_lab = functools.partialmethod(_serialize, iter_func = _iter_lab) # Serialize to LAB string
+    to_audacity = functools.partialmethod(_serialize, iter_func = _iter_audacity) # Serialize to Audacity marker string
+    
+    def _write(self, file: TextIO, iter_func: Callable):
+        """Dump annotation to file using specified format
 
         Parameters
         ----------
         file : file object
-
+        iter_func : function
         Usage
         -----
-        >>> with open('file.lab', 'w') as file:
-        ...     annotation.write_lab(file)
+        >>> with open('file.txt', 'w') as file:
+        ...     annotation.write_audacity(file)
         """
-        for line in self._iter_lab():
+        for line in iter_func(self):
             file.write(line)
+    
+    write_rttm = functools.partialmethod(_write, iter_func = _iter_rttm) # Dump annotation to RTTM file
+    write_lab = functools.partialmethod(_write, iter_func = _iter_lab) # Dump annotation to LAB file
+    write_audacity = functools.partialmethod(_write, iter_func = _iter_audacity) # Dump annotation to Audacity marker file
+
 
     def crop(self, support: Support, mode: CropMode = "intersection") -> "Annotation":
         """Crop annotation to new support
