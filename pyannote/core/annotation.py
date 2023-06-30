@@ -407,6 +407,17 @@ class Annotation:
                 raise ValueError(msg)
             yield f"{segment.start:.3f} {segment.start + segment.duration:.3f} {label}\n"
 
+    def _iter_audacity(self) -> Iterator[Text]:
+        """Generate lines for a audacity marker file for this annotation
+
+        Returns
+        -------
+        iterator: Iterator[str]
+            An iterator over audacity text lines
+        """
+        for segment, _, label in self.itertracks(yield_label=True):
+            yield f"{segment.start:.3f}\t{segment.start + segment.duration:.3f}\t{label}\n"
+
     def _serialize(self, iter_func : Callable) -> Text :
         """Serialize annotation as a string given an iter function
 
