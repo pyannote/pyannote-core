@@ -162,6 +162,75 @@ class Annotation:
     """
 
     @classmethod
+    def from_rttm(
+        cls, 
+        rttm_file: TextIO, 
+        uri: Optional[str] = None, 
+        modality: Optional[str] = None,
+    ) -> "Annotation":
+        """Create annotation from rttm
+
+        Parameters
+        ----------
+        rttm_file : string,
+            path to the rttm file
+        uri : string, optional
+            name of annotated resource (e.g. audio or video file)
+        modality : string, optional
+            name of annotated modality
+
+        Returns
+        -------
+        annotation : Annotation
+            New annotation
+
+        """
+        segment_list = []
+        for line in rttm_file:
+            splitted_line = line.rstrip().split(" ")
+            uri = uri if isinstance(uri,str) else splitted_line[1]
+            segment_list.append(
+                (
+                    Segment(start=float(splitted_line[3]), end=float(splitted_line[3]) + float(splitted_line[4])),
+                    int(splitted_line[2]),
+                    str(splitted_line[7]),
+                )
+            )
+        return Annotation.from_records(segment_list, uri, modality)
+
+    @classmethod
+    def from_audacity(
+        cls,
+        audacity_file: str,
+        uri: Optional[str] = None,
+        modality: Optional[str] = None,
+    ) -> "Annotation":
+        """Create annotation from audacity marker file
+
+        Parameters
+        ----------
+        audacity_txt_file : string,
+            path to the rttm file
+        uri : string, optional
+            name of annotated resource (e.g. audio or video file)
+        modality : string, optional
+            name of annotated modality
+
+        Returns
+        -------
+        annotation : Annotation
+            New annotation
+
+        """
+        segment_list = []
+        for line in audacity_file:
+            start, end, label = line.rstrip().split("\t")
+            segment_list.append(
+                (Segment(start=float(start), end=float(end)), 1, str(label))
+            )
+        return Annotation.from_records(segment_list, uri, modality)
+
+    @classmethod
     def from_df(
         cls,
         df: "pd.DataFrame",
