@@ -413,6 +413,25 @@ class Annotation:
         for line in self._iter_rttm():
             file.write(line)
 
+    def from_rttm(self, file: TextIO):
+        """Load annotation from RTTM file
+
+        Parameters
+        ----------
+        file : file object
+
+        Usage
+        -----
+        >>> annotation = Annotation.from_rttm(open('file.rttm', 'r'))
+        """
+        for line in file.readlines()
+            if line.startswith("SPEAKER"):
+                _, _, _, start, duration, _, _, _, label, _ = line.split()
+                start = float(start)
+                duration = float(duration)
+                segment = Segment(start, start + duration)
+                self[segment] = label
+
     def _iter_lab(self) -> Iterator[Text]:
         """Generate lines for a LAB file for this annotation
 
