@@ -186,19 +186,22 @@ class Annotation:
 
         """
         segment_list = []
+        default_uri = uri if isinstance(uri,str) else rttm_file.readline().split(" ")[1] # if not specified, default uri is read from the first line of the file
         for line in rttm_file:
-            if not line.isspace() :
+            if not line.isspace() and line.startswith("SPEAKER"):
                 line =  ' '.join(line.split()) # Remove eventual multiple and trailing spaces in rttm line
-                splitted_line = line.rstrip().split(" ") 
-                uri = uri if isinstance(uri,str) else splitted_line[1]
-                segment_list.append(
-                    (
-                        Segment(start=float(splitted_line[3]), end=float(splitted_line[3]) + float(splitted_line[4])),
-                        int(splitted_line[2]),
-                        str(splitted_line[7]),
+                _,segment_uri,channel,start,length,_,_,label,_,_ =  line.rstrip().split(" ")
+                if segment_uri != default_uri and not isinstance(uri,str):
+                     raise Exception("Provided input rttm file contains data for more than one audio file, please specify uri. Found at least 2: {} and {}".format(default_uri,segment_uri))
+                elif segment_uri == default_uri :
+                    segment_list.append(
+                        (
+                            Segment(start=float(start), end=float(start) + float(length)),
+                            int(channel),
+                            str(label),
+                        )
                     )
-                )
-        return Annotation.from_records(segment_list, uri, modality)
+        return Annotation.from_records(segment_list, default_uri, modality)
 
     @classmethod
     def from_audacity(
