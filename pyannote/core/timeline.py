@@ -182,7 +182,7 @@ class Timeline:
         """
         return len(self.segments_set_) > 0
 
-    def __iter__(self) -> Iterable[Segment]:
+    def __iter__(self) -> Iterator[Segment]:
         """Iterate over segments (in chronological order)
 
         >>> for segment in timeline:
