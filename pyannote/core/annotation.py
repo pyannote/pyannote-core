@@ -122,6 +122,7 @@ from typing import (
     Iterator,
     Text,
     TYPE_CHECKING,
+    NamedTuple,
 )
 
 import numpy as np
@@ -139,7 +140,17 @@ from .utils.generators import string_generator, int_generator
 from .utils.types import Label, Key, Support, LabelGenerator, TrackName, CropMode
 
 if TYPE_CHECKING:
-    import pandas as pd
+    import pandas as pd  # type: ignore
+
+
+class SegmentTrack(NamedTuple):
+    segment: Segment
+    track: TrackName
+
+class SegmentTrackLabel(NamedTuple):
+    segment: Segment
+    track: TrackName
+    label: Label
 
 
 class Annotation:
@@ -187,7 +198,7 @@ class Annotation:
         self._labelNeedsUpdate: Dict[Label, bool] = {}
 
         # timeline meant to store all annotated segments
-        self._timeline: Timeline = None
+        self._timeline: Optional[Timeline] = None
         self._timelineNeedsUpdate: bool = True
 
     @property
@@ -213,7 +224,7 @@ class Annotation:
 
         # accumulate segments for updated labels
         _segments = {label: [] for label in update}
-        for segment, track, label in self.itertracks(yield_label=True):
+        for segment, track, label in self.itertracks_with_labels():
             if label in update:
                 _segments[label].append(segment)
 
@@ -261,8 +272,12 @@ class Annotation:
 
     def itertracks(
         self, yield_label: bool = False
-    ) -> Iterator[Union[Tuple[Segment, TrackName], Tuple[Segment, TrackName, Label]]]:
+    ) -> Iterator[Union[SegmentTrack, SegmentTrackLabel]]:
         """Iterate over tracks (in chronological order)
+
+        Typed version of :func:`itertracks`:
+        - :func:`itertracks_without_labels` yields (segment, track) tuples (SegmentTrack)
+        - :func:`itertracks_with_labels` yields (segment, track, label) tuples (SegmentTrackLabel)
 
         Parameters
         ----------
@@ -277,7 +292,7 @@ class Annotation:
         >>> for segment, track in annotation.itertracks():
         ...     # do something with the track
 
-        >>> for segment, track, label in annotation.itertracks(yield_label=True):
+        >>> for segment, track, label in annotation.itertracks_with_labels():
         ...     # do something with the track and its label
         """
 
@@ -286,9 +301,17 @@ class Annotation:
                 tracks.items(), key=lambda tl: (str(tl[0]), str(tl[1]))
             ):
                 if yield_label:
-                    yield segment, track, lbl
+                    yield SegmentTrackLabel(segment, track, lbl)
                 else:
-                    yield segment, track
+                    yield SegmentTrack(segment, track)
+
+    def itertracks_with_labels(self) -> Iterator[SegmentTrackLabel]:
+        """Typed version of :func:`itertracks`(yield_label=True)"""
+        return self.itertracks_with_labels()  # type: ignore
+
+    def itertracks_without_labels(self) -> Iterator[SegmentTrack]:
+        """Typed version of :func:`itertracks`(yield_label=False)"""
+        return self.itertracks(yield_label=False)  # type: ignore
 
     def _updateTimeline(self):
         self._timeline = Timeline(segments=self._tracks, uri=self.uri)
@@ -317,9 +340,14 @@ class Annotation:
         """
         if self._timelineNeedsUpdate:
             self._updateTimeline()
+
+        timeline_ = self._timeline
+        if timeline_ is None:
+            timeline_ = Timeline(uri=self.uri)
+
         if copy:
-            return self._timeline.copy()
-        return self._timeline
+            return timeline_.copy()
+        return timeline_
 
     def __eq__(self, other: "Annotation"):
         """Equality
@@ -330,14 +358,14 @@ class Annotation:
         labels are equal.
         """
         pairOfTracks = itertools.zip_longest(
-            self.itertracks(yield_label=True), other.itertracks(yield_label=True)
+            self.itertracks_with_labels(), other.itertracks_with_labels()
         )
         return all(t1 == t2 for t1, t2 in pairOfTracks)
 
     def __ne__(self, other: "Annotation"):
         """Inequality"""
         pairOfTracks = itertools.zip_longest(
-            self.itertracks(yield_label=True), other.itertracks(yield_label=True)
+            self.itertracks_with_labels(), other.itertracks_with_labels()
         )
 
         return any(t1 != t2 for t1, t2 in pairOfTracks)
@@ -376,7 +404,7 @@ class Annotation:
                 f'containing spaces (got: "{uri}").'
             )
             raise ValueError(msg)
-        for segment, _, label in self.itertracks(yield_label=True):
+        for segment, _, label in self.itertracks_with_labels():
             if isinstance(label, Text) and " " in label:
                 msg = (
                     f"Space-separated RTTM file format does not allow labels "
@@ -421,7 +449,7 @@ class Annotation:
         iterator: Iterator[str]
             An iterator over LAB text lines
         """
-        for segment, _, label in self.itertracks(yield_label=True):
+        for segment, _, label in self.itertracks_with_labels():
             if isinstance(label, Text) and " " in label:
                 msg = (
                     f"Space-separated LAB file format does not allow labels "
@@ -555,6 +583,9 @@ class Annotation:
 
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
+
+        else:
+            raise TypeError("unsupported support type: '%s'" % type(support))
 
     def extrude(
         self, removed: Support, mode: CropMode = "intersection"
@@ -775,7 +806,7 @@ class Annotation:
         """Human-friendly representation"""
         # TODO: use pandas.DataFrame
         return "\n".join(
-            ["%s %s %s" % (s, t, l) for s, t, l in self.itertracks(yield_label=True)]
+            ["%s %s %s" % (s, t, l) for s, t, l in self.itertracks_with_labels()]
         )
 
     def __delitem__(self, key: Key):
@@ -1020,7 +1051,7 @@ class Annotation:
         result = self.copy() if copy else self
 
         # TODO speed things up by working directly with annotation internals
-        for segment, track, label in annotation.itertracks(yield_label=True):
+        for segment, track, label in annotation.itertracks_with_labels():
             result[segment, track] = label
 
         return result
@@ -1178,7 +1209,7 @@ class Annotation:
             key=lambda x: x[1],
         )[0]
 
-    def rename_tracks(self, generator: LabelGenerator = "string") -> "Annotation":
+    def rename_tracks(self, generator: Union[LabelGenerator, Iterable[str], Iterable[int]] = "string") -> "Annotation":
         """Rename all tracks
 
         Parameters
@@ -1215,13 +1246,17 @@ class Annotation:
         renamed = self.__class__(uri=self.uri, modality=self.modality)
 
         if generator == "string":
-            generator = string_generator()
+            generator_ = string_generator()
         elif generator == "int":
-            generator = int_generator()
+            generator_ = int_generator()
+        elif isinstance(generator, Iterable):
+            generator_ = iter(generator)
+        else:
+            raise ValueError("generator must be 'string', 'int', or iterable")
 
         # TODO speed things up by working directly with annotation internals
-        for s, _, label in self.itertracks(yield_label=True):
-            renamed[s, next(generator)] = label
+        for s, _, label in self.itertracks_with_labels():
+            renamed[s, next(generator_)] = label
         return renamed
 
     def rename_labels(
@@ -1303,7 +1338,7 @@ class Annotation:
             generator = int_generator()
 
         relabeled = self.empty()
-        for s, t, _ in self.itertracks(yield_label=True):
+        for s, t, _ in self.itertracks_with_labels():
             relabeled[s, t] = next(generator)
 
         return relabeled
@@ -1439,11 +1474,11 @@ class Annotation:
         duration: Optional[float] = None,
     ):
         """Discretize
-        
+
         Parameters
         ----------
         support : Segment, optional
-            Part of annotation to discretize. 
+            Part of annotation to discretize.
             Defaults to annotation full extent.
         resolution : float or SlidingWindow, optional
             Defaults to 10ms frames.
