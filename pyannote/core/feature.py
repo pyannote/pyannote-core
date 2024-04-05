@@ -36,11 +36,11 @@ See :class:`pyannote.core.SlidingWindowFeature` for the complete reference.
 """
 import numbers
 import warnings
-from typing import Tuple, Optional, Union, Iterator, List, Text
+from typing import Tuple, Optional, Union, Iterator, List
 
 import numpy as np
 
-from pyannote.core.utils.types import Alignment
+from pyannote.core.utils.types import Alignment, Label
 from .segment import Segment
 from .segment import SlidingWindow
 from .timeline import Timeline
@@ -58,7 +58,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     """
 
     def __init__(
-        self, data: np.ndarray, sliding_window: SlidingWindow, labels: List[Text] = None
+        self, data: np.ndarray, sliding_window: SlidingWindow, labels: Optional[List[Label]] = None
     ):
         self.sliding_window: SlidingWindow = sliding_window
         self.data = data
@@ -106,7 +106,7 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
         self.__i += 1
         try:
             return self.sliding_window[self.__i], self.data[self.__i]
-        except IndexError as e:
+        except IndexError:
             raise StopIteration()
 
     def next(self):
