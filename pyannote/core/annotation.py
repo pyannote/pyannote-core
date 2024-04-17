@@ -307,7 +307,7 @@ class Annotation:
 
     def itertracks_with_labels(self) -> Iterator[SegmentTrackLabel]:
         """Typed version of :func:`itertracks`(yield_label=True)"""
-        return self.itertracks_with_labels()  # type: ignore
+        return self.itertracks(yield_label=True)  # type: ignore
 
     def itertracks_without_labels(self) -> Iterator[SegmentTrack]:
         """Typed version of :func:`itertracks`(yield_label=False)"""
