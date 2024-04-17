@@ -92,6 +92,8 @@ import warnings
 from typing import (Optional, Iterable, List, Union, Callable,
                     TextIO, Tuple, TYPE_CHECKING, Iterator, Dict, Text)
 
+# sortedcontainers does not support type hinting
+# introduces some type: ignore comments below.
 from sortedcontainers import SortedList
 
 from . import PYANNOTE_SEGMENT
@@ -104,7 +106,7 @@ from .utils.types import Support, Label, CropMode
 #  https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports
 if TYPE_CHECKING:
     from .annotation import Annotation
-    import pandas as pd
+    import pandas as pd  # type: ignore
 
 
 # =====================================================================
@@ -141,13 +143,13 @@ class Timeline:
 
     def __init__(self,
                  segments: Optional[Iterable[Segment]] = None,
-                 uri: str = None):
+                 uri: Optional[str] = None):
         if segments is None:
             segments = ()
 
         # set of segments (used for checking inclusion)
         # Store only non-empty Segments.
-        segments_set = set([segment for segment in segments if segment])
+        segments_set = set(segment for segment in segments if segment)
 
         self.segments_set_ = segments_set
 
@@ -159,7 +161,7 @@ class Timeline:
         self.segments_boundaries_ = SortedList(boundaries)
 
         # path to (or any identifier of) segmented resource
-        self.uri: str = uri
+        self.uri: Optional[str] = uri
 
     def __len__(self):
         """Number of segments
@@ -200,7 +202,7 @@ class Timeline:
         >>> first_segment = timeline[0]
         >>> penultimate_segment = timeline[-2]
         """
-        return self.segments_list_[k]
+        return self.segments_list_[k]  # type: ignore
 
     def __eq__(self, other: 'Timeline'):
         """Equality
@@ -320,7 +322,7 @@ class Timeline:
     def __ior__(self, timeline: 'Timeline') -> 'Timeline':
         return self.update(timeline)
 
-    def update(self, timeline: Segment) -> 'Timeline':
+    def update(self, timeline: 'Timeline') -> 'Timeline':
         """Add every segments of an existing timeline (in place)
 
         Parameters
@@ -465,6 +467,20 @@ class Timeline:
             else:
                 yield mapped_to
 
+    def crop_iter_no_mapping(self,
+            support: Support,
+            mode: CropMode = 'intersection') \
+            -> Iterator[Segment]:
+        """Typed version of crop_iter without mapping"""
+        return self.crop_iter(support=support, mode=mode, returns_mapping=False)  # type: ignore
+
+    def crop_iter_with_mapping(self,
+            support: Support,
+            mode: CropMode = 'intersection') \
+            -> Iterator[Tuple[Segment, Segment]]:
+        """Typed version of crop_iter with mapping"""
+        return self.crop_iter(support=support, mode=mode, returns_mapping=True)  # type: ignore
+
     def crop(self,
              support: Support,
              mode: CropMode = 'intersection',
@@ -516,15 +532,28 @@ class Timeline:
 
         if mode == 'intersection' and returns_mapping:
             segments, mapping = [], {}
-            for segment, mapped_to in self.crop_iter(support,
-                                                     mode='intersection',
-                                                     returns_mapping=True):
+            for segment, mapped_to in self.crop_iter_with_mapping(support,
+                                                     mode='intersection'):
                 segments.append(mapped_to)
                 mapping[mapped_to] = mapping.get(mapped_to, list()) + [segment]
             return Timeline(segments=segments, uri=self.uri), mapping
 
-        return Timeline(segments=self.crop_iter(support, mode=mode),
+        return Timeline(segments=self.crop_iter_no_mapping(support, mode=mode),
                         uri=self.uri)
+
+    def crop_with_mapping(self,
+            support: Support,
+            mode: CropMode = 'intersection') \
+            -> Tuple['Timeline', Dict[Segment, List[Segment]]]:
+        """Typed version of crop with mapping"""
+        return self.crop(support=support, mode=mode, returns_mapping=True)  # type: ignore
+
+    def crop_no_mapping(self,
+            support: Support,
+            mode: CropMode = 'intersection') \
+            -> 'Timeline':
+        """Typed version of crop without mapping"""
+        return self.crop(support=support, mode=mode, returns_mapping=False)  # type: ignore
 
     def overlapping(self, t: float) -> List[Segment]:
         """Get list of segments overlapping `t`
@@ -622,7 +651,7 @@ class Timeline:
             mode = "strict"
         elif mode == "strict":
             mode = "loose"
-        return self.crop(truncating_support, mode=mode)
+        return self.crop_no_mapping(truncating_support, mode=mode)
 
     def __str__(self):
         """Human-readable representation
@@ -705,7 +734,7 @@ class Timeline:
 
     def covers(self, other: 'Timeline') -> bool:
         """Check whether other timeline is fully covered by the timeline
-        
+
         Parameter
         ---------
         other : Timeline
@@ -718,16 +747,16 @@ class Timeline:
             one segment of "other" is not fully covered by timeline
         """
 
-        # compute gaps within "other" extent 
-        # this is where we should look for possible faulty segments 
+        # compute gaps within "other" extent
+        # this is where we should look for possible faulty segments
         gaps = self.gaps(support=other.extent())
 
-        # if at least one gap intersects with a segment from "other", 
+        # if at least one gap intersects with a segment from "other",
         # "self" does not cover "other" entirely --> return False
         for _ in gaps.co_iter(other):
             return False
 
-        # if no gap intersects with a segment from "other", 
+        # if no gap intersects with a segment from "other",
         # "self" covers "other" entirely --> return True
         return True
 
@@ -790,8 +819,8 @@ class Timeline:
         """
         if self.segments_set_:
             segments_boundaries_ = self.segments_boundaries_
-            start = segments_boundaries_[0]
-            end = segments_boundaries_[-1]
+            start: float = segments_boundaries_[0]  # type: ignore
+            end: float = segments_boundaries_[-1]  # type: ignore
             return Segment(start=start, end=end)
 
         return Segment(start=0.0, end=0.0)
@@ -818,7 +847,7 @@ class Timeline:
 
         # Initialize new support segment
         # as very first segment of the timeline
-        new_segment = self.segments_list_[0]
+        new_segment: Segment = self.segments_list_[0]  # type: ignore
 
         for segment in self:
 
@@ -918,7 +947,7 @@ class Timeline:
             end = support.start
 
             # support on the intersection of timeline and provided segment
-            for segment in self.crop(support, mode='intersection').support():
+            for segment in self.crop_no_mapping(support, mode='intersection').support():
 
                 # add gap between each pair of consecutive segments
                 # if there is no gap, segment is empty, therefore not added
@@ -1015,8 +1044,6 @@ class Timeline:
         # becomes
         # |-|--|-|  |-|---|--|  |--|----|--|
 
-        # start with an empty copy
-        timeline = Timeline(uri=self.uri)
 
         if len(timestamps) == 0:
             return Timeline(uri=self.uri)
@@ -1034,7 +1061,7 @@ class Timeline:
         return Timeline(segments=segments, uri=self.uri)
 
     def to_annotation(self,
-                      generator: Union[str, Iterable[Label], None, None] = 'string',
+                      generator: Union[str, Iterable[Label], None] = 'string',
                       modality: Optional[str] = None) \
             -> 'Annotation':
         """Turn timeline into an annotation
@@ -1056,15 +1083,22 @@ class Timeline:
 
         from .annotation import Annotation
         annotation = Annotation(uri=self.uri, modality=modality)
-        if generator == 'string':
+        if generator == 'string' or generator is None:
             from .utils.generators import string_generator
-            generator = string_generator()
+            generator_ = string_generator()
         elif generator == 'int':
             from .utils.generators import int_generator
-            generator = int_generator()
+            generator_ = int_generator()
+        elif isinstance(generator, Iterable):
+            generator_ = iter(generator)
+        else:
+            msg = ("`generator` must be one of 'string', 'int', or an iterable "
+                   "(got {generator}).")
+            raise ValueError(msg.format(generator=generator))
+
 
         for segment in self:
-            annotation[segment] = next(generator)
+            annotation[segment] = next(generator_)
 
         return annotation
 
