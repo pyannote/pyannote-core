@@ -12,6 +12,13 @@ def features():
     return SlidingWindowFeature(data, window)
 
 @pytest.fixture
+def one_feature():
+    return SlidingWindowFeature(
+        np.array([ [[0, 0, 0]], [[1, 1, 1]] ]),
+        SlidingWindow()
+    )
+
+@pytest.fixture
 def segment():
     return Segment(3.3, 6.7)
 
@@ -47,3 +54,23 @@ def test_crop_fixed_out_of_bounds(features):
     expected = np.array([[0, 0, 0, 0, 1, 2, 3, 4, 5],
                          [10, 10, 10, 10, 11, 12, 13, 14, 15]]).T
     np.testing.assert_array_equal(expected, actual)
+
+def test_repr_png(features):
+    try:
+        import matplotlib
+        import IPython
+    except ModuleNotFoundError:
+        pytest.skip("notebook dependencies not available")
+    expected = b'\x89PNG'
+    actual = features._repr_png_()[:4]
+    assert expected == actual
+
+def test_repr_png_one_feature(one_feature):
+    try:
+        import matplotlib
+        import IPython
+    except ModuleNotFoundError:
+        pytest.skip("notebook dependencies not available")
+    expected = b'\x89PNG'
+    actual = one_feature._repr_png_()[:4]
+    assert expected == actual
