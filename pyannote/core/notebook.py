@@ -341,7 +341,7 @@ class Notebook:
     ):
 
         if not self.crop:
-            self.crop = feature.getExtent()
+            self.crop = feature.extent
 
         window = feature.sliding_window
         n, dimension = feature.data.shape
