@@ -442,7 +442,8 @@ def repr_feature(feature: SlidingWindowFeature):
 
         plt.rcParams["figure.figsize"] = (notebook.width, 1.5 * num_overlap)
 
-        fig, axes = plt.subplots(nrows=num_overlap, ncols=1,)
+        fig, axes = plt.subplots(nrows=num_overlap, ncols=1, squeeze=False)
+        axes = axes.flatten()
         mini, maxi = np.nanmin(feature.data), np.nanmax(feature.data)
         ylim = (mini - 0.2 * (maxi - mini), maxi + 0.2 * (maxi - mini))
         for c, (window, data) in enumerate(feature):
