@@ -1034,7 +1034,7 @@ class Timeline:
         return Timeline(segments=segments, uri=self.uri)
 
     def to_annotation(self,
-                      generator: Union[str, Iterable[Label], None, None] = 'string',
+                      generator: Union[str, Iterable[Label]] = 'string',
                       modality: Optional[str] = None) \
             -> 'Annotation':
         """Turn timeline into an annotation
