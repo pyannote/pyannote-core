@@ -2,6 +2,12 @@
 Changelog
 #########
 
+Version 5.0.1 (2024-06-14)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix return type of Timeline.__iter__ (@domsmrz)
+- improve: remove MatplotlibDeprecationWarning (@kimdwkimdw)
+
 Version 5.0.0 (2022-12-15)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
