@@ -284,10 +284,6 @@ class Annotation:
     ) -> Iterator[Union[SegmentTrack, SegmentTrackLabel]]:
         """Iterate over tracks (in chronological order)
 
-        Typed version of :func:`itertracks`:
-        - :func:`itertracks_without_labels` yields (segment, track) tuples (SegmentTrack)
-        - :func:`itertracks_with_labels` yields (segment, track, label) tuples (SegmentTrackLabel)
-
         Parameters
         ----------
         yield_label : bool, optional
@@ -313,14 +309,6 @@ class Annotation:
                     yield SegmentTrackLabel(segment, track, lbl)
                 else:
                     yield SegmentTrack(segment, track)
-
-    def itertracks_with_labels(self) -> Iterator[SegmentTrackLabel]:
-        """Typed version of :func:`itertracks`(yield_label=True)"""
-        return self.itertracks(yield_label=True)
-
-    def itertracks_without_labels(self) -> Iterator[SegmentTrack]:
-        """Typed version of :func:`itertracks`(yield_label=False)"""
-        return self.itertracks(yield_label=False)
 
     def _updateTimeline(self):
         self._timeline = Timeline(segments=self._tracks, uri=self.uri)
