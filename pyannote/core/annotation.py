@@ -107,9 +107,11 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Annotation` for the complete reference.
 """
 import itertools
+import functools
 import warnings
 from collections import defaultdict
 from typing import (
+    Callable,
     Hashable,
     Optional,
     Dict,
@@ -158,6 +160,81 @@ class Annotation:
         New annotation
 
     """
+
+    @classmethod
+    def from_rttm(
+        cls, 
+        rttm_file: TextIO, 
+        uri: Optional[str] = None, 
+        modality: Optional[str] = None,
+    ) -> "Annotation":
+        """Create annotation from rttm
+
+        Parameters
+        ----------
+        rttm_file : string,
+            path to the rttm file
+        uri : string, optional
+            name of annotated resource (e.g. audio or video file)
+        modality : string, optional
+            name of annotated modality
+
+        Returns
+        -------
+        annotation : Annotation
+            New annotation
+
+        """
+        segment_list = []
+        default_uri = uri if isinstance(uri,str) else rttm_file.readline().split(" ")[1] # if not specified, default uri is read from the first line of the file
+        for line in rttm_file:
+            if not line.isspace() and line.startswith("SPEAKER"):
+                line =  ' '.join(line.split()) # Remove eventual multiple and trailing spaces in rttm line
+                _,segment_uri,channel,start,length,_,_,label,_,_ =  line.rstrip().split(" ")
+                if segment_uri != default_uri and not isinstance(uri,str):
+                     raise Exception("Provided input rttm file contains data for more than one audio file, please specify uri. Found at least 2: {} and {}".format(default_uri,segment_uri))
+                elif segment_uri == default_uri :
+                    segment_list.append(
+                        (
+                            Segment(start=float(start), end=float(start) + float(length)),
+                            int(channel),
+                            str(label),
+                        )
+                    )
+        return Annotation.from_records(segment_list, default_uri, modality)
+
+    @classmethod
+    def from_audacity(
+        cls,
+        audacity_file: str,
+        uri: Optional[str] = None,
+        modality: Optional[str] = None,
+    ) -> "Annotation":
+        """Create annotation from audacity marker file
+
+        Parameters
+        ----------
+        audacity_txt_file : string,
+            path to the rttm file
+        uri : string, optional
+            name of annotated resource (e.g. audio or video file)
+        modality : string, optional
+            name of annotated modality
+
+        Returns
+        -------
+        annotation : Annotation
+            New annotation
+
+        """
+        segment_list = []
+        for line in audacity_file:
+            if not line.isspace() :
+                start, end, label = line.rstrip().split("\t")
+                segment_list.append(
+                    (Segment(start=float(start), end=float(end)), 1, str(label))
+                )
+        return Annotation.from_records(segment_list, uri, modality)
 
     @classmethod
     def from_df(
@@ -388,31 +465,6 @@ class Annotation:
                 f"<NA> <NA> {label} <NA> <NA>\n"
             )
 
-    def to_rttm(self) -> Text:
-        """Serialize annotation as a string using RTTM format
-
-        Returns
-        -------
-        serialized: str
-            RTTM string
-        """
-        return "".join([line for line in self._iter_rttm()])
-
-    def write_rttm(self, file: TextIO):
-        """Dump annotation to file using RTTM format
-
-        Parameters
-        ----------
-        file : file object
-
-        Usage
-        -----
-        >>> with open('file.rttm', 'w') as file:
-        ...     annotation.write_rttm(file)
-        """
-        for line in self._iter_rttm():
-            file.write(line)
-
     def _iter_lab(self) -> Iterator[Text]:
         """Generate lines for a LAB file for this annotation
 
@@ -430,30 +482,54 @@ class Annotation:
                 raise ValueError(msg)
             yield f"{segment.start:.3f} {segment.start + segment.duration:.3f} {label}\n"
 
-    def to_lab(self) -> Text:
-        """Serialize annotation as a string using LAB format
+    def _iter_audacity(self) -> Iterator[Text]:
+        """Generate lines for a audacity marker file for this annotation
 
         Returns
         -------
-        serialized: str
-            LAB string
+        iterator: Iterator[str]
+            An iterator over audacity text lines
         """
-        return "".join([line for line in self._iter_lab()])
+        for segment, _, label in self.itertracks(yield_label=True):
+            yield f"{segment.start:.3f}\t{segment.start + segment.duration:.3f}\t{label}\n"
 
-    def write_lab(self, file: TextIO):
-        """Dump annotation to file using LAB format
+    def _serialize(self, iter_func : Callable) -> Text :
+        """Serialize annotation as a string given an iter function
+
+        Parameters
+        ----------
+        iter_func : function
+            Function generating lines for a given format, e.g. "_iter_rttm","_iter_lab",etc.
+        Returns
+        -------
+        serialized: str
+            String in the specified format
+        """
+        return "".join([line for line in iter_func(self)])
+    
+    to_rttm = functools.partialmethod(_serialize, iter_func = _iter_rttm) # Serialize to RTTM string 
+    to_lab = functools.partialmethod(_serialize, iter_func = _iter_lab) # Serialize to LAB string
+    to_audacity = functools.partialmethod(_serialize, iter_func = _iter_audacity) # Serialize to Audacity marker string
+    
+    def _write(self, file: TextIO, iter_func: Callable):
+        """Dump annotation to file using specified format
 
         Parameters
         ----------
         file : file object
-
+        iter_func : function
         Usage
         -----
-        >>> with open('file.lab', 'w') as file:
-        ...     annotation.write_lab(file)
+        >>> with open('file.txt', 'w') as file:
+        ...     annotation.write_audacity(file)
         """
-        for line in self._iter_lab():
+        for line in iter_func(self):
             file.write(line)
+    
+    write_rttm = functools.partialmethod(_write, iter_func = _iter_rttm) # Dump annotation to RTTM file
+    write_lab = functools.partialmethod(_write, iter_func = _iter_lab) # Dump annotation to LAB file
+    write_audacity = functools.partialmethod(_write, iter_func = _iter_audacity) # Dump annotation to Audacity marker file
+
 
     def crop(self, support: Support, mode: CropMode = "intersection") -> "Annotation":
         """Crop annotation to new support
