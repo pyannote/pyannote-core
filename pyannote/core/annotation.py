@@ -111,6 +111,7 @@ import warnings
 from collections import defaultdict
 from typing import (
     Hashable,
+    Literal,
     Optional,
     Dict,
     Union,
@@ -122,6 +123,8 @@ from typing import (
     Iterator,
     Text,
     TYPE_CHECKING,
+    NamedTuple,
+    overload,
 )
 
 import numpy as np
@@ -139,7 +142,17 @@ from .utils.generators import string_generator, int_generator
 from .utils.types import Label, Key, Support, LabelGenerator, TrackName, CropMode
 
 if TYPE_CHECKING:
-    import pandas as pd
+    import pandas as pd  # type: ignore
+
+
+class SegmentTrack(NamedTuple):
+    segment: Segment
+    track: TrackName
+
+class SegmentTrackLabel(NamedTuple):
+    segment: Segment
+    track: TrackName
+    label: Label
 
 
 class Annotation:
@@ -187,7 +200,7 @@ class Annotation:
         self._labelNeedsUpdate: Dict[Label, bool] = {}
 
         # timeline meant to store all annotated segments
-        self._timeline: Timeline = None
+        self._timeline: Optional[Timeline] = None
         self._timelineNeedsUpdate: bool = True
 
     @property
@@ -259,9 +272,16 @@ class Annotation:
         """
         return iter(self._tracks)
 
+    @overload
+    def itertracks(self, yield_label: Literal[False] = ...) -> Iterator[SegmentTrack]: ...
+    @overload
+    def itertracks(self, yield_label: Literal[True]) -> Iterator[SegmentTrackLabel]: ...
+    @overload
+    def itertracks(self, yield_label: bool) -> Iterator[Union[SegmentTrack, SegmentTrackLabel]]: ...
+
     def itertracks(
         self, yield_label: bool = False
-    ) -> Iterator[Union[Tuple[Segment, TrackName], Tuple[Segment, TrackName, Label]]]:
+    ) -> Iterator[Union[SegmentTrack, SegmentTrackLabel]]:
         """Iterate over tracks (in chronological order)
 
         Parameters
@@ -286,9 +306,9 @@ class Annotation:
                 tracks.items(), key=lambda tl: (str(tl[0]), str(tl[1]))
             ):
                 if yield_label:
-                    yield segment, track, lbl
+                    yield SegmentTrackLabel(segment, track, lbl)
                 else:
-                    yield segment, track
+                    yield SegmentTrack(segment, track)
 
     def _updateTimeline(self):
         self._timeline = Timeline(segments=self._tracks, uri=self.uri)
@@ -317,9 +337,14 @@ class Annotation:
         """
         if self._timelineNeedsUpdate:
             self._updateTimeline()
+
+        timeline_ = self._timeline
+        if timeline_ is None:
+            timeline_ = Timeline(uri=self.uri)
+
         if copy:
-            return self._timeline.copy()
-        return self._timeline
+            return timeline_.copy()
+        return timeline_
 
     def __eq__(self, other: "Annotation"):
         """Equality
@@ -555,6 +580,9 @@ class Annotation:
 
             else:
                 raise NotImplementedError("unsupported mode: '%s'" % mode)
+
+        else:
+            raise TypeError("unsupported support type: '%s'" % type(support))
 
     def extrude(
         self, removed: Support, mode: CropMode = "intersection"
@@ -1178,7 +1206,7 @@ class Annotation:
             key=lambda x: x[1],
         )[0]
 
-    def rename_tracks(self, generator: LabelGenerator = "string") -> "Annotation":
+    def rename_tracks(self, generator: Union[LabelGenerator, Iterable[str], Iterable[int]] = "string") -> "Annotation":
         """Rename all tracks
 
         Parameters
@@ -1215,13 +1243,17 @@ class Annotation:
         renamed = self.__class__(uri=self.uri, modality=self.modality)
 
         if generator == "string":
-            generator = string_generator()
+            generator_ = string_generator()
         elif generator == "int":
-            generator = int_generator()
+            generator_ = int_generator()
+        elif isinstance(generator, Iterable):
+            generator_ = iter(generator)
+        else:
+            raise ValueError("generator must be 'string', 'int', or iterable")
 
         # TODO speed things up by working directly with annotation internals
         for s, _, label in self.itertracks(yield_label=True):
-            renamed[s, next(generator)] = label
+            renamed[s, next(generator_)] = label
         return renamed
 
     def rename_labels(
@@ -1439,11 +1471,11 @@ class Annotation:
         duration: Optional[float] = None,
     ):
         """Discretize
-        
+
         Parameters
         ----------
         support : Segment, optional
-            Part of annotation to discretize. 
+            Part of annotation to discretize.
             Defaults to annotation full extent.
         resolution : float or SlidingWindow, optional
             Defaults to 10ms frames.
