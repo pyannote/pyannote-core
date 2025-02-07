@@ -1,0 +1,36 @@
+[project]
+name = "pyannote-core"
+version = "6.0.0a0"
+description = "Advanced data structures for handling temporal segments with attached labels"
+readme = "README.md"
+authors = [
+    { name = "Hervé BREDIN", email = "herve@pyannote.ai" }
+]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=2.0",
+    "pandas>=2.2.3",
+    "sortedcontainers>=2.4.0",
+]
+
+[project.optional-dependencies]
+notebook = [
+    "ipython>=8.31.0",
+    "matplotlib>=3.10.0",
+]
+test = [
+    "matplotlib>=3.10.0",
+    "pytest>=8.3.4",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pyannote"]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]
