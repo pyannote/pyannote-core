@@ -1,6 +1,6 @@
 [project]
 name = "pyannote-core"
-version = "6.0.0a0"
+version = "6.0.0a1"
 description = "Advanced data structures for handling temporal segments with attached labels"
 readme = "README.md"
 authors = [
