@@ -33,7 +33,11 @@ build-backend = "hatchling.build"
 
 [tool.hatch.version]
 source = "vcs"
-raw-options = {local_scheme = "no-local-version"}
+
+# [tool.hatch.version.raw-options]
+# local_scheme = "no-local-version"
+
+[tool.hatch.metadata.hooks.vcs]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pyannote"]
