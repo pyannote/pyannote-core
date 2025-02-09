@@ -1,6 +1,4 @@
-from typing import Hashable, Union, Tuple, Iterator
-
-from typing_extensions import Literal
+from typing import Hashable, Union, Tuple, Iterator, Literal
 
 Label = Hashable
 Support = Union['Segment', 'Timeline']

@@ -35,7 +35,7 @@ Visualization
 :class:`pyannote.core.Annotation` and :class:`pyannote.core.SlidingWindowFeature`
 instances can be directly visualized in notebooks.
 
-You will however need to install ``pytannote.core``'s additional dependencies
+You will however need to install ``pyannote.core``'s additional dependencies
 for notebook representations (namely, matplotlib):
 
 

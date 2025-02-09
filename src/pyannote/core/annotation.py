@@ -563,25 +563,27 @@ class Annotation:
 
         A simple illustration:
 
-            annotation
-            A |------|    |------|
-            B                  |----------|
-            C |--------------|              |------|
+        .. code-block:: text
+        
+            A |------|    |------|                      #
+            B                  |----------|             # self
+            C |--------------|              |------|    #
 
-            removed `Timeline`
-              |-------|  |-----------|
+                                                        #
+              |-------|  |-----------|                  # removed
+                                                        #
+              
+            A                                           #  
+            B                        |---|              # mode="intersection"
+            C         |--|                  |------|    # 
+                                                         
+            A                                           #
+            B                                           # mode="loose"
+            C                               |------|    # 
 
-            extruded Annotation with mode="intersection"
-            B                        |---|
-            C         |--|                  |------|
-
-            extruded Annotation with mode="loose"
-            C                               |------|
-
-            extruded Annotation with mode="strict"
-            A |------|
-            B                  |----------|
-            C |--------------|              |------|
+            A |------|                                  #
+            B                  |----------|             # mode="strict"
+            C |--------------|              |------|    #
 
         Parameters
         ----------
@@ -622,6 +624,8 @@ class Annotation:
         """Get overlapping parts of the annotation.
 
         A simple illustration:
+
+        .. code-block:: text
 
             annotation
             A |------|    |------|      |----|

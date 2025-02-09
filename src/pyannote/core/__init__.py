@@ -3,7 +3,7 @@
 
 # The MIT License (MIT)
 
-# Copyright (c) 2014 CNRS
+# Copyright (c) 2014-2019 CNRS
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,4 +26,28 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-__import__('pkg_resources').declare_namespace(__name__)
+
+import importlib.metadata
+
+PYANNOTE_URI = 'uri'
+PYANNOTE_MODALITY = 'modality'
+PYANNOTE_SEGMENT = 'segment'
+PYANNOTE_TRACK = 'track'
+PYANNOTE_LABEL = 'label'
+PYANNOTE_SCORE = 'score'
+PYANNOTE_IDENTITY = 'identity'
+
+from .segment import Segment, SlidingWindow
+from .timeline import Timeline
+from .annotation import Annotation
+from .feature import SlidingWindowFeature
+
+try:
+    from .notebook import notebook
+except ImportError as e:
+    pass
+
+Segment.set_precision()
+
+__version__ = importlib.metadata.version("pyannote-core")
+
