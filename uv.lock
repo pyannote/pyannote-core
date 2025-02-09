@@ -982,7 +982,7 @@ wheels = [
 
 [[package]]
 name = "pyannote-core"
-version = "5.0.2.dev20+gd048c41.d20250209"
+version = "6.0.0rc2.dev1+g8cc92e6.d20250209"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
@@ -992,6 +992,8 @@ dependencies = [
 
 [package.optional-dependencies]
 doc = [
+    { name = "ipython" },
+    { name = "matplotlib" },
     { name = "sphinx" },
     { name = "sphinx-rtd-theme" },
 ]
@@ -1011,7 +1013,9 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "ipython", marker = "extra == 'doc'", specifier = ">=8.32.0" },
     { name = "ipython", marker = "extra == 'notebook'", specifier = ">=8.31.0" },
+    { name = "matplotlib", marker = "extra == 'doc'", specifier = ">=3.10.0" },
     { name = "matplotlib", marker = "extra == 'notebook'", specifier = ">=3.10.0" },
     { name = "matplotlib", marker = "extra == 'test'", specifier = ">=3.10.0" },
     { name = "numpy", specifier = ">=2.0" },
