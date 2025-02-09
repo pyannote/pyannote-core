@@ -797,7 +797,7 @@ wheels = [
 
 [[package]]
 name = "pyannote-core"
-version = "5.0.2.dev13+ge0dbe5b.d20250208"
+version = "5.0.2.dev19+g5e0579a.d20250209"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
