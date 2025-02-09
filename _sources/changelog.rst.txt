@@ -2,6 +2,31 @@
 Changelog
 #########
 
+Version 6.0.0rc1 (2025-02-09)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- BREAKING: drop support to `Python` < 3.10
+- BREAKING: switch to native namespace package 
+- setup: switch to `uv`
+
+Version 5.0.1 (2024-06-14)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- fix: fix return type of Timeline.__iter__ (@domsmrz)
+- improve: remove MatplotlibDeprecationWarning (@kimdwkimdw)
+
+Version 5.0.0 (2022-12-15)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- BREAKING: remove support for JSON serialization
+
+Version 4.5 (2022-08-24)
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add Annotation.write_lab method (@FrancescoBonzi)
+- feat: add Annotation.to_{rttm|lab} and Timeline.to_uem serializers (@juanmc2005)
+- setup: exclude tests from package (@kimdwkimdw)
+
 Version 4.4 (2022-03-09)
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

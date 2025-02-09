@@ -1,98 +1,58 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Changelog &mdash; pyannote.core 4.4 documentation</title>
-  
-
-  
-  
-  
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Changelog &mdash; pyannote.core 6.0.0rc1.post2.dev0+gbdb8c82.d20250209 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=33494bd0"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Reference" href="reference.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
 
           
-            <a href="index.html" class="icon icon-home"> pyannote.core
           
-
-          
+          <a href="index.html" class="icon icon-home">
+            pyannote.core
           </a>
-
-          
-            
-            
-              <div class="version">
-                4.4
-              </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Available data structures</a></li>
 <li class="toctree-l1"><a class="reference internal" href="visualization.html">Visualization</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#version-6-0-0rc1-2025-02-09">Version 6.0.0rc1 (2025-02-09)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-5-0-1-2024-06-14">Version 5.0.1 (2024-06-14)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-5-0-0-2022-12-15">Version 5.0.0 (2022-12-15)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#version-4-5-2022-08-24">Version 4.5 (2022-08-24)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-4-2022-03-09">Version 4.4 (2022-03-09)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-3-2021-10-11">Version 4.3 (2021-10-11)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#version-4-2-1-2021-09-27">Version 4.2.1 (2021-09-27)</a></li>
@@ -168,72 +128,63 @@
 </li>
 </ul>
 
-            
-          
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pyannote.core</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
-      <li><a href="index.html">Docs</a> &raquo;</li>
-        
-      <li>Changelog</li>
-    
-    
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Changelog</li>
       <li class="wy-breadcrumbs-aside">
-        
-            
             <a href="_sources/changelog.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
+             
   <section id="changelog">
-<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<h1>Changelog<a class="headerlink" href="#changelog" title="Link to this heading"></a></h1>
+<section id="version-6-0-0rc1-2025-02-09">
+<h2>Version 6.0.0rc1 (2025-02-09)<a class="headerlink" href="#version-6-0-0rc1-2025-02-09" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>BREAKING: drop support to <cite>Python</cite> &lt; 3.10</p></li>
+<li><p>BREAKING: switch to native namespace package</p></li>
+<li><p>setup: switch to <cite>uv</cite></p></li>
+</ul>
+</section>
+<section id="version-5-0-1-2024-06-14">
+<h2>Version 5.0.1 (2024-06-14)<a class="headerlink" href="#version-5-0-1-2024-06-14" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>fix: fix return type of Timeline.__iter__ (&#64;domsmrz)</p></li>
+<li><p>improve: remove MatplotlibDeprecationWarning (&#64;kimdwkimdw)</p></li>
+</ul>
+</section>
+<section id="version-5-0-0-2022-12-15">
+<h2>Version 5.0.0 (2022-12-15)<a class="headerlink" href="#version-5-0-0-2022-12-15" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>BREAKING: remove support for JSON serialization</p></li>
+</ul>
+</section>
+<section id="version-4-5-2022-08-24">
+<h2>Version 4.5 (2022-08-24)<a class="headerlink" href="#version-4-5-2022-08-24" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>feat: add Annotation.write_lab method (&#64;FrancescoBonzi)</p></li>
+<li><p>feat: add Annotation.to_{rttm|lab} and Timeline.to_uem serializers (&#64;juanmc2005)</p></li>
+<li><p>setup: exclude tests from package (&#64;kimdwkimdw)</p></li>
+</ul>
+</section>
 <section id="version-4-4-2022-03-09">
-<h2>Version 4.4 (2022-03-09)<a class="headerlink" href="#version-4-4-2022-03-09" title="Permalink to this headline">¶</a></h2>
+<h2>Version 4.4 (2022-03-09)<a class="headerlink" href="#version-4-4-2022-03-09" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>BREAKING: remove empty segments in Timeline.__init__</p></li>
 <li><p>BREAKING: Timeline.extent() returns Segment(0.0, 0.0) for empty timelines</p></li>
@@ -244,20 +195,20 @@
 </ul>
 </section>
 <section id="version-4-3-2021-10-11">
-<h2>Version 4.3 (2021-10-11)<a class="headerlink" href="#version-4-3-2021-10-11" title="Permalink to this headline">¶</a></h2>
+<h2>Version 4.3 (2021-10-11)<a class="headerlink" href="#version-4-3-2021-10-11" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add support for visualizing 3D SlidingWindowFeatures (#66)</p></li>
 <li><p>feat: add Annotation.discretize (#65)</p></li>
 </ul>
 </section>
 <section id="version-4-2-1-2021-09-27">
-<h2>Version 4.2.1 (2021-09-27)<a class="headerlink" href="#version-4-2-1-2021-09-27" title="Permalink to this headline">¶</a></h2>
+<h2>Version 4.2.1 (2021-09-27)<a class="headerlink" href="#version-4-2-1-2021-09-27" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: fix automatic deployment of documentation</p></li>
 </ul>
 </section>
 <section id="version-4-2-2021-09-24">
-<h2>Version 4.2 (2021-09-24)<a class="headerlink" href="#version-4-2-2021-09-24" title="Permalink to this headline">¶</a></h2>
+<h2>Version 4.2 (2021-09-24)<a class="headerlink" href="#version-4-2-2021-09-24" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add Segment.set_precision to automatically round start/end timestamps (&#64;kimdwkimdw)</p></li>
 <li><p>feat: add methods {Timeline|Annotation}.{extrude|get_overlap} (&#64;hadware)</p></li>
@@ -268,13 +219,13 @@
 </ul>
 </section>
 <section id="version-4-1-2020-05-27">
-<h2>Version 4.1 (2020-05-27)<a class="headerlink" href="#version-4-1-2020-05-27" title="Permalink to this headline">¶</a></h2>
+<h2>Version 4.1 (2020-05-27)<a class="headerlink" href="#version-4-1-2020-05-27" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add “must_link_method” option to “pool” clustering</p></li>
 </ul>
 </section>
 <section id="version-4-0-2020-05-15">
-<h2>Version 4.0 (2020-05-15)<a class="headerlink" href="#version-4-0-2020-05-15" title="Permalink to this headline">¶</a></h2>
+<h2>Version 4.0 (2020-05-15)<a class="headerlink" href="#version-4-0-2020-05-15" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add support for cannot/must link constraints in “pool” clustering</p></li>
 <li><p>BREAKING: make one_hot_encoding return SlidingWindowFeature with labels</p></li>
@@ -282,19 +233,19 @@
 </ul>
 </section>
 <section id="version-3-7-1-2020-03-23">
-<h2>Version 3.7.1 (2020-03-23)<a class="headerlink" href="#version-3-7-1-2020-03-23" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.7.1 (2020-03-23)<a class="headerlink" href="#version-3-7-1-2020-03-23" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: fix corner case in pyannote.core.utils.numpy.one_hot_encoding</p></li>
 </ul>
 </section>
 <section id="version-3-7-2020-03-21">
-<h2>Version 3.7 (2020-03-21)<a class="headerlink" href="#version-3-7-2020-03-21" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.7 (2020-03-21)<a class="headerlink" href="#version-3-7-2020-03-21" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add new method SlidingWindowFeature.align</p></li>
 </ul>
 </section>
 <section id="version-3-6-2020-03-03">
-<h2>Version 3.6 (2020-03-03)<a class="headerlink" href="#version-3-6-2020-03-03" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.6 (2020-03-03)<a class="headerlink" href="#version-3-6-2020-03-03" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add collar argument to Timeline.support (&#64;nryant)</p></li>
 <li><p>feat: add new method Timeline.covers (&#64;PaulLerner)</p></li>
@@ -303,20 +254,20 @@
 </ul>
 </section>
 <section id="version-3-5-2020-01-23">
-<h2>Version 3.5 (2020-01-23)<a class="headerlink" href="#version-3-5-2020-01-23" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.5 (2020-01-23)<a class="headerlink" href="#version-3-5-2020-01-23" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add align_last option to SlidingWindow.__call__</p></li>
 </ul>
 </section>
 <section id="version-3-4-2020-01-21">
-<h2>Version 3.4 (2020-01-21)<a class="headerlink" href="#version-3-4-2020-01-21" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.4 (2020-01-21)<a class="headerlink" href="#version-3-4-2020-01-21" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add SlidingWindow.__call__ to slide over a specific support</p></li>
 <li><p>feat: add pyannote.core.utils.random</p></li>
 </ul>
 </section>
 <section id="version-3-3-2020-01-08">
-<h2>Version 3.3 (2020-01-08)<a class="headerlink" href="#version-3-3-2020-01-08" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.3 (2020-01-08)<a class="headerlink" href="#version-3-3-2020-01-08" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>BREAKING: remove pyannote.core.Scores</p></li>
 <li><p>fix: fix legend corner case with empty Annotation instances</p></li>
@@ -324,20 +275,20 @@
 </ul>
 </section>
 <section id="version-3-2-2-2020-01-06">
-<h2>Version 3.2.2 (2020-01-06)<a class="headerlink" href="#version-3-2-2-2020-01-06" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.2.2 (2020-01-06)<a class="headerlink" href="#version-3-2-2-2020-01-06" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: fix Segment.__bool__ return type</p></li>
 </ul>
 </section>
 <section id="version-3-2-2019-12-13">
-<h2>Version 3.2 (2019-12-13)<a class="headerlink" href="#version-3-2-2019-12-13" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.2 (2019-12-13)<a class="headerlink" href="#version-3-2-2019-12-13" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add type hints (&#64;hadware)</p></li>
 <li><p>chore: Python3-ize code base (&#64;hadware)</p></li>
 </ul>
 </section>
 <section id="version-3-1-10-2019-12-12">
-<h2>Version 3.1.10 (2019-12-12)<a class="headerlink" href="#version-3-1-10-2019-12-12" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.1.10 (2019-12-12)<a class="headerlink" href="#version-3-1-10-2019-12-12" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add Annotation.write_rttm and Timeline.write_uem (&#64;PaulLerner)</p></li>
 <li><p>feat: add numpy interface to SlidingWindowFeature (experimental)</p></li>
@@ -348,7 +299,7 @@
 </ul>
 </section>
 <section id="version-3-0-2019-06-24">
-<h2>Version 3.0 (2019-06-24)<a class="headerlink" href="#version-3-0-2019-06-24" title="Permalink to this headline">¶</a></h2>
+<h2>Version 3.0 (2019-06-24)<a class="headerlink" href="#version-3-0-2019-06-24" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>BREAKING: <cite>Annotation.__mul__</cite> now returns <cite>np.ndarray</cite> instance</p></li>
@@ -360,7 +311,7 @@
 </div></blockquote>
 </section>
 <section id="version-2-2-2-2019-04-18">
-<h2>Version 2.2.2 (2019-04-18)<a class="headerlink" href="#version-2-2-2-2019-04-18" title="Permalink to this headline">¶</a></h2>
+<h2>Version 2.2.2 (2019-04-18)<a class="headerlink" href="#version-2-2-2-2019-04-18" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>improve: speed-up several `</p></li>
@@ -376,7 +327,7 @@
 </dl>
 </section>
 <section id="version-2-1-2019-01-17">
-<h2>Version 2.1 (2019-01-17)<a class="headerlink" href="#version-2-1-2019-01-17" title="Permalink to this headline">¶</a></h2>
+<h2>Version 2.1 (2019-01-17)<a class="headerlink" href="#version-2-1-2019-01-17" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>feat: add basic implementation of Chinese Whispers clustering</p></li>
@@ -385,7 +336,7 @@
 </div></blockquote>
 </section>
 <section id="version-2-0-3-2018-11-23">
-<h2>Version 2.0.3 (2018-11-23)<a class="headerlink" href="#version-2-0-3-2018-11-23" title="Permalink to this headline">¶</a></h2>
+<h2>Version 2.0.3 (2018-11-23)<a class="headerlink" href="#version-2-0-3-2018-11-23" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>BREAKING: move pyannote.core.util to pyannote.core.utils.generators</p></li>
@@ -399,7 +350,7 @@
 </div></blockquote>
 </section>
 <section id="version-1-4-1-2018-09-13">
-<h2>Version 1.4.1 (2018-09-13)<a class="headerlink" href="#version-1-4-1-2018-09-13" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.4.1 (2018-09-13)<a class="headerlink" href="#version-1-4-1-2018-09-13" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>feat: add unit tests for feature cropping</p></li>
@@ -408,7 +359,7 @@
 </div></blockquote>
 </section>
 <section id="version-1-4-2018-07-09">
-<h2>Version 1.4 (2018-07-09)<a class="headerlink" href="#version-1-4-2018-07-09" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.4 (2018-07-09)<a class="headerlink" href="#version-1-4-2018-07-09" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>feat: expose <cite>SlidingWindow.closest_frame</cite></p></li>
@@ -416,7 +367,7 @@
 </div></blockquote>
 </section>
 <section id="version-1-3-2-2018-06-12">
-<h2>Version 1.3.2 (2018-06-12)<a class="headerlink" href="#version-1-3-2-2018-06-12" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.3.2 (2018-06-12)<a class="headerlink" href="#version-1-3-2-2018-06-12" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>feat: add support for multi-dimensional SlidingWindowFeatures</p></li>
@@ -427,7 +378,7 @@
 </div></blockquote>
 </section>
 <section id="version-1-3-1-2017-12-14">
-<h2>Version 1.3.1 (2017-12-14)<a class="headerlink" href="#version-1-3-1-2017-12-14" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.3.1 (2017-12-14)<a class="headerlink" href="#version-1-3-1-2017-12-14" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>feat: add “return_ranges” option to SlidingWindow.crop</p></li>
@@ -437,7 +388,7 @@
 </div></blockquote>
 </section>
 <section id="version-1-2-2017-10-05">
-<h2>Version 1.2 (2017-10-05)<a class="headerlink" href="#version-1-2-2017-10-05" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.2 (2017-10-05)<a class="headerlink" href="#version-1-2-2017-10-05" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul class="simple">
 <li><p>BREAKING: remove all things “Transcription”</p></li>
@@ -449,33 +400,33 @@
 </div></blockquote>
 </section>
 <section id="version-1-1-2017-09-19">
-<h2>Version 1.1 (2017-09-19)<a class="headerlink" href="#version-1-1-2017-09-19" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.1 (2017-09-19)<a class="headerlink" href="#version-1-1-2017-09-19" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: make iterators out of SlidingWindowFeature instances</p></li>
 <li><p>improve: make Annotation.__mul__ (much) faster</p></li>
 </ul>
 </section>
 <section id="version-1-0-5-2017-09-13">
-<h2>Version 1.0.5 (2017-09-13)<a class="headerlink" href="#version-1-0-5-2017-09-13" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.0.5 (2017-09-13)<a class="headerlink" href="#version-1-0-5-2017-09-13" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: make iterators out of SlidingWindow instances</p></li>
 </ul>
 </section>
 <section id="version-1-0-4-2017-07-18">
-<h2>Version 1.0.4 (2017-07-18)<a class="headerlink" href="#version-1-0-4-2017-07-18" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.0.4 (2017-07-18)<a class="headerlink" href="#version-1-0-4-2017-07-18" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: add missing import</p></li>
 <li><p>fix: fix corner case in Timeline.crop_iter</p></li>
 </ul>
 </section>
 <section id="version-1-0-2-2017-07-15">
-<h2>Version 1.0.2 (2017-07-15)<a class="headerlink" href="#version-1-0-2-2017-07-15" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.0.2 (2017-07-15)<a class="headerlink" href="#version-1-0-2-2017-07-15" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: use Timeline.support() instead of .coverage()</p></li>
 </ul>
 </section>
 <section id="version-1-0-1-2017-07-04">
-<h2>Version 1.0.1 (2017-07-04)<a class="headerlink" href="#version-1-0-1-2017-07-04" title="Permalink to this headline">¶</a></h2>
+<h2>Version 1.0.1 (2017-07-04)<a class="headerlink" href="#version-1-0-1-2017-07-04" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>improve: switch from banyan to sortedcontainers</p></li>
 <li><p>feat: add Timeline.{remove|discard|overlapping_iter} methods</p></li>
@@ -486,49 +437,49 @@
 </ul>
 </section>
 <section id="version-0-13-3-2017-06-29">
-<h2>Version 0.13.3 (2017-06-29)<a class="headerlink" href="#version-0-13-3-2017-06-29" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.13.3 (2017-06-29)<a class="headerlink" href="#version-0-13-3-2017-06-29" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: fix SlidingWindowFeature.iterfeatures()</p></li>
 </ul>
 </section>
 <section id="version-0-13-2-2017-03-29">
-<h2>Version 0.13.2 (2017-03-29)<a class="headerlink" href="#version-0-13-2-2017-03-29" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.13.2 (2017-03-29)<a class="headerlink" href="#version-0-13-2-2017-03-29" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>setup: add dependencies for notebook visualization</p></li>
 </ul>
 </section>
 <section id="version-0-13-1-2017-02-20">
-<h2>Version 0.13.1 (2017-02-20)<a class="headerlink" href="#version-0-13-1-2017-02-20" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.13.1 (2017-02-20)<a class="headerlink" href="#version-0-13-1-2017-02-20" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: fix Annotation.rename_labels</p></li>
 </ul>
 </section>
 <section id="version-0-13-2017-02-05">
-<h2>Version 0.13 (2017-02-05)<a class="headerlink" href="#version-0-13-2017-02-05" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.13 (2017-02-05)<a class="headerlink" href="#version-0-13-2017-02-05" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>improve: faster Annotation.subset and Annotation.rename_labels</p></li>
 </ul>
 </section>
 <section id="version-0-12-1-2017-30-01">
-<h2>Version 0.12.1 (2017-30-01)<a class="headerlink" href="#version-0-12-1-2017-30-01" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.12.1 (2017-30-01)<a class="headerlink" href="#version-0-12-1-2017-30-01" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: fix Annotation.uri setter</p></li>
 </ul>
 </section>
 <section id="version-0-12-2017-29-01">
-<h2>Version 0.12 (2017-29-01)<a class="headerlink" href="#version-0-12-2017-29-01" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.12 (2017-29-01)<a class="headerlink" href="#version-0-12-2017-29-01" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add Timeline.to_annotation()</p></li>
 </ul>
 </section>
 <section id="version-0-11-1-2017-25-01">
-<h2>Version 0.11.1 (2017-25-01)<a class="headerlink" href="#version-0-11-1-2017-25-01" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.11.1 (2017-25-01)<a class="headerlink" href="#version-0-11-1-2017-25-01" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: fix (deprecated) “smooth” method</p></li>
 </ul>
 </section>
 <section id="version-0-11-2017-24-01">
-<h2>Version 0.11 (2017-24-01)<a class="headerlink" href="#version-0-11-2017-24-01" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.11 (2017-24-01)<a class="headerlink" href="#version-0-11-2017-24-01" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add (Sphinx-based) documentation</p></li>
 <li><p>chore: move sample notebooks to /notebook</p></li>
@@ -537,7 +488,7 @@
 </ul>
 </section>
 <section id="version-0-10-2017-18-01">
-<h2>Version 0.10 (2017-18-01)<a class="headerlink" href="#version-0-10-2017-18-01" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.10 (2017-18-01)<a class="headerlink" href="#version-0-10-2017-18-01" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add ‘copy’ parameter to Annotation.{label|get}_timeline()</p></li>
 <li><p>improve: speed-up Timeline.extent()</p></li>
@@ -546,25 +497,25 @@
 </ul>
 </section>
 <section id="version-0-9-2017-01-17">
-<h2>Version 0.9 (2017-01-17)<a class="headerlink" href="#version-0-9-2017-01-17" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.9 (2017-01-17)<a class="headerlink" href="#version-0-9-2017-01-17" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>improve: speed up Timeline and Annotation</p></li>
 </ul>
 </section>
 <section id="version-0-8-2016-11-05">
-<h2>Version 0.8 (2016-11-05)<a class="headerlink" href="#version-0-8-2016-11-05" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.8 (2016-11-05)<a class="headerlink" href="#version-0-8-2016-11-05" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: add “copy” option to Annotation.update</p></li>
 </ul>
 </section>
 <section id="version-0-7-3-2016-11-01">
-<h2>Version 0.7.3 (2016-11-01)<a class="headerlink" href="#version-0-7-3-2016-11-01" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.7.3 (2016-11-01)<a class="headerlink" href="#version-0-7-3-2016-11-01" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: SlidingWindowFeature notebook display</p></li>
 </ul>
 </section>
 <section id="version-0-7-2-2016-07-12">
-<h2>Version 0.7.2 (2016-07-12)<a class="headerlink" href="#version-0-7-2-2016-07-12" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.7.2 (2016-07-12)<a class="headerlink" href="#version-0-7-2-2016-07-12" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: new SlidingWindow.{samples|crop} methods</p></li>
 <li><p>feat: new ‘mode’ parameter to SlidingWindowFeature.crop method</p></li>
@@ -572,44 +523,44 @@
 </ul>
 </section>
 <section id="version-0-6-6-2016-06-23">
-<h2>Version 0.6.6 (2016-06-23)<a class="headerlink" href="#version-0-6-6-2016-06-23" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.6.6 (2016-06-23)<a class="headerlink" href="#version-0-6-6-2016-06-23" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: force internal timeline update after copy</p></li>
 </ul>
 </section>
 <section id="version-0-6-5-2016-06-13">
-<h2>Version 0.6.5 (2016-06-13)<a class="headerlink" href="#version-0-6-5-2016-06-13" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.6.5 (2016-06-13)<a class="headerlink" href="#version-0-6-5-2016-06-13" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>BREAKING: make segmentToRange deterministic wrt. segment duration</p></li>
 </ul>
 </section>
 <section id="version-0-6-4-2016-06-06">
-<h2>Version 0.6.4 (2016-06-06)<a class="headerlink" href="#version-0-6-4-2016-06-06" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.6.4 (2016-06-06)<a class="headerlink" href="#version-0-6-4-2016-06-06" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: Python 3 support in pyannote.core.features</p></li>
 </ul>
 </section>
 <section id="version-0-6-3-2016-03-29">
-<h2>Version 0.6.3 (2016-03-29)<a class="headerlink" href="#version-0-6-3-2016-03-29" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.6.3 (2016-03-29)<a class="headerlink" href="#version-0-6-3-2016-03-29" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>setup: versioneer 0.15</p></li>
 </ul>
 </section>
 <section id="version-0-6-1-2016-03-20">
-<h2>Version 0.6.1 (2016-03-20)<a class="headerlink" href="#version-0-6-1-2016-03-20" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.6.1 (2016-03-20)<a class="headerlink" href="#version-0-6-1-2016-03-20" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: prevent adding empty segments in Annotation and Scores</p></li>
 </ul>
 </section>
 <section id="version-0-6-2016-02-25">
-<h2>Version 0.6 (2016-02-25)<a class="headerlink" href="#version-0-6-2016-02-25" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.6 (2016-02-25)<a class="headerlink" href="#version-0-6-2016-02-25" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>BREAKING: pyannote.core.json.{load|dump} expects file handles</p></li>
 <li><p>feat: load_from, dump_to</p></li>
 </ul>
 </section>
 <section id="version-0-5-2-2016-02-19">
-<h2>Version 0.5.2 (2016-02-19)<a class="headerlink" href="#version-0-5-2-2016-02-19" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.5.2 (2016-02-19)<a class="headerlink" href="#version-0-5-2-2016-02-19" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: Annotation * Annotation returns cooccurrence matrix</p></li>
 <li><p>fix: Annotation.itertracks would raise a UnicodeDecodeError in some
@@ -617,7 +568,7 @@ cases</p></li>
 </ul>
 </section>
 <section id="version-0-5-1-2016-02-17">
-<h2>Version 0.5.1 (2016-02-17)<a class="headerlink" href="#version-0-5-1-2016-02-17" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.5.1 (2016-02-17)<a class="headerlink" href="#version-0-5-1-2016-02-17" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>improve: notebook display</p></li>
 <li><p>improve: Annotation.anonymize_{tracks|labels} no longer use Unknown
@@ -626,7 +577,7 @@ instances</p></li>
 </ul>
 </section>
 <section id="version-0-4-7-2016-02-04">
-<h2>Version 0.4.7 (2016-02-04)<a class="headerlink" href="#version-0-4-7-2016-02-04" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.4.7 (2016-02-04)<a class="headerlink" href="#version-0-4-7-2016-02-04" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: deterministic order in Annotation.co_iter</p></li>
 <li><p>fix: LabelMatrix.argmax corner case</p></li>
@@ -634,26 +585,26 @@ instances</p></li>
 </ul>
 </section>
 <section id="version-0-4-4-2015-11-02">
-<h2>Version 0.4.4 (2015-11-02)<a class="headerlink" href="#version-0-4-4-2015-11-02" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.4.4 (2015-11-02)<a class="headerlink" href="#version-0-4-4-2015-11-02" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: Travis continuous integration</p></li>
 </ul>
 </section>
 <section id="version-0-4-3-2015-10-28">
-<h2>Version 0.4.3 (2015-10-28)<a class="headerlink" href="#version-0-4-3-2015-10-28" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.4.3 (2015-10-28)<a class="headerlink" href="#version-0-4-3-2015-10-28" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: Python 2/3 notebook representations</p></li>
 <li><p>fix: bug in Scores with integer-values segments</p></li>
 </ul>
 </section>
 <section id="version-0-4-1-2015-10-27">
-<h2>Version 0.4.1 (2015-10-27)<a class="headerlink" href="#version-0-4-1-2015-10-27" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.4.1 (2015-10-27)<a class="headerlink" href="#version-0-4-1-2015-10-27" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: update Scores.from_df to pandas 0.17</p></li>
 </ul>
 </section>
 <section id="version-0-4-2015-10-26">
-<h2>Version 0.4 (2015-10-26)<a class="headerlink" href="#version-0-4-2015-10-26" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.4 (2015-10-26)<a class="headerlink" href="#version-0-4-2015-10-26" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: Python 3 support</p></li>
 <li><p>feat: pytest test suite</p></li>
@@ -662,82 +613,82 @@ instances</p></li>
 </ul>
 </section>
 <section id="version-0-3-6-2015-05-06">
-<h2>Version 0.3.6 (2015-05-06)<a class="headerlink" href="#version-0-3-6-2015-05-06" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.3.6 (2015-05-06)<a class="headerlink" href="#version-0-3-6-2015-05-06" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: LabelMatrix save/load methods</p></li>
 </ul>
 </section>
 <section id="version-0-3-4-2015-03-04">
-<h2>Version 0.3.4 (2015-03-04)<a class="headerlink" href="#version-0-3-4-2015-03-04" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.3.4 (2015-03-04)<a class="headerlink" href="#version-0-3-4-2015-03-04" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: MAJOR bug in Annotation lazy-update</p></li>
 </ul>
 </section>
 <section id="version-0-3-3-2015-02-27">
-<h2>Version 0.3.3 (2015-02-27)<a class="headerlink" href="#version-0-3-3-2015-02-27" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.3.3 (2015-02-27)<a class="headerlink" href="#version-0-3-3-2015-02-27" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: Scores IPython display</p></li>
 </ul>
 </section>
 <section id="version-0-3-1-2015-01-26">
-<h2>Version 0.3.1 (2015-01-26)<a class="headerlink" href="#version-0-3-1-2015-01-26" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.3.1 (2015-01-26)<a class="headerlink" href="#version-0-3-1-2015-01-26" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: new Annotation.update method</p></li>
 <li><p>improve: Annotation.subset support for any label iterable</p></li>
 </ul>
 </section>
 <section id="version-0-3-2014-12-04">
-<h2>Version 0.3 (2014-12-04)<a class="headerlink" href="#version-0-3-2014-12-04" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.3 (2014-12-04)<a class="headerlink" href="#version-0-3-2014-12-04" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>refactor: rewrote Scores internals</p></li>
 <li><p>setup: use pandas 0.15.1+</p></li>
 </ul>
 </section>
 <section id="version-0-2-5-2014-11-21">
-<h2>Version 0.2.5 (2014-11-21)<a class="headerlink" href="#version-0-2-5-2014-11-21" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.2.5 (2014-11-21)<a class="headerlink" href="#version-0-2-5-2014-11-21" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>setup: use pyannote-banyan 0.1.6</p></li>
 </ul>
 </section>
 <section id="version-0-2-4-2014-11-18">
-<h2>Version 0.2.4 (2014-11-18)<a class="headerlink" href="#version-0-2-4-2014-11-18" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.2.4 (2014-11-18)<a class="headerlink" href="#version-0-2-4-2014-11-18" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: extent of empty Timeline</p></li>
 </ul>
 </section>
 <section id="version-0-2-3-2014-11-14">
-<h2>Version 0.2.3 (2014-11-14)<a class="headerlink" href="#version-0-2-3-2014-11-14" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.2.3 (2014-11-14)<a class="headerlink" href="#version-0-2-3-2014-11-14" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix: force revert to pandas 0.13.1 for Scores to work again…</p></li>
 </ul>
 </section>
 <section id="version-0-2-2-2014-11-12">
-<h2>Version 0.2.2 (2014-11-12)<a class="headerlink" href="#version-0-2-2-2014-11-12" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.2.2 (2014-11-12)<a class="headerlink" href="#version-0-2-2-2014-11-12" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>setup: use banyan 0.1.5.1 from GitHub</p></li>
 </ul>
 </section>
 <section id="version-0-2-1-2014-10-30">
-<h2>Version 0.2.1 (2014-10-30)<a class="headerlink" href="#version-0-2-1-2014-10-30" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.2.1 (2014-10-30)<a class="headerlink" href="#version-0-2-1-2014-10-30" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: pyannote/core Docker image</p></li>
 <li><p>feat(Timeline): add from_df constructor</p></li>
 </ul>
 </section>
 <section id="version-0-2-2014-10-24">
-<h2>Version 0.2 (2014-10-24)<a class="headerlink" href="#version-0-2-2014-10-24" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.2 (2014-10-24)<a class="headerlink" href="#version-0-2-2014-10-24" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>breaking change: new PyAnnote JSON format</p></li>
 </ul>
 </section>
 <section id="version-0-1-2014-08-05">
-<h2>Version 0.1 (2014-08-05)<a class="headerlink" href="#version-0-1-2014-08-05" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.1 (2014-08-05)<a class="headerlink" href="#version-0-1-2014-08-05" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>fix(Transcription): fix potential edge/key conflict during alignment</p></li>
 </ul>
 </section>
 <section id="version-0-0-5-2014-07-23">
-<h2>Version 0.0.5 (2014-07-23)<a class="headerlink" href="#version-0-0-5-2014-07-23" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.0.5 (2014-07-23)<a class="headerlink" href="#version-0-0-5-2014-07-23" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat(SlidingWindow): add durationToSamples (and vice-versa)</p></li>
 <li><p>fix(Transcription): fix loading from JSON</p></li>
@@ -747,7 +698,7 @@ instances</p></li>
 </ul>
 </section>
 <section id="version-0-0-3-2014-06-02">
-<h2>Version 0.0.3 (2014-06-02)<a class="headerlink" href="#version-0-0-3-2014-06-02" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.0.3 (2014-06-02)<a class="headerlink" href="#version-0-0-3-2014-06-02" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat(Annotation): add ‘collar’ param to .smooth()</p></li>
 <li><p>refactor(Annotation): remove support for &gt;&gt; operator</p></li>
@@ -763,13 +714,13 @@ instances</p></li>
 </ul>
 </section>
 <section id="version-0-0-2-2014-05-06">
-<h2>Version 0.0.2 (2014-05-06)<a class="headerlink" href="#version-0-0-2-2014-05-06" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.0.2 (2014-05-06)<a class="headerlink" href="#version-0-0-2-2014-05-06" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>feat: Transcription data structure (annotation graph)</p></li>
 </ul>
 </section>
 <section id="version-0-0-1-2014-05-02">
-<h2>Version 0.0.1 (2014-05-02)<a class="headerlink" href="#version-0-0-1-2014-05-02" title="Permalink to this headline">¶</a></h2>
+<h2>Version 0.0.1 (2014-05-02)<a class="headerlink" href="#version-0-0-1-2014-05-02" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>first public version</p></li>
 </ul>
@@ -778,49 +729,32 @@ instances</p></li>
 
 
            </div>
-           
           </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-      
-        <a href="reference.html" class="btn btn-neutral float-left" title="Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="reference.html" class="btn btn-neutral float-left" title="Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &copy; Copyright 2017, CNRS
-
-    </p>
+    <p>&#169; Copyright 2017, CNRS.</p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
-
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
