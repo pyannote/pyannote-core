@@ -564,26 +564,26 @@ class Annotation:
         A simple illustration:
 
         .. code-block:: text
+        
+            A |------|    |------|                      #
+            B                  |----------|             # self
+            C |--------------|              |------|    #
 
-            annotation
-            A |------|    |------|
-            B                  |----------|
-            C |--------------|              |------|
+                                                        #
+              |-------|  |-----------|                  # removed
+                                                        #
+              
+            A                                           #  
+            B                        |---|              # mode="intersection"
+            C         |--|                  |------|    # 
+                                                         
+            A                                           #
+            B                                           # mode="loose"
+            C                               |------|    # 
 
-            removed `Timeline`
-              |-------|  |-----------|
-
-            extruded Annotation with mode="intersection"
-            B                        |---|
-            C         |--|                  |------|
-
-            extruded Annotation with mode="loose"
-            C                               |------|
-
-            extruded Annotation with mode="strict"
-            A |------|
-            B                  |----------|
-            C |--------------|              |------|
+            A |------|                                  #
+            B                  |----------|             # mode="strict"
+            C |--------------|              |------|    #
 
         Parameters
         ----------
