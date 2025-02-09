@@ -57,3 +57,4 @@ Visualization
 
 .. automodule:: pyannote.core.notebook
    :members:
+   :no-index:

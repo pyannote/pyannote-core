@@ -563,6 +563,8 @@ class Annotation:
 
         A simple illustration:
 
+        .. code-block:: text
+
             annotation
             A |------|    |------|
             B                  |----------|
@@ -622,6 +624,8 @@ class Annotation:
         """Get overlapping parts of the annotation.
 
         A simple illustration:
+
+        .. code-block:: text
 
             annotation
             A |------|    |------|      |----|
