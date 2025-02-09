@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Version 6.x.x (2025-xx-xx)
+## Version 6.0.0rc1 (2025-02-09)
 
 - BREAKING: drop support to `Python` < 3.10
 - BREAKING: switch to native namespace package 
