@@ -558,6 +558,8 @@ class Timeline:
 
         A simple illustration:
 
+        .. code-block:: text
+
             timeline
             |------|    |------|      |----|
               |--|    |-----|      |----------|
@@ -565,12 +567,11 @@ class Timeline:
             timeline.get_overlap()
               |--|      |---|         |----|
 
-
-       Returns
-       -------
-       overlap : `pyannote.core.Timeline`
+        Returns
+        -------
+        overlap : `pyannote.core.Timeline`
            Timeline of the overlaps.
-       """
+        """
         overlaps_tl = Timeline(uri=self.uri)
         for s1, s2 in self.co_iter(self):
             if s1 == s2:
