@@ -2,7 +2,7 @@
 Changelog
 #########
 
-Version 6.0.0rc1 (2025-02-09)
+Version 6.0.0 (2025-09-09)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 - BREAKING: drop support to `Python` < 3.10
