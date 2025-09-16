@@ -2,6 +2,11 @@
 Changelog
 #########
 
+Version 6.0.1 (2025-09-16)
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- feat: add `Annotation.__iter__` (turn: Segment, speaker: str) iterator
+
 Version 6.0.0 (2025-09-09)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
