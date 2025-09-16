@@ -247,6 +247,18 @@ class Annotation:
         """
         return len(self._tracks) > 0
 
+    def __iter__(self) -> Iterator[Tuple[Segment, Label]]:
+        """Iterate over (segment, label) pairs in chronological order
+
+        Examples
+        --------
+
+        >>> for segment, label in annotation:
+        ...     # do something with the segment and its label
+        """
+        for segment, _, label in self.itertracks(yield_label=True):
+            yield segment, label
+
     def itersegments(self):
         """Iterate over segments (in chronological order)
 
