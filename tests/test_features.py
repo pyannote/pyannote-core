@@ -70,6 +70,23 @@ def test_crop_fixed_out_of_bounds(features):
     np.testing.assert_array_equal(expected, actual)
 
 
+@pytest.mark.parametrize("duration", [0.0, 0.005, 0.01, 0.015])
+def test_strict_samples_short_duration(duration):
+    window = SlidingWindow(duration=0.025, step=0.01)
+    assert window.samples(duration, mode="strict") == 0
+
+
+@pytest.mark.parametrize("start", [-0.1, 0.0, 0.5, 1.1])
+@pytest.mark.parametrize("duration", [0.005, 0.01, 0.015])
+def test_crop_strict_fixed_short_duration(start, duration):
+    data = np.arange(200).reshape(100, 2)
+    features = SlidingWindowFeature(data, SlidingWindow(duration=0.025, step=0.01))
+    cropped = features.crop(
+        Segment(start, start + duration), mode="strict", fixed=duration
+    )
+    assert cropped.shape == (0, 2)
+
+
 def test_repr_png(features):
     pytest.importorskip("IPython")
     pytest.importorskip("matplotlib")
