@@ -5,17 +5,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>pyannote.core.feature &mdash; pyannote.core 6.0.2.dev0+gb83999a4e.d20250916 documentation</title>
+  <title>pyannote.core.feature &mdash; pyannote.core 6.0.0rc1.post2.dev6+gdc7fdf1f7 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=340f7f6b"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/documentation_options.js?v=b0dc72e5"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -46,7 +46,7 @@
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../reference.html">Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/pyannote/pyannote-core/blob/main/CHANGELOG.md">Changelog</a></li>
 </ul>
 
         </div>
@@ -74,15 +74,12 @@
            <div itemprop="articleBody">
              
   <h1>Source code for pyannote.core.feature</h1><div class="highlight"><pre>
-<span></span><span class="ch">#!/usr/bin/env python</span>
-<span class="c1"># encoding: utf-8</span>
-
-<span class="c1"># The MIT License (MIT)</span>
+<span></span><span class="c1"># The MIT License (MIT)</span>
 
 <span class="c1"># Copyright (c) 2014-2019 CNRS</span>
 
 <span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># of this software and associated documentation files (the "Software"), to deal</span>
 <span class="c1"># in the Software without restriction, including without limitation the rights</span>
 <span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
 <span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
@@ -91,7 +88,7 @@
 <span class="c1"># The above copyright notice and this permission notice shall be included in</span>
 <span class="c1"># all copies or substantial portions of the Software.</span>
 
-<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
 <span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
 <span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
 <span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
@@ -103,29 +100,31 @@
 <span class="c1"># Hervé BREDIN - http://herve.niderb.fr</span>
 
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
 <span class="sd">########</span>
 <span class="sd">Features</span>
 <span class="sd">########</span>
 
 <span class="sd">See :class:`pyannote.core.SlidingWindowFeature` for the complete reference.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">"""</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numbers</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Iterator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">pyannote.core.utils.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Alignment</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.segment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Segment</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.segment</span><span class="w"> </span><span class="kn">import</span> <span class="n">SlidingWindow</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.segment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Segment</span><span class="p">,</span> <span class="n">SlidingWindow</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.timeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">Timeline</span>
 
 
 <div class="viewcode-block" id="SlidingWindowFeature">
 <a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SlidingWindowFeature</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">mixins</span><span class="o">.</span><span class="n">NDArrayOperatorsMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Periodic feature vectors</span>
+<span class="w">    </span><span class="sd">"""Periodic feature vectors</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -133,12 +132,15 @@
 <span class="sd">    sliding_window : SlidingWindow</span>
 <span class="sd">    labels : list, optional</span>
 <span class="sd">        Textual description of each dimension.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="SlidingWindowFeature.__init__">
 <a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">sliding_window</span><span class="p">:</span> <span class="n">SlidingWindow</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Text</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">sliding_window</span><span class="p">:</span> <span class="n">SlidingWindow</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="p">:</span> <span class="n">SlidingWindow</span> <span class="o">=</span> <span class="n">sliding_window</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
@@ -149,7 +151,7 @@
 <div class="viewcode-block" id="SlidingWindowFeature.__len__">
 <a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.__len__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Number of feature vectors&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Number of feature vectors"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
@@ -159,29 +161,29 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dimension of feature vectors&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Dimension of feature vectors"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">getNumber</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;This is deprecated in favor of `__len__`&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">"This is deprecated in favor of `__len__`"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">getDimension</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;This is deprecated in favor of `dimension` property&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span>
+            <span class="s2">"This is deprecated in favor of `dimension` property"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dimension</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">getExtent</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;This is deprecated in favor of `extent` property&quot;</span><span class="p">,</span> <span class="ne">DeprecationWarning</span>
+            <span class="s2">"This is deprecated in favor of `extent` property"</span><span class="p">,</span> <span class="ne">DeprecationWarning</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">extent</span>
 
 <div class="viewcode-block" id="SlidingWindowFeature.__getitem__">
 <a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.__getitem__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get ith feature vector&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Get ith feature vector"""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
 
 
@@ -189,11 +191,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__i</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__i</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__i</span><span class="p">]</span>
-        <span class="k">except</span> <span class="ne">IndexError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -202,9 +204,9 @@
 <div class="viewcode-block" id="SlidingWindowFeature.iterfeatures">
 <a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.iterfeatures">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">iterfeatures</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Segment</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Feature vector iterator</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Segment</span><span class="p">]</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Feature vector iterator</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -212,7 +214,7 @@
 <span class="sd">            When True, yield both feature vector and corresponding window.</span>
 <span class="sd">            Default is to only yield feature vector</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">n_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_samples</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">window</span><span class="p">:</span>
@@ -225,28 +227,28 @@
 <a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.crop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">crop</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">focus</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Segment</span><span class="p">,</span> <span class="n">Timeline</span><span class="p">],</span>
-        <span class="n">mode</span><span class="p">:</span> <span class="n">Alignment</span> <span class="o">=</span> <span class="s2">&quot;loose&quot;</span><span class="p">,</span>
-        <span class="n">fixed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">focus</span><span class="p">:</span> <span class="n">Segment</span> <span class="o">|</span> <span class="n">Timeline</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">:</span> <span class="n">Alignment</span> <span class="o">=</span> <span class="s2">"loose"</span><span class="p">,</span>
+        <span class="n">fixed</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">return_data</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="s2">&quot;SlidingWindowFeature&quot;</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract frames</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="s2">"SlidingWindowFeature"</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Extract frames</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        focus : Segment or Timeline</span>
-<span class="sd">        mode : {&#39;loose&#39;, &#39;strict&#39;, &#39;center&#39;}, optional</span>
-<span class="sd">            In &#39;strict&#39; mode, only frames fully included in &#39;focus&#39; support are</span>
-<span class="sd">            returned. In &#39;loose&#39; mode, any intersecting frames are returned. In</span>
-<span class="sd">            &#39;center&#39; mode, first and last frames are chosen to be the ones</span>
-<span class="sd">            whose centers are the closest to &#39;focus&#39; start and end times.</span>
-<span class="sd">            Defaults to &#39;loose&#39;.</span>
+<span class="sd">        mode : {'loose', 'strict', 'center'}, optional</span>
+<span class="sd">            In 'strict' mode, only frames fully included in 'focus' support are</span>
+<span class="sd">            returned. In 'loose' mode, any intersecting frames are returned. In</span>
+<span class="sd">            'center' mode, first and last frames are chosen to be the ones</span>
+<span class="sd">            whose centers are the closest to 'focus' start and end times.</span>
+<span class="sd">            Defaults to 'loose'.</span>
 <span class="sd">        fixed : float, optional</span>
-<span class="sd">            Overrides `Segment` &#39;focus&#39; duration and ensures that the number of</span>
+<span class="sd">            Overrides `Segment` 'focus' duration and ensures that the number of</span>
 <span class="sd">            returned frames is fixed (which might otherwise not be the case</span>
 <span class="sd">            because of rounding errors).</span>
 <span class="sd">        return_data : bool, optional</span>
-<span class="sd">            Return a numpy array (default). For `Segment` &#39;focus&#39;, setting it</span>
+<span class="sd">            Return a numpy array (default). For `Segment` 'focus', setting it</span>
 <span class="sd">            to False will return a `SlidingWindowFeature` instance.</span>
 
 <span class="sd">        Returns</span>
@@ -258,17 +260,17 @@
 <span class="sd">        --------</span>
 <span class="sd">        SlidingWindow.crop</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">return_data</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">focus</span><span class="p">,</span> <span class="n">Segment</span><span class="p">)):</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s1">&#39;&quot;focus&quot; must be a &quot;Segment&quot; instance when &quot;return_data&quot;&#39;</span>
-                <span class="s2">&quot;is set to False.&quot;</span>
+                <span class="s1">'"focus" must be a "Segment" instance when "return_data"'</span>
+                <span class="s2">"is set to False."</span>
             <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">return_data</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">fixed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;&quot;fixed&quot; cannot be set when &quot;return_data&quot; is set to False.&#39;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">'"fixed" cannot be set when "return_data" is set to False.'</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
         <span class="n">ranges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span>
@@ -304,7 +306,7 @@
             <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
 
-        <span class="c1"># corner case when &quot;fixed&quot; duration cropping is requested:</span>
+        <span class="c1"># corner case when "fixed" duration cropping is requested:</span>
         <span class="c1"># correct number of samples even with out-of-bounds indices</span>
         <span class="k">if</span> <span class="n">fixed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
@@ -350,11 +352,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__array_ufunc__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="p">())</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"out"</span><span class="p">,</span> <span class="p">())</span>
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span> <span class="o">+</span> <span class="n">out</span><span class="p">:</span>
             <span class="c1"># Only support operations with instances of _HANDLED_TYPES.</span>
             <span class="c1"># Use SlidingWindowFeature instead of type(self) for isinstance to</span>
-            <span class="c1"># allow subclasses that don&#39;t override __array_ufunc__ to</span>
+            <span class="c1"># allow subclasses that don't override __array_ufunc__ to</span>
             <span class="c1"># handle SlidingWindowFeature objects.</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_HANDLED_TYPES</span> <span class="o">+</span> <span class="p">(</span><span class="n">SlidingWindowFeature</span><span class="p">,)):</span>
                 <span class="k">return</span> <span class="bp">NotImplemented</span>
@@ -364,7 +366,7 @@
             <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">SlidingWindowFeature</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">inputs</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">out</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;out&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">"out"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
                 <span class="n">x</span><span class="o">.</span><span class="n">data</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">SlidingWindowFeature</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">out</span>
             <span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ufunc</span><span class="p">,</span> <span class="n">method</span><span class="p">)(</span><span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -374,7 +376,7 @@
             <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span>
                 <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span>
             <span class="p">)</span>
-        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;at&quot;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"at"</span><span class="p">:</span>
             <span class="c1"># no return value</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
@@ -383,8 +385,8 @@
 
 <div class="viewcode-block" id="SlidingWindowFeature.align">
 <a class="viewcode-back" href="../../../reference.html#pyannote.core.SlidingWindowFeature.align">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="s2">&quot;SlidingWindowFeature&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SlidingWindowFeature&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Align features by linear temporal interpolation</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">to</span><span class="p">:</span> <span class="s2">"SlidingWindowFeature"</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"SlidingWindowFeature"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Align features by linear temporal interpolation</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -395,7 +397,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        aligned : SlidingWindowFeature</span>
 <span class="sd">            Aligned features</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">old_start</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">start</span>
         <span class="n">old_step</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sliding_window</span><span class="o">.</span><span class="n">step</span>
@@ -420,7 +422,7 @@
 
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">doctest</span>
 
     <span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">()</span>
