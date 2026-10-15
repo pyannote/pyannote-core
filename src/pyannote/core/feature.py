@@ -255,8 +255,8 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
 
     _HANDLED_TYPES = (np.ndarray, numbers.Number)
 
-    def __array__(self) -> np.ndarray:
-        return self.data
+    def __array__(self, dtype=None, copy=None) -> np.ndarray:
+        return np.array(self.data, dtype=dtype, copy=copy)
 
     def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
         out = kwargs.get("out", ())

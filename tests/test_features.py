@@ -84,3 +84,22 @@ def test_repr_png_one_feature(one_feature):
     expected = b"\x89PNG"
     actual = one_feature._repr_png_()[:4]
     assert expected == actual
+
+
+@pytest.mark.parametrize("dtype", [np.float32, np.float64])
+def test_array_dtype(features, dtype):
+    actual = np.asarray(features, dtype=dtype)
+    np.testing.assert_array_equal(actual, features.data.astype(dtype))
+    assert actual.dtype == dtype
+
+
+@pytest.mark.parametrize("copy", [False, True, None])
+def test_array_copy(features, copy):
+    actual = np.array(features, copy=copy)
+    np.testing.assert_array_equal(actual, features.data)
+    assert np.shares_memory(actual, features.data) == (copy is not True)
+
+
+def test_array_copy_false_dtype_change(features):
+    with pytest.raises(ValueError):
+        np.array(features, dtype=np.float32, copy=False)
