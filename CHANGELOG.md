@@ -2,14 +2,31 @@
 
 ## Next version
 
-- fix: restore pooling clustering compatibility with NumPy 2 and order linkage
-  children by decreasing cluster size
-- fix: resolve remaining lint findings in library code, tests, and examples
-
 - BREAKING: drop Python 3.10 support; require Python 3.11 or newer
-- setup: align CI and release workflows with pyannote.pipeline: test built wheels,
-  add advisory lint checks, and publish checked artifacts on GitHub Releases
-- setup: verify release versions and existing PyPI file hashes before publishing
+- fix(cluster): replace removed `np.infty` with `np.inf` for NumPy 2 compatibility
+- fix(cluster): order linkage children by decreasing cluster size, including
+  must-link merges, without changing merge membership or distances
+- fix(notebook): import IPython's PNG renderer only when rendering is requested,
+  instead of silently swallowing import errors
+- refactor: define public wildcard exports with `__all__`, including public
+  constants and the optional `notebook` export
+- refactor: remove unnecessary label-cache updates during annotation plotting
+  and unused timeline construction during segmentation
+- chore: resolve Ruff findings and formatting issues in library code, tests,
+  documentation examples, and notebooks
+- test: add clustering regression coverage for pooling methods, linkage child
+  ordering, and must-link/cannot-link constraints; include SciPy in test dependencies
+- setup: build distributions once and test the wheel on Python 3.11–3.15 and the
+  latest stable Python 3 release
+- setup: publish checked distributions when a GitHub Release is published,
+  instead of on tag pushes; attach the wheel and source archive to the release
+- setup: verify release tags against package versions and existing PyPI file
+  hashes; support retries when published files have identical contents
+- setup: use pinned GitHub Actions, scoped workflow permissions, advisory Ruff
+  checks, and Hatchling 1.32.0 while retaining tag-derived package versions
+- doc: build documentation on pull requests and deploy from `main`
+- doc: use `CHANGELOG.md` as the single release history and link to it from Sphinx
+- doc: add the social preview to the README using a raw GitHub image URL for PyPI
 
 ## Version 6.0.1 (2025-09-16)
 
