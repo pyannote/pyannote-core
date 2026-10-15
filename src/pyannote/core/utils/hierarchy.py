@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# encoding: utf-8
 
 # The MIT License (MIT)
 
@@ -33,38 +32,34 @@ Hierarchical clustering (:mod:`pyannote.core.utils.hierarchy`)
 
 """
 
-from typing import Text, Callable, List, Tuple, Union
 from collections import Counter
+from collections.abc import Callable
 from inspect import signature
+
 import numpy as np
 import scipy.cluster.hierarchy
-from .distance import to_condensed
-from .distance import to_squared
-from .distance import l2_normalize
-from .distance import pdist
-from .distance import cdist
-
-from scipy.spatial.distance import squareform
 from scipy.sparse import csr_matrix
 from scipy.sparse.csgraph import connected_components
+from scipy.spatial.distance import squareform
+
+from .distance import cdist, l2_normalize, pdist, to_condensed, to_squared
 
 
 def linkage(X, method="single", metric="euclidean", **kwargs):
-    """Same as scipy.cluster.hierarchy.linkage with more metrics and methods
-    """
+    """Same as scipy.cluster.hierarchy.linkage with more metrics and methods"""
 
     if method == "pool":
         return pool(X, metric=metric, **kwargs)
 
     # corner case when using non-euclidean distances with methods
     # designed for the euclidean distance
-    if metric != 'euclidean' and method in ['centroid', 'median', 'ward']:
+    if metric != "euclidean" and method in ["centroid", "median", "ward"]:
         # Those 3 methods only work with 'euclidean' distance.
         # Therefore, one has to unit-normalized embeddings before
         # comparison in case they were optimized for 'cosine' (or 'angular')
         # distance.
         X = l2_normalize(X)
-        metric = 'euclidean'
+        metric = "euclidean"
 
     distance = pdist(X, metric=metric)
     return scipy.cluster.hierarchy.linkage(
@@ -73,7 +68,11 @@ def linkage(X, method="single", metric="euclidean", **kwargs):
 
 
 def _average_pooling_func(
-    u: int, v: int, S: np.ndarray = None, C: np.ndarray = None, **kwargs,
+    u: int,
+    v: int,
+    S: np.ndarray = None,
+    C: np.ndarray = None,
+    **kwargs,
 ) -> np.ndarray:
     """Compute average of newly merged cluster
 
@@ -130,15 +129,15 @@ def _centroid_pooling_func(
 
 
 def propagate_constraints(
-    cannot_link: List[Tuple[int, int]], must_link: List[Tuple[int, int]]
+    cannot_link: list[tuple[int, int]], must_link: list[tuple[int, int]]
 ):
 
     # expand list of "cannot link" constraints thanks to the following rule
     # (u != v) & (v == w) ==> u != w
 
-    cannot_link = set(tuple(sorted(uv)) for uv in cannot_link)
+    cannot_link = {tuple(sorted(uv)) for uv in cannot_link}
     while True:
-        new_cannot_link = list()
+        new_cannot_link = []
         for x, y in must_link:
             for u, v in cannot_link:
                 ij = tuple(sorted({u, v}.symmetric_difference({x, y})))
@@ -160,11 +159,11 @@ def propagate_constraints(
 
 def pool(
     X: np.ndarray,
-    metric: Text = "euclidean",
-    pooling_func: Union[Text, Callable] = "average",
-    cannot_link: List[Tuple[int, int]] = None,
-    must_link: List[Tuple[int, int]] = None,
-    must_link_method: Text = "both",
+    metric: str = "euclidean",
+    pooling_func: str | Callable = "average",
+    cannot_link: list[tuple[int, int]] | None = None,
+    must_link: list[tuple[int, int]] | None = None,
+    must_link_method: str = "both",
 ):
     """'pool' linkage
 
@@ -202,7 +201,7 @@ def pool(
     elif pooling_func == "centroid":
         pooling_func = _centroid_pooling_func
 
-    elif isinstance(pooling_func, Text):
+    elif isinstance(pooling_func, str):
         msg = (
             f"{pooling_func} pooling is not supported. Choose between "
             f"'average' and 'centroid', or provide your own function."
@@ -345,7 +344,6 @@ def pool(
     iteration = 0
 
     if cannot_link:
-
         if must_link_method in ["propagate", "both"]:
             cannot_link = propagate_constraints(cannot_link, must_link)
 
@@ -377,7 +375,6 @@ def pool(
 
     # iterate until one cluster remains
     for iteration in range(iteration, n - 1):
-
         # find two most similar clusters
         k = np.argmin(D)
 
@@ -394,7 +391,7 @@ def pool(
     return Z
 
 
-def fcluster_auto(X, Z, metric='euclidean'):
+def fcluster_auto(X, Z, metric="euclidean"):
     """Forms flat clusters using within-class sum of square elbow criterion
 
     Parameters
@@ -424,14 +421,17 @@ def fcluster_auto(X, Z, metric='euclidean'):
     # within-class sum of squares
     wcss = []
     for threshold in Z[:, 2]:
-        y_t = scipy.cluster.hierarchy.fcluster(Z, threshold,
-                                               criterion='distance')
+        y_t = scipy.cluster.hierarchy.fcluster(Z, threshold, criterion="distance")
         D = []
         for k in np.unique(y_t):
             Xk = X[y_t == k]
             Ck = np.mean(Xk, axis=0, keepdims=True)
-            D.append(cdist(Ck, Xk, metric=metric).reshape(-1, ))
-        wcss.append(np.mean(np.hstack(D)**2))
+            D.append(
+                cdist(Ck, Xk, metric=metric).reshape(
+                    -1,
+                )
+            )
+        wcss.append(np.mean(np.hstack(D) ** 2))
     wcss = np.array(wcss)
 
     # elbow criterion
@@ -452,4 +452,4 @@ def fcluster_auto(X, Z, metric='euclidean'):
     distance = np.abs(a * np.arange(1, n) + b * wcss + c) / np.sqrt(a**2 + b**2)
     threshold = Z[np.argmax(distance), 2]
 
-    return scipy.cluster.hierarchy.fcluster(Z, threshold, criterion='distance')
+    return scipy.cluster.hierarchy.fcluster(Z, threshold, criterion="distance")

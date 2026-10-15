@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# encoding: utf-8
 
 # The MIT License (MIT)
 
@@ -26,16 +25,17 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-import numpy as np
-from .distance import pdist
-from scipy.spatial.distance import squareform
 from collections import Counter
 
+import numpy as np
+from scipy.spatial.distance import squareform
 
-def chinese_whispers_clustering(X, t, method='distance',
-                                metric='euclidean',
-                                max_iter=1000,
-                                init=None):
+from .distance import pdist
+
+
+def chinese_whispers_clustering(
+    X, t, method="distance", metric="euclidean", max_iter=1000, init=None
+):
     """Chinese whispers clustering
 
     Parameters
@@ -71,7 +71,7 @@ def chinese_whispers_clustering(X, t, method='distance',
 
     # TODO. add support for 'precomputed' metric
 
-    if method == 'distance':
+    if method == "distance":
         distance = pdist(X, metric=metric)
         neighbors = squareform(distance < t)
 
@@ -79,7 +79,7 @@ def chinese_whispers_clustering(X, t, method='distance',
         has_no_neighbor = np.sum(neighbors, axis=1) == 0
         for i in range(len(X)):
             neighbors[i, i] = has_no_neighbor[i]
-    elif method == 'knn':
+    elif method == "knn":
         msg = "only 'distance' method is supported for now."
         raise NotImplementedError(msg)
         # neighbors = np.argpartition(squareform(distance), t, axis=1)[:,:t]
@@ -98,7 +98,6 @@ def chinese_whispers_clustering(X, t, method='distance',
     indices = np.arange(len(X))
 
     for _ in range(max_iter):
-
         # keep track of current state
         prev_clusters = np.copy(clusters)
 
@@ -106,7 +105,6 @@ def chinese_whispers_clustering(X, t, method='distance',
         # TODO: option to set random seed for reproducibility
         np.random.shuffle(indices)
         for i in indices:
-
             # count number of neighbors in each cluster
             counts = Counter(clusters[neighbors[i]])
             # assign item to most common neighbor cluster

@@ -1,6 +1,5 @@
-
 notebook.width = 10
-plt.rcParams['figure.figsize'] = (notebook.width, 3)
+plt.rcParams["figure.figsize"] = (notebook.width, 3)
 
 # only display [0, 20] timerange
 notebook.crop = Segment(0, 20)
@@ -8,10 +7,10 @@ notebook.crop = Segment(0, 20)
 # plot annotation
 plt.subplot(211)
 annotation = Annotation()
-annotation[Segment(1, 5)] = 'Carol'
-annotation[Segment(6, 8)] = 'Bob'
-annotation[Segment(12, 18)] = 'Carol'
-annotation[Segment(7, 20)] = 'Alice'
+annotation[Segment(1, 5)] = "Carol"
+annotation[Segment(6, 8)] = "Bob"
+annotation[Segment(12, 18)] = "Carol"
+annotation[Segment(7, 20)] = "Alice"
 notebook.plot_annotation(annotation, legend=True, time=False)
 
 # plot timeline

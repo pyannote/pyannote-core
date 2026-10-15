@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# encoding: utf-8
 
 # The MIT License (MIT)
 
@@ -92,20 +91,23 @@ Annotations
 .. plot:: pyplots/annotation.py
 
 """
-from typing import Iterable, Dict, Optional
+
+from collections.abc import Iterable
 
 from .utils.types import Label, LabelStyle, Resource
 
 try:
     from IPython.core.pylabtools import print_figure
-except Exception as e:
+except Exception:
     pass
+from itertools import cycle, groupby, product
+
 import numpy as np
-from itertools import cycle, product, groupby
-from .segment import Segment, SlidingWindow
-from .timeline import Timeline
+
 from .annotation import Annotation
 from .feature import SlidingWindowFeature
+from .segment import Segment, SlidingWindow
+from .timeline import Timeline
 
 try:
     import matplotlib
@@ -135,7 +137,7 @@ class Notebook:
         colors = [cm(1.0 * i / 8) for i in range(9)]
 
         self._style_generator = cycle(product(linestyle, linewidth, colors))
-        self._style: Dict[Optional[Label], LabelStyle] = {
+        self._style: dict[Label | None, LabelStyle] = {
             None: ("solid", 1, (0.0, 0.0, 0.0))
         }
         del self.crop
@@ -303,7 +305,7 @@ class Notebook:
             self.crop = annotation.get_timeline(copy=False).extent()
 
         cropped = annotation.crop(self.crop, mode="intersection")
-        labels = cropped.labels()
+        cropped.labels()
         segments = [s for s, _ in cropped.itertracks()]
 
         ax = self.setup(ax=ax, time=time)
@@ -325,7 +327,7 @@ class Notebook:
             HL = groupby(
                 sorted(zip(H, L), key=lambda h_l: h_l[1]), key=lambda h_l: h_l[1]
             )
-            H, L = zip(*list((next(h_l)[0], l) for l, h_l in HL))
+            H, L = zip(*[(next(h_l)[0], l) for l, h_l in HL])
             ax.legend(
                 H,
                 L,
@@ -344,7 +346,7 @@ class Notebook:
             self.crop = feature.extent
 
         window = feature.sliding_window
-        n, dimension = feature.data.shape
+        n, _dimension = feature.data.shape
         ((start, stop),) = window.crop(self.crop, mode="loose", return_ranges=True)
         xlim = (window[start].middle, window[stop].middle)
 
@@ -415,7 +417,6 @@ def repr_feature(feature: SlidingWindowFeature):
     figsize = plt.rcParams["figure.figsize"]
 
     if feature.data.ndim == 2:
-
         plt.rcParams["figure.figsize"] = (notebook.width, 2)
         fig, ax = plt.subplots()
         notebook.plot_feature(feature, ax=ax)
@@ -423,7 +424,6 @@ def repr_feature(feature: SlidingWindowFeature):
         plt.close(fig)
 
     elif feature.data.ndim == 3:
-
         num_chunks = len(feature)
 
         if notebook.crop is None:

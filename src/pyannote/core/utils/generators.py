@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# encoding: utf-8
 
 # The MIT License (MIT)
 
@@ -27,8 +26,8 @@
 # Hervé BREDIN - http://herve.niderb.fr
 
 import itertools
+from collections.abc import Iterable, Iterator
 from string import ascii_uppercase
-from typing import Iterable, Union, List, Set, Optional, Iterator
 
 
 def pairwise(iterable: Iterable):
@@ -38,8 +37,7 @@ def pairwise(iterable: Iterable):
     return zip(a, b)
 
 
-def string_generator(skip: Optional[Union[List, Set]] = None) \
-        -> Iterator[str]:
+def string_generator(skip: list | set | None = None) -> Iterator[str]:
     """Label generator
 
     Parameters
@@ -64,19 +62,18 @@ def string_generator(skip: Optional[Union[List, Set]] = None) \
     ...               # (you get the idea)
     """
     if skip is None:
-        skip = list()
+        skip = []
 
     # label length
     r = 1
 
     # infinite loop
     while True:
-
         # generate labels with current length
         for c in itertools.product(ascii_uppercase, repeat=r):
             if c in skip:
                 continue
-            yield ''.join(c)
+            yield "".join(c)
 
         # increment label length when all possibilities are exhausted
         r = r + 1
