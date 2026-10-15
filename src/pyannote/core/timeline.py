@@ -1015,9 +1015,6 @@ class Timeline:
         # becomes
         # |-|--|-|  |-|---|--|  |--|----|--|
 
-        # start with an empty copy
-        Timeline(uri=self.uri)
-
         if len(timestamps) == 0:
             return Timeline(uri=self.uri)
 

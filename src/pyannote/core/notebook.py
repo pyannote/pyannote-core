@@ -297,7 +297,6 @@ class Notebook:
             self.crop = annotation.get_timeline(copy=False).extent()
 
         cropped = annotation.crop(self.crop, mode="intersection")
-        cropped.labels()
         segments = [s for s, _ in cropped.itertracks()]
 
         ax = self.setup(ax=ax, time=time)
