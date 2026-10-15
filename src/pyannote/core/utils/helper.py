@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 # The MIT License (MIT)
 
 # Copyright (c) 2018 CNRS
@@ -26,12 +23,10 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
-from typing import Optional
 from importlib import import_module
 
 
-def get_class_by_name(class_name: str,
-                      default_module_name: Optional[str] = None) -> type:
+def get_class_by_name(class_name: str, default_module_name: str | None = None) -> type:
     """Load class by its name
 
     Parameters
@@ -52,17 +47,18 @@ def get_class_by_name(class_name: str,
     >>> ClopiNet = get_class_by_name(
     ...     'ClopiNet', default_module_name='pyannote.audio.embedding.models')
     """
-    tokens = class_name.split('.')
+    tokens = class_name.split(".")
 
     if len(tokens) == 1:
         if default_module_name is None:
             msg = (
                 f'Could not infer module name from class name "{class_name}".'
-                f'Please provide default module name.')
+                f"Please provide default module name."
+            )
             raise ValueError(msg)
         module_name = default_module_name
     else:
-        module_name = '.'.join(tokens[:-1])
+        module_name = ".".join(tokens[:-1])
         class_name = tokens[-1]
 
     return getattr(import_module(module_name), class_name)

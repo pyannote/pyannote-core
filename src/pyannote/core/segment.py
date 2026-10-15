@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 # The MIT License (MIT)
 
 # Copyright (c) 2014-2021 CNRS
@@ -81,12 +78,16 @@ See :class:`pyannote.core.Segment` for the complete reference.
 """
 
 import warnings
-from typing import Union, Optional, Tuple, List, Iterator, Iterable
+from collections.abc import Iterable, Iterator
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Union
 
-from .utils.types import Alignment
+if TYPE_CHECKING:
+    from .timeline import Timeline
 
 import numpy as np
-from dataclasses import dataclass
+
+from .utils.types import Alignment
 
 
 # setting 'frozen' to True makes it hashable and immutable
@@ -124,14 +125,15 @@ class Segment:
       - `segment.start == other_segment.start` and `segment.end < other_segment.end`
 
     """
+
     start: float = 0.0
     end: float = 0.0
 
     @staticmethod
-    def set_precision(ndigits: Optional[int] = None):
+    def set_precision(ndigits: int | None = None):
         """Automatically round start and end timestamps to `ndigits` precision after the decimal point
 
-        To ensure consistency between `Segment` instances, it is recommended to call this method only 
+        To ensure consistency between `Segment` instances, it is recommended to call this method only
         once, right after importing `pyannote.core.Segment`.
 
         Usage
@@ -171,18 +173,24 @@ class Segment:
     def __post_init__(self):
         """Round start and end up to SEGMENT_PRECISION precision (when required)"""
         if AUTO_ROUND_TIME:
-            object.__setattr__(self, 'start', int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
-            object.__setattr__(self, 'end', int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION)
+            object.__setattr__(
+                self,
+                "start",
+                int(self.start / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION,
+            )
+            object.__setattr__(
+                self, "end", int(self.end / SEGMENT_PRECISION + 0.5) * SEGMENT_PRECISION
+            )
 
     @property
     def duration(self) -> float:
         """Segment duration (read-only)"""
-        return self.end - self.start if self else 0.
+        return self.end - self.start if self else 0.0
 
     @property
     def middle(self) -> float:
         """Segment mid-time (read-only)"""
-        return .5 * (self.start + self.end)
+        return 0.5 * (self.start + self.end)
 
     def __iter__(self) -> Iterator[float]:
         """Unpack segment boundaries
@@ -192,7 +200,7 @@ class Segment:
         yield self.start
         yield self.end
 
-    def copy(self) -> 'Segment':
+    def copy(self) -> "Segment":
         """Get a copy of the segment
 
         Returns
@@ -206,7 +214,7 @@ class Segment:
     # Inclusion (in), intersection (&), union (|) and gap (^) #
     # ------------------------------------------------------- #
 
-    def __contains__(self, other: 'Segment'):
+    def __contains__(self, other: "Segment"):
         """Inclusion
 
         >>> segment = Segment(start=0, end=10)
@@ -239,7 +247,7 @@ class Segment:
         end = min(self.end, other.end)
         return Segment(start=start, end=end)
 
-    def intersects(self, other: 'Segment') -> bool:
+    def intersects(self, other: "Segment") -> bool:
         """Check whether two segments intersect each other
 
         Parameters
@@ -253,11 +261,11 @@ class Segment:
             True if segments intersect, False otherwise
         """
 
-        return (self.start < other.start and
-                other.start < self.end - SEGMENT_PRECISION) or \
-               (self.start > other.start and
-                self.start < other.end - SEGMENT_PRECISION) or \
-               (self.start == other.start)
+        return (
+            (self.start < other.start and other.start < self.end - SEGMENT_PRECISION)
+            or (self.start > other.start and self.start < other.end - SEGMENT_PRECISION)
+            or (self.start == other.start)
+        )
 
     def overlaps(self, t: float) -> bool:
         """Check if segment overlaps a given time
@@ -274,7 +282,7 @@ class Segment:
         """
         return self.start <= t and self.end >= t
 
-    def __or__(self, other: 'Segment') -> 'Segment':
+    def __or__(self, other: "Segment") -> "Segment":
         """Union
 
         >>> segment = Segment(0, 10)
@@ -304,7 +312,7 @@ class Segment:
         end = max(self.end, other.end)
         return Segment(start=start, end=end)
 
-    def __xor__(self, other: 'Segment') -> 'Segment':
+    def __xor__(self, other: "Segment") -> "Segment":
         """Gap
 
         >>> segment = Segment(0, 10)
@@ -325,8 +333,8 @@ class Segment:
         # if segment is empty, xor is not defined
         if (not self) or (not other):
             raise ValueError(
-                'The gap between a segment and an empty segment '
-                'is not defined.')
+                "The gap between a segment and an empty segment is not defined."
+            )
 
         start = min(self.end, other.end)
         end = max(self.start, other.start)
@@ -334,6 +342,7 @@ class Segment:
 
     def _str_helper(self, seconds: float) -> str:
         from datetime import timedelta
+
         negative = seconds < 0
         seconds = abs(seconds)
         td = timedelta(seconds=seconds)
@@ -341,9 +350,10 @@ class Segment:
         microseconds = td.microseconds
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
-        return '%s%02d:%02d:%02d.%03d' % (
-            '-' if negative else ' ', hours, minutes,
-            seconds, microseconds / 1000)
+        sign = "-" if negative else " "
+        return (
+            f"{sign}{hours:02d}:{minutes:02d}:{seconds:02d}.{microseconds // 1000:03d}"
+        )
 
     def __str__(self):
         """Human-readable representation
@@ -356,9 +366,8 @@ class Segment:
         Empty segments are printed as "[]"
         """
         if self:
-            return '[%s --> %s]' % (self._str_helper(self.start),
-                                    self._str_helper(self.end))
-        return '[]'
+            return f"[{self._str_helper(self.start)} --> {self._str_helper(self.end)}]"
+        return "[]"
 
     def __repr__(self):
         """Computer-readable representation
@@ -366,7 +375,7 @@ class Segment:
         >>> Segment(1337, 1337 + 0.42)
         <Segment(1337, 1337.42)>
         """
-        return '<Segment(%g, %g)>' % (self.start, self.end)
+        return f"<Segment({self.start:g}, {self.end:g})>"
 
     def _repr_png_(self):
         """IPython notebook support
@@ -376,16 +385,19 @@ class Segment:
         :mod:`pyannote.core.notebook`
         """
         from .notebook import MATPLOTLIB_IS_AVAILABLE, MATPLOTLIB_WARNING
+
         if not MATPLOTLIB_IS_AVAILABLE:
             warnings.warn(MATPLOTLIB_WARNING.format(klass=self.__class__.__name__))
             return None
 
         from .notebook import repr_segment
+
         try:
             return repr_segment(self)
         except ImportError:
             warnings.warn(
-                f"Couldn't import matplotlib to render the vizualization for object {self}. To enable, install the required dependencies with 'pip install pyannore.core[notebook]'")
+                f"Couldn't import matplotlib to render the vizualization for object {self}. To enable, install the required dependencies with 'pip install pyannore.core[notebook]'"
+            )
             return None
 
 
@@ -483,11 +495,9 @@ class SlidingWindow:
             Index of frame whose middle is the closest to `timestamp`
 
         """
-        return int(np.rint(
-            (t - self.__start - .5 * self.__duration) / self.__step
-        ))
+        return int(np.rint((t - self.__start - 0.5 * self.__duration) / self.__step))
 
-    def samples(self, from_duration: float, mode: Alignment = 'strict') -> int:
+    def samples(self, from_duration: float, mode: Alignment = "strict") -> int:
         """Number of frames
 
         Parameters
@@ -505,20 +515,22 @@ class SlidingWindow:
             `from_duration`.
 
         """
-        if mode == 'strict':
+        if mode == "strict":
             return int(np.floor((from_duration - self.duration) / self.step)) + 1
 
-        elif mode == 'loose':
+        elif mode == "loose":
             return int(np.floor((from_duration + self.duration) / self.step))
 
-        elif mode == 'center':
-            return int(np.rint((from_duration / self.step)))
+        elif mode == "center":
+            return int(np.rint(from_duration / self.step))
 
-    def crop(self, focus: Union[Segment, 'Timeline'],
-             mode: Alignment = 'loose',
-             fixed: Optional[float] = None,
-             return_ranges: Optional[bool] = False) -> \
-            Union[np.ndarray, List[List[int]]]:
+    def crop(
+        self,
+        focus: Union[Segment, "Timeline"],
+        mode: Alignment = "loose",
+        fixed: float | None = None,
+        return_ranges: bool | None = False,
+    ) -> np.ndarray | list[list[int]]:
         """Crop sliding window
 
         Parameters
@@ -550,7 +562,6 @@ class SlidingWindow:
             raise TypeError(msg)
 
         if isinstance(focus, Timeline):
-
             if fixed is not None:
                 msg = "'fixed' is not supported with `Timeline` 'focus'."
                 raise ValueError(msg)
@@ -559,8 +570,7 @@ class SlidingWindow:
                 ranges = []
 
                 for i, s in enumerate(focus.support()):
-                    rng = self.crop(s, mode=mode, fixed=fixed,
-                                    return_ranges=True)
+                    rng = self.crop(s, mode=mode, fixed=fixed, return_ranges=True)
 
                     # if first or disjoint segment, add it
                     if i == 0 or rng[0][0] > ranges[-1][1]:
@@ -573,17 +583,19 @@ class SlidingWindow:
                 return ranges
 
             # concatenate all indices
-            indices = np.hstack([
-                self.crop(s, mode=mode, fixed=fixed, return_ranges=False)
-                for s in focus.support()])
+            indices = np.hstack(
+                [
+                    self.crop(s, mode=mode, fixed=fixed, return_ranges=False)
+                    for s in focus.support()
+                ]
+            )
 
             # remove duplicate indices
             return np.unique(indices)
 
         # 'focus' is a `Segment` instance
 
-        if mode == 'loose':
-
+        if mode == "loose":
             # find smallest integer i such that
             # self.start + i x self.step + self.duration >= focus.start
             i_ = (focus.start - self.duration - self.start) / self.step
@@ -597,18 +609,16 @@ class SlidingWindow:
                 rng = (i, j + 1)
 
             else:
-                n = self.samples(fixed, mode='loose')
+                n = self.samples(fixed, mode="loose")
                 rng = (i, i + n)
 
-        elif mode == 'strict':
-
+        elif mode == "strict":
             # find smallest integer i such that
             # self.start + i x self.step >= focus.start
             i_ = (focus.start - self.start) / self.step
             i = int(np.ceil(i_))
 
             if fixed is None:
-
                 # find largest integer j such that
                 # self.start + j x self.step + self.duration <= focus.end
                 j_ = (focus.end - self.duration - self.start) / self.step
@@ -616,11 +626,10 @@ class SlidingWindow:
                 rng = (i, j + 1)
 
             else:
-                n = self.samples(fixed, mode='strict')
+                n = self.samples(fixed, mode="strict")
                 rng = (i, i + n)
 
-        elif mode == 'center':
-
+        elif mode == "center":
             # find window position whose center is the closest to focus.start
             i = self.closest_frame(focus.start)
 
@@ -629,7 +638,7 @@ class SlidingWindow:
                 j = self.closest_frame(focus.end)
                 rng = (i, j + 1)
             else:
-                n = self.samples(fixed, mode='center')
+                n = self.samples(fixed, mode="center")
                 rng = (i, i + n)
 
         else:
@@ -641,12 +650,11 @@ class SlidingWindow:
 
         return np.array(range(*rng), dtype=np.int64)
 
-    def segmentToRange(self, segment: Segment) -> Tuple[int, int]:
-        warnings.warn("Deprecated in favor of `segment_to_range`",
-                      DeprecationWarning)
+    def segmentToRange(self, segment: Segment) -> tuple[int, int]:
+        warnings.warn("Deprecated in favor of `segment_to_range`", DeprecationWarning)
         return self.segment_to_range(segment)
 
-    def segment_to_range(self, segment: Segment) -> Tuple[int, int]:
+    def segment_to_range(self, segment: Segment) -> tuple[int, int]:
         """Convert segment to 0-indexed frame range
 
         Parameters
@@ -677,8 +685,9 @@ class SlidingWindow:
         return i0, n
 
     def rangeToSegment(self, i0: int, n: int) -> Segment:
-        warnings.warn("This is deprecated in favor of `range_to_segment`",
-                      DeprecationWarning)
+        warnings.warn(
+            "This is deprecated in favor of `range_to_segment`", DeprecationWarning
+        )
         return self.range_to_segment(i0, n)
 
     def range_to_segment(self, i0: int, n: int) -> Segment:
@@ -716,7 +725,7 @@ class SlidingWindow:
         # start += .5 * self.duration
         # subframe start time
         # start -= .5 * self.step
-        start = self.__start + (i0 - .5) * self.__step + .5 * self.__duration
+        start = self.__start + (i0 - 0.5) * self.__step + 0.5 * self.__duration
         duration = n * self.__step
         end = start + duration
 
@@ -727,8 +736,9 @@ class SlidingWindow:
         return Segment(start, end)
 
     def samplesToDuration(self, nSamples: int) -> float:
-        warnings.warn("This is deprecated in favor of `samples_to_duration`",
-                      DeprecationWarning)
+        warnings.warn(
+            "This is deprecated in favor of `samples_to_duration`", DeprecationWarning
+        )
         return self.samples_to_duration(nSamples)
 
     def samples_to_duration(self, n_samples: int) -> float:
@@ -736,8 +746,9 @@ class SlidingWindow:
         return self.range_to_segment(0, n_samples).duration
 
     def durationToSamples(self, duration: float) -> int:
-        warnings.warn("This is deprecated in favor of `duration_to_samples`",
-                      DeprecationWarning)
+        warnings.warn(
+            "This is deprecated in favor of `duration_to_samples`", DeprecationWarning
+        )
         return self.duration_to_samples(duration)
 
     def duration_to_samples(self, duration: float) -> int:
@@ -780,7 +791,7 @@ class SlidingWindow:
         else:
             raise StopIteration()
 
-    def __iter__(self) -> 'SlidingWindow':
+    def __iter__(self) -> "SlidingWindow":
         """Sliding window iterator
 
         Use expression 'for segment in sliding_window'
@@ -820,19 +831,19 @@ class SlidingWindow:
 
         """
         if np.isinf(self.__end):
-            raise ValueError('infinite sliding window.')
+            raise ValueError("infinite sliding window.")
 
         # start looking for last position
         # based on frame closest to the end
         i = self.closest_frame(self.__end)
 
-        while (self[i]):
+        while self[i]:
             i += 1
         length = i
 
         return length
 
-    def copy(self) -> 'SlidingWindow':
+    def copy(self) -> "SlidingWindow":
         """Duplicate sliding window"""
         duration = self.duration
         step = self.step
@@ -843,9 +854,9 @@ class SlidingWindow:
         )
         return sliding_window
 
-    def __call__(self,
-                 support: Union[Segment, 'Timeline'],
-                 align_last: bool = False) -> Iterable[Segment]:
+    def __call__(
+        self, support: Union[Segment, "Timeline"], align_last: bool = False
+    ) -> Iterable[Segment]:
         """Slide window over support
 
         Parameter
@@ -876,6 +887,7 @@ class SlidingWindow:
         """
 
         from pyannote.core import Timeline
+
         if isinstance(support, Timeline):
             segments = support
 
@@ -885,19 +897,20 @@ class SlidingWindow:
         else:
             msg = (
                 f'"support" must be either a Segment or a Timeline '
-                f'instance (is {type(support)})'
+                f"instance (is {type(support)})"
             )
             raise TypeError(msg)
 
         for segment in segments:
-
             if segment.duration < self.duration:
                 continue
 
-            window = SlidingWindow(duration=self.duration,
-                                   step=self.step,
-                                   start=segment.start,
-                                   end=segment.end)
+            window = SlidingWindow(
+                duration=self.duration,
+                step=self.step,
+                start=segment.start,
+                end=segment.end,
+            )
 
             for s in window:
                 # ugly hack to account for floating point imprecision
@@ -906,5 +919,4 @@ class SlidingWindow:
                     last = s
 
             if align_last and last.end < segment.end:
-                yield Segment(start=segment.end - self.duration,
-                              end=segment.end)
+                yield Segment(start=segment.end - self.duration, end=segment.end)

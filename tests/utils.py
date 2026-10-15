@@ -9,8 +9,6 @@ def preserve_segment_state(f):
         prev_round_time = segment.AUTO_ROUND_TIME
         try:
             ret = f(*args, **kwargs)
-        except Exception as e:
-            raise e
         finally:
             segment.AUTO_ROUND_TIME = prev_round_time
         return ret

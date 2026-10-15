@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 # The MIT License (MIT)
 
 # Copyright (c) 2018 CNRS
@@ -27,8 +24,8 @@
 # Hervé BREDIN - http://herve.niderb.fr
 
 import numpy as np
-import scipy.spatial.distance
 import scipy.cluster.hierarchy
+import scipy.spatial.distance
 
 
 def l2_normalize(X: np.ndarray):
@@ -46,7 +43,7 @@ def l2_normalize(X: np.ndarray):
 
     """
 
-    norm = np.sqrt(np.sum(X ** 2, axis=1))
+    norm = np.sqrt(np.sum(X**2, axis=1))
     norm[norm == 0] = 1.0
     return (X.T / norm).T
 
@@ -158,27 +155,27 @@ def cdist(fX_trn, fX_tst, metric="euclidean", **kwargs):
         return np.arccos(np.clip(1.0 - cosine, -1.0, 1.0))
 
     elif metric == "equal":
-        assert (
-            fX_trn.ndim == 1 and fX_tst.ndim == 1
-        ), f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        assert fX_trn.ndim == 1 and fX_tst.ndim == 1, (
+            f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        )
         return _cdist_func_1D(fX_trn, fX_tst, lambda x_trn, X_tst: x_trn == X_tst)
 
     elif metric == "minimum":
-        assert (
-            fX_trn.ndim == 1 and fX_tst.ndim == 1
-        ), f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        assert fX_trn.ndim == 1 and fX_tst.ndim == 1, (
+            f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        )
         return _cdist_func_1D(fX_trn, fX_tst, np.minimum)
 
     elif metric == "maximum":
-        assert (
-            fX_trn.ndim == 1 and fX_tst.ndim == 1
-        ), f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        assert fX_trn.ndim == 1 and fX_tst.ndim == 1, (
+            f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        )
         return _cdist_func_1D(fX_trn, fX_tst, np.maximum)
 
     elif metric == "average":
-        assert (
-            fX_trn.ndim == 1 and fX_tst.ndim == 1
-        ), f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        assert fX_trn.ndim == 1 and fX_tst.ndim == 1, (
+            f"'{metric}' metric only supports 1-dimensional fX_trn and fX_tst."
+        )
         return _cdist_func_1D(
             fX_trn, fX_tst, lambda x_trn, X_tst: 0.5 * (x_trn + X_tst)
         )
@@ -235,6 +232,6 @@ def to_squared(n, k):
 
     """
     k = np.array(k)
-    i = np.int64(n - np.sqrt(-8 * k + 4 * n ** 2 - 4 * n + 1) / 2 - 1 / 2)
-    j = np.int64(i ** 2 / 2 - i * n + 3 * i / 2 + k + 1)
+    i = np.int64(n - np.sqrt(-8 * k + 4 * n**2 - 4 * n + 1) / 2 - 1 / 2)
+    j = np.int64(i**2 / 2 - i * n + 3 * i / 2 + k + 1)
     return i, j

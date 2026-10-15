@@ -5,7 +5,7 @@ readme = "README.md"
 authors = [
     { name = "Hervé BREDIN", email = "herve@pyannote.ai" }
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 dynamic = [
   "version",
@@ -25,6 +25,7 @@ notebook = [
 test = [
     "matplotlib>=3.10.0",
     "pytest>=8.3.4",
+    "scipy>=1.15.1",
 ]
 doc = [
     "sphinx-rtd-theme>=3.0.2",
@@ -34,7 +35,7 @@ doc = [
 ]
 
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling==1.32.0", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [tool.hatch.version]

@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 # The MIT License (MIT)
 
 # Copyright (c) 2018 CNRS
@@ -26,25 +23,22 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
+
 import numpy as np
-from typing import Union
-from typing import List
-from typing import Text
-from typing import Optional
-from ..segment import Segment
-from ..segment import SlidingWindow
-from ..timeline import Timeline
+
 from ..annotation import Annotation
 from ..feature import SlidingWindowFeature
+from ..segment import Segment, SlidingWindow
+from ..timeline import Timeline
 from .generators import string_generator
 
 
 def one_hot_encoding(
     annotation: Annotation,
-    support: Union[Segment, Timeline],
-    window: Union[SlidingWindow, SlidingWindowFeature],
-    labels: Optional[List[Text]] = None,
-    mode: Text = "center",
+    support: Segment | Timeline,
+    window: SlidingWindow | SlidingWindowFeature,
+    labels: list[str] | None = None,
+    mode: str = "center",
 ) -> SlidingWindowFeature:
     """Convert annotation to one-hot-encoded numpy array
 
@@ -74,8 +68,8 @@ def one_hot_encoding(
             window = window.sliding_window
         else:
             msg = (
-                f"`window` must be an instance of `SlidingWindow` "
-                f"or have an attribute called 'sliding_window'."
+                "`window` must be an instance of `SlidingWindow` "
+                "or have an attribute called 'sliding_window'."
             )
             raise TypeError(msg)
 
@@ -106,7 +100,7 @@ def one_hot_encoding(
     for label in annotation.labels():
         try:
             k = indices[label]
-        except KeyError as e:
+        except KeyError:
             msg = f'List of `labels` does not contain label "{label}".'
             print(indices.keys())
             raise ValueError(msg)
@@ -152,8 +146,8 @@ def one_hot_decoding(y, window, labels=None):
             window = window.sliding_window
         else:
             msg = (
-                f"`window` must be an instance of `SlidingWindow` "
-                f"or have an attribute called 'sliding_window'."
+                "`window` must be an instance of `SlidingWindow` "
+                "or have an attribute called 'sliding_window'."
             )
             raise TypeError(msg)
 

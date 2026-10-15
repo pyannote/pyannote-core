@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 # The MIT License (MIT)
 
 # Copyright (c) 2014-2019 CNRS
@@ -34,15 +31,17 @@ Features
 
 See :class:`pyannote.core.SlidingWindowFeature` for the complete reference.
 """
+
 import numbers
 import warnings
-from typing import Tuple, Optional, Union, Iterator, List, Text
+from collections.abc import Iterator
+from typing import Union
 
 import numpy as np
 
 from pyannote.core.utils.types import Alignment
-from .segment import Segment
-from .segment import SlidingWindow
+
+from .segment import Segment, SlidingWindow
 from .timeline import Timeline
 
 
@@ -58,7 +57,10 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     """
 
     def __init__(
-        self, data: np.ndarray, sliding_window: SlidingWindow, labels: List[Text] = None
+        self,
+        data: np.ndarray,
+        sliding_window: SlidingWindow,
+        labels: list[str] | None = None,
     ):
         self.sliding_window: SlidingWindow = sliding_window
         self.data = data
@@ -102,19 +104,19 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
         self.__i = -1
         return self
 
-    def __next__(self) -> Tuple[Segment, np.ndarray]:
+    def __next__(self) -> tuple[Segment, np.ndarray]:
         self.__i += 1
         try:
             return self.sliding_window[self.__i], self.data[self.__i]
-        except IndexError as e:
+        except IndexError:
             raise StopIteration()
 
     def next(self):
         return self.__next__()
 
     def iterfeatures(
-        self, window: Optional[bool] = False
-    ) -> Iterator[Union[Tuple[np.ndarray, Segment], np.ndarray]]:
+        self, window: bool | None = False
+    ) -> Iterator[tuple[np.ndarray, Segment] | np.ndarray]:
         """Feature vector iterator
 
         Parameters
@@ -133,9 +135,9 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
 
     def crop(
         self,
-        focus: Union[Segment, Timeline],
+        focus: Segment | Timeline,
         mode: Alignment = "loose",
-        fixed: Optional[float] = None,
+        fixed: float | None = None,
         return_data: bool = True,
     ) -> Union[np.ndarray, "SlidingWindowFeature"]:
         """Extract frames

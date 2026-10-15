@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## Next version
+
+- BREAKING: require Python 3.11 or newer; Python 3.10 is no longer supported
+- BREAKING: `from pyannote.core import *` now exports only public classes, constants,
+  and `notebook` when available; incidental module imports are no longer exported
+- fix(cluster): restore pooling clustering with NumPy 2
+- fix(cluster): place the larger cluster first in linkage rows, including
+  must-link merges; cluster membership and merge distances are unchanged
+
 ## Version 6.0.1 (2025-09-16)
 
 - feat: add `Annotation.__iter__` (turn: Segment, speaker: str) iterator

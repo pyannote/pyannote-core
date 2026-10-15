@@ -4,8 +4,8 @@ from tests.utils import preserve_segment_state
 
 def test_creation():
 
-    s = 1.
-    e = 9.
+    s = 1.0
+    e = 9.0
     segment = Segment(start=s, end=e)
 
     assert str(segment) == "[ 00:00:01.000 -->  00:00:09.000]"
@@ -50,6 +50,6 @@ def test_other_operation():
 @preserve_segment_state
 def test_segment_precision_mode():
     Segment.set_precision(None)
-    assert not Segment(90 / 1000, 90 / 1000 + 240 / 1000) == Segment(90 / 1000, 330 / 1000)
+    assert Segment(90 / 1000, 90 / 1000 + 240 / 1000) != Segment(90 / 1000, 330 / 1000)
     Segment.set_precision(4)
     assert Segment(90 / 1000, 90 / 1000 + 240 / 1000) == Segment(90 / 1000, 330 / 1000)

@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 # The MIT License (MIT)
 
 # Copyright (c) 2014-2019 CNRS
@@ -29,25 +26,41 @@
 
 import importlib.metadata
 
-PYANNOTE_URI = 'uri'
-PYANNOTE_MODALITY = 'modality'
-PYANNOTE_SEGMENT = 'segment'
-PYANNOTE_TRACK = 'track'
-PYANNOTE_LABEL = 'label'
-PYANNOTE_SCORE = 'score'
-PYANNOTE_IDENTITY = 'identity'
+PYANNOTE_URI = "uri"
+PYANNOTE_MODALITY = "modality"
+PYANNOTE_SEGMENT = "segment"
+PYANNOTE_TRACK = "track"
+PYANNOTE_LABEL = "label"
+PYANNOTE_SCORE = "score"
+PYANNOTE_IDENTITY = "identity"
 
-from .segment import Segment, SlidingWindow
-from .timeline import Timeline
 from .annotation import Annotation
 from .feature import SlidingWindowFeature
+from .segment import Segment, SlidingWindow
+from .timeline import Timeline
+
+__all__ = [
+    "PYANNOTE_IDENTITY",
+    "PYANNOTE_LABEL",
+    "PYANNOTE_MODALITY",
+    "PYANNOTE_SCORE",
+    "PYANNOTE_SEGMENT",
+    "PYANNOTE_TRACK",
+    "PYANNOTE_URI",
+    "Annotation",
+    "Segment",
+    "SlidingWindow",
+    "SlidingWindowFeature",
+    "Timeline",
+]
 
 try:
     from .notebook import notebook
-except ImportError as e:
+except ImportError:
     pass
+else:
+    __all__ += ["notebook"]
 
 Segment.set_precision()
 
 __version__ = importlib.metadata.version("pyannote-core")
-

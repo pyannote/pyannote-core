@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 # The MIT License (MIT)
 
 # Copyright (c) 2020 CNRS
@@ -27,16 +24,16 @@
 # Hervé BREDIN - http://herve.niderb.fr
 
 
+from collections.abc import Iterable, Iterator
+
 import numpy as np
 
 from pyannote.core import Segment
-from typing import Iterable
-from typing import Iterator
-from typing import Optional
 
 
-def random_segment(segments: Iterable[Segment] ,
-                   weighted: bool = False) -> Iterator[Segment]:
+def random_segment(
+    segments: Iterable[Segment], weighted: bool = False
+) -> Iterator[Segment]:
     """Generate segment with probability proportional to its duration
 
     Parameters
@@ -63,10 +60,9 @@ def random_segment(segments: Iterable[Segment] ,
         yield segments[i]
 
 
-def random_subsegment(segment: Segment,
-                      duration: float,
-                      min_duration: Optional[float] = None) -> \
-                                                            Iterator[Segment]:
+def random_subsegment(
+    segment: Segment, duration: float, min_duration: float | None = None
+) -> Iterator[Segment]:
     """Pick a subsegment at random
 
     Parameters
@@ -92,16 +88,16 @@ def random_subsegment(segment: Segment,
     >>> subsegment = next(generator)
     """
     if min_duration is None:
-
         if duration > segment.duration:
-            msg = (f'`duration` (= {duration:g}) should be smaller '
-                   f'than `segment` duration (= {segment.duration:g}).')
+            msg = (
+                f"`duration` (= {duration:g}) should be smaller "
+                f"than `segment` duration (= {segment.duration:g})."
+            )
             raise ValueError(msg)
 
         while True:
             # draw start time from [segment.start, segment.end - duration]
-            t = segment.start + \
-                np.random.random() * (segment.duration - duration)
+            t = segment.start + np.random.random() * (segment.duration - duration)
             yield Segment(t, t + duration)
 
     else:
@@ -110,8 +106,9 @@ def random_subsegment(segment: Segment,
 
         while True:
             # draw duration from [min_duration, max_duration] interval
-            rnd_duration = min_duration + \
-                           np.random.random() * (max_duration - min_duration)
+            rnd_duration = min_duration + np.random.random() * (
+                max_duration - min_duration
+            )
 
             # draw start from [segment.start, segment.end - rnd_duration] interval
             t = segment.start + np.random.random() * (segment.duration - rnd_duration)
