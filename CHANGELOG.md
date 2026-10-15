@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Next version
+## Version 6.1.0 (2026-10-15)
 
 - BREAKING: require Python 3.11 or newer; Python 3.10 is no longer supported
 - BREAKING: `from pyannote.core import *` now exports only public classes, constants,
