@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The MIT License (MIT)
 
 # Copyright (c) 2014-2019 CNRS
@@ -36,13 +34,14 @@ PYANNOTE_LABEL = "label"
 PYANNOTE_SCORE = "score"
 PYANNOTE_IDENTITY = "identity"
 
-from .annotation import Annotation
-from .feature import SlidingWindowFeature
-from .segment import Segment, SlidingWindow
-from .timeline import Timeline
+from .annotation import Annotation as Annotation
+from .feature import SlidingWindowFeature as SlidingWindowFeature
+from .segment import Segment
+from .segment import SlidingWindow as SlidingWindow
+from .timeline import Timeline as Timeline
 
 try:
-    from .notebook import notebook
+    from .notebook import notebook as notebook
 except ImportError:
     pass
 

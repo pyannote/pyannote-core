@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The MIT License (MIT)
 
 # Copyright (c) 2014-2019 CNRS
@@ -59,7 +57,10 @@ class SlidingWindowFeature(np.lib.mixins.NDArrayOperatorsMixin):
     """
 
     def __init__(
-        self, data: np.ndarray, sliding_window: SlidingWindow, labels: list[str] | None = None
+        self,
+        data: np.ndarray,
+        sliding_window: SlidingWindow,
+        labels: list[str] | None = None,
     ):
         self.sliding_window: SlidingWindow = sliding_window
         self.data = data

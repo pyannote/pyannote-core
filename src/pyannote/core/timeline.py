@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The MIT License (MIT)
 
 # Copyright (c) 2014-2020 CNRS
@@ -144,7 +142,9 @@ class Timeline:
         timeline = cls(segments=segments, uri=uri)
         return timeline
 
-    def __init__(self, segments: Iterable[Segment] | None = None, uri: str | None = None):
+    def __init__(
+        self, segments: Iterable[Segment] | None = None, uri: str | None = None
+    ):
         if segments is None:
             segments = ()
 
@@ -552,8 +552,8 @@ class Timeline:
         --------
         :func:`pyannote.core.Timeline.overlapping`
         """
-        segment = Segment(start=t, end=t)
-        for segment in self.segments_list_.irange(maximum=segment):
+        boundary = Segment(start=t, end=t)
+        for segment in self.segments_list_.irange(maximum=boundary):
             if segment.overlaps(t):
                 yield segment
 

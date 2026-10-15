@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The MIT License (MIT)
 
 # Copyright (c) 2016-2017 CNRS
@@ -84,10 +82,6 @@ def test_getter(timeline):
 
 def test_getter_negative(timeline):
     assert timeline[-2] == Segment(7, 8)
-
-
-def test_extent(timeline):
-    assert timeline.extent() == Segment(0.5, 10)
 
 
 def test_remove_and_extent():

@@ -71,22 +71,16 @@ def test_crop_fixed_out_of_bounds(features):
 
 
 def test_repr_png(features):
-    try:
-        import IPython
-        import matplotlib
-    except ModuleNotFoundError:
-        pytest.skip("notebook dependencies not available")
+    pytest.importorskip("IPython")
+    pytest.importorskip("matplotlib")
     expected = b"\x89PNG"
     actual = features._repr_png_()[:4]
     assert expected == actual
 
 
 def test_repr_png_one_feature(one_feature):
-    try:
-        import IPython
-        import matplotlib
-    except ModuleNotFoundError:
-        pytest.skip("notebook dependencies not available")
+    pytest.importorskip("IPython")
+    pytest.importorskip("matplotlib")
     expected = b"\x89PNG"
     actual = one_feature._repr_png_()[:4]
     assert expected == actual

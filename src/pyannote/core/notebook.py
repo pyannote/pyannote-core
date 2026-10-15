@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The MIT License (MIT)
 
 # Copyright (c) 2014-2019 CNRS
@@ -93,13 +91,6 @@ Annotations
 """
 
 from collections.abc import Iterable
-
-from .utils.types import Label, LabelStyle, Resource
-
-try:
-    from IPython.core.pylabtools import print_figure
-except Exception:
-    pass
 from itertools import cycle, groupby, product
 
 import numpy as np
@@ -108,9 +99,10 @@ from .annotation import Annotation
 from .feature import SlidingWindowFeature
 from .segment import Segment, SlidingWindow
 from .timeline import Timeline
+from .utils.types import Label, LabelStyle, Resource
 
 try:
-    import matplotlib
+    import matplotlib  # noqa: F401 -- probe whether the optional dependency imports
 except ImportError:
     MATPLOTLIB_IS_AVAILABLE = False
 else:
@@ -371,6 +363,7 @@ notebook = Notebook()
 def repr_segment(segment: Segment):
     """Get `png` data for `segment`"""
     import matplotlib.pyplot as plt
+    from IPython.core.pylabtools import print_figure
 
     figsize = plt.rcParams["figure.figsize"]
     plt.rcParams["figure.figsize"] = (notebook.width, 1)
@@ -385,6 +378,7 @@ def repr_segment(segment: Segment):
 def repr_timeline(timeline: Timeline):
     """Get `png` data for `timeline`"""
     import matplotlib.pyplot as plt
+    from IPython.core.pylabtools import print_figure
 
     figsize = plt.rcParams["figure.figsize"]
     plt.rcParams["figure.figsize"] = (notebook.width, 1)
@@ -399,6 +393,7 @@ def repr_timeline(timeline: Timeline):
 def repr_annotation(annotation: Annotation):
     """Get `png` data for `annotation`"""
     import matplotlib.pyplot as plt
+    from IPython.core.pylabtools import print_figure
 
     figsize = plt.rcParams["figure.figsize"]
     plt.rcParams["figure.figsize"] = (notebook.width, 2)
@@ -413,6 +408,7 @@ def repr_annotation(annotation: Annotation):
 def repr_feature(feature: SlidingWindowFeature):
     """Get `png` data for `feature`"""
     import matplotlib.pyplot as plt
+    from IPython.core.pylabtools import print_figure
 
     figsize = plt.rcParams["figure.figsize"]
 

@@ -2,6 +2,10 @@
 
 ## Next version
 
+- fix: restore pooling clustering compatibility with NumPy 2 and order linkage
+  children by decreasing cluster size
+- fix: resolve remaining lint findings in library code, tests, and examples
+
 - BREAKING: drop Python 3.10 support; require Python 3.11 or newer
 - setup: align CI and release workflows with pyannote.pipeline: test built wheels,
   add advisory lint checks, and publish checked artifacts on GitHub Releases

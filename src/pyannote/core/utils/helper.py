@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The MIT License (MIT)
 
 # Copyright (c) 2018 CNRS
@@ -28,9 +26,7 @@
 from importlib import import_module
 
 
-def get_class_by_name(
-    class_name: str, default_module_name: str | None = None
-) -> type:
+def get_class_by_name(class_name: str, default_module_name: str | None = None) -> type:
     """Load class by its name
 
     Parameters

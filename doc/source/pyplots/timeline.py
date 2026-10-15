@@ -1,3 +1,7 @@
+import matplotlib.pyplot as plt
+
+from pyannote.core import Segment, Timeline, notebook
+
 notebook.width = 10
 plt.rcParams["figure.figsize"] = (notebook.width, 2)
 

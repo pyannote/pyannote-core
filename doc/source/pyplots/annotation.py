@@ -1,3 +1,7 @@
+import matplotlib.pyplot as plt
+
+from pyannote.core import Annotation, Segment, notebook
+
 notebook.width = 10
 plt.rcParams["figure.figsize"] = (notebook.width, 2)
 

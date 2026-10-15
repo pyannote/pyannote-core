@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The MIT License (MIT)
 
 # Copyright (c) 2014-2021 CNRS
@@ -198,9 +196,7 @@ class Annotation:
     def _updateLabels(self):
 
         # list of labels that needs to be updated
-        update = {
-            label for label, update in self._labelNeedsUpdate.items() if update
-        }
+        update = {label for label, update in self._labelNeedsUpdate.items() if update}
 
         # accumulate segments for updated labels
         _segments = {label: [] for label in update}
@@ -764,11 +760,11 @@ class Annotation:
         # find first non-existing track name for segment
         # eg. if '0' exists, try '1', then '2', ...
         count = 0
-        while ("%s%d" % (prefix, count)) in existing_tracks:
+        while f"{prefix}{count}" in existing_tracks:
             count += 1
 
         # return first non-existing track name
-        return "%s%d" % (prefix, count)
+        return f"{prefix}{count}"
 
     def __str__(self):
         """Human-friendly representation"""

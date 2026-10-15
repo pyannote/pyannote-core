@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The MIT License (MIT)
 
 # Copyright (c) 2014-2021 CNRS
@@ -82,7 +80,10 @@ See :class:`pyannote.core.Segment` for the complete reference.
 import warnings
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
-from typing import Union
+from typing import TYPE_CHECKING, Union
+
+if TYPE_CHECKING:
+    from .timeline import Timeline
 
 import numpy as np
 
@@ -349,12 +350,9 @@ class Segment:
         microseconds = td.microseconds
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
-        return "%s%02d:%02d:%02d.%03d" % (
-            "-" if negative else " ",
-            hours,
-            minutes,
-            seconds,
-            microseconds / 1000,
+        sign = "-" if negative else " "
+        return (
+            f"{sign}{hours:02d}:{minutes:02d}:{seconds:02d}.{microseconds // 1000:03d}"
         )
 
     def __str__(self):

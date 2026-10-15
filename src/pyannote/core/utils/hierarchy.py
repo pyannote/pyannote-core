@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The MIT License (MIT)
 
 # Copyright (c) 2018 CNRS
@@ -242,7 +240,7 @@ def pool(
     # convert condensed pdist matrix for the `n` original observation to a
     # condensed pdist matrix for the `2n-1` clusters (including the `n`
     # original observations) that will exist at some point during the process.
-    D = np.infty * np.ones((2 * n - 1) * (2 * n - 2) // 2)
+    D = np.inf * np.ones((2 * n - 1) * (2 * n - 2) // 2)
     D[to_condensed(2 * n - 1, *to_squared(n, np.arange(n * (n - 1) // 2)))] = d
 
     if "d" in signature(pooling_func).parameters:
@@ -275,14 +273,15 @@ def pool(
 
         k = to_condensed(2 * n - 1, u, v)
 
-        if constraint and D[k] == np.infty:
+        if constraint and D[k] == np.inf:
             w = u if u < n else v
             msg = f"Found a conflict between 'must_link' and 'cannot_link' constraints for observation {w}."
             raise ValueError(msg)
 
         # keep track of ...
         # ... which clusters are merged at this iteration
-        Z[iteration, 0] = v if S[v] > S[u] else v
+        # Place the larger child first; preserve input order for equal sizes.
+        Z[iteration, 0] = v if S[v] > S[u] else u
         Z[iteration, 1] = u if Z[iteration, 0] == v else v
 
         # ... their distance
@@ -321,23 +320,23 @@ def pool(
 
         # propagate "cannot link" constraints to newly formed cluster
         if cannot_link:
-            x, _ = to_squared(2 * n - 1, _u[D[_u] == np.infty])
-            D[to_condensed(2 * n - 1, n + iteration, x)] = np.infty
-            _, x = to_squared(2 * n - 1, u_[D[u_] == np.infty])
-            D[to_condensed(2 * n - 1, n + iteration, x)] = np.infty
-            x, _ = to_squared(2 * n - 1, _v[D[_v] == np.infty])
-            D[to_condensed(2 * n - 1, n + iteration, x)] = np.infty
-            _, x = to_squared(2 * n - 1, v_[D[v_] == np.infty])
-            D[to_condensed(2 * n - 1, n + iteration, x)] = np.infty
+            x, _ = to_squared(2 * n - 1, _u[D[_u] == np.inf])
+            D[to_condensed(2 * n - 1, n + iteration, x)] = np.inf
+            _, x = to_squared(2 * n - 1, u_[D[u_] == np.inf])
+            D[to_condensed(2 * n - 1, n + iteration, x)] = np.inf
+            x, _ = to_squared(2 * n - 1, _v[D[_v] == np.inf])
+            D[to_condensed(2 * n - 1, n + iteration, x)] = np.inf
+            _, x = to_squared(2 * n - 1, v_[D[v_] == np.inf])
+            D[to_condensed(2 * n - 1, n + iteration, x)] = np.inf
 
         # distance to merged clusters u and v no longer exist
-        D[_u] = np.infty
-        D[u_] = np.infty
-        D[_v] = np.infty
-        D[v_] = np.infty
+        D[_u] = np.inf
+        D[u_] = np.inf
+        D[_v] = np.inf
+        D[v_] = np.inf
 
         k = to_condensed(2 * n - 1, n + iteration, np.arange(n + iteration)[empty])
-        D[k] = np.infty
+        D[k] = np.inf
 
         return n + iteration
 
@@ -350,7 +349,7 @@ def pool(
         # take "cannot link" constraints into account by artifically setting the
         # distance between corresponding observations to infinity.
         u, v = zip(*cannot_link)
-        D[to_condensed(2 * n - 1, u, v)] = np.infty
+        D[to_condensed(2 * n - 1, u, v)] = np.inf
 
     # take "must link" constraints into account by merging corresponding
     # observations regardless of their actual similarity. this might lead to
@@ -374,13 +373,14 @@ def pool(
                 iteration += 1
 
     # iterate until one cluster remains
-    for iteration in range(iteration, n - 1):
+    start_iteration = iteration
+    for iteration in range(start_iteration, n - 1):
         # find two most similar clusters
         k = np.argmin(D)
 
         # when cannot_link constraints prevents any further merging,
         # choose an arbitrary (u, v) pair among remaining clusters
-        if D[k] == np.infty:
+        if D[k] == np.inf:
             u, v, *_ = np.where(S > 0)[0]
         else:
             u, v = to_squared(2 * n - 1, k)
