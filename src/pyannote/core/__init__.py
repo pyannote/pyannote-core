@@ -34,16 +34,32 @@ PYANNOTE_LABEL = "label"
 PYANNOTE_SCORE = "score"
 PYANNOTE_IDENTITY = "identity"
 
-from .annotation import Annotation as Annotation
-from .feature import SlidingWindowFeature as SlidingWindowFeature
-from .segment import Segment
-from .segment import SlidingWindow as SlidingWindow
-from .timeline import Timeline as Timeline
+from .annotation import Annotation
+from .feature import SlidingWindowFeature
+from .segment import Segment, SlidingWindow
+from .timeline import Timeline
+
+__all__ = [
+    "PYANNOTE_IDENTITY",
+    "PYANNOTE_LABEL",
+    "PYANNOTE_MODALITY",
+    "PYANNOTE_SCORE",
+    "PYANNOTE_SEGMENT",
+    "PYANNOTE_TRACK",
+    "PYANNOTE_URI",
+    "Annotation",
+    "Segment",
+    "SlidingWindow",
+    "SlidingWindowFeature",
+    "Timeline",
+]
 
 try:
-    from .notebook import notebook as notebook
+    from .notebook import notebook
 except ImportError:
     pass
+else:
+    __all__ += ["notebook"]
 
 Segment.set_precision()
 
