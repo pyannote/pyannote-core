@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Next version
+
+- BREAKING: drop Python 3.10 support; require Python 3.11 or newer
+- setup: align CI and release workflows with pyannote.pipeline: test built wheels,
+  add advisory lint checks, and publish checked artifacts on GitHub Releases
+- setup: verify release versions and existing PyPI file hashes before publishing
+
 ## Version 6.0.1 (2025-09-16)
 
 - feat: add `Annotation.__iter__` (turn: Segment, speaker: str) iterator
