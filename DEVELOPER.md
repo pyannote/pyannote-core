@@ -39,7 +39,7 @@ pushes, tag pushes, and draft releases do not trigger publication.
 3. On releases, [version-guard.yml](.github/workflows/version-guard.yml)
    verifies that the wheel version matches the release tag and
    compares both artifacts with PyPI's recorded SHA-256 hashes. The check is
-   implemented inline in the workflow, following `on-premise`. An existing
+   implemented inline in the workflow. An existing
    filename with different contents fails the release; identical files are
    allowed for retries. Network errors other than HTTP 404 fail the check.
 4. After tests and the version guard succeed, attach those distributions to
@@ -147,7 +147,7 @@ Before the first release, update the PyPI trusted publisher workflow filename
 from `release.yml` to `ci.yml`. The repository and `pypi` environment are
 unchanged. This configuration change is required for publication to succeed.
 No PyPI API token is required. The publishing job requests `id-token: write` for OIDC.
-Unlike `on-premise`, the upload job stays in this top-level workflow because
+The upload job stays in this top-level workflow because
 [PyPI trusted publishing does not support reusable publishing workflows](https://docs.pypi.org/trusted-publishers/troubleshooting/).
 GitHub Release attachments now contain the wheel and source archive.
 Release runs are not automatically cancelled when another run starts, to
