@@ -86,6 +86,7 @@ Several convenient methods are available. Here are a few examples:
 See :class:`pyannote.core.Timeline` for the complete reference.
 """
 
+import math
 import warnings
 from collections.abc import Callable, Iterable, Iterator
 from typing import (
@@ -402,12 +403,45 @@ class Timeline:
             Yields pairs of intersecting segments in chronological order.
         """
 
+        # Sweep over both (sorted) timelines at once instead of re-scanning
+        # every segment of `other` that starts before `segment` ends, which
+        # is quadratic in the number of segments.
+        #
+        # `active` holds candidate segments of `other`, in sorted order:
+        # every segment of `other` up to `pointer` that has not been proven
+        # unable to intersect any later segment of `self`.
+        others = list(other.segments_list_)
+        num_others = len(others)
+        pointer = 0
+        active: list[Segment] = []
+
         for segment in self.segments_list_:
-            # iterate over segments that starts before 'segment' ends
+            # same upper bound as before: segments of `other` sorted
+            # after `temp` can not intersect `segment`
             temp = Segment(start=segment.end, end=segment.end)
-            for other_segment in other.segments_list_.irange(maximum=temp):
+            while pointer < num_others and others[pointer] <= temp:
+                active.append(others[pointer])
+                pointer += 1
+
+            # `active` is sorted, so stop at the first segment beyond `temp`.
+            # Segments of `other` that start before `segment` but do not
+            # intersect it can not intersect any later segment of `self`
+            # either (later segments do not start earlier), so drop them.
+            kept = []
+            index = 0
+            num_active = len(active)
+            while index < num_active:
+                other_segment = active[index]
+                if not other_segment <= temp:
+                    break
+                index += 1
                 if segment.intersects(other_segment):
+                    kept.append(other_segment)
                     yield segment, other_segment
+                elif other_segment.start >= segment.start:
+                    kept.append(other_segment)
+            if len(kept) < index:
+                active[:index] = kept
 
     def crop_iter(
         self,
@@ -1018,13 +1052,36 @@ class Timeline:
         if len(timestamps) == 0:
             return Timeline(uri=self.uri)
 
+        # Segment middles are increasing, so instead of calling
+        # `support.overlapping(middle)` (which scans every support segment
+        # starting before `middle`), sweep through support segments once
+        # while tracking the largest end time seen so far: `middle` is
+        # covered iff one of the support segments sorted before
+        # Segment(middle, middle) and starting at or before `middle` ends
+        # at or after `middle`. Both conditions select a prefix of the
+        # (sorted) support segments that only grows as `middle` increases.
+        support_segments = support.segments_list_
+        num_support = len(support_segments)
+        pointer = 0
+        max_end = -math.inf
+
         segments = []
         start = timestamps[0]
         for end in timestamps[1:]:
             # only add segments that are covered by original timeline
             segment = Segment(start=start, end=end)
-            if segment and support.overlapping(segment.middle):
-                segments.append(segment)
+            if segment:
+                middle = segment.middle
+                boundary = Segment(start=middle, end=middle)
+                while (
+                    pointer < num_support
+                    and support_segments[pointer] <= boundary
+                    and support_segments[pointer].start <= middle
+                ):
+                    max_end = max(max_end, support_segments[pointer].end)
+                    pointer += 1
+                if max_end >= middle:
+                    segments.append(segment)
             # next segment...
             start = end
 
