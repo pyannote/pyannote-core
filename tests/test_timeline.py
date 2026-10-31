@@ -23,6 +23,9 @@
 # AUTHORS
 # Hervé BREDIN - http://herve.niderb.fr
 
+import itertools
+import random
+
 import pytest
 
 from pyannote.core import Annotation, Segment, Timeline
@@ -269,3 +272,79 @@ def test_consistent_timelines_with_empty_segments():
     second_timeline.add(Segment(8, 10))
 
     assert first_timeline == second_timeline
+
+
+def _naive_co_iter(timeline, other):
+    # reference implementation: for each segment, scan every segment of
+    # `other` sorted before Segment(segment.end, segment.end)
+    for segment in timeline:
+        temp = Segment(segment.end, segment.end)
+        for other_segment in other:
+            if other_segment <= temp and segment.intersects(other_segment):
+                yield segment, other_segment
+
+
+def _naive_segmentation(timeline):
+    # reference implementation: check each elementary segment's middle
+    # against every segment of the support
+    support = timeline.support()
+    timestamps = sorted({t for segment in timeline for t in segment})
+    segments = [Segment(start, end) for start, end in itertools.pairwise(timestamps)]
+    return Timeline(
+        [
+            segment
+            for segment in segments
+            if segment
+            and any(
+                s <= Segment(segment.middle, segment.middle)
+                and s.overlaps(segment.middle)
+                for s in support
+            )
+        ]
+    )
+
+
+def _random_timeline(rng, num_segments):
+    timeline = Timeline()
+    for _ in range(num_segments):
+        # coarse grid so that ties, nested, touching and duplicate
+        # segments are frequent
+        # jitter below and around SEGMENT_PRECISION (1μs) to exercise
+        # the precision-dependent branches of Segment.intersects
+        start = rng.randint(0, 20) / 2 + rng.choice([0, 0, 0, 5e-7, -5e-7, 2e-6])
+        duration = rng.choice([0.5, 1, 2, 5, 10, 1e-7, 2e-6])
+        timeline.add(Segment(start, start + duration))
+    return timeline
+
+
+def test_co_iter_long_segment_followed_by_short_ones():
+    # a long segment makes the sweep add many candidates at once:
+    # later, shorter segments must not be paired with candidates
+    # starting after they end.
+    timeline = Timeline([Segment(0, 10), Segment(1, 2), Segment(3, 4)])
+    other = Timeline([Segment(0.5, 1.5), Segment(2.5, 3.5), Segment(5, 6)])
+    assert list(timeline.co_iter(other)) == [
+        (Segment(0, 10), Segment(0.5, 1.5)),
+        (Segment(0, 10), Segment(2.5, 3.5)),
+        (Segment(0, 10), Segment(5, 6)),
+        (Segment(1, 2), Segment(0.5, 1.5)),
+        (Segment(3, 4), Segment(2.5, 3.5)),
+    ]
+
+
+def test_co_iter_matches_naive_implementation():
+    rng = random.Random(42)
+    for _ in range(500):
+        first = _random_timeline(rng, rng.randint(0, 30))
+        second = _random_timeline(rng, rng.randint(0, 30))
+        for timeline, other in [(first, second), (second, first), (first, first)]:
+            assert list(timeline.co_iter(other)) == list(
+                _naive_co_iter(timeline, other)
+            )
+
+
+def test_segmentation_matches_naive_implementation():
+    rng = random.Random(42)
+    for _ in range(500):
+        timeline = _random_timeline(rng, rng.randint(0, 30))
+        assert list(timeline.segmentation()) == list(_naive_segmentation(timeline))
